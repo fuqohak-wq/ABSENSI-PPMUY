@@ -4,22 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Manajemen PPMUY</title>
-    <!-- Tailwind CSS untuk Desain Modern & Futuristik -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome untuk Ikon Keren -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .page { display: none; }
         .page.active { display: block; }
+        /* Animasi Kartu Santri Menghilang */
+        .fade-out-absen {
+            animation: slideAway 0.4s ease forwards;
+        }
+        @keyframes slideAway {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: translateX(50px); }
+            100% { opacity: 0; transform: translateX(100px); max-height: 0; padding: 0; margin: 0; overflow: hidden; }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
 
     <!-- ========================================== -->
-    <!-- 1. HALAMAN LOGIN (Akses Semua Pengurus)    -->
+    <!-- 1. HALAMAN LOGIN                           -->
     <!-- ========================================== -->
     <div id="page-login" class="page active min-h-screen flex items-center justify-center p-4">
-        <div class="bg-slate-800/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-md transform transition-all">
+        <div class="bg-slate-800/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="inline-flex p-4 bg-emerald-500/10 rounded-full text-emerald-400 mb-3 text-3xl">
                     <i class="fa-solid fa-mosque"></i>
@@ -27,32 +34,20 @@
                 <h1 class="text-2xl font-bold tracking-tight">E-Pesantren PPMUY</h1>
                 <p class="text-slate-400 text-sm mt-1">Silakan masuk menggunakan akun pengurus Anda</p>
             </div>
-
             <form id="form-login" class="space-y-5">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Username</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="login-username" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
-                    </div>
+                    <input type="text" id="login-username" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
-
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Password / PIN</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
-                    </div>
+                    <input type="password" id="login-password" required class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
-
-                <div id="login-error" class="hidden text-sm bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span id="login-error-msg">Username atau Password salah.</span>
+                <div id="login-error" class="hidden text-sm bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Username atau PIN salah.
                 </div>
-
-                <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition-all duration-200 active:scale-98 flex items-center justify-center gap-2">
-                    <span>Masuk ke Sistem</span>
-                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition">
+                    Masuk ke Sistem
                 </button>
             </form>
         </div>
@@ -62,12 +57,11 @@
     <!-- 2. HALAMAN DASHBOARD UTAMA                 -->
     <!-- ========================================== -->
     <div id="page-dashboard" class="page min-h-screen flex flex-col">
-        <!-- Navbar Atas -->
         <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-shield-halved text-emerald-400 text-xl"></i>
                 <div>
-                    <h2 class="font-bold text-lg leading-tight" id="user-display-name">Nama Pengurus</h2>
+                    <h2 class="font-bold text-lg" id="user-display-name">Nama Pengurus</h2>
                     <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md font-medium uppercase tracking-wider" id="user-display-role">Role</span>
                 </div>
             </div>
@@ -76,154 +70,340 @@
             </button>
         </header>
 
-        <!-- Konten Utama Dashboard -->
         <main class="flex-1 p-6 max-w-7xl w-full mx-auto">
             <div class="mb-6">
                 <h3 class="text-xl font-bold">Pusat Kendali Pesantren</h3>
-                <p class="text-sm text-slate-400">Selamat datang kembali. Silakan pilih modul kerja Anda hari ini.</p>
+                <p class="text-sm text-slate-400">Silakan pilih modul kerja Anda hari ini.</p>
             </div>
-
-            <!-- Grid Menu Dinamis (Muncul Berdasarkan Hak Akses / Role) -->
-            <div id="menu-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Menu akan diinjeksi oleh JavaScript berdasarkan Role -->
-            </div>
+            <div id="menu-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </main>
     </div>
 
     <!-- ========================================== -->
-    <!-- JAVASCRIPT - LOGIKA HUBUNGAN KE API .GS    -->
+    <!-- 3. HALAMAN ABSENSI SEKOLAH (PANGGIL-HILANG)-->
+    <!-- ========================================== -->
+    <div id="page-absen-sekolah" class="page min-h-screen bg-slate-900">
+        <!-- Header Navigasi -->
+        <div class="bg-slate-800 border-b border-slate-700 px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-lg">
+            <div class="flex items-center gap-3">
+                <button onclick="showPage('page-dashboard')" class="text-slate-400 hover:text-white p-2 bg-slate-900 rounded-xl"><i class="fa-solid fa-arrow-left"></i></button>
+                <div>
+                    <h2 class="font-bold text-base md:text-lg">Absensi Manual Sekolah</h2>
+                    <p class="text-xs text-slate-400" id="info-mapel-guru">Mengabsen Kelas...</p>
+                </div>
+            </div>
+            <button onclick="selesaiDanRekapAbsen()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-md transition">
+                Selesai & Rekap (<span id="count-hadir">0</span>)
+            </button>
+        </div>
+
+        <!-- Form Setup Sebelum Mulai Absen -->
+        <div id="absen-setup" class="max-w-md mx-auto mt-10 p-6 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl mx-4">
+            <h3 class="text-lg font-bold mb-4 text-emerald-400"><i class="fa-solid fa-book-open mr-2"></i>Informasi Mengajar</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Mata Pelajaran / Kitab</label>
+                    <input type="text" id="absen-mapel" placeholder="Contoh: Fathul Qorib / Matematika" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 px-4 text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <button onclick="mulaiProsesAbsen()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <span>Mulai Panggil Absen</span>
+                    <i class="fa-solid fa-play text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Area Utama Pemanggilan Absen (Akan Muncul setelah Setup Selesai) -->
+        <div id="absen-panggil-area" class="hidden max-w-4xl mx-auto p-4 md:p-6">
+            <!-- Filter Pencarian Cepat -->
+            <div class="mb-6 relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="search-santri" oninput="filterCariSantri()" placeholder="Cari nama santri dengan cepat di sini..." class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-emerald-500 shadow-inner">
+            </div>
+
+            <!-- Grid Kartu Nama Santri -->
+            <div id="grid-santri-absen" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Kartu Santri dimasukkan via JS -->
+            </div>
+
+            <!-- Keterangan Jika Semua Sudah Terpanggil -->
+            <div id="empty-absen-state" class="hidden text-center py-16 bg-slate-800/40 rounded-2xl border border-dashed border-slate-700">
+                <div class="text-5xl text-emerald-400 mb-3"><i class="fa-regular fa-circle-check"></i></div>
+                <h4 class="text-lg font-bold">Semua Santri Sudah Dipanggil!</h4>
+                <p class="text-sm text-slate-400 mt-1">Sisa santri yang tidak diklik otomatis dianggap Alpa/Bolos.</p>
+                <button onclick="selesaiDanRekapAbsen()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm px-6 py-2.5 rounded-xl shadow-md transition">
+                    Lihat Rekap & Simpan ke Sheets
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. MODAL POPUP REKAP AKHIR                 -->
+    <!-- ========================================== -->
+    <div id="modal-rekap" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="p-5 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-list-check text-emerald-400 mr-2"></i>Konfirmasi Rekap Absen</h3>
+                <button onclick="tutupModalRekap()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto space-y-4 flex-1">
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl">
+                        <span class="block text-2xl font-bold text-emerald-400" id="rekap-total-hadir">0</span>
+                        <span class="text-xs text-slate-400 uppercase font-semibold">Hadir</span>
+                    </div>
+                    <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
+                        <span class="block text-2xl font-bold text-red-400" id="rekap-total-alpa">0</span>
+                        <span class="text-xs text-slate-400 uppercase font-semibold">Alpa / Tidak Hadir</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daftar Santri Alpa (Bolos):</h4>
+                    <ul id="list-santri-alpa" class="space-y-2 bg-slate-900 p-3 rounded-xl border border-slate-700 max-h-48 overflow-y-auto text-sm text-red-300">
+                        <!-- Diisi via JS -->
+                    </ul>
+                </div>
+            </div>
+            <div class="p-5 border-t border-slate-700 flex gap-3">
+                <button onclick="tutupModalRekap()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-xl transition">Periksa Lagi</button>
+                <button onclick="kirimAbsenKeSheets()" id="btn-kirim-sheets" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <span>Simpan Permanen</span>
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT CORE                            -->
     <!-- ========================================== -->
     <script>
-        // URL API Google Apps Script Anda
         const API_URL = "https://script.google.com/macros/s/AKfycbz0BZ-mwLGGhySPEz6H6krnScZoo7S8ZNLDAWh-dvCTQyhy62tkDV6RuCUotScR5REt7w/exec";
-
-        // Variabel Penyimpan Data User yang Sedang Login
+        
         let currentUser = null;
+        let masterSantri = []; // Menyimpan semua santri dari Sheets
+        let dataHadirNIK = []; // Menyimpan NIK santri yang DIKLIK HADIR
 
-        // Fungsi Pindah Halaman Tanpa Loading
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
         }
 
-        // Handle Form Login
-        document.getElementById('form-login').addEventListener('submit', async function(e) {
+        // Login Handler
+        document.getElementById('form-login').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const usernameInput = document.getElementById('login-username').value;
             const passwordInput = document.getElementById('login-password').value;
-            const btnLogin = document.getElementById('btn-login');
-            const errorDiv = document.getElementById('login-error');
-            const errorMsg = document.getElementById('login-error-msg');
-
-            // Efek Loading pada tombol
-            btnLogin.disabled = true;
-            btnLogin.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memverifikasi...</span>`;
-            errorDiv.classList.add('hidden');
-
-            try {
-                // Tembak data ke API Google Apps Script
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Penting untuk menghindari CORS issue pada Google App Script standar
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'login',
-                        username: usernameInput,
-                        password: passwordInput
-                    })
-                });
-
-                /* 
-                  Catatan khusus mode 'no-cors': Kita tidak bisa membaca isi JSON respons secara langsung.
-                  Untuk simulasi pengembangan cepat agar sistem langsung bisa dicoba di sisi Vercel/Lokal,
-                  kita lakukan verifikasi lokal jika no-cors aktif, atau sesuaikan skrip .gs di masa depan.
-                */
-                
-                // Pembacaan Data Simulasi Cepat (Karena no-cors mengosongkan response body demi keamanan browser)
-                // Kita akan tembak ulang atau lakukan bypass otentikasi pintar sesuai dengan user contoh di .gs Anda
-                // Di bawah ini adalah gerbang logika untuk membaca hasil dari users_pengurus Anda:
-                
-                // Bypass cerdas untuk pengembangan (Kita mengasumsikan data cocok dengan user contoh yang dibuat di .gs)
-                let mockRole = "";
-                let mockNama = "";
-
-                if (usernameInput === "admin_kiai" && passwordInput === "123456") { mockRole = "Kiai"; mockNama = "K.H. Masykur"; }
-                else if (usernameInput === "guru_ahmad" && passwordInput === "112233") { mockRole = "Guru"; mockNama = "Ustadz Ahmad"; }
-                else if (usernameInput === "keamanan_pondok" && passwordInput === "445566") { mockRole = "Keamanan"; mockNama = "Kang Ali"; }
-                else if (usernameInput === "kiosk_masjid" && passwordInput === "778899") { mockRole = "Kiosk"; mockNama = "Tablet Masjid"; }
-
-                if (mockRole !== "") {
-                    currentUser = { username: usernameInput, nama: mockNama, role: mockRole };
-                    suksesLogin(currentUser);
-                } else {
-                    throw new Error("Username atau Password/PIN salah!");
-                }
-
-            } catch (err) {
-                errorMsg.innerText = err.message || "Terjadi kesalahan jaringan.";
-                errorDiv.classList.remove('hidden');
-                btnLogin.disabled = false;
-                btnLogin.innerHTML = `<span>Masuk ke Sistem</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+            
+            let mockRole = ""; let mockNama = "";
+            if (usernameInput === "admin_kiai" && passwordInput === "123456") { mockRole = "Kiai"; mockNama = "K.H. Masykur"; }
+            else if (usernameInput === "guru_ahmad" && passwordInput === "112233") { mockRole = "Guru"; mockNama = "Ustadz Ahmad"; }
+            else if (usernameInput === "keamanan_pondok" && passwordInput === "445566") { mockRole = "Keamanan"; mockNama = "Kang Ali"; }
+            
+            if (mockRole !== "") {
+                currentUser = { username: usernameInput, nama: mockNama, role: mockRole };
+                document.getElementById('user-display-name').innerText = currentUser.nama;
+                document.getElementById('user-display-role').innerText = currentUser.role;
+                renderMenu(currentUser.role);
+                showPage('page-dashboard');
+                // Tarik data master santri di background agar siap dipakai saat absen dibuka
+                loadMasterSantri();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
             }
         });
 
-        // Aksi Ketika Login Sukses
-        function suksesLogin(user) {
-            document.getElementById('user-display-name').innerText = user.nama;
-            document.getElementById('user-display-role').innerText = user.role;
-            
-            // Generate Menu Berdasarkan Role
-            renderMenu(user.role);
-            
-            // Pindah ke Halaman Dashboard
-            showPage('page-dashboard');
-            
-            // Reset Form
-            document.getElementById('form-login').reset();
-            document.getElementById('btn-login').disabled = false;
-            document.getElementById('btn-login').innerHTML = `<span>Masuk ke Sistem</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
-        }
-
-        // Mengatur Menu yang Muncul Berdasarkan Siapa Yang Login (Sesuai Kesepakatan)
         function renderMenu(role) {
             const container = document.getElementById('menu-container');
-            container.innerHTML = ""; // Bersihkan menu lama
-
-            // Daftar Seluruh Modul Webapp PPMUY
+            container.innerHTML = "";
             const semuaMenu = [
-                { id: 'jamaah', nama: 'Absensi Wajah Jamaah', ikon: 'fa-user-check', warna: 'bg-indigo-600', roles: ['Kiai', 'Kiosk'] },
                 { id: 'sekolah', nama: 'Absensi Sekolah (Manual)', ikon: 'fa-graduation-cap', warna: 'bg-emerald-600', roles: ['Kiai', 'Guru'] },
+                { id: 'jamaah', nama: 'Absensi Wajah Jamaah', ikon: 'fa-user-check', warna: 'bg-indigo-600', roles: ['Kiai'] },
                 { id: 'perizinan', nama: 'Perizinan Santri', ikon: 'fa-id-card', warna: 'bg-amber-600', roles: ['Kiai', 'Keamanan'] },
-                { id: 'pelanggaran', nama: 'Data Pelanggaran (Ta\'zir)', ikon: 'fa-gavel', warna: 'bg-red-600', roles: ['Kiai', 'Keamanan'] },
-                { id: 'piket', nama: 'Piket Kebersihan Asrama', ikon: 'fa-broom', warna: 'bg-cyan-600', roles: ['Kiai', 'Kebersihan'] },
-                { id: 'evaluasi', nama: 'Evaluasi Pelajaran', ikon: 'fa-chart-simple', warna: 'bg-purple-600', roles: ['Kiai', 'Guru'] }
+                { id: 'pelanggaran', nama: 'Data Pelanggaran (Ta\'zir)', ikon: 'fa-gavel', warna: 'bg-red-600', roles: ['Kiai', 'Keamanan'] }
             ];
-
-            // Filter menu sesuai role user yang login
             semuaMenu.forEach(menu => {
                 if (menu.roles.includes(role)) {
                     const card = document.createElement('button');
-                    card.className = `p-5 rounded-2xl ${menu.warna} text-left shadow-lg hover:scale-[1.02] active:scale-98 transition duration-200 flex flex-col justify-between h-40 group cursor-pointer w-full`;
+                    card.className = `p-5 rounded-2xl ${menu.warna} text-left shadow-lg hover:scale-[1.02] active:scale-98 transition flex flex-col justify-between h-40 cursor-pointer w-full`;
                     card.onclick = () => bukaModul(menu.id);
-                    card.innerHTML = `
-                        <div class="p-3 bg-white/10 rounded-xl w-fit text-xl group-hover:scale-110 transition"><i class="fa-solid ${menu.ikon}"></i></div>
-                        <div>
-                            <h4 class="font-bold text-lg">${menu.nama}</h4>
-                            <p class="text-xs text-white/70 mt-1">Buka modul aplikasi &rarr;</p>
-                        </div>
-                    `;
+                    card.innerHTML = `<div class="p-3 bg-white/10 rounded-xl w-fit text-xl"><i class="fa-solid ${menu.ikon}"></i></div><div><h4 class="font-bold text-lg">${menu.nama}</h4><p class="text-xs text-white/70 mt-1">Buka modul &rarr;</p></div>`;
                     container.appendChild(card);
                 }
             });
         }
 
-        // Fungsi Trigger Klik Menu Modul
         function bukaModul(modulId) {
-            alert("Anda membuka modul: " + modulId + ". Fitur ini akan kita aktifkan di tahap berikutnya!");
+            if (modulId === 'sekolah') {
+                showPage('page-absen-sekolah');
+                document.getElementById('absen-setup').classList.remove('hidden');
+                document.getElementById('absen-panggil-area').classList.add('hidden');
+                dataHadirNIK = [];
+                document.getElementById('count-hadir').innerText = "0";
+            } else {
+                alert("Modul " + modulId + " akan menyusul di tahap berikutnya!");
+            }
         }
 
-        // Fungsi Logout
+        // AMBIL DATA SANTRI DARI .GS SHEET MASTER
+        async function loadMasterSantri() {
+            try {
+                // Gunakan fetch dengan method POST sesuai konfigurasi doPost .gs
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "getDaftarSantri" })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    masterSantri = result.data;
+                }
+            } catch (e) {
+                console.error("Gagal memuat data santri dari Google Sheets:", e);
+            }
+        }
+
+        // PROSES PERSIAPAN JALAN ABSEN
+        function mulaiProsesAbsen() {
+            const mapel = document.getElementById('absen-mapel').value;
+            if (!mapel) return alert("Ketik nama mata pelajaran/kitab dulu Ustadz!");
+            
+            document.getElementById('info-mapel-guru').innerText = `${mapel} | Diajar oleh: ${currentUser.nama}`;
+            document.getElementById('absen-setup').classList.add('hidden');
+            document.getElementById('absen-panggil-area').classList.remove('hidden');
+            
+            buildKartuSantri();
+        }
+
+        // RE-BUILD GRID KARTU SANTRI YANG BELUM DIABSEN
+        function buildKartuSantri() {
+            const grid = document.getElementById('grid-santri-absen');
+            grid.innerHTML = "";
+            
+            // Tampilkan hanya santri yang BELUM diklik hadir
+            const sisaSantri = masterSantri.filter(s => !dataHadirNIK.includes(s.nik));
+            
+            if (sisaSantri.length === 0) {
+                document.getElementById('empty-absen-state').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('empty-absen-state').classList.add('hidden');
+            }
+
+            sisaSantri.forEach(santri => {
+                const card = document.createElement('div');
+                card.id = `card-${santri.nik}`;
+                card.className = "bg-slate-800 border border-slate-700 p-4 rounded-xl flex items-center justify-between shadow-md transition duration-150 hover:border-emerald-500/50";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-slate-100 text-sm md:text-base">${santri.nama}</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Kamar: ${santri.kamar} | Kelas: ${santri.kelas}</p>
+                    </div>
+                    <button onclick="klikSantriHadir('${santri.nik}')" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-check"></i> Hadir
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // FUNGSI INI YANG MEMBUAT EFEK PANGGIL - KLIK - HILANG FUTURISTIK
+        function klikSantriHadir(nik) {
+            const card = document.getElementById(`card-${nik}`);
+            if (card) {
+                card.classList.add('fade-out-absen'); // Jalankan animasi CSS menghilang
+                
+                // Tunggu animasi berdurasi 400ms selesai, lalu hapus dari DOM & update data
+                setTimeout(() => {
+                    dataHadirNIK.push(nik);
+                    document.getElementById('count-hadir').innerText = dataHadirNIK.length;
+                    buildKartuSantri(); // Refresh grid sisa santri
+                }, 400);
+            }
+        }
+
+        // FITUR CARI KARTU SECARA REALTIME SAAT KETIK NAMA
+        function filterCariSantri() {
+            const keyword = document.getElementById('search-santri').value.toLowerCase();
+            masterSantri.forEach(santri => {
+                const card = document.getElementById(`card-${santri.nik}`);
+                if (card) {
+                    if (santri.nama.toLowerCase().includes(keyword)) {
+                        card.style.display = "flex";
+                    } else {
+                        card.style.display = "none";
+                    }
+                }
+            });
+        }
+
+        // HITUNG REKAP AKHIR (YANG TIDAK DIKLIK = ALPA)
+        function selesaiDanRekapAbsen() {
+            const alpaSantri = masterSantri.filter(s => !dataHadirNIK.includes(s.nik));
+            
+            document.getElementById('rekap-total-hadir').innerText = dataHadirNIK.length;
+            document.getElementById('rekap-total-alpa').innerText = alpaSantri.length;
+            
+            const listUl = document.getElementById('list-santri-alpa');
+            listUl.innerHTML = "";
+            
+            if (alpaSantri.length === 0) {
+                listUl.innerHTML = "<li class='text-emerald-400 text-xs italic text-center py-2'>Nihil (Semua santri masuk sekolah)</li>";
+            } else {
+                alpaSantri.forEach(s => {
+                    listUl.innerHTML += `<li class="flex justify-between border-b border-slate-800 py-1"><span>${s.nama}</span> <span class="text-slate-500 text-xs">${s.kelas}</span></li>`;
+                });
+            }
+            
+            document.getElementById('modal-rekap').classList.remove('hidden');
+        }
+
+        function tutupModalRekap() {
+            document.getElementById('modal-rekap').classList.add('hidden');
+        }
+
+        // KIRIM DATA REKAP AKHIR KE GOOGLE SHEETS VIA API
+        async function kirimAbsenKeSheets() {
+            const btn = document.getElementById('btn-kirim-sheets');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Menyimpan...`;
+            
+            const mapel = document.getElementById('absen-mapel').value;
+            
+            // Susun data gabungan (Hadir + Alpa) untuk ditembak sekaligus
+            const payloadAbsen = masterSantri.map(s => {
+                return {
+                    nik: s.nik,
+                    status: dataHadirNIK.includes(s.nik) ? "Hadir" : "Alpa"
+                }
+            });
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "simpanAbsenSekolah",
+                        guru: currentUser.nama,
+                        mapel: mapel,
+                        dataHadir: payloadAbsen
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert("Alhamdulillah, data absensi berhasil masuk ke Google Sheets!");
+                    tutupModalRekap();
+                    showPage('page-dashboard');
+                } else {
+                    alert("Gagal menyimpan: " + result.message);
+                }
+            } catch (e) {
+                alert("Terjadi gangguan jaringan saat mengirim ke Google Sheets.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Simpan Permanen</span> <i class="fa-solid fa-cloud-arrow-up"></i>`;
+            }
+        }
+
         function logout() {
             currentUser = null;
             showPage('page-login');
