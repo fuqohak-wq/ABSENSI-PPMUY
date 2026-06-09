@@ -467,37 +467,33 @@
         }
 
         async function prosesLoginSistem() {
-            let u = document.getElementById('login-username').value;
-            let p = document.getElementById('login-password').value;
+    let u = document.getElementById('login-username').value;
+    let p = document.getElementById('login-password').value;
 
-            if(!u || !p) return Swal.fire('Gagal', 'Kolom username dan password wajib diisi!', 'warning');
-            
-            Swal.fire({ title: 'Memverifikasi Akun...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            try {
-                let r = await fetch(`${URL_API}?aksi=login_pengurus&user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`);
-                let res = await r.json();
-                if(res.status === "success") {
-                    localStorage.setItem('ppmuy_session', JSON.stringify({ username: u, token: Date.now() }));
-                    document.getElementById('halaman-login').classList.add('hidden');
-                    document.getElementById('sidebar-utama').classList.remove('hidden');
-                    document.getElementById('konten-utama').classList.remove('hidden');
-                    document.getElementById('txt-role-pengurus').innerText = "Akses: " + u.toUpperCase();
-                    Swal.close();
-                    initApp();
-                } else {
-                    Swal.fire('Akses Ditolak', 'Kombinasi password atau username pengurus salah!', 'error');
-                }
-            } catch(e) {
-                Swal.fire('Error Koneksi', 'Gagal terhubung dengan server WebApp: ' + e.toString(), 'error');
-            }
+    if(!u || !p) return Swal.fire('Gagal', 'Kolom Username dan Password wajib diisi!', 'warning');
+    
+    Swal.fire({ title: 'Memverifikasi Akun...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    
+    try {
+        // Parameter disesuaikan agar sesuai dengan nama kolom di spreadsheet (Username & Password_PIN)
+        let r = await fetch(`${URL_API}?aksi=login_pengurus&Username=${encodeURIComponent(u)}&Password_PIN=${encodeURIComponent(p)}`);
+        let res = await r.json();
+        
+        if(res.status === "success") {
+            localStorage.setItem('ppmuy_session', JSON.stringify({ username: u, token: Date.now() }));
+            document.getElementById('halaman-login').classList.add('hidden');
+            document.getElementById('sidebar-utama').classList.remove('hidden');
+            document.getElementById('konten-utama').classList.remove('hidden');
+            document.getElementById('txt-role-pengurus').innerText = "Akses: " + u.toUpperCase();
+            Swal.close();
+            initApp();
+        } else {
+            Swal.fire('Akses Ditolak', 'Kombinasi Username atau Password PIN salah!', 'error');
         }
-
-        function prosesLogoutSistem() {
-            localStorage.removeItem('ppmuy_session');
-            matikanSemuaKamera();
-            window.location.reload();
-        }
+    } catch(e) {
+        Swal.fire('Error Koneksi', 'Gagal terhubung dengan server WebApp: ' + e.toString(), 'error');
+    }
+}
 
         // 2. ROOT INITIALIZER (MEMUAT MODEL JAVASCRIPT & DATABASE LAMA)
         async function initApp() {
