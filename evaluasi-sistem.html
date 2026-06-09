@@ -1,1 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Takziran & Poin Harian - E-Pesantren</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body, header, div, section, button, table, td, th, footer, input, select {
+            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .theme-dark {
+            --bg-main: #0f172a;
+            --bg-header: #020617;
+            --bg-box: #020617;
+            --bg-inner: #0f172a;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --border-row: #020617;
+            --text-row: #cbd5e1;
+        }
 
+        .theme-light {
+            --bg-main: #f0f4f8;
+            --bg-header: #ffffff;
+            --bg-box: #ffffff;
+            --bg-inner: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-row: #f1f5f9;
+            --text-row: #334155;
+        }
+
+        body { background-color: var(--bg-main); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; }
+        .dynamic-bg-main { background-color: var(--bg-main); }
+        .dynamic-bg-header { background-color: var(--bg-header); }
+        .dynamic-bg-box { background-color: var(--bg-box); }
+        .dynamic-bg-inner { background-color: var(--bg-inner); }
+        .dynamic-text-main { color: var(--text-main); }
+        .dynamic-text-muted { color: var(--text-muted); }
+        .dynamic-border { border-color: var(--border-color); }
+        .dynamic-border-row { border-color: var(--border-row); }
+        .dynamic-text-row { color: var(--text-row); }
+
+        /* Mode Cetak Surat / Dokumen Laporan */
+        @media print {
+            body * { visibility: hidden; background: transparent !important; color: #000 !important; }
+            #area-cetak, #area-cetak * { visibility: visible; }
+            #area-cetak { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+            .badge-print { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body class="theme-dark min-h-screen flex flex-col justify-between antialiased">
+
+    <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm no-print">
+        <div class="flex items-center gap-3">
+            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-yellow-400 border dynamic-border shadow-sm">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">REKAP TAKZIRAN & POIN HARIAN</h1>
+                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">SISTEM INTEGRASI</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow text-amber-400">
+                <i class="fa-solid fa-sun text-base"></i>
+            </button>
+            <button onclick="window.print()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-sky-400 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow" title="Cetak PDF/Kertas">
+                <i class="fa-solid fa-print"></i>
+            </button>
+        </div>
+    </header>
+
+    <main id="area-cetak" class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
+        
+        <div class="hidden print:flex flex-col items-center text-center border-b-4 border-double border-slate-900 pb-4 mb-4">
+            <h2 class="text-lg font-black tracking-wide uppercase">PONDOK PESANTREN MODERN PUSAT YOGYAKARTA (PPMUY)</h2>
+            <p class="text-xs font-bold tracking-wider text-slate-600 uppercase">Laporan Rekapitulasi Poin Kedisiplinan & Takzir Edukatif Santri</p>
+            <p id="print-tanggal" class="text-[10px] font-mono mt-1 text-slate-500">Tanggal Cetak: --:--:--</p>
+        </div>
+
+        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 flex flex-col md:flex-row gap-4 justify-between items-center shadow-sm no-print">
+            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <div class="flex flex-col gap-1 w-full sm:w-auto">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Pilih Golongan</label>
+                    <select id="filter-golongan" onchange="filterDanRenderData()" class="dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                        <option value="SANTRI" selected>SANTRI (13 Kegiatan)</option>
+                        <option value="USTADZ">USTADZ (5 Kegiatan)</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1 w-full sm:w-auto">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Takzir</label>
+                    <select id="filter-status" onchange="filterDanRenderData()" class="dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                        <option value="SEMUA">-- SEMUA STATUS --</option>
+                        <option value="AMAN">🟢 AMAN (0 Poin)</option>
+                        <option value="TEGURAN">🟡 TEGURAN RINGAN (1-5 Poin)</option>
+                        <option value="SEDANG">🟠 TAKZIR SEDANG (6-15 Poin)</option>
+                        <option value="KERAS">🔴 PERINGATAN KERAS (16-30 Poin)</option>
+                        <option value="BERAT">🚨 PELANGGARAN BERAT (31-50 Poin)</option>
+                        <option value="DARURAT">⚫ DARURAT / EVALUASI (>50 Poin)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1 w-full md:w-64">
+                <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Cari Nama / NIK</label>
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
+                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama santri..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
+                </div>
+            </div>
+        </section>
+
+        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 sm:p-5 shadow-sm flex-1 flex flex-col">
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left text-[11px] sm:text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b-2 dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
+                            <th class="py-3 px-2 w-24">NIK</th>
+                            <th class="py-3 px-2 w-48">NAMA LENGKAP</th>
+                            <th class="py-3 px-2 text-center w-20">JUMLAH POIN</th>
+                            <th class="py-3 px-2">ISI TAKZIRAN (HUMANIS-EDUKATIF)</th>
+                            <th class="py-3 px-2 text-right w-36">STATUS TINGKAT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-rekap-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
+                                <i class="fa-solid fa-spinner animate-spin text-lg text-yellow-500 block mb-2"></i>
+                                Memuat & Mengalkulasi Sesi Log Harian...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">
+        SISTEM VALIDASI TAKZIR OTOMATIS HUB • @2026
+    </footer>
+
+    <script>
+        // Gunakan URL API yang sama dengan sistem inti Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        
+        // Penampung data mentah global dari Google Sheet
+        let masterDataMentah = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Validasi Sesi Keamanan Gerbang Utama
+            const nama = localStorage.getItem('session_nama');
+            const role = localStorage.getItem('session_role');
+            if (!nama || !role) { window.location.href = "index.html"; return; }
+
+            // Sinkronisasi Setelan Tema Dashboard
+            const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
+            setTemaAplikasi(temaSimpanan);
+
+            // Tampilkan tanggal cetak real-time untuk arsip fisik kertas
+            const opsiWaktu = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('print-tanggal').innerText = `Tanggal Cetak Dokumen: ${new Date().toLocaleDateString('id-ID', opsiWaktu)} WIB`;
+
+            // Ambil data dari database
+            ambilDataRekapSheet();
+        });
+
+        // SIMULASI GENERATE DATA (Agar Pengurus langsung melihat visualisasi fleksibilitas rumusnya)
+        function generateDataSimulasi() {
+            return [
+                { nik: "20260101", nama: "AHMAD REZKY MAULANA", golongan: "SANTRI", bolos: 4, piket: 0, pelanggaran: 0, izin: 3 }, // (4+0+0) - 3 = 1 Poin
+                { nik: "20260102", nama: "MUHAMMAD ILHAM HAKIM", golongan: "SANTRI", bolos: 0, piket: 10, pelanggaran: 0, izin: 0 }, // 0 + 10 = 10 Poin
+                { nik: "20260103", nama: "ZULFAKRI ARIF", golongan: "SANTRI", bolos: 12, piket: 10, pelanggaran: 5, izin: 0 }, // 12+10+5 = 27 Poin
+                { nik: "20260104", nama: "SITI NUR HALIZA", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 50, izin: 6 }, // 0+0+50-6 = 44 Poin
+                { nik: "20260105", nama: "FATHUR RAHMAN", golongan: "SANTRI", bolos: 13, piket: 10, pelanggaran: 50, izin: 3 }, // 13+10+50-3 = 70 Poin
+                { nik: "20260106", nama: "DEDI JUNAEDI", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 0, izin: 0 }, // 0 Poin (Aman)
+                { nik: "19900211", nama: "USTADZ KHIRZUL YAMANI", golongan: "USTADZ", bolos: 2, piket: 0, pelanggaran: 10, izin: 0 }, // 2+10 = 12 Poin
+                { nik: "19880514", nama: "USTADZ HASAN BASRI", golongan: "USTADZ", bolos: 0, piket: 0, pelanggaran: 0, izin: 3 } // 0 Poin
+            ];
+        }
+
+        async function ambilDataRekapSheet() {
+            try {
+                // Di masa depan tinggal aktifkan fetch asli ini:
+                // let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
+                // let r = await res.json();
+                // masterDataMentah = r.data;
+
+                // Sekarang kita gunakan basis data simulasi fleksibel yang dihitung real-time:
+                masterDataMentah = generateDataSimulasi();
+                filterDanRenderData();
+            } catch (err) {
+                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran.</td></tr>`;
+            }
+        }
+
+        // FUNGSI UTAMA: MENGHITUNG FORMULA DAN MENENTUKAN MATRIKS TAKZIRAN HUMANIS
+        function hitungMatriksPoinDanTakzir(item) {
+            // RUMUS FLUIDA KITA: (Bolos + Piket + Pelanggaran) - Izin/Khidmah/Melekan
+            let totalHitung = (parseInt(item.bolos) + parseInt(item.piket) + parseInt(item.pelanggaran)) - parseInt(item.izin);
+            
+            // Kunci Batas Bawah: Tidak boleh ada nilai minus
+            let poinAkhir = totalHitung < 0 ? 0 : totalHitung;
+
+            let statusTingkat = "";
+            let isiTakziran = "";
+            let warnaBadge = "";
+
+            // PENCOCOKAN DENGAN MATRIKS HUMANIS YANG KITA RUMUSKAN
+            if (poinAkhir === 0) {
+                statusTingkat = "AMAN";
+                isiTakziran = "Bebas Takziran (Bersih harian)";
+                warnaBadge = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
+            } else if (poinAkhir >= 1 && poinAkhir <= 5) {
+                statusTingkat = "TEGURAN RINGAN";
+                isiTakziran = "Sanksi Literasi: Merangkum 1 lembar halaman kitab akhlak/sejarah nabi di perpustakaan pondok.";
+                warnaBadge = "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+            } else if (poinAkhir >= 6 && poinAkhir <= 15) {
+                statusTingkat = "TAKZIR SEDANG";
+                isiTakziran = "Khidmah Fasilitas Umum: Merapikan rak literasi buku perpustakaan atau ro'an membersihkan area halaman masjid.";
+                warnaBadge = "bg-orange-500/15 text-orange-600 dark:text-orange-400";
+            } else if (poinAkhir >= 16 && poinAkhir <= 30) {
+                statusTingkat = "PERINGATAN KERAS";
+                isiTakziran = "Khidmah Dapur Umum: Membantu tim logistik dapur mengupas bahan masakan dan cuci peralatan masak besar selama 1 hari.";
+                warnaBadge = "bg-rose-500/15 text-rose-600 dark:text-rose-400";
+            } else if (poinAkhir >= 31 && poinAkhir <= 50) {
+                statusTingkat = "PELANGGARAN BERAT";
+                isiTakziran = "Isolasi Spiritual Mandiri: Wajib i'tikaf di saf pertama masjid membaca Al-Qur'an dari ba'da Ashar sampai Maghrib (3 hari rutin).";
+                warnaBadge = "bg-red-600 text-white dark:bg-red-950 dark:text-red-300";
+            } else {
+                statusTingkat = "DARURAT / EVALUASI";
+                isiTakziran = "Sidang Pengasuh & Khidmah Ndalem Terbimbing: Pemanggilan Orang Tua ke pondok serta tugas bantu kebersihan area ndalem Kyai.";
+                warnaBadge = "bg-slate-950 text-yellow-400 border border-yellow-500";
+            }
+
+            return { poinAkhir, statusTingkat, isiTakziran, warnaBadge };
+        }
+
+        // FILTERISASI DAN RENDERING DATA KE TABEL HTML
+        function filterDanRenderData() {
+            const tblBody = document.getElementById('tbl-rekap-body');
+            const golSelected = document.getElementById('filter-golongan').value;
+            const statusSelected = document.getElementById('filter-status').value;
+            const cariKeyword = document.getElementById('cari-nama').value.toUpperCase();
+
+            if (!tblBody) return;
+            tblBody.innerHTML = '';
+
+            // Saring data berdasarkan input kontrol pengurus
+            let dataTersaring = masterDataMentah.filter(item => {
+                let hasilMatriks = hitungMatriksPoinDanTakzir(item);
+                
+                // Match 1: Golongan (Santri/Ustadz)
+                let matchGol = (item.golongan === golSelected);
+                
+                // Match 2: Kata Kunci Pencarian NIK/Nama
+                let matchCari = (item.nama.includes(cariKeyword) || item.nik.includes(cariKeyword));
+                
+                // Match 3: Drop-down Status Tingkat Takziran
+                let matchStatus = false;
+                if (statusSelected === "SEMUA") matchStatus = true;
+                else if (statusSelected === "AMAN" && hasilMatriks.poinAkhir === 0) matchStatus = true;
+                else if (statusSelected === "TEGURAN" && hasilMatriks.poinAkhir >= 1 && hasilMatriks.poinAkhir <= 5) matchStatus = true;
+                else if (statusSelected === "SEDANG" && hasilMatriks.poinAkhir >= 6 && hasilMatriks.poinAkhir <= 15) matchStatus = true;
+                else if (statusSelected === "KERAS" && hasilMatriks.poinAkhir >= 16 && hasilMatriks.poinAkhir <= 30) matchStatus = true;
+                else if (statusSelected === "BERAT" && hasilMatriks.poinAkhir >= 31 && hasilMatriks.poinAkhir <= 50) matchStatus = true;
+                else if (statusSelected === "DARURAT" && hasilMatriks.poinAkhir > 50) matchStatus = true;
+
+                return matchGol && matchCari && matchStatus;
+            });
+
+            if (dataTersaring.length === 0) {
+                tblBody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap takziran ditemukan yang cocok.</td></tr>`;
+                return;
+            }
+
+            // Suntikkan baris data ke tabel HTML
+            dataTersaring.forEach(item => {
+                let m = hitungMatriksPoinDanTakzir(item);
+                let tr = document.createElement('tr');
+                tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${item.nik}</td>
+                    <td class="py-3 px-2 uppercase font-black tracking-wide">${item.nama}</td>
+                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${m.poinAkhir > 0 ? 'text-rose-500' : 'text-emerald-500'}">${m.poinAkhir} Ppt</td>
+                    <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${m.isiTakziran}</td>
+                    <td class="py-3 px-2 text-right">
+                        <span class="badge-print px-2.5 py-1 rounded-md text-[9px] font-black tracking-wider inline-block ${m.warnaBadge}">
+                            ${m.statusTingkat}
+                        </span>
+                    </td>
+                `;
+                tblBody.appendChild(tr);
+            });
+        }
+
+        // PENGATURAN LOGIKA TEMA (DARK / LIGHT)
+        function toggleTema() {
+            const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
+            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
+            setTemaAplikasi(newTheme);
+        }
+
+        function setTemaAplikasi(tema) {
+            const btnTema = document.getElementById('btn-tema');
+            if (tema === 'theme-light') {
+                document.body.classList.remove('theme-dark');
+                document.body.classList.add('theme-light');
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-indigo-950"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-light');
+            } else {
+                document.body.classList.remove('theme-light');
+                document.body.classList.add('theme-dark');
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-dark');
+            }
+            filterDanRenderData();
+        }
+    </script>
+</body>
+</html>
