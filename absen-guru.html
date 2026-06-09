@@ -223,32 +223,28 @@
             }
         }
 
+        // REALTIME CLOUD DETECTOR: Mengambil data langsung dari stampsheet absensi_sekolah hari ini
         async function tarikLiveFeedHadirDashboard() {
             logHadirHariIni = [];
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_guru_realtime`, { method: "GET" });
                 let r = await res.json();
-                if (r.status === "success" && r.liveFeed) {
-                    r.liveFeed.forEach(log => {
-                        // Jika kolom shalat berisi kata "JAM" atau "BEBAS", atau petugas mengandung kata "sekolah"
-                        if (log.shalat.toUpperCase().includes("JAM") || log.shalat === "BEBAS" || log.petugas.toLowerCase().includes("sekolah")) {
-                            let namaClean = log.nama.toUpperCase().trim();
-                            
-                            let dataJadwalAsli = masterJadwal.find(j => j.nama.toUpperCase().trim() === namaClean);
-                            
-                            let labelJamDanMapel = dataJadwalAsli 
-                                ? `${dataJadwalAsli.jam || "Mengajar"} - ${dataJadwalAsli.mapel}`
-                                : `${log.shalat} - ${log.petugas}`;
+                
+                if (r.status === "success" && r.liveFeedGuru) {
+                    r.liveFeedGuru.forEach(log => {
+                        let namaClean = log.nama.toUpperCase().trim();
+                        let labelJamDanMapel = `${log.shalat || "Mengajar"} - ${log.petugas || "Mapel"}`;
 
-                            logHadirHariIni.push({
-                                jamLog: log.jam || "Hari Ini",
-                                nama: namaClean,
-                                mapel: labelJamDanMapel
-                            });
-                        }
+                        logHadirHariIni.push({
+                            jamLog: log.jam || "Hari Ini",
+                            nama: namaClean,
+                            mapel: labelJamDanMapel
+                        });
                     });
                 }
-            } catch(e) { console.log("Log absensi lokal masih kosong."); }
+            } catch(e) { 
+                console.log("Log database cloud absensi_sekolah kosong atau gagal dimuat."); 
+            }
         }
 
         async function muatDataJadwalGuru() {
@@ -365,8 +361,7 @@
             paramsAbsen.append('mapel', guruData.mapel);
             paramsAbsen.append('kelas', guruData.kelas || "A");
             paramsAbsen.append('gender', gender);
-            // KUNCI UTAMA: Ikut kirimkan string "Jam 1", "Jam 2", dll ke Apps Script
-            paramsAbsen.append('jam', guruData.jam || "BEBAS"); 
+            paramsAbsen.append('jam', guruData.jam || "BEBAS"); // Mengirimkan jam aslinya (Jam 1, Jam 2, dst)
 
             try {
                 let resAbsen = await fetch(API_URL, { 
