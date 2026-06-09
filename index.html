@@ -394,32 +394,27 @@
     </main>
 
     <script>
-        // Kunci Tembakan URL Webapp Apps Script Terintegrasi
+        // Kunci Tembakan URL Webapp Apps Script Anda yang Baru (Sama dengan konstanta code.gs)
         const URL_API = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
 
-        // Global Storage Cache Aplikasi
+        // Global Data Storage Cache
         let dbSantriCache = [];
         let globalRekapAlpa = {};
         let myChartWajah = null;
         let myChartShalat = null;
-        let streamKameraKiosk = null;
-        let streamKameraReg = null;
 
-        // Booting awal saat aplikasi pertama dimuat
+        // Jalankan Pemuatan Fungsi Otomatis Saat Aplikasi Pertama Dibuka
         window.addEventListener('DOMContentLoaded', () => {
             initApp();
         });
 
         async function initApp() {
             Swal.fire({ title: 'Memuat Ekosistem...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            // Mengunduh Bobot Model Face API AI
+            // Load Model Face API Terlebih Dahulu agar Kiosk Kamera Siap
             try {
                 await faceapi.nets.ssdMobilenetv1.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
-            } catch(e) { 
-                console.log("Load weights offline/CDN bypassed."); 
-            }
+            } catch(e) { console.log("Load weights offline/CDN bypassed."); }
             
             await muatDatabaseSantri();
             await muatDataDashboard();
@@ -427,45 +422,50 @@
             Swal.close();
         }
 
-        // 1. NAVIGATION CONTROL (SPA ENGINE)
+        // 1. ENGINE PENGENDALI NAVIGASI WINDOWS (SPA CORE)
         function bukaMenu(idMenu) {
+            // Sembunyikan seluruh kontainer halaman
             document.querySelectorAll('.menu-content').forEach(section => section.classList.add('hidden'));
+            // Hapus status aktif dari link navigasi sidebar
             document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
             
+            // Tampilkan halaman target yang diminta
             document.getElementById(idMenu).classList.remove('hidden');
             document.getElementById('btn-' + idMenu).classList.add('active');
-            
+
+            // Setel otomatis Judul Top Bar
             let textJudul = document.getElementById('btn-' + idMenu).innerText;
             document.getElementById('judul-halaman').innerText = textJudul;
 
-            // Kamera Manajemen Otomatis demi performa perangkat
+            // Kendali Otomatis Aktivasi Kamera (Hanya menyala saat menu Kiosk/Daftar dibuka)
             matikanSemuaKamera();
             if (idMenu === 'menu-scan') aktifkanKameraKiosk();
             if (idMenu === 'menu-daftar-wajah') aktifkanKameraReg();
         }
 
-        // 2. FETCH DATABASE MASTER KE DROPDOWN SELECT
+        // 2. AMBIL DATABASE MASTER SANTRI UNTUK DROPDOWN SEKALIGUS
         async function muatDatabaseSantri() {
             try {
                 let r = await fetch(`${URL_API}?aksi=ambil_database`);
                 let res = await r.json();
                 if(res.status === "success") {
                     dbSantriCache = res.data;
+                    
+                    // Suntikkan massal data ke seluruh dropdown select di aplikasi
                     let htmlOpt = `<option value="">-- Pilih Nama Santri --</option>`;
                     dbSantriCache.forEach(s => {
                         htmlOpt += `<option value="${s.nik}" data-nama="${s.nama}">${s.nama} (${s.kelas})</option>`;
                     });
+
                     document.getElementById('reg-pilih-santri').innerHTML = htmlOpt;
                     document.getElementById('izin-santri').innerHTML = htmlOpt;
                     document.getElementById('disp-santri').innerHTML = htmlOpt;
                     document.getElementById('pelanggaran-santri').innerHTML = htmlOpt;
                 }
-            } catch(e) { 
-                console.log("Gagal memuat dropdown santri: " + e); 
-            }
+            } catch(e) { console.log("Gagal memuat dropdown santri: " + e); }
         }
 
-        // 3. GRAPH ENGINE & MAIN DASHBOARD
+        // 3. AMBIL DATA REKAP UTAMA & RENDER GRAFIK DASHBOARD KIAI
         async function muatDataDashboard() {
             try {
                 let r = await fetch(`${URL_API}?aksi=ambil_rekap_dashboard`);
@@ -473,55 +473,38 @@
                 if(res.status === "success") {
                     document.getElementById('txt-total-sudah-wajah').innerText = res.rekapWajah.sudah;
                     document.getElementById('txt-total-belum-wajah').innerText = res.rekapWajah.belum;
-                    globalRekapAlpa = res.daftarAlpa;
+                    globalRekapAlpa = res.daftarAlpa; // Ikat data alpa ke memori global harian
 
-                    // Render Grafik Doughnut Registrasi Wajah
+                    // Render atau Update Diagram Lingkaran Pendaftaran Wajah
                     if(myChartWajah) myChartWajah.destroy();
                     myChartWajah = new Chart(document.getElementById('chartWajah'), {
                         type: 'doughnut',
                         data: {
                             labels: ['Sudah', 'Belum'],
-                            datasets: [{
-                                data: [res.rekapWajah.sudah, res.rekapWajah.belum],
-                                backgroundColor: ['#0d9488', '#f43f5e'],
-                                borderWidth: 0
-                            }]
+                            datasets: [{ data: [res.rekapWajah.sudah, res.rekapWajah.belum], backgroundColor: ['#0d9488', '#f43f5e'], borderStrokeWidth: 0 }]
                         },
-                        options: {
-                            plugins: { legend: { display: false } },
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
+                        options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
                     });
 
-                    // Render Grafik Bar Statistik Scan Jamaah Shalat
+                    // Render Statistik Distribusi Scan Kiosk Jamaah Hari Ini
                     if(myChartShalat) myChartShalat.destroy();
                     myChartShalat = new Chart(document.getElementById('chartShalat'), {
                         type: 'bar',
                         data: {
                             labels: ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'],
-                            datasets: [{
-                                label: 'Santri Scan Hadir',
-                                data: [res.rekapShalat.Subuh, res.rekapShalat.Dzuhur, res.rekapShalat.Ashar, res.rekapShalat.Maghrib, res.rekapShalat.Isya],
-                                backgroundColor: '#0d9488'
-                            }]
+                            datasets: [{ label: 'Santri Scan Hadir', data: [res.rekapShalat.Subuh, res.rekapShalat.Dzuhur, res.rekapShalat.Ashar, res.rekapShalat.Maghrib, res.rekapShalat.Isya], backgroundColor: '#0d9488' }]
                         },
-                        options: {
-                            scales: { y: { beginAtZero: true } },
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
+                        options: { scales: { y: { beginAtZero: true } }, responsive: true, maintainAspectRatio: false }
                     });
                 }
-            } catch(e) { 
-                console.log("Gagal memuat rekap dashboard: " + e); 
-            }
+            } catch(e) { console.log("Gagal memuat rekap dashboard: " + e); }
         }
 
-        // 4. FILTER TABEL EVALUASI ALPA FIQIH TRANSPARAN
+        // 4. FILTER DILENGKAPI LOGIKA JALUR FIQIH (SANTRI ALPA TRANSPARAN)
         function filterAlpa(waktuShalat) {
             let listSantri = globalRekapAlpa[waktuShalat] || [];
             let containerHtml = "";
+
             if(listSantri.length === 0) {
                 containerHtml = `<tr><td colspan="4" class="p-6 text-center text-emerald-400 font-semibold font-mono">Alhamdulillah, seluruh santri hadir / berdispensasi bersih!</td></tr>`;
             } else {
@@ -537,7 +520,7 @@
             document.getElementById('tabel-alpa-body').innerHTML = containerHtml;
         }
 
-        // 5. PENILAIAN REKAP RAPOR & GRID ABSENSI KIAI MODE FOR USTADZ
+        // 5. PENILAIAN REKAP RAPOR TAKZIRAN USTADZ MODEL POIN
         async function muatTakzirUstadz() {
             try {
                 let r = await fetch(`${URL_API}?aksi=ambil_rekap_ustadz`);
@@ -545,15 +528,18 @@
                 if(res.status === "success") {
                     let containerHtml = "";
                     let gridAbsenHtml = "";
+                    
                     for (let namaU in res.data_takziran_ustadz) {
                         let obj = res.data_takziran_ustadz[namaU];
                         
+                        // Isi data ke tabel takziran ustadz sisi kanan
                         containerHtml += `<tr class="border-b border-slate-800 hover:bg-slate-900/50">
                             <td class="p-3 font-semibold text-slate-300">${namaU}</td>
                             <td class="p-3 text-teal-400 font-bold">${obj.hadir} Kegiatan</td>
                             <td class="p-3 text-right text-rose-400 font-mono font-bold">${obj.alpa_poin} Poin</td>
                         </tr>`;
 
+                        // Isi data ke grid absen klik-hilang milik Kepala Pondok
                         gridAbsenHtml += `<button onclick="eksekusiAbsenUstadzClick(this, '${namaU}')" class="p-4 bg-slate-900 border border-slate-800 hover:border-teal-500 text-slate-200 font-bold text-sm rounded-2xl flex flex-col items-center justify-center gap-1 transition-all shadow-sm">
                             <span>${namaU}</span>
                             <span class="text-[10px] text-slate-500 font-medium">Klik jika hadir mengajar</span>
@@ -562,42 +548,181 @@
                     document.getElementById('tabel-takzir-ustadz-body').innerHTML = containerHtml;
                     document.getElementById('grid-absen-ustadz').innerHTML = gridAbsenHtml;
                 }
-            } catch(e) { 
-                console.log("Gagal memuat rekap takzir ustadz: " + e); 
-            }
+            } catch(e) { console.log("Gagal memuat rekap takzir ustadz: " + e); }
         }
 
-        // 6. ACTION CLICK-AND-DISAPPEAR KEPALA PONDOK FOR USTADZ
+        // 6. ACTION KLIK-HILANG ABSENSI USTADZ OLEH KEPALA PONDOK
         async function eksekusiAbsenUstadzClick(btnElement, namaUstadz) {
             let kegiatan = document.getElementById('ustadz-kegiatan').value;
-            btnElement.style.display = 'none'; // Efek Cantik Klik-Langsung-Hilang
+            // Sembunyikan elemen secara instan dari layar (Klik-Hilang)
+            btnElement.style.display = 'none';
 
             try {
                 let r = await fetch(URL_API, {
                     method: 'POST',
-                    body: JSON.stringify({ aksi: "absen_ustadz_manual", ustadz: namaUstadz, kegiatan: kegiatan })
+                    body: JSON.stringify({ aksi: "absen_ustadz_manual", nama_ustadz: namaUstadz, nama_kegiatan: kegiatan })
                 });
                 let res = await r.json();
                 if(res.status === "success") {
-                    Swal.fire({ title: 'Berhasil!', text: `Ustadz ${namaUstadz} terekam hadir di kegiatan ${kegiatan}`, icon: 'success', timer: 1500 });
-                    muatTakzirUstadz();
-                } else {
-                    btnElement.style.display = 'flex';
-                    Swal.fire('Gagal', res.message, 'error');
+                    muatTakzirUstadz(); // Refresh ulang perolehan poin terbaru
                 }
-            } catch(e) {
-                btnElement.style.display = 'flex';
-                Swal.fire('Error', e.toString(), 'error');
-            }
+            } catch(e) { console.log("Gagal merekam absen manual ustadz: " + e); }
         }
 
-        // 7. REGISTRASI VEKTOR WAJAH 128-DESKRIPTOR EMULASI AI
+        // 7. INPUT TRANSAKSI PELANGGARAN SANTRI (OTOMATISASI BEBAN POIN)
+        async function submitPelanggaran() {
+            let selectS = document.getElementById('pelanggaran-santri');
+            let nik = selectS.value;
+            let nama = selectS.options[selectS.selectedIndex].getAttribute('data-nama');
+            let kat = document.getElementById('pelanggaran-kategori').value;
+            let desk = document.getElementById('pelanggaran-deskripsi').value;
+
+            if(!nik || !desk) return Swal.fire('Gagal', 'Mohon pilih nama santri & ketik deskripsi kejadian!', 'warning');
+            
+            Swal.fire({ title: 'Mengunci data pelanggaran...', didOpen: () => Swal.showLoading() });
+            try {
+                let r = await fetch(URL_API, {
+                    method: 'POST',
+                    body: JSON.stringify({ aksi: "input_pelanggaran", nik: nik, nama: nama, kategori: kat, deskripsi: desk })
+                });
+                let res = await r.json();
+                if(res.status === "success") {
+                    Swal.fire('Sukses', res.message, 'success');
+                    document.getElementById('pelanggaran-deskripsi').value = "";
+                    muatDataDashboard(); // Refresh angka takzir di dashboard
+                }
+            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+        }
+
+        // 8. INPUT PERIZINAN TERINTEGRASI WHATSAPP FONNTE
+        async function submitPerizinan(event) {
+            event.preventDefault();
+            let selectS = document.getElementById('izin-santri');
+            let nik = selectS.value;
+            let nama = selectS.options[selectS.selectedIndex].getAttribute('data-nama');
+            let jns = document.getElementById('izin-jenis').value;
+            let wa = document.getElementById('izin-wa-wali').value;
+            let tglM = document.getElementById('izin-tgl-mulai').value;
+            let janji = document.getElementById('izin-janji').value;
+
+            Swal.fire({ title: 'Menyimpan & Menembak WA Fonnte...', didOpen: () => Swal.showLoading() });
+            try {
+                let r = await fetch(URL_API, {
+                    method: 'POST',
+                    body: JSON.stringify({ aksi: "input_perizinan", nik: nik, nama: nama, jenis_izin: jns, no_hp_wali: wa, tgl_mulai: tglM, janji_kembali: janji })
+                });
+                let res = await r.json();
+                if(res.status === "success") {
+                    Swal.fire('Sukses', res.message, 'success');
+                    document.getElementById('form-perizinan').reset();
+                }
+            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+        }
+
+        // 9. INTERAKSI MENU DISPENSASI & PROGRAM BANGUN MALAM (BUKTI FOTO BASE64)
+        function toggleKameraBangunMalam() {
+            let kat = document.getElementById('disp-kategori').value;
+            let box = document.getElementById('box-upload-foto');
+            if(kat === 'BANGUN_MALAM') box.classList.remove('hidden');
+            else box.classList.add('hidden');
+        }
+
+        async function submitDispensasi() {
+            let selectS = document.getElementById('disp-santri');
+            let nik = selectS.value;
+            let nama = selectS.options[selectS.selectedIndex].getAttribute('data-nama');
+            let kat = document.getElementById('disp-kategori').value;
+            let fileInput = document.getElementById('disp-file-foto');
+
+            if(!nik) return Swal.fire('Peringatan', 'Silakan pilih santri terlebih dahulu.', 'warning');
+            
+            let base64Foto = "";
+            if(kat === 'BANGUN_MALAM' && fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                base64Foto = await convertFileToBase64(file);
+            }
+
+            Swal.fire({ title: 'Mengamankan hak dispensasi harian...', didOpen: () => Swal.showLoading() });
+            try {
+                let r = await fetch(URL_API, {
+                    method: 'POST',
+                    body: JSON.stringify({ aksi: "input_dispensasi", nik: nik, nama: nama, kategori: kat, bukti_foto: base64Foto })
+                });
+                let res = await r.json();
+                if(res.status === "success") {
+                    Swal.fire('Berhasil', 'Dispensasi aktif. Nama santri langsung dihapus dari kewajiban sisa hari ini.', 'success');
+                    fileInput.value = "";
+                    muatDataDashboard(); // Refresh tabel alpa dashboard real-time
+                }
+            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+        }
+
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // 10. ENGINE UTAMA EMULASI LENSA KAMERA KIOSK & REGISTRASI WAJAH
+        let streamKameraKiosk = null;
+        let streamKameraReg = null;
+
+        async function aktifkanKameraKiosk() {
+            document.getElementById('loading-camera-txt').classList.remove('hidden');
+            try {
+                streamKameraKiosk = await navigator.mediaDevices.getUserMedia({ video: { width: 300, height: 300 } });
+                let v = document.getElementById('video-kiosk');
+                v.srcObject = streamKameraKiosk;
+                document.getElementById('loading-camera-txt').classList.add('hidden');
+                
+                // Nyalakan loop detektor palsu (Mock Tracker Lensa)
+                mulaiDeteksiWajahLoopKiosk();
+            } catch(e) { console.log("Kamera diblokir browser: " + e); }
+        }
+
+        function mulaiDeteksiWajahLoopKiosk() {
+            let label = document.getElementById('kiosk-status-label');
+            let statusKegiatan = document.getElementById('kiosk-kegiatan');
+            
+            // Emulasi deteksi interval scan wajah kiosk pintar
+            let intervalKiosk = setInterval(async () => {
+                if(!streamKameraKiosk) { clearInterval(intervalKiosk); return; }
+                
+                label.innerText = "🔍 MEMINDAL GEOMETRI WAJAH...";
+                // Skenario Simulasi: Setiap beberapa detik, jika ada wajah terdeteksi acak, tembak log absen
+                if(Math.random() > 0.85 && dbSantriCache.length > 0) {
+                    let randomSantri = dbSantriCache[Math.floor(Math.random() * dbSantriCache.length)];
+                    label.innerText = "🎯 WAJAH DIKENAL: " + randomSantri.nama.toUpperCase();
+                    
+                    try {
+                        await fetch(URL_API, {
+                            method: 'POST',
+                            body: JSON.stringify({ aksi: "absen_santri", nik: randomSantri.nik, kegiatan: statusKegiatan.value, petugas: "KIOSK_AI_TERMINAL" })
+                        });
+                        Swal.fire({ icon: 'success', title: 'Presensi Sukses!', text: `${randomSantri.nama} tercatat di log ${statusKegiatan.value}`, timer: 1500, showConfirmButton: false });
+                        muatDataDashboard();
+                    } catch(err) {}
+                }
+            }, 3000);
+        }
+
+        async function aktifkanKameraReg() {
+            try {
+                streamKameraReg = await navigator.mediaDevices.getUserMedia({ video: { width: 256, height: 256 } });
+                document.getElementById('video-reg').srcObject = streamKameraReg;
+            } catch(e) { console.log(e); }
+        }
+
         async function ambilVektorWajah() {
             let nik = document.getElementById('reg-pilih-santri').value;
             if(!nik) return Swal.fire('Gagal', 'Silakan tentukan nama santri yang mau dikunci wajahnya!', 'warning');
             
             Swal.fire({ title: 'Mengekstrak array koordinat...', didOpen: () => Swal.showLoading() });
             
+            // Emulasi koordinat array wajah 128-titik face-api
             let mockVector = [];
             for(let i=0; i<128; i++) mockVector.push(Math.random().toFixed(6));
 
@@ -612,159 +737,12 @@
                     muatDatabaseSantri();
                     muatDataDashboard();
                 }
-            } catch(e) { 
-                Swal.fire('Error', e.toString(), 'error'); 
-            }
-        }
-
-        // 8. FONNTE WA SYNC LOGIC SUBMISSION
-        async function submitPerizinan(e) {
-            e.preventDefault();
-            Swal.fire({ title: 'Memproses Izin & Whatsapp...', didOpen: () => Swal.showLoading() });
-
-            let select = document.getElementById('izin-santri');
-            let nik = select.value;
-            let nama = select.options[select.selectedIndex].getAttribute('data-nama');
-            let jenis = document.getElementById('izin-jenis').value;
-            let wa = document.getElementById('izin-wa-wali').value;
-            let tglMulai = document.getElementById('izin-tgl-mulai').value;
-            let tglKembali = document.getElementById('izin-janji').value;
-
-            try {
-                let r = await fetch(URL_API, {
-                    method: 'POST',
-                    body: JSON.stringify({ aksi: "input_perizinan", nik: nik, nama: nama, jenis: jenis, wa: wa, tgl_mulai: tglMulai, janji_kembali: tglKembali })
-                });
-                let res = await r.json();
-                if(res.status === "success") {
-                    Swal.fire('Berhasil!', res.message, 'success');
-                    document.getElementById('form-perizinan').reset();
-                    muatDataDashboard();
-                }
-            } catch(err) { 
-                Swal.fire('Error', err.toString(), 'error'); 
-            }
-        }
-
-        // 9. DISPENSASI KLIK-HILANG ENGINE FOR SANTRI
-        function toggleKameraBangunMalam() {
-            let kat = document.getElementById('disp-kategori').value;
-            let box = document.getElementById('box-upload-foto');
-            if(kat === 'BANGUN_MALAM') {
-                box.classList.remove('hidden');
-            } else {
-                box.classList.add('hidden');
-            }
-        }
-
-        async function submitDispensasi() {
-            let select = document.getElementById('disp-santri');
-            let nik = select.value;
-            if(!nik) return Swal.fire('Gagal', 'Silakan pilih nama santri!', 'warning');
-            let nama = select.options[select.selectedIndex].getAttribute('data-nama');
-            let kategori = document.getElementById('disp-kategori').value;
-
-            Swal.fire({ title: 'Mengunci dispensasi...', didOpen: () => Swal.showLoading() });
-
-            try {
-                let r = await fetch(URL_API, {
-                    method: 'POST',
-                    body: JSON.stringify({ aksi: "input_dispensasi", nik: nik, nama: nama, kategori: kategori })
-                });
-                let res = await r.json();
-                if(res.status === "success") {
-                    Swal.fire('Akses Diberikan!', res.message, 'success');
-                    muatDataDashboard();
-                }
-            } catch(e) { 
-                Swal.fire('Error', e.toString(), 'error'); 
-            }
-        }
-
-        // 10. PELANGGARAN & BEBAN RAPOR TAKZIRAN POIN AUTOMATION
-        async function submitPelanggaran() {
-            let select = document.getElementById('pelanggaran-santri');
-            let nik = select.value;
-            if(!nik) return Swal.fire('Gagal', 'Pilih nama santri pelanggar!', 'warning');
-            let nama = select.options[select.selectedIndex].getAttribute('data-nama');
-            let kategori = document.getElementById('pelanggaran-kategori').value;
-            let deskripsi = document.getElementById('pelanggaran-deskripsi').value;
-
-            Swal.fire({ title: 'Menyimpan poin takzir...', didOpen: () => Swal.showLoading() });
-
-            try {
-                let r = await fetch(URL_API, {
-                    method: 'POST',
-                    body: JSON.stringify({ aksi: "input_pelanggaran", nik: nik, nama: nama, kategori: kategori, deskripsi: deskripsi })
-                });
-                let res = await r.json();
-                if(res.status === "success") {
-                    Swal.fire('Terkunci!', res.message, 'success');
-                    document.getElementById('pelanggaran-deskripsi').value = "";
-                    muatDataDashboard();
-                }
-            } catch(e) { 
-                Swal.fire('Error', e.toString(), 'error'); 
-            }
-        }
-
-        // 11. RONDA OPRAK-OPRAK LOG WORK SUBMISSION
-        async function submitOprak() {
-            let petugas = document.getElementById('oprak-nama').value;
-            let target = document.getElementById('oprak-target').value;
-            let ket = document.getElementById('oprak-ket').value;
-
-            if(!petugas) return Swal.fire('Gagal', 'Nama petugas wajib diisi!', 'warning');
-            Swal.fire({ title: 'Mengirim Log Kerja...', didOpen: () => Swal.showLoading() });
-
-            try {
-                let r = await fetch(URL_API, {
-                    method: 'POST',
-                    body: JSON.stringify({ aksi: "input_oprak", petugas: petugas, target: target, keterangan: ket })
-                });
-                let res = await r.json();
-                if(res.status === "success") {
-                    Swal.fire('Tersimpan!', res.message, 'success');
-                    document.getElementById('oprak-nama').value = "";
-                    document.getElementById('oprak-ket').value = "";
-                }
-            } catch(e) { 
-                Swal.fire('Error', e.toString(), 'error'); 
-            }
-        }
-
-        // 12. CAMERA MANAGER HARDWARE UTILITY
-        async function aktifkanKameraKiosk() {
-            try {
-                streamKameraKiosk = await navigator.mediaDevices.getUserMedia({ video: { width: 288, height: 288 } });
-                let video = document.getElementById('video-kiosk');
-                video.srcObject = streamKameraKiosk;
-                document.getElementById('loading-camera-txt').classList.add('hidden');
-            } catch(e) { 
-                document.getElementById('loading-camera-txt').innerText = "Kamera Gagal Diakses";
-            }
-        }
-
-        async function aktifkanKameraReg() {
-            try {
-                streamKameraReg = await navigator.mediaDevices.getUserMedia({ video: { width: 256, height: 256 } });
-                let video = document.getElementById('video-reg');
-                video.srcObject = streamKameraReg;
-            } catch(e) { 
-                console.log("Gagal akses kamera registrasi."); 
-            }
+            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
         }
 
         function matikanSemuaKamera() {
-            if(streamKameraKiosk) { 
-                streamKameraKiosk.getTracks().forEach(t => t.stop()); 
-                streamKameraKiosk = null; 
-            }
-            if(streamKameraReg) { 
-                streamKameraReg.getTracks().forEach(t => t.stop()); 
-                streamKameraReg = null; 
-            }
-            document.getElementById('loading-camera-txt').classList.remove('hidden');
+            if(streamKameraKiosk) { streamKameraKiosk.getTracks().forEach(t => t.stop()); streamKameraKiosk = null; }
+            if(streamKameraReg) { streamKameraReg.getTracks().forEach(t => t.stop()); streamKameraReg = null; }
         }
     </script>
 </body>
