@@ -183,36 +183,26 @@
             ambilDataRekapSheet();
         });
 
-        // SIMULASI GENERATE DATA (Ditambahkan variasi gender L/P)
-        function generateDataSimulasi() {
-            return [
-                { nik: "20260101", nama: "AHMAD REZKY MAULANA", gender: "L", golongan: "SANTRI", bolos: 4, piket: 0, pelanggaran: 0, izin: 3 },
-                { nik: "20260102", nama: "MUHAMMAD ILHAM HAKIM", gender: "L", golongan: "SANTRI", bolos: 0, piket: 10, pelanggaran: 0, izin: 0 },
-                { nik: "20260103", nama: "ZULFAKRI ARIF", gender: "L", golongan: "SANTRI", bolos: 12, piket: 10, pelanggaran: 5, izin: 0 },
-                { nik: "20260104", nama: "SITI NUR HALIZA", gender: "P", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 50, izin: 6 },
-                { nik: "20260105", nama: "NURUL BAITI FAJRIA", gender: "P", golongan: "SANTRI", bolos: 13, piket: 10, pelanggaran: 50, izin: 3 },
-                { nik: "20260106", nama: "DEDI JUNAEDI", gender: "L", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 0, izin: 0 },
-                { nik: "19900211", nama: "USTADZ KHIRZUL YAMANI", gender: "L", golongan: "USTADZ", bolos: 2, piket: 0, pelanggaran: 10, izin: 0 },
-                { nik: "19950824", nama: "USTADZAH AMINA ZAHRA", gender: "P", golongan: "USTADZ", bolos: 0, piket: 0, pelanggaran: 0, izin: 3 }
-            ];
-        }
-
         async function ambilDataRekapSheet() {
             try {
-                // Integrasi fetch otomatis masa depan:
-                // let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
-                // let r = await res.json();
-                // masterDataMentah = r.data;
-
-                masterDataMentah = generateDataSimulasi();
-                filterDanRenderData();
+                // INTEGRASI LIVE FETCH: Mengambil data asli langsung dari Google Apps Script
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
+                let r = await res.json();
+                
+                if (r.status === "success") {
+                    masterDataMentah = r.data;
+                    filterDanRenderData();
+                } else {
+                    throw new Error(r.message || "Gagal mendapatkan data.");
+                }
             } catch (err) {
-                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran.</td></tr>`;
+                console.error(err);
+                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran Server.</td></tr>`;
             }
         }
 
         function hitungMatriksPoinDanTakzir(item) {
-            let totalHitung = (parseInt(item.bolos) + parseInt(item.piket) + parseInt(item.pelanggaran)) - parseInt(item.izin);
+            let totalHitung = (parseInt(item.bolos || 0) + parseInt(item.piket || 0) + parseInt(item.pelanggaran || 0)) - parseInt(item.izin || 0);
             let poinAkhir = totalHitung < 0 ? 0 : totalHitung;
 
             let statusTingkat = "";
@@ -263,7 +253,7 @@
                 
                 let matchGol = (item.golongan === golSelected);
                 let matchGen = (genSelected === "SEMUA" || item.gender === genSelected);
-                let matchCari = (item.nama.includes(cariKeyword) || item.nik.includes(cariKeyword));
+                let matchCari = (item.nama.toUpperCase().includes(cariKeyword) || item.nik.includes(cariKeyword));
                 
                 let matchStatus = false;
                 if (statusSelected === "SEMUA") matchStatus = true;
@@ -287,7 +277,6 @@
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
                 
-                // Badge info gender penanda visual singkat
                 let badgeGender = item.gender === "L" 
                     ? `<span class="text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded text-[10px]">LPA</span>` 
                     : `<span class="text-pink-500 bg-pink-500/10 px-1.5 py-0.5 rounded text-[10px]">LPI</span>`;
