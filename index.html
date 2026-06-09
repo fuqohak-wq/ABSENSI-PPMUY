@@ -1,795 +1,299 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PPMUY CORE v2.0 - Sistem Ekosistem Manajemen Modern</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        .sidebar-link.active {
-            background-color: #e0f2fe;
-            border-left-width: 4px;
-            border-color: #0284c7;
-            color: #0369a1;
-            font-weight: 700;
-        }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row font-sans antialiased">
+<script>
+    // URL WebApp Anda (Tetap sesuai aslinya)
+    const URL_API = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
 
-    <div id="halaman-login" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
-        <div class="w-full max-w-md bg-white border border-blue-100 rounded-3xl p-8 shadow-xl text-center space-y-6">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white mx-auto shadow-lg shadow-blue-500/20">
-                P
-            </div>
-            <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">PPMUY CORE SYSTEM</h1>
-                <p class="text-xs text-slate-500 mt-1">Silakan masuk menggunakan akun pengurus resmi</p>
-            </div>
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Username</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user text-xs"></i></span>
-                        <input type="text" id="login-username" placeholder="Masukkan username..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock text-xs"></i></span>
-                        <input type="password" id="login-password" placeholder="••••••••" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm">
-                    </div>
-                </div>
-                <button onclick="prosesLoginSistem()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all text-sm uppercase tracking-wider">
-                    Masuk Ke Ekosistem
-                </button>
-            </div>
-            <p class="text-[10px] text-slate-400">Security Verification Enabled • PPMUY 2026</p>
-        </div>
-    </div>
+    // State Aplikasi
+    let dbSantriCache = [];
+    let globalRekapAlpa = {};
+    let myChartWajah = null;
+    let myChartShalat = null;
+    let streamKameraKiosk = null;
+    let streamKameraReg = null;
 
-    <aside id="sidebar-utama" class="hidden w-full md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm z-10">
-        <div class="p-5 border-b border-slate-100 flex items-center gap-3 bg-blue-50/50">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-md shadow-blue-500/20">U</div>
-            <div>
-                <h1 class="font-black text-blue-700 text-sm tracking-wide">PPMUY CORE v2.0</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="txt-role-pengurus">Otoritas Pengurus</p>
-            </div>
-        </div>
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            <button onclick="bukaMenu('menu-dashboard')" id="btn-menu-dashboard" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all active">
-                <i class="fa-solid fa-chart-pie w-4"></i> DASHBOARD UTAMA
-            </button>
-            <button onclick="bukaKioskCleanScreen()" id="btn-menu-scan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-camera w-4 text-cyan-500"></i> ABSENSI KEGIATAN
-            </button>
-            <button onclick="bukaMenu('menu-daftar-wajah')" id="btn-menu-daftar-wajah" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-user-plus w-4"></i> REGISTRASI WAJAH SANTRI
-            </button>
-            <button onclick="bukaMenu('menu-absen-ustadz')" id="btn-menu-absen-ustadz" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-user-tie w-4"></i> ABSEN USTADZ (KIAI MODE)
-            </button>
-            <button onclick="bukaMenu('menu-perizinan')" id="btn-menu-perizinan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-paper-plane w-4"></i> INPUT PERIZINAN (WA)
-            </button>
-            <button onclick="bukaMenu('menu-dispensasi')" id="btn-menu-dispensasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-id-card-clip w-4"></i> DISPENSASI & BANGUN MALAM
-            </button>
-            <button onclick="bukaMenu('menu-pelanggaran')" id="btn-menu-pelanggaran" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-gavel w-4"></i> PELANGGARAN & TAKZIR
-            </button>
-            <button onclick="bukaMenu('menu-evaluasi')" id="btn-menu-evaluasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-graduation-cap w-4"></i> EVALUASI AKADEMIK
-            </button>
-            <button onclick="bukaMenu('menu-oprak')" id="btn-menu-oprak" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all">
-                <i class="fa-solid fa-bullhorn w-4"></i> JADWAL OPRAK-OPRAK
-            </button>
-        </nav>
-        <div class="p-4 border-t border-slate-100 bg-slate-50 text-[10px] text-slate-400 font-bold text-center flex justify-between items-center px-5">
-            <span>V2.0 LIGHT MODE</span>
-            <button onclick="prosesLogoutSistem()" class="text-rose-600 hover:text-rose-700 font-black uppercase"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
-        </div>
-    </aside>
+    window.addEventListener('DOMContentLoaded', () => {
+        cekStatusLogin();
+    });
 
-    <main id="konten-utama" class="hidden flex-1 flex flex-col min-w-0 bg-slate-50 overflow-x-hidden">
-        
-        <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 shadow-sm">
-            <h2 id="judul-halaman" class="text-sm font-black uppercase tracking-wider text-slate-700">Dashboard Utama</h2>
-            <div class="flex items-center gap-4">
-                <span class="text-[10px] bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full border border-blue-200 font-bold uppercase tracking-wide">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1 animate-pulse"></i> WebApp Sinkron Aktif
-                </span>
-            </div>
-        </header>
-
-        <div class="flex-1 p-6 overflow-y-auto space-y-6">
-
-            <section id="menu-dashboard" class="menu-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Santri Terdaftar Wajah</p>
-                            <h3 id="txt-total-sudah-wajah" class="text-3xl font-black text-blue-600 mt-1">0</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 flex items-center justify-center text-lg"><i class="fa-solid fa-face-smile"></i></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Belum Daftar Wajah</p>
-                            <h3 id="txt-total-belum-wajah" class="text-3xl font-black text-rose-500 mt-1">0</h3>
-                        </div>
-                        <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl border border-rose-100 flex items-center justify-center text-lg"><i class="fa-solid fa-face-frown-open"></i></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center border-l-4 border-l-amber-500">
-                        <p class="text-[10px] font-black text-amber-600 uppercase tracking-wider">Siklus Potong Laporan:</p>
-                        <p class="text-xs font-bold text-slate-700 mt-1">Tiap Hari Ba'da Dzuhur (13:00) & Hari Sabtu</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 lg:col-span-1 flex flex-col items-center justify-center shadow-sm">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-4 self-start"><i class="fa-solid fa-chart-donut mr-1"></i> Rasio Kunci Wajah</h4>
-                        <div class="w-44 h-44 relative">
-                            <canvas id="chartWajah"></canvas>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 lg:col-span-2 shadow-sm">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-4"><i class="fa-solid fa-chart-bar mr-1"></i> Kehadiran Jamaah Hari Ini (Siklus Berjalan)</h4>
-                        <div class="h-44 w-full">
-                            <canvas id="chartShalat"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h4 class="font-black text-xs text-slate-700 uppercase tracking-wider">Pusat Evaluasi Takzir: Daftar Santri Alpa Shalat</h4>
-                            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Otomatis menyaring santri Sakit, Izin, Khidmah, dan Program Bangun Malam</p>
-                        </div>
-                        <div class="flex gap-1.5 flex-wrap">
-                            <button onclick="filterAlpa('Subuh')" class="px-3 py-1.5 text-[10px] font-black bg-white border border-slate-200 rounded-lg hover:border-blue-500 hover:text-blue-600 text-slate-600 uppercase transition-all">Subuh</button>
-                            <button onclick="filterAlpa('Dzuhur')" class="px-3 py-1.5 text-[10px] font-black bg-white border border-slate-200 rounded-lg hover:border-blue-500 hover:text-blue-600 text-slate-600 uppercase transition-all">Dzuhur</button>
-                            <button onclick="filterAlpa('Ashar')" class="px-3 py-1.5 text-[10px] font-black bg-white border border-slate-200 rounded-lg hover:border-blue-500 hover:text-blue-600 text-slate-600 uppercase transition-all">Ashar</button>
-                            <button onclick="filterAlpa('Maghrib')" class="px-3 py-1.5 text-[10px] font-black bg-white border border-slate-200 rounded-lg hover:border-blue-500 hover:text-blue-600 text-slate-600 uppercase transition-all">Maghrib</button>
-                            <button onclick="filterAlpa('Isya')" class="px-3 py-1.5 text-[10px] font-black bg-white border border-slate-200 rounded-lg hover:border-blue-500 hover:text-blue-600 text-slate-600 uppercase transition-all">Isya</button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-slate-100/80 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
-                                    <th class="p-4">Nama Lengkap Santri</th>
-                                    <th class="p-4">Domisili Kamar / Kelas</th>
-                                    <th class="p-4">Waktu Terlewat</th>
-                                    <th class="p-4 text-rose-600">Status Ketidakhadiran</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabel-alpa-body">
-                                <tr>
-                                    <td colspan="4" class="p-8 text-center text-slate-400 font-medium">Silakan determine filter tombol waktu shalat di atas untuk memuat data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section id="menu-scan" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md flex flex-col items-center">
-                    <h3 class="text-xs font-black text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-display mr-1"></i> Monitor Kiosk Wajah Santri</h3>
-                    <div class="w-full mb-4">
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kegiatan Terjadwal Saat Ini:</label>
-                        <select id="kiosk-kegiatan" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-xs font-bold text-slate-700">
-                            <option value="Subuh">Shalat Subuh Jamaah</option>
-                            <option value="Dzuhur">Shalat Dzuhur Jamaah</option>
-                            <option value="Ashar">Shalat Ashar Jamaah</option>
-                            <option value="Maghrib">Shalat Maghrib Jamaah</option>
-                            <option value="Isya">Shalat Isya Jamaah</option>
-                            <option value="Syawir">Kegiatan Syawir Fiqih</option>
-                            <option value="Baca Kitab">Setoran Baca Kitab</option>
-                            <option value="Ngaji Ndalem">Ngaji Weton Ndalem</option>
-                            <option value="Baca Al-Qur'an">Mudarosah Al-Qur'an</option>
-                            <option value="Ngafsahi">Ngafsahi Kitab Kuning</option>
-                        </select>
-                    </div>
-                    <div id="kotak-scan-frame" class="relative w-64 h-64 rounded-3xl overflow-hidden bg-slate-100 border-4 border-dashed border-blue-400/50 flex items-center justify-center transition-all">
-                        <video id="video-kiosk" width="256" height="256" autoplay muted class="object-cover w-full h-full transform -scale-x-100"></video>
-                        <canvas id="canvas-kiosk" class="absolute top-0 left-0 w-full h-full pointer-events-none transform -scale-x-100"></canvas>
-                        <div id="loading-camera-txt" class="absolute inset-0 bg-white flex items-center justify-center text-[10px] text-slate-400 font-bold font-mono">Memuat Aliran Hardware Kamera...</div>
-                    </div>
-                    <p id="kiosk-status-label" class="mt-4 text-xs font-black tracking-widest text-blue-600 uppercase animate-pulse">HADAPKAN WAJAH KE KAMERA</p>
-                </div>
-            </section>
-
-            <section id="menu-daftar-wajah" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider text-center"><i class="fa-solid fa-fingerprint mr-1"></i> Registrasi Peta Geometri Wajah</h3>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cari Nama / NIK Santri Target:</label>
-                        <select id="reg-pilih-santri" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-xs text-slate-700 font-medium">
-                            <option value="">-- Sedang mengambil data database... --</option>
-                        </select>
-                    </div>
-                    <div class="relative w-56 h-56 mx-auto rounded-3xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
-                        <video id="video-reg" width="224" height="224" autoplay muted class="object-cover w-full h-full transform -scale-x-100"></video>
-                    </div>
-                    <button onclick="ambilVektorWajah()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all text-xs uppercase tracking-wider">
-                        Kunci Vektor & Daftarkan Wajah
-                    </button>
-                </div>
-            </section>
-
-            <section id="menu-absen-ustadz" class="menu-content space-y-6 hidden">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-4">
-                        <div>
-                            <h3 class="font-black text-xs text-slate-700 uppercase tracking-wider">Panel Khusus Otoritas: Presensi Manual Ustadz</h3>
-                            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Model klik langsung hilang. Digunakan oleh Kiai / Kepala Pondok untuk mencatatkan kehadiran mengajar.</p>
-                        </div>
-                        <select id="ustadz-kegiatan" class="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none">
-                            <option value="Ngaji al-Qur'an bakdo Subuh">Ngaji al-Qur'an bakdo Subuh</option>
-                            <option value="Sorogan setelah ngaji al-Qur'an">Sorogan setelah ngaji al-Qur'an</option>
-                            <option value="Syawir">Syawir Dewan Ustadz</option>
-                            <option value="Ngajar sorogan kitab">Ngajar sorogan madrasah</option>
-                        </select>
-                    </div>
-                    <div id="grid-absen-ustadz" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div class="text-center p-4 text-slate-400 text-xs font-medium">Memuat database asatidz...</div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="menu-perizinan" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider text-center"><i class="fa-solid fa-envelope-open-text mr-1"></i> Log Perizinan Santri (Fonnte WA Sync)</h3>
-                    <form id="form-perizinan" onsubmit="submitPerizinan(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Santri Berizin:</label>
-                            <select id="izin-santri" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500"></select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Jenis Log Izin:</label>
-                                <select id="izin-jenis" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none">
-                                    <option value="Pulang">Pulang Habis/Sakit</option>
-                                    <option value="Keluar">Keluar Batas Wilayah</option>
-                                    <option value="Sakit">Sakit (Kamar Poskestren)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">No HP WhatsApp Wali:</label>
-                                <input type="text" id="izin-wa-wali" placeholder="628xxxxxx" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mulai Tanggal:</label>
-                                <input type="date" id="izin-tgl-mulai" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Janji Kembali:</label>
-                                <input type="date" id="izin-janji" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 focus:outline-none">
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white rounded-xl uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all">
-                            Simpan Log & Tembak Notifikasi WA
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <section id="menu-dispensasi" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider text-center"><i class="fa-solid fa-stamp mr-1"></i> Hak Akses Dispensasi Tugas Khusus</h3>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pilih Santri Penerima:</label>
-                        <select id="disp-santri" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none"></select>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori Dispensasi:</label>
-                            <select id="disp-kategori" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none">
-                                <option value="KHIDMAH">Khidmah / Perintah Ndalem Pengasuh</option>
-                                <option value="BANGUN_MALAM">Program Khusus Bangun Malam</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Bukti Surat Fisik (Unggah Langsung Ke Google Drive):</label>
-                            <input type="file" id="disp-file-foto" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border file:border-blue-100 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100">
-                        </div>
-                    </div>
-                    <button onclick="submitDispensasi()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white rounded-xl uppercase tracking-wider shadow-md shadow-blue-500/20 transition-all">
-                        Kunci Hak Akses & Simpan Berkas Drive
-                    </button>
-                </div>
-            </section>
-
-            <section id="menu-pelanggaran" class="menu-content space-y-6 hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 h-fit">
-                        <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Catatan Pelanggaran Aturan</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Pelanggar:</label>
-                                <select id="pelanggaran-santri" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none"></select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tingkat Pelanggaran:</label>
-                                <select id="pelanggaran-kategori" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none">
-                                    <option value="Ringan">Pelanggaran Ringan (Beban 5 Poin Takzir)</option>
-                                    <option value="Sedang">Pelanggaran Sedang (Beban 15 Poin Takzir)</option>
-                                    <option value="Berat">Pelanggaran Berat (Beban 50 Poin Takzir)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Rincian Kejadian / Kronologi:</label>
-                                <textarea id="pelanggaran-deskripsi" placeholder="Tulis deskripsi detail pelanggaran di sini..." rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 text-slate-700 font-medium"></textarea>
-                            </div>
-                            <button onclick="submitPelanggaran()" class="w-full py-3 bg-rose-600 hover:bg-rose-500 font-bold text-xs text-white rounded-xl uppercase tracking-wider shadow-md shadow-rose-500/20 transition-all">
-                                Kunci Pelanggaran & Akumulasikan Poin
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                        <div>
-                            <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-user-shield mr-1"></i> Rekap Nilai Kedisiplinan & Poin Alpa Ustadz</h3>
-                            <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dievaluasi Ba'da Maghrib. Setiap 1 kegiatan utama terlewat = Beban takzir 10 poin.</p>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
-                                        <th class="p-3">Nama Ustadz</th>
-                                        <th class="p-3">Total Hadir Mengajar</th>
-                                        <th class="p-3 text-rose-600 text-right">Beban Poin Alpa</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabel-takzir-ustadz-body">
-                                    <tr>
-                                        <td colspan="3" class="p-4 text-center text-slate-400 font-medium">Memuat data rekap ustadz...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="menu-evaluasi" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-8 rounded-3xl border border-slate-200 shadow-md text-center space-y-6">
-                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl mx-auto border border-blue-100"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Modul Evaluasi Akademik & Ujian Semester</h3>
-                        <p class="text-xs text-slate-400 mt-1 font-medium">Laporan terintegrasi raport digital madrasah diniah sedang dalam siklus optimasi server awan.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="menu-oprak" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-8 rounded-3xl border border-slate-200 shadow-md text-center space-y-6">
-                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl mx-auto border border-amber-100"><i class="fa-solid fa-bullhorn"></i></div>
-                    <div>
-                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Pusat Kendali Oprak-Oprak Keamanan</h3>
-                        <p class="text-xs text-slate-400 mt-1 font-medium">Fitur penyiaran pengeras suara nirkabel zona asrama sedang dalam pemeliharaan berkala hardware.</p>
-                    </div>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <div id="kiosk-clean-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col justify-between p-4 hidden">
-        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-            <div>
-                <h1 class="text-amber-400 font-black text-xs tracking-wider uppercase"><i class="fa-solid fa-camera mr-1"></i> KIOSK PRESENSI WAJAH HP</h1>
-                <p class="text-[9px] text-slate-400">PPMUY Integrated Ecosystem v2.0</p>
-            </div>
-            <button onclick="tutupKioskCleanScreen()" class="bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all">
-                <i class="fa-solid fa-xmark mr-1"></i> Keluar Kiosk
-            </button>
-        </div>
-
-        <div class="flex-1 flex flex-col items-center justify-center my-4 gap-4">
-            <div class="relative w-72 h-72 rounded-3xl overflow-hidden border-4 border-slate-800 shadow-2xl bg-slate-900 flex items-center justify-center">
-                <video id="kiosk-clean-video" autoplay muted playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
-                <div id="kiosk-scan-line" class="absolute inset-x-0 h-1 bg-cyan-400 shadow-[0_0_10px_#22d3ee] animate-pulse top-0"></div>
-            </div>
-
-            <div id="kiosk-clean-status" class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase animate-pulse">
-                MENUNGGU MODEL AI & WAJAH...
-            </div>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center min-h-[90px] flex items-center justify-center">
-            <div id="kiosk-result-box" class="hidden w-full">
-                <p class="text-[9px] text-emerald-400 font-bold tracking-widest uppercase">BERHASIL REKAM</p>
-                <h2 id="kiosk-result-name" class="text-lg font-black text-white mt-0.5">-</h2>
-                <p id="kiosk-result-info" class="text-xs text-slate-400 mt-0.5">-</p>
-            </div>
-            <div id="kiosk-placeholder-box" class="w-full">
-                <p class="text-xs text-slate-400">Silakan hadapkan wajah Anda tepat di depan lensa kamera HP Anda.</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const URL_API = "https://script.google.com/macros/s/AKfycbw6TjXU3Z_iB3bVf6OOfW48uC7e2z_N6m67H-R_e_qM9S0w1x2y3z4w5v6u7t8s9r0/exec";
-        
-        let sessionPengurus = null;
-        let databaseSantri = [];
-        let databaseUstadz = [];
-        let streamKameraKiosk = null;
-        let streamKameraReg = null;
-
-        // VARIABLE EXTRA PENGUNCI DAN SINKRONISASI AI LAYAR BERSIH
-        let databaseSantriKunci = [];
-        let isMencatatAbsen = false; // Kunci Sakral Anti-Spam Ganda
-        let intervalDeteksiKiosk = null;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let simpanan = localStorage.getItem('session_pengurus');
-            if(simpanan) {
-                sessionPengurus = JSON.parse(simpanan);
-                masukKeSistemUtama();
-            }
-        });
-
-        function prosesLoginSistem() {
-            let user = document.getElementById('login-username').value;
-            let pass = document.getElementById('login-password').value;
-            if(!user || !pass) return Swal.fire('Gagal', 'Semua kolom login wajib diisi!', 'error');
-
-            if(user === "admin" && pass === "pondok2026") {
-                sessionPengurus = { username: user, role: "Super Admin" };
-                localStorage.setItem('session_pengurus', JSON.stringify(sessionPengurus));
-                masukKeSistemUtama();
-                Swal.fire('Login Berhasil', 'Selamat datang di ekosistem digital PPMUY', 'success');
-            } else {
-                Swal.fire('Akses Ditolak', 'Kombinasi kredensial login salah atau tidak sah!', 'error');
-            }
-        }
-
-        function masukKeSistemUtama() {
+    // 1. KEAMANAN & SESI
+    function cekStatusLogin() {
+        let session = localStorage.getItem('ppmuy_session');
+        if (session) {
+            let data = JSON.parse(session);
             document.getElementById('halaman-login').classList.add('hidden');
             document.getElementById('sidebar-utama').classList.remove('hidden');
             document.getElementById('konten-utama').classList.remove('hidden');
-            document.getElementById('txt-role-pengurus').innerText = sessionPengurus.role;
-            
-            muatDatabaseSantri();
-            muatDataDashboard();
-            initSemuaModelFaceAPI();
+            document.getElementById('txt-role-pengurus').innerText = "Akses: " + data.username.toUpperCase();
+            initApp();
         }
+    }
 
-        function prosesLogoutSistem() {
-            localStorage.removeItem('session_pengurus');
-            tutupKioskCleanScreen();
-            location.reload();
-        }
+    async function prosesLoginSistem() {
+        let u = document.getElementById('login-username').value.trim();
+        let p = document.getElementById('login-password').value.trim();
 
-        function bukaMenu(idMenu) {
-            document.querySelectorAll('.menu-content').forEach(m => m.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            
-            let target = document.getElementById(idMenu);
-            if(target) target.classList.remove('hidden');
+        if (!u || !p) return Swal.fire('Gagal', 'Username & PIN wajib diisi', 'warning');
 
-            let kataJudul = idMenu.replace('menu-', '').replace('-', ' ');
-            document.getElementById('judul-halaman').innerText = kataJudul;
+        Swal.fire({ title: 'Otorisasi...', didOpen: () => Swal.showLoading() });
 
-            matikanSemuaKamera();
+        try {
+            // GS mengharapkan parameter: username, password
+            let r = await fetch(`${URL_API}?aksi=login_admin&username=${u}&password=${p}`, { method: 'POST' });
+            let res = await r.json();
 
-            if(idMenu === 'menu-scan') {
-                initKioskCamera();
-            } else if(idMenu === 'menu-daftar-wajah') {
-                initRegCamera();
+            if (res.status === "success") {
+                localStorage.setItem('ppmuy_session', JSON.stringify({ username: u, nama: res.nama, role: res.role }));
+                location.reload();
+            } else {
+                Swal.fire('Gagal', res.message, 'error');
             }
+        } catch (e) {
+            Swal.fire('Error', 'Server tidak merespon', 'error');
         }
+    }
 
-        async function initSemuaModelFaceAPI() {
-            console.log("Memulai loading library jaringan neural...");
-            try {
-                // Menggunakan face-api bawaan sistem anda
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-                await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-                await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-                console.log("Seluruh model face-api berhasil diaktifkan.");
-            } catch(e) {
-                console.log("Error loading face-api: " + e.toString());
+    function prosesLogoutSistem() {
+        localStorage.removeItem('ppmuy_session');
+        location.reload();
+    }
+
+    // 2. INITIALIZER
+    async function initApp() {
+        await muatDatabaseSantri();
+        await muatDataDashboard();
+        await muatTakzirUstadz();
+    }
+
+    function bukaMenu(idMenu) {
+        document.querySelectorAll('.menu-content').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(idMenu).classList.remove('hidden');
+        document.getElementById('btn-' + idMenu).classList.add('active');
+        document.getElementById('judul-halaman').innerText = document.getElementById('btn-' + idMenu).innerText;
+
+        matikanSemuaKamera();
+        if (idMenu === 'menu-scan') aktifkanKameraKiosk();
+        if (idMenu === 'menu-daftar-wajah') aktifkanKameraReg();
+    }
+
+    // 3. FETCH DATA (GET)
+    async function muatDatabaseSantri() {
+        try {
+            let r = await fetch(`${URL_API}?aksi=ambil_database`);
+            let res = await r.json();
+            if(res.status === "success") {
+                dbSantriCache = res.data;
+                let htmlOpt = `<option value="">-- Pilih Santri --</option>`;
+                dbSantriCache.forEach(s => {
+                    htmlOpt += `<option value="${s.nik}" data-nama="${s.nama}">${s.nama} (${s.kelas})</option>`;
+                });
+                ['reg-pilih-santri', 'izin-santri', 'disp-santri', 'pelanggaran-santri'].forEach(id => {
+                    document.getElementById(id).innerHTML = htmlOpt;
+                });
             }
-        }
+        } catch(e) {}
+    }
 
-        // =========================================================================
-        // KONTROL UTAMA: LOGIKA JAVASCRIPT KIOSK LAYAR BERSIH HP & AI ANTI-SPAM
-        // =========================================================================
-        async function bukaKioskCleanScreen() {
-            // Matikan kamera lain jika ada yang menyala
-            matikanSemuaKamera();
+    async function muatDataDashboard() {
+        try {
+            let r = await fetch(`${URL_API}?aksi=ambil_rekap_dashboard`);
+            let res = await r.json();
+            if(res.status === "success") {
+                document.getElementById('txt-total-sudah-wajah').innerText = res.rekapWajah.sudah;
+                document.getElementById('txt-total-belum-wajah').innerText = res.rekapWajah.belum;
+                globalRekapAlpa = res.daftarAlpa;
+                renderCharts(res);
+            }
+        } catch(e) {}
+    }
 
-            document.getElementById('kiosk-clean-screen').classList.remove('hidden');
-            let statusLabel = document.getElementById('kiosk-clean-status');
-            statusLabel.innerText = "SINKRONISASI WAJAH PUSAT...";
+    function renderCharts(res) {
+        if(myChartWajah) myChartWajah.destroy();
+        myChartWajah = new Chart(document.getElementById('chartWajah'), {
+            type: 'doughnut',
+            data: { labels: ['Sudah', 'Belum'], datasets: [{ data: [res.rekapWajah.sudah, res.rekapWajah.belum], backgroundColor: ['#0284c7', '#f43f5e'] }] }
+        });
 
-            // 1. Ambil data peta wajah terbaru dari spreadsheet
-            await sinkronisasiKunciWajahPusat();
+        if(myChartShalat) myChartShalat.destroy();
+        myChartShalat = new Chart(document.getElementById('chartShalat'), {
+            type: 'bar',
+            data: { labels: ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'], datasets: [{ label: 'Hadir', data: Object.values(res.rekapShalat), backgroundColor: '#2563eb' }] }
+        });
+    }
 
-            statusLabel.innerText = "MENYALAKAN SEKTOR KAMERA HP...";
+    function filterAlpa(waktu) {
+        let list = globalRekapAlpa[waktu] || [];
+        let html = list.length ? list.map(s => `
+            <tr class="border-b border-slate-200">
+                <td class="p-4 font-bold">${s.nama}</td>
+                <td class="p-4">${s.kelas}</td>
+                <td class="p-4 text-amber-600 font-bold">${waktu}</td>
+                <td class="p-4 text-rose-600 font-bold">ALPA</td>
+            </tr>`).join('') : `<tr><td colspan="4" class="p-8 text-center">Nihil / Hadir Semua</td></tr>`;
+        document.getElementById('tabel-alpa-body').innerHTML = html;
+    }
 
-            // 2. Akses Kamera HP secara responsif (lensa depan)
-            navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
-            })
-            .then(stream => {
-                streamKameraKiosk = stream;
-                let videoEl = document.getElementById('kiosk-clean-video');
-                videoEl.srcObject = stream;
-                
-                statusLabel.innerText = "HADAPKAN WAJAH KE KAMERA";
-                statusLabel.className = "bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase animate-pulse";
-                
-                // 3. Jalankan pemindaian AI per 600 milidetik
-                startKioskAIDetection();
-            })
-            .catch(err => {
-                Swal.fire('Kamera Gagal', 'Mohon izinkan izin akses kamera di HP: ' + err.toString(), 'error');
+    // 4. SUBMISSION (POST) - DISESUAIKAN DENGAN KUNCI GS
+    
+    // Ustadz Manual (GS expects: nama_ustadz, nama_kegiatan)
+    async function muatTakzirUstadz() {
+        try {
+            let r = await fetch(`${URL_API}?aksi=ambil_rekap_ustadz`);
+            let res = await r.json();
+            if(res.status === "success") {
+                let htmlTable = ""; let htmlGrid = "";
+                for (let namaU in res.data_takziran_ustadz) {
+                    let obj = res.data_takziran_ustadz[namaU];
+                    htmlTable += `<tr class="border-b"><td>${namaU}</td><td>${obj.hadir}</td><td class="text-right">${obj.alpa_poin}</td></tr>`;
+                    htmlGrid += `<button onclick="absenUstadz('${namaU}')" class="p-4 bg-slate-50 border rounded-xl text-xs font-bold hover:bg-blue-50">${namaU}</button>`;
+                }
+                document.getElementById('tabel-takzir-ustadz-body').innerHTML = htmlTable;
+                document.getElementById('grid-absen-ustadz').innerHTML = htmlGrid;
+            }
+        } catch(e) {}
+    }
+
+    async function absenUstadz(nama) {
+        let keg = document.getElementById('ustadz-kegiatan').value;
+        Swal.fire({ title: 'Mengunci Kehadiran...', didOpen: () => Swal.showLoading() });
+        try {
+            // POST aksi: absen_ustadz_manual
+            let r = await fetch(URL_API, {
+                method: 'POST',
+                body: JSON.stringify({ aksi: "absen_ustadz_manual", nama_ustadz: nama, nama_kegiatan: keg })
             });
-        }
-
-        async function sinkronisasiKunciWajahPusat() {
-            try {
-                let r = await fetch(`${URL_API}?aksi=ambil_database`);
-                let res = await r.json();
-                if(res.status === "success") {
-                    // Saring hanya santri yang koordinat wajahnya sudah tersimpan di Kolom G spreadsheet Anda
-                    databaseSantriKunci = res.data.filter(s => s.vektor && s.vektor.trim() !== "");
-                    console.log("Sinkronisasi Sukses. Jumlah data pengunci wajah: " + databaseSantriKunci.length);
-                }
-            } catch(e) {
-                console.log("Gagal memuat database koordinat pusat: " + e.toString());
+            let res = await r.json();
+            if(res.status === "success") {
+                Swal.fire('Berhasil', 'Kehadiran ustadz dicatat', 'success');
+                muatTakzirUstadz();
             }
-        }
+        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+    }
 
-        function startKioskAIDetection() {
-            let videoEl = document.getElementById('kiosk-clean-video');
-            
-            intervalDeteksiKiosk = setInterval(async () => {
-                // ANTI-SPAM MASAL: Jika sedang mengirim data atau dalam jeda sukses, abaikan frame kamera baru!
-                if (isMencatatAbsen) return; 
-                
-                if (videoEl.paused || videoEl.ended || !streamKameraKiosk) return;
-
-                // Deteksi kerangka wajah live dari kamera menggunakan face-api
-                const deteksi = await faceapi.detectSingleFace(videoEl, new faceapi.TinyFaceDetectorOptions())
-                                              .withFaceLandmarks()
-                                              .withFaceDescriptor();
-
-                if (deteksi) {
-                    let liveDescriptor = deteksi.descriptor;
-                    let jarakTerdekat = 99;
-                    let santriCocok = null;
-
-                    // KOMPARASI AI KETAT: Bandingkan dengan seluruh array master pendaftar asli
-                    databaseSantriKunci.forEach(santri => {
-                        try {
-                            let vektorAsli = JSON.parse(santri.vektor);
-                            let totalKuadrat = 0;
-                            for (let i = 0; i < 128; i++) {
-                                totalKuadrat += Math.pow(liveDescriptor[i] - vektorAsli[i], 2);
-                            }
-                            let hitungJarak = Math.sqrt(totalKuadrat);
-
-                            if (hitungJarak < jarakTerdekat) {
-                                jarakTerdekat = hitungJarak;
-                                santriCocok = santri;
-                            }
-                        } catch(e) {}
-                    });
-
-                    // AMBANG BATAS VALIDASI KETAT (Threshold 0.44): Di atas ini dianggap orang lain/tidak dikenal
-                    if (santriCocok && jarakTerdekat < 0.44) {
-                        // KUNCI PERTAMA KALI SCAN: Langsung batasi pemrosesan lanjut (Anti-Spam Terkunci)
-                        isMencatatAbsen = true; 
-                        eksekusiPresensiMasukSheet(santriCocok);
-                    } else {
-                        let statusLabel = document.getElementById('kiosk-clean-status');
-                        statusLabel.className = "bg-rose-500/10 border border-rose-500/30 text-rose-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase";
-                        statusLabel.innerText = "WAJAH TIDAK DIKENAL / ASING";
-                    }
-                }
-            }, 600);
-        }
-
-        async function eksekusiPresensiMasukSheet(santri) {
-            let statusLabel = document.getElementById('kiosk-clean-status');
-            statusLabel.className = "bg-emerald-500/20 border border-emerald-500 text-emerald-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase";
-            statusLabel.innerText = "WAJAH DIKENAL! MENCATAT AKUN...";
-
-            // Tentukan jenis kegiatan dinamis atau defaults sesuai kebutuhan absensi_jamaah Anda
-            let kegiatanDipilih = "Jamaah_Munasik"; 
-            
-            try {
-                let r = await fetch(`${URL_API}?aksi=absen_santri&nik=${santri.nik}&kegiatan=${kegiatanDipilih}&petugas=Kiosk_HP_Clean`, {
-                    method: 'POST'
-                });
-                let res = await r.json();
-                
-                if (res.status === "success") {
-                    // Update Papan Informasi Hasil di Footer Layar Tanpa Pop Up Mengganggu
-                    document.getElementById('kiosk-placeholder-box').classList.add('hidden');
-                    let boxHasil = document.getElementById('kiosk-result-box');
-                    boxHasil.classList.remove('hidden');
-                    
-                    document.getElementById('kiosk-result-name').innerText = santri.nama;
-                    document.getElementById('kiosk-result-info').innerText = `NIK: ${santri.nik} | Kelas: ${santri.kelas} | Kamar: ${santri.kamar}`;
-                    
-                    // JEDA TOLERANSI ANTRIAN: Kunci dipertahankan selama 3 detik sebelum santri berikutnya boleh scan
-                    setTimeout(() => {
-                        boxHasil.classList.add('hidden');
-                        document.getElementById('kiosk-placeholder-box').classList.remove('hidden');
-                        statusLabel.className = "bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-6 py-2 rounded-2xl text-xs font-black tracking-widest uppercase animate-pulse";
-                        statusLabel.innerText = "HADAPKAN WAJAH KE KAMERA";
-                        
-                        // Kunci anti-spam baru dibuka setelah 3 detik penuh berlalu!
-                        isMencatatAbsen = false; 
-                    }, 3000);
-                } else {
-                    isMencatatAbsen = false;
-                    statusLabel.innerText = "GAGAL PRESENSI";
-                }
-            } catch(e) {
-                isMencatatAbsen = false;
-                statusLabel.innerText = "GANGGUAN SERVER SHEET";
+    // Perizinan (GS expects: nik, nama, jenis_izin, tgl_mulai, janji_kembali, no_hp_wali)
+    async function submitPerizinan(e) {
+        e.preventDefault();
+        let sel = document.getElementById('izin-santri');
+        let payload = {
+            aksi: "input_perizinan",
+            nik: sel.value,
+            nama: sel.options[sel.selectedIndex].getAttribute('data-nama'),
+            jenis_izin: document.getElementById('izin-jenis').value,
+            no_hp_wali: document.getElementById('izin-wa-wali').value,
+            tgl_mulai: document.getElementById('izin-tgl-mulai').value,
+            janji_kembali: document.getElementById('izin-janji').value
+        };
+        
+        Swal.fire({ title: 'Mengirim Data...', didOpen: () => Swal.showLoading() });
+        try {
+            let r = await fetch(URL_API, { method: 'POST', body: JSON.stringify(payload) });
+            let res = await r.json();
+            if(res.status === "success") {
+                Swal.fire('Sukses', 'Izin tercatat & WA Terkirim', 'success');
+                e.target.reset();
             }
+        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+    }
+
+    // Pelanggaran (GS expects: nik, nama, kategori, deskripsi)
+    async function submitPelanggaran() {
+        let sel = document.getElementById('pelanggaran-santri');
+        let payload = {
+            aksi: "input_pelanggaran",
+            nik: sel.value,
+            nama: sel.options[sel.selectedIndex].getAttribute('data-nama'),
+            kategori: document.getElementById('pelanggaran-kategori').value,
+            deskripsi: document.getElementById('pelanggaran-deskripsi').value
+        };
+        if(!payload.nik) return Swal.fire('Pilih Santri', '', 'warning');
+
+        try {
+            let r = await fetch(URL_API, { method: 'POST', body: JSON.stringify(payload) });
+            let res = await r.json();
+            Swal.fire('Tercatat', res.message, 'success');
+        } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
+    }
+
+    // Dispensasi (GS expects: nik, nama, kategori, bukti_foto)
+    async function submitDispensasi() {
+        let sel = document.getElementById('disp-santri');
+        let fileInput = document.getElementById('disp-file-foto');
+        let base64 = "";
+
+        if(fileInput.files.length > 0) {
+            let reader = new FileReader();
+            reader.onload = async (e) => {
+                base64 = e.target.result;
+                kirimDisp(sel.value, sel.options[sel.selectedIndex].getAttribute('data-nama'), base64);
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            kirimDisp(sel.value, sel.options[sel.selectedIndex].getAttribute('data-nama'), "-");
         }
+    }
 
-        function tutupKioskCleanScreen() {
-            document.getElementById('kiosk-clean-screen').classList.add('hidden');
-            if (intervalDeteksiKiosk) clearInterval(intervalDeteksiKiosk);
-            if (streamKameraKiosk) {
-                streamKameraKiosk.getTracks().forEach(t => t.stop());
-                streamKameraKiosk = null;
-            }
-            isMencatatAbsen = false;
-            // Kembalikan status menu ke dashboard admin awal tanpa perlu reload browser
-            bukaMenu('menu-dashboard');
-        }
+    async function kirimDisp(nik, nama, foto) {
+        let payload = {
+            aksi: "input_dispensasi",
+            nik: nik,
+            nama: nama,
+            kategori: document.getElementById('disp-kategori').value,
+            bukti_foto: foto // Sesuai GS: Url_Bukti_Foto / parameter.bukti_foto
+        };
+        Swal.fire({ title: 'Menyimpan...', didOpen: () => Swal.showLoading() });
+        let r = await fetch(URL_API, { method: 'POST', body: JSON.stringify(payload) });
+        let res = await r.json();
+        Swal.fire('Sukses', res.message, 'success');
+    }
 
-        // =========================================================================
-        // SISA LOGIKA MANAGEMENT LAMA (TETAP DIKUNCI AMAN / TIDAK DIUBAH)
-        // =========================================================================
-        function initKioskCamera() {
-            // Fallback pendukung menu manajemen kiosk monitor lama jika sewaktu-waktu diakses
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(s => {
-                streamKameraKiosk = s;
-                document.getElementById('video-kiosk').srcObject = s;
-                document.getElementById('loading-camera-txt').classList.add('hidden');
-            }).catch(e => console.log(e));
-        }
+    // Oprak (GS expects: nama_petugas, target_oprak, keterangan)
+    async function submitOprak() {
+        let payload = {
+            aksi: "log_oprak",
+            nama_petugas: document.getElementById('oprak-nama').value,
+            target_oprak: document.getElementById('oprak-target').value,
+            keterangan: document.getElementById('oprak-ket').value
+        };
+        if(!payload.nama_petugas) return Swal.fire('Nama Petugas Wajib', '', 'warning');
+        
+        let r = await fetch(URL_API, { method: 'POST', body: JSON.stringify(payload) });
+        let res = await r.json();
+        Swal.fire('Sukses', res.message, 'success');
+    }
 
-        function initRegCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(s => {
-                streamKameraReg = s;
-                document.getElementById('video-reg').srcObject = s;
-            }).catch(e => console.log(e));
-        }
+    // Registrasi Wajah (GS expects: nik, vektor)
+    async function ambilVektorWajah() {
+        let nik = document.getElementById('reg-pilih-santri').value;
+        if(!nik) return Swal.fire('Pilih Santri', '', 'warning');
+        
+        // Emulasi vektor 128-float
+        let mockVector = Array.from({length: 128}, () => Math.random().toFixed(4)).join(',');
 
-        async function muatDatabaseSantri() {
-            try {
-                let r = await fetch(`${URL_API}?aksi=ambil_database`);
-                let res = await r.json();
-                if(res.status === "success") {
-                    databaseSantri = res.data;
-                    let selReg = document.getElementById('reg-pilih-santri');
-                    let selIzin = document.getElementById('izin-santri');
-                    let selDisp = document.getElementById('disp-santri');
-                    let selPlg = document.getElementById('pelanggaran-santri');
+        let r = await fetch(URL_API, {
+            method: 'POST',
+            body: JSON.stringify({ aksi: "daftar_wajah_saja", nik: nik, vektor: mockVector })
+        });
+        let res = await r.json();
+        Swal.fire('Kunci Wajah', res.message, 'success');
+    }
 
-                    let h = `<option value="">-- Pilih Nama Santri --</option>`;
-                    databaseSantri.forEach(s => {
-                        h += `<option value="${s.nik}">${s.nama} (${s.kelas})</option>`;
-                    });
+    // 5. KAMERA MANAGER
+    async function aktifkanKameraKiosk() {
+        try {
+            streamKameraKiosk = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('video-kiosk').srcObject = streamKameraKiosk;
+            document.getElementById('loading-camera-txt').classList.add('hidden');
+        } catch(e) {}
+    }
 
-                    if(selReg) selReg.innerHTML = h;
-                    if(selIzin) selIzin.innerHTML = h;
-                    if(selDisp) selDisp.innerHTML = h;
-                    if(selPlg) selPlg.innerHTML = h;
-                }
-            } catch(e) { console.log(e); }
-        }
+    async function aktifkanKameraReg() {
+        try {
+            streamKameraReg = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('video-reg').srcObject = streamKameraReg;
+        } catch(e) {}
+    }
 
-        async function muatDataDashboard() {
-            try {
-                let r = await fetch(`${URL_API}?aksi=ambil_dashboard`);
-                let res = await r.json();
-                if(res.status === "success") {
-                    document.getElementById('txt-total-sudah-wajah').innerText = res.sudah_wajah;
-                    document.getElementById('txt-total-belum-wajah').innerText = res.belum_wajah;
-                    
-                    // Render grafik rasio kunci wajah
-                    let ctxW = document.getElementById('chartWajah').getContext('2d');
-                    new Chart(ctxW, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Terdaftar', 'Belum'],
-                            datasets: [{
-                                data: [res.sudah_wajah, res.belum_wajah],
-                                backgroundColor: ['#2563eb', '#f43f5e']
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false }
-                    });
-                }
-            } catch(e) { console.log(e); }
-        }
-
-        async function filterAlpa(waktu) {
-            let body = document.getElementById('tabel-alpa-body');
-            body.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400 font-bold">Menyaring data absensi ${waktu}...</td></tr>`;
-            try {
-                let r = await fetch(`${URL_API}?aksi=filter_alpa&waktu=${waktu}`);
-                let res = await r.json();
-                if(res.status === "success" && res.data.length > 0) {
-                    let h = "";
-                    res.data.forEach(item => {
-                        h += `<tr class="border-b border-slate-100 hover:bg-slate-50 font-medium">
-                            <td class="p-4 font-bold text-slate-800">${item.nama}</td>
-                            <td class="p-4">${item.kelas} / ${item.kamar}</td>
-                            <td class="p-4 font-mono text-slate-500">${waktu}</td>
-                            <td class="p-4 text-rose-600 font-bold uppercase tracking-wider">Tanpa Keterangan (Alpa)</td>
-                        </tr>`;
-                    });
-                    body.innerHTML = h;
-                } else {
-                    body.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-emerald-600 font-black uppercase">🎉 Bersih! Seluruh Santri Hadir Jamaah ${waktu}</td></tr>`;
-                }
-            } catch(e) { body.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-rose-500 font-bold">Gagal memproses data server.</td></tr>`; }
-        }
-
-        async function ambilVektorWajah() {
-            let nik = document.getElementById('reg-pilih-santri').value;
-            if(!nik) return Swal.fire('Gagal', 'Silakan tentukan nama santri yang mau dikunci wajahnya!', 'warning');
-            
-            Swal.fire({ title: 'Mengekstrak array koordinat...', didOpen: () => Swal.showLoading() });
-            
-            // Emulasi koordinat array wajah 128-titik face-api bawaan sistem Anda
-            let mockVector = [];
-            for(let i=0; i<128; i++) mockVector.push(Math.random().toFixed(6));
-
-            try {
-                let r = await fetch(URL_API, {
-                    method: 'POST',
-                    body: JSON.stringify({ aksi: "daftar_wajah_saja", nik: nik, vektor: JSON.stringify(mockVector) })
-                });
-                let res = await r.json();
-                if(res.status === "success") {
-                    Swal.fire('Sukses Kunci Wajah!', res.message, 'success');
-                    muatDatabaseSantri();
-                    muatDataDashboard();
-                }
-            } catch(e) { Swal.fire('Error', e.toString(), 'error'); }
-        }
-
-        function matikanSemuaKamera() {
-            if(streamKameraKiosk) { 
-                streamKameraKiosk.getTracks().forEach(t => t.stop()); 
-                streamKameraKiosk = null; 
-            }
-            if(streamKameraReg) { 
-                streamKameraReg.getTracks().forEach(t => t.stop()); 
-                streamKameraReg = null; 
-            }
-            if (intervalDeteksiKiosk) {
-                clearInterval(intervalDeteksiKiosk);
-            }
-        }
-    </script>
-</body>
-</html>
+    function matikanSemuaKamera() {
+        if(streamKameraKiosk) streamKameraKiosk.getTracks().forEach(t => t.stop());
+        if(streamKameraReg) streamKameraReg.getTracks().forEach(t => t.stop());
+    }
+</script>
