@@ -14,31 +14,31 @@
         
         /* Tema Malam (Default Asli Anda) */
         .theme-dark {
-            --bg-main: #0f172a; /* slate-900 */
-            --bg-header: #020617; /* slate-955 */
-            --bg-box: #020617; /* slate-955 */
-            --bg-inner: #0f172a; /* slate-900 */
-            --text-main: #f1f5f9; /* slate-100 */
-            --text-muted: #94a3b8; /* slate-400 */
+            --bg-main: #0f172a;      /* slate-900 */
+            --bg-header: #020617;    /* slate-955 */
+            --bg-box: #020617;       /* slate-955 */
+            --bg-inner: #0f172a;     /* slate-900 */
+            --text-main: #f1f5f9;    /* slate-100 */
+            --text-muted: #94a3b8;   /* slate-400 */
             --border-color: #1e293b; /* slate-800 */
-            --border-row: #020617; /* slate-950 */
-            --text-row: #cbd5e1; /* slate-300 */
+            --border-row: #020617;   /* slate-950 */
+            --text-row: #cbd5e1;     /* slate-300 */
         }
 
         /* Tema Siang (Cerah Premium ala Mobile App) */
         .theme-light {
-            --bg-main: #f0f4f8; /* Abu-abu kebiruan sangat lembut */
-            --bg-header: #ffffff; /* Putih Bersih */
-            --bg-box: #ffffff; /* Putih Bersih dengan shadow */
-            --bg-inner: #f8fafc; /* slate-50 */
-            --text-main: #0f172a; /* slate-900 */
-            --text-muted: #64748b; /* slate-500 */
+            --bg-main: #f0f4f8;      /* Abu-abu kebiruan sangat lembut */
+            --bg-header: #ffffff;    /* Putih Bersih */
+            --bg-box: #ffffff;       /* Putih Bersih dengan shadow */
+            --bg-inner: #f8fafc;     /* slate-50 */
+            --text-main: #0f172a;    /* slate-900 */
+            --text-muted: #64748b;   /* slate-500 */
             --border-color: #e2e8f0; /* slate-200 */
-            --border-row: #f1f5f9; /* slate-100 */
-            --text-row: #334155; /* slate-700 */
+            --border-row: #f1f5f9;   /* slate-100 */
+            --text-row: #334155;     /* slate-700 */
         }
 
-        body { background-color: var(--bg-main); color: var(--text-main); }
+        body { bg-color: var(--bg-main); color: var(--text-main); }
         .dynamic-bg-main { background-color: var(--bg-main); }
         .dynamic-bg-header { background-color: var(--bg-header); }
         .dynamic-bg-box { background-color: var(--bg-box); box-shadow: var(--theme-shadow); }
@@ -109,7 +109,7 @@
         </section>
 
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
-         
+            
             <div class="lg:col-span-2 flex flex-col gap-6">
                 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -170,15 +170,14 @@
                                     <th class="py-2">KELAS</th>
                                     <th class="py-2 text-right">STATUS</th>
                                 </tr>
-                            </thead>
-                        </table>
-                        <div class="overflow-y-auto max-h-[160px]">
-                            <table class="w-full text-left text-[11px]">
-                                <tbody id="tbl-wajah-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
-                                    <tr><td colspan="3" class="py-3 text-center text-slate-500">Memuat data analisis...</td></tr>
-                                </tbody>
                             </table>
-                        </div>
+                            <div class="overflow-y-auto max-h-[160px]">
+                                <table class="w-full text-left text-[11px]">
+                                    <tbody id="tbl-wajah-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
+                                        <tr><td colspan="3" class="py-3 text-center text-slate-500">Memuat data analisis...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -203,17 +202,6 @@
                 <div class="flex gap-2 items-center no-print">
                     <button onclick="window.print()" class="bg-indigo-900 hover:bg-indigo-800 text-white font-black text-[10px] px-3 py-1.5 rounded-lg uppercase cursor-pointer shadow-sm"><i class="fa-solid fa-print"></i> CETAK</button>
                     <button onclick="tutupModalGuru()" class="text-red-600 font-black text-xs uppercase cursor-pointer p-1">TUTUP <i class="fa-solid fa-xmark"></i></button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 mb-3 no-print">
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2 text-center">
-                    <span class="text-[9px] font-black text-emerald-700 block uppercase tracking-wider">TOTAL HADIR</span>
-                    <span id="modal-txt-hadir" class="text-sm font-black text-emerald-600">0</span>
-                </div>
-                <div class="bg-red-50 border border-red-200 rounded-xl p-2 text-center">
-                    <span class="text-[9px] font-black text-red-700 block uppercase tracking-wider">TOTAL GAIB</span>
-                    <span id="modal-txt-gaib" class="text-sm font-black text-red-600">0</span>
                 </div>
             </div>
 
@@ -249,12 +237,9 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
-
-        // Global Variable Tambahan untuk Penghitung Kartu Guru
-        let mCounterHadir = 0;
-        let mCounterGaib = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             const nama = localStorage.getItem('session_nama');
@@ -289,6 +274,7 @@
                 document.body.classList.add('theme-light');
                 btnTema.innerHTML = `<i class="fa-solid fa-moon text-base text-indigo-950"></i>`;
                 btnTema.className = "w-10 h-10 rounded-xl bg-slate-200 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-300 shadow text-indigo-950";
+                
                 // Penyesuaian tombol internal tab rekap biar kontras saat mode terang
                 if (tabAktif === "BELUM") {
                     btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all";
@@ -301,6 +287,7 @@
                 document.body.classList.add('theme-dark');
                 btnTema.innerHTML = `<i class="fa-solid fa-sun text-base"></i>`;
                 btnTema.className = "w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400";
+                
                 if (tabAktif === "BELUM") {
                     btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
                 } else {
@@ -315,6 +302,7 @@
             const btnBelum = document.getElementById('btn-tab-belum');
             const btnSudah = document.getElementById('btn-tab-sudah');
             const isLight = document.body.classList.contains('theme-light');
+
             if (jenis === "BELUM") {
                 btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer transition-all";
                 btnSudah.className = isLight 
@@ -334,6 +322,7 @@
             tblBody.innerHTML = '';
             
             let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
+
             if (listData.length === 0) {
                 tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 uppercase font-bold text-[10px]">Data tidak ditemukan / Kosong.</td></tr>`;
                 return;
@@ -388,7 +377,6 @@
                             div.className = isLight
                                 ? "bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm"
                                 : "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm";
-                                
                             div.innerHTML = `
                                 <div class="flex flex-col gap-0.5">
                                     <span class="dynamic-text-main uppercase tracking-wide">${log.nama}</span>
@@ -408,15 +396,7 @@
             }
         }
 
-        function bukaModalGuru() { 
-            document.getElementById('modal-guru').classList.remove('hidden');
-            // Reset counter statistik modal ke posisi awal tiap kali dibuka
-            mCounterHadir = 0;
-            mCounterGaib = 0;
-            document.getElementById('modal-txt-hadir').innerText = "0";
-            document.getElementById('modal-txt-gaib').innerText = "0";
-        }
-        
+        function bukaModalGuru() { document.getElementById('modal-guru').classList.remove('hidden'); }
         function tutupModalGuru() { document.getElementById('modal-guru').classList.add('hidden'); }
         function prosesLogout() { localStorage.clear(); window.location.href = "index.html"; }
 
@@ -428,6 +408,7 @@
             const hari = document.getElementById('g-hari').value;
             const jam = document.getElementById('g-jam').value;
             const gender = document.getElementById('g-gender').value;
+
             const urlAmbil = `${API_URL}?aksi=ambil_guru_pdf&hari=${encodeURIComponent(hari)}&jam=${encodeURIComponent(jam)}&gender=${encodeURIComponent(gender)}`;
 
             try {
@@ -435,12 +416,6 @@
                 let r = await res.json();
                 
                 if (r.status === "success" && r.data.length > 0) {
-                    // Set angka awal statistik internal modal
-                    mCounterHadir = 0;
-                    mCounterGaib = r.data.length;
-                    document.getElementById('modal-txt-hadir').innerText = mCounterHadir;
-                    document.getElementById('modal-txt-gaib').innerText = mCounterGaib;
-
                     r.data.forEach(guru => {
                         let btn = document.createElement('button');
                         btn.className = "bg-indigo-50 hover:bg-red-100 text-indigo-950 font-black p-4 rounded-xl border border-indigo-200 text-xs flex flex-col justify-center items-center gap-1 cursor-pointer text-center duration-300 shadow-sm transition-all transform hover:scale-95";
@@ -461,43 +436,17 @@
                                 let resAbsen = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: paramsAbsen.toString() });
                                 let rAbsen = await resAbsen.json();
                                 if(rAbsen.status === "success") {
-                                    // Efek animasi mengecil & menghilang saat sukses diklik
-                                    btn.style.transform = "scale(0)";
-                                    btn.style.opacity = "0";
-                                    
-                                    setTimeout(() => { 
-                                        btn.remove(); 
-                                        
-                                        // Update status counter rekap real-time di atas kartu
-                                        mCounterHadir++;
-                                        mCounterGaib--;
-                                        document.getElementById('modal-txt-hadir').innerText = mCounterHadir;
-                                        document.getElementById('modal-txt-gaib').innerText = mCounterGaib;
-
-                                        // Tetap jalankan update background log utama
-                                        muatSeluruhRekapDashboard(); 
-                                    }, 300);
-                                } else { 
-                                    alert("Gagal catat."); 
-                                    btn.disabled = false;
-                                    btn.innerHTML = `<i class="fa-solid fa-user-tie text-base text-indigo-900 opacity-60"></i><span>${guru.nama.toUpperCase()}</span><span class="text-[9px] text-indigo-700 font-mono">${guru.mapel} (${guru.kelas})</span>`;
-                                }
-                            } catch(e) { 
-                                alert("Masalah jaringan!");
-                                btn.disabled = false; 
-                                btn.innerHTML = `<i class="fa-solid fa-user-tie text-base text-indigo-900 opacity-60"></i><span>${guru.nama.toUpperCase()}</span><span class="text-[9px] text-indigo-700 font-mono">${guru.mapel} (${guru.kelas})</span>`;
-                            }
+                                    btn.style.transform = "scale(0)"; btn.style.opacity = "0";
+                                    setTimeout(() => { btn.remove(); muatSeluruhRekapDashboard(); }, 300);
+                                } else { alert("Gagal catat."); btn.disabled = false; }
+                            } catch(e) { alert("Masalah jaringan!"); btn.disabled = false; }
                         });
                         box.appendChild(btn);
                     });
                 } else {
-                    document.getElementById('modal-txt-hadir').innerText = "0";
-                    document.getElementById('modal-txt-gaib').innerText = "0";
                     box.innerHTML = `<div class="col-span-full text-center font-bold text-xs py-6 text-slate-400 uppercase tracking-wider">Jadwal mengajar kosong.</div>`;
                 }
-            } catch(e) { 
-                box.innerHTML = `<div class="col-span-full text-center text-red-500 font-bold text-xs py-6">Koneksi Cloud Macet!</div>`;
-            }
+            } catch(e) { box.innerHTML = `<div class="col-span-full text-center text-red-500 font-bold text-xs py-6">Koneksi Cloud Macet!</div>`; }
             finally { loader.classList.add('hidden'); }
         }
     </script>
