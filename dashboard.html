@@ -319,7 +319,7 @@
             const nama = localStorage.getItem("admin_nama");
             const role = localStorage.getItem("admin_role");
             if (!nama || !role) {
-                window.location.href = "login.html";
+                window.location.href = "index.html"; // JIKA BELUM LOGIN, DILEMPAR KE HALAMAN UTAMA (INDEX)
                 return;
             }
             document.getElementById("labelAdmin").innerHTML = `
@@ -396,7 +396,7 @@
             }
         }
 
-        // AMBIL REKAP DOSEN / GURU REALTIME (AKSI BARU YANG BARUSAN KITA SUNTIK DI GATEWAY)
+        // AMBIL REKAP GURU REALTIME
         async function ambilRekapGuruRealtime() {
             const guruBox = document.getElementById("liveFeedGuruBox");
             try {
@@ -436,7 +436,7 @@
 
         function prosesLogout() { 
             localStorage.clear(); 
-            window.location.href = "login.html"; 
+            window.location.href = "index.html"; // KETIKA LOGOUT, DILEMPAR AMAN BALIK KE GERBANG INDEX
         }
     </script>
 </body>
