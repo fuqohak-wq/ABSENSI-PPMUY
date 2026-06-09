@@ -467,32 +467,125 @@
         }
 
         async function prosesLoginSistem() {
-    let u = document.getElementById('login-username').value;
-    let p = document.getElementById('login-password').value;
+    // Ambil input nilai dari kotak form login Anda
+    let u = document.getElementById('login-username').value.trim();
+    let p = document.getElementById('login-password').value.trim();
 
-    if(!u || !p) return Swal.fire('Gagal', 'Kolom Username dan Password wajib diisi!', 'warning');
+    // Validasi input kosong di sisi klien
+    if (!u || !p) {
+        return Swal.fire('Gagal', 'Kolom Username dan Password PIN wajib diisi!', 'warning');
+    }
     
-    Swal.fire({ title: 'Memverifikasi Akun...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    // Tampilkan loading animasi dari SweetAlert2
+    Swal.fire({ 
+        title: 'Memverifikasi Akun...', 
+        text: 'Menghubungkan ke server pusat PPMUY...',
+        allowOutsideClick: false, 
+        didOpen: () => Swal.showLoading() 
+    });
     
     try {
-        // Parameter disesuaikan agar sesuai dengan nama kolom di spreadsheet (Username & Password_PIN)
-        let r = await fetch(`${URL_API}?aksi=login_pengurus&Username=${encodeURIComponent(u)}&Password_PIN=${encodeURIComponent(p)}`);
+        /**
+         * Menggunakan metode POST sesuai dengan penanganan aksi "login_admin" pada code.gs Anda.
+         * Parameter dikirimkan dalam format URL-encoded agar langsung dibaca oleh e.parameter server.
+         */
+        let r = await fetch(`${URL_API}?aksi=login_admin&username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`, {
+            method: 'POST'
+        });
+        
         let res = await r.json();
         
-        if(res.status === "success") {
-            localStorage.setItem('ppmuy_session', JSON.stringify({ username: u, token: Date.now() }));
+        // Memeriksa respons balik dari server Apps Script
+        if (res.status === "success") {
+            // Simpan data sesi ke penyimpanan lokal browser (localStorage)
+            localStorage.setItem('ppmuy_session', JSON.stringify({ 
+                username: u, 
+                namaLengkap: res.nama,
+                role: res.role,
+                token: Date.now() 
+            }));
+            
+            // Tutup pelindung gerbang halaman login, lalu buka tampilan sistem utama
             document.getElementById('halaman-login').classList.add('hidden');
-            document.getElementById('sidebar-utama').classList.remove('hidden');
-            document.getElementById('konten-utama').classList.remove('hidden');
-            document.getElementById('txt-role-pengurus').innerText = "Akses: " + u.toUpperCase();
-            Swal.close();
+            if(document.getElementById('sidebar-utama')) document.getElementById('sidebar-utama').classList.remove('hidden');
+            if(document.getElementById('konten-utama')) document.getElementById('konten-utama').classList.remove('hidden');
+            
+            // Menampilkan informasi Akun dan Hak Akses Pengurus di Sidebar secara dinamis
+            if(document.getElementById('txt-nama-pengurus')) {
+                document.getElementById('txt-nama-pengurus').innerText = res.nama;
+            }
+            if(document.getElementById('txt-role-pengurus')) {
+                document.getElementById('txt-role-pengurus').innerText = "Akses: " + res.role;
+            }
+            
+            // Notifikasi sukses
+            Swal.fire({
+                title: 'Login Berhasil!',
+                text: `Selamat datang kembali, ${res.nama} (${res.role})`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            // Jalankan fungsi inisialisasi pemuatan data aplikasi Anda
             initApp();
+            
         } else {
-            Swal.fire('Akses Ditolak', 'Kombinasi Username atau Password PIN salah!', 'error');
+            // Jika username atau PIN salah, atau data pengurus tidak ditemukan
+            Swal.fire('Akses Ditolak', res.message || 'Kombinasi Username atau Password PIN salah!', 'error');
         }
-    } catch(e) {
-        Swal.fire('Error Koneksi', 'Gagal terhubung dengan server WebApp: ' + e.toString(), 'error');
+    } catch (e) {
+        // Penanganan jika ada gangguan jaringan atau URL WebApp salah/belum di-deploy ulang
+        Swal.fire('Error Jaringan', 'Gagal terhubung dengan server WebApp: ' + e.toString(), 'error');
     }
+}
+
+/**
+ * Fungsi Cek Status Login (Letakkan ini agar dijalankan otomatis saat halaman dibuka)
+ */
+function cekStatusLogin() {
+    let session = localStorage.getItem('ppmuy_session');
+    if (session) {
+        let dataSesi = JSON.parse(session);
+        // Jika sesi masih aktif, langsung bypass halaman login
+        document.getElementById('halaman-login').classList.add('hidden');
+        if(document.getElementById('sidebar-utama')) document.getElementById('sidebar-utama').classList.remove('hidden');
+        if(document.getElementById('konten-utama')) document.getElementById('konten-utama').classList.remove('hidden');
+        
+        if(document.getElementById('txt-nama-pengurus')) document.getElementById('txt-nama-pengurus').innerText = dataSesi.namaLengkap;
+        if(document.getElementById('txt-role-pengurus')) document.getElementById('txt-role-pengurus').innerText = "Akses: " + dataSesi.role;
+        
+        initApp();
+    } else {
+        // Jika belum login, pastikan seluruh dashboard terkunci rapat
+        document.getElementById('halaman-login').classList.remove('hidden');
+        if(document.getElementById('sidebar-utama')) document.getElementById('sidebar-utama').classList.add('hidden');
+        if(document.getElementById('konten-utama')) document.getElementById('konten-utama').classList.add('hidden');
+    }
+}
+
+/**
+ * Fungsi Keluar Sistem (Logout)
+ */
+function prosesLogoutSistem() {
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Sesi admin Anda di perangkat ini akan disudahi!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0d9488',
+        cancelButtonColor: '#f43f5e',
+        confirmButtonText: 'Ya, Keluar',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('ppmuy_session');
+            // Matikan hardware kamera web jika fungsi pendukung tersedia
+            if (typeof matikanSemuaKamera === "function") { matikanSemuaKamera(); }
+            // Muat ulang halaman ke kondisi awal terproteksi
+            window.location.reload();
+        }
+    });
 }
 
         // 2. ROOT INITIALIZER (MEMUAT MODEL JAVASCRIPT & DATABASE LAMA)
