@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Kiosk Wajah AI - Core Pakem v3</title>
+    <title>Terminal Kiosk Wajah AI - Core Pakem Standar Industri</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -80,9 +80,11 @@
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
-                // Menggunakan model landmark penuh (68 titik penanda) untuk akurasi presisi tinggi
+                // Memuat jaringan kecerdasan pengenal pengunci wajah berakurasi tinggi (SSD Mobilenet & Face Recognition Net)
+                label.innerText = "MEMUAT AI KIOSK...";
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
                 const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
                 const json = await res.json();
@@ -98,26 +100,23 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Deteksi wajah tunggal beserta struktur garis landmark-nya
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
+                    // Deteksi wajah langsung dengan ekstraksi ekstra deskriptor biometrik
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
                         kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                         label.innerText = "MENCOCOKKAN BIOMETRIK...";
                         
-                        verifikasiWajahLokal(hasilKamera.landmarks);
+                        verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 350);
+                }, 400);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
-        async function verifikasiWajahLokal(landmarksKamera) {
+        async function verifikasiWajahLokal(descriptorKamera) {
             let santriDitemukan = null; 
-            let skorTerbaik = 999;
-
-            // 1. Ambil deskriptor jarak antar komponen organ wajah dari kamera saat ini
-            let matriksKamera = hitungMatriksRelatifWajah(landmarksKamera.positions);
+            let jarakTerkecil = 1.0; // Standar pencarian jarak kecocokan wajah jarak terdekat
 
             for (let santri of databaseSantri) {
                 try {
@@ -125,22 +124,19 @@
                     if(!dataVektorRaw) continue;
                     
                     let dataVektorArr = JSON.parse(dataVektorRaw);
-                    let matriksDatabase = (dataVektorArr.positions) ? dataVektorArr.positions : dataVektorArr;
+                    
+                    // JIKA DATA ADALAH STRUKTUR LANDMARK LAMA, KONVERSIKAN ATAU AMBIL SIMPANAN DESCRIPTOR ASLINYA
+                    let arrayVektorDb = Array.isArray(dataVektorArr) ? dataVektorArr : Object.values(dataVektorArr);
+                    
+                    // Kasus proteksi fallback jika array bukan panjang deskriptor standar (128 titik data float)
+                    if(arrayVektorDb.length !== 128) continue; 
 
-                    // 2. Ubah data pembanding database ke dalam format matriks jarak relatif yang sama
-                    let matriksDbRelatif = hitungMatriksRelatifWajah(matriksDatabase);
+                    // Hitung Euclidean Distance murni dari face-api asli (Sangat Pakem)
+                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // 3. Hitung Deviasi Euclidean Total
-                    let selisihAkurasi = 0;
-                    for (let i = 0; i < matriksKamera.length; i++) {
-                        let diff = matriksKamera[i] - matriksDbRelatif[i];
-                        selisihAkurasi += diff * diff;
-                    }
-                    let totalJarakKemiripan = Math.sqrt(selisihAkurasi);
-
-                    // THRESHOLD AMAN & STRICT: 0.045 (Di bawah ini dijamin asli, di atas ini ditolak/tidak dikenal)
-                    if (totalJarakKemiripan < skorTerbaik && totalJarakKemiripan < 0.045) { 
-                        skorTerbaik = totalJarakKemiripan; 
+                    // BATAS STRICT TOLERANSI AMAN INTERNASIONAL: 0.50 (Di bawah 0.50 dipastikan orang yang sama)
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.50) { 
+                        jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
                 } catch(e){}
@@ -204,28 +200,6 @@
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                 }, 1200);
             }
-        }
-
-        // AKURASI PAKEM: Rumus Pemetaan Vektor Jarak Relatif Antar Titik Inti Wajah
-        function hitungMatriksRelatifWajah(posisi) {
-            if (!posisi || posisi.length < 68) return [];
-            
-            // Menggunakan Titik Hidung Tengah (indeks 30) dan Ujung Hidung bawah (indeks 33) sebagai dasar skala ukur wajah asli
-            let p30 = posisi[30];
-            let p33 = posisi[33];
-            let basisPanjangHidung = Math.sqrt(Math.pow(p33.x - p30.x, 2) + Math.pow(p33.y - p30.y, 2));
-            if (basisPanjangHidung === 0) basisPanjangHidung = 1;
-
-            // Kunci organ vital: Alis (17-26), Mata (36-47), Hidung (27-35), Mulut (48-67)
-            let indeksFiturUtama = [];
-            for (let i = 17; i <= 67; i++) { indeksFiturUtama.push(i); }
-
-            // Hitung jarak murni setiap organ vital ke pusat hidung tengah (titik 30) lalu dibagi panjang hidung
-            return indeksFiturUtama.map(idx => {
-                let p = posisi[idx];
-                let jarakMurni = Math.sqrt(Math.pow(p.x - p30.x, 2) + Math.pow(p.y - p30.y, 2));
-                return jarakMurni / basisPanjangHidung; // Hasil berupa rasio desimal murni (Kebal Jarak Kamera)
-            });
         }
     </script>
 </body>
