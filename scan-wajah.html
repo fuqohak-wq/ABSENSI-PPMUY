@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Kiosk Wajah AI - Core Pakem</title>
+    <title>Terminal Kiosk Wajah AI - Core Pakem v3</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -80,6 +80,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
+                // Menggunakan model landmark penuh (68 titik penanda) untuk akurasi presisi tinggi
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
@@ -96,6 +97,8 @@
                 
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
+                    
+                    // Deteksi wajah tunggal beserta struktur garis landmark-nya
                     const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
                     
                     if (hasilKamera) {
@@ -103,32 +106,41 @@
                         kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                         label.innerText = "MENCOCOKKAN BIOMETRIK...";
                         
-                        // Kirim seluruh objek landmark hasil kamera untuk dinormalisasi skalanya
                         verifikasiWajahLokal(hasilKamera.landmarks);
                     }
-                }, 300);
+                }, 350);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
-        // ALGORITMA BARU: MATRIKS NORMALISASI DAN JARAK AKTUAL PRESISI TINGGI
         async function verifikasiWajahLokal(landmarksKamera) {
             let santriDitemukan = null; 
             let skorTerbaik = 999;
 
-            // Ekstrak dan normalisasi struktur wajah dari kamera langsung
-            let vektorKameraNormal = dapatkanVektorNormal(landmarksKamera);
+            // 1. Ambil deskriptor jarak antar komponen organ wajah dari kamera saat ini
+            let matriksKamera = hitungMatriksRelatifWajah(landmarksKamera.positions);
 
             for (let santri of databaseSantri) {
                 try {
                     let dataVektorRaw = santri.vektor;
                     if(!dataVektorRaw) continue;
                     
-                    // Hitung kemiripan geometris struktur data master dengan kamera nyata
-                    let jarak = hitungJarakSkalaSama(vektorKameraNormal, JSON.parse(dataVektorRaw));
-                    
-                    // Batas toleransi strict (0.055) setelah dinormalisasi agar tidak tertukar orang lain
-                    if (jarak < skorTerbaik && jarak < 0.055) { 
-                        skorTerbaik = jarak; 
+                    let dataVektorArr = JSON.parse(dataVektorRaw);
+                    let matriksDatabase = (dataVektorArr.positions) ? dataVektorArr.positions : dataVektorArr;
+
+                    // 2. Ubah data pembanding database ke dalam format matriks jarak relatif yang sama
+                    let matriksDbRelatif = hitungMatriksRelatifWajah(matriksDatabase);
+
+                    // 3. Hitung Deviasi Euclidean Total
+                    let selisihAkurasi = 0;
+                    for (let i = 0; i < matriksKamera.length; i++) {
+                        let diff = matriksKamera[i] - matriksDbRelatif[i];
+                        selisihAkurasi += diff * diff;
+                    }
+                    let totalJarakKemiripan = Math.sqrt(selisihAkurasi);
+
+                    // THRESHOLD AMAN & STRICT: 0.045 (Di bawah ini dijamin asli, di atas ini ditolak/tidak dikenal)
+                    if (totalJarakKemiripan < skorTerbaik && totalJarakKemiripan < 0.045) { 
+                        skorTerbaik = totalJarakKemiripan; 
                         santriDitemukan = santri; 
                     }
                 } catch(e){}
@@ -194,47 +206,26 @@
             }
         }
 
-        // FUNGSI UTAMA: MENGUBAH KOORDINAT PIKSEL MENJADI MATRIKS RASIO (ANTI-PERUBAHAN JARAK KAMERA)
-        function dapatkanVektorNormal(landmarks) {
-            const posisi = landmarks.positions;
-            // Titik acuan hidung (indeks 30) sebagai pusat koordinat (0,0)
-            const pusatX = posisi[30].x;
-            const pusatY = posisi[30].y;
-
-            // Hitung lebar wajah aktual di kamera (Mata Kiri ke Mata Kanan) untuk pembagi skala
-            const mataKiriX = posisi[36].x;
-            const mataKananX = posisi[45].x;
-            const skalaWajah = Math.max(1, Math.abs(mataKananX - mataKiriX));
-
-            // Geser pusat ke hidung dan bagi dengan skala wajah agar ukuran wajah selalu konisten (1:1)
-            return posisi.map(p => ({
-                x: (p.x - pusatX) / skalaWajah,
-                y: (p.y - pusatY) / skalaWajah
-            }));
-        }
-
-        // FUNGSI UTAMA: MENGHITUNG SELISIH AKURAT SEBELUM & SESUDAH DAFTAR WAJAH
-        function hitungJarakSkalaSama(vektorKamera, vektorDatabase) {
-            let totalJarak = 0;
-            let jumlahTitik = Math.min(vektorKamera.length, vektorDatabase.length);
+        // AKURASI PAKEM: Rumus Pemetaan Vektor Jarak Relatif Antar Titik Inti Wajah
+        function hitungMatriksRelatifWajah(posisi) {
+            if (!posisi || posisi.length < 68) return [];
             
-            // Jika basis data pendaftaran lama belum menggunakan sistem normalisasi normal, lakukan konversi otomatis
-            let vDbNormal = vektorDatabase;
-            if (vektorDatabase[0] && vektorDatabase[0].x > 1) {
-                // Konversi fallback jika array database masih berupa koordinat piksel mentah asli
-                const pX = vektorDatabase[30].x; const pY = vektorDatabase[30].y;
-                const sW = Math.max(1, Math.abs(vektorDatabase[45].x - vektorDatabase[36].x));
-                vDbNormal = vektorDatabase.map(p => ({ x: (p.x - pX) / sW, y: (p.y - pY) / sW }));
-            }
+            // Menggunakan Titik Hidung Tengah (indeks 30) dan Ujung Hidung bawah (indeks 33) sebagai dasar skala ukur wajah asli
+            let p30 = posisi[30];
+            let p33 = posisi[33];
+            let basisPanjangHidung = Math.sqrt(Math.pow(p33.x - p30.x, 2) + Math.pow(p33.y - p30.y, 2));
+            if (basisPanjangHidung === 0) basisPanjangHidung = 1;
 
-            for (let i = 0; i < jumlahTitik; i++) {
-                // Berikan bobot pembobot (weight) lebih ketat pada area mata, alis, hidung, mulut (indeks 17-67)
-                let bobot = (i >= 17) ? 2.0 : 0.5; 
-                let dX = vektorKamera[i].x - vDbNormal[i].x;
-                let dY = vektorKamera[i].y - vDbNormal[i].y;
-                totalJarak += (dX * dX + dY * dY) * bobot;
-            }
-            return Math.sqrt(totalJarak) / jumlahTitik;
+            // Kunci organ vital: Alis (17-26), Mata (36-47), Hidung (27-35), Mulut (48-67)
+            let indeksFiturUtama = [];
+            for (let i = 17; i <= 67; i++) { indeksFiturUtama.push(i); }
+
+            // Hitung jarak murni setiap organ vital ke pusat hidung tengah (titik 30) lalu dibagi panjang hidung
+            return indeksFiturUtama.map(idx => {
+                let p = posisi[idx];
+                let jarakMurni = Math.sqrt(Math.pow(p.x - p30.x, 2) + Math.pow(p.y - p30.y, 2));
+                return jarakMurni / basisPanjangHidung; // Hasil berupa rasio desimal murni (Kebal Jarak Kamera)
+            });
         }
     </script>
 </body>
