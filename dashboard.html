@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Core & Rekap Eksplisit - E-Pesantren</title>
+    <title>Dashboard Core Ecosystem - E-Pesantren</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body, header, div, section, button, table, td, th, footer {
+        body, header, div, section, button, table, td, th, footer, a {
             transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
         }
         
@@ -24,10 +24,10 @@
         }
 
         .theme-light {
-            --bg-main: #f0f4f8;
+            --bg-main: #f8fafc;
             --bg-header: #ffffff;
             --bg-box: #ffffff;
-            --bg-inner: #f8fafc;
+            --bg-inner: #f1f5f9;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
@@ -35,297 +35,355 @@
             --text-row: #334155;
         }
 
-        body { background-color: var(--bg-main); color: var(--text-main); }
-        .dynamic-bg-main { background-color: var(--bg-main); }
-        .dynamic-bg-header { background-color: var(--bg-header); }
-        .dynamic-bg-box { background-color: var(--bg-box); }
-        .dynamic-bg-inner { background-color: var(--bg-inner); }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .header-box { background-color: var(--bg-header); border-bottom: 1px solid var(--border-color); }
+        .card-box { background-color: var(--bg-box); border: 1px solid var(--border-color); }
+        .inner-box { background-color: var(--bg-inner); border: 1px solid var(--border-color); }
         .dynamic-text-main { color: var(--text-main); }
         .dynamic-text-muted { color: var(--text-muted); }
         .dynamic-border { border-color: var(--border-color); }
-        .dynamic-border-row { border-color: var(--border-row); }
-        .dynamic-text-row { color: var(--text-row); }
+        .dynamic-border-row { border-color: var(--border-row); color: var(--text-row); }
 
-        .royal-card { background: linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%); border: 3px solid #facc15; box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); transition: all 0.3s ease; }
-        .royal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(30, 58, 138, 0.25); }
-        .gold-card { background: linear-gradient(135deg, #facc15 0%, #eab308 100%); border: 3px solid #1e3a8a; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.15); transition: all 0.3s ease; }
-        .gold-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(234, 179, 8, 0.25); }
-        
-        @media print { body * { visibility: hidden; } #area-cetak-pdf, #area-cetak-pdf * { visibility: visible; } #area-cetak-pdf { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none !important; } }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
-<body class="theme-dark font-sans min-h-screen flex flex-col justify-between dynamic-bg-main text-slate-100">
+<body class="theme-dark min-h-screen flex flex-col antialiased pb-8">
 
-    <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm no-print">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shadow-sm"><i class="fa-solid fa-mosque text-slate-950 text-lg"></i></div>
-            <div>
-                <h1 id="txt-user-nama" class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">LOAD...</h1>
-                <span id="badge-role" class="text-[9px] bg-yellow-400 text-indigo-950 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">ROLE</span>
+    <header class="header-box sticky top-0 z-50 px-4 py-3 shadow-sm backdrop-blur-md bg-opacity-90">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-gradient-to-tr from-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-mosque text-white text-base"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-black tracking-wider uppercase bg-gradient-to-r from-yellow-500 to-amber-400 bg-clip-text text-transparent">E-Pesantren Core</h1>
+                        <p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">PPMUY PUSAT YOGYAKARTA</p>
+                    </div>
+                </div>
+                <button onclick="toggleTheme()" class="sm:hidden inner-box w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:scale-105 active:scale-95 transition-all">
+                    <i id="theme-icon-mobile" class="fa-solid fa-sun text-sm"></i>
+                </button>
             </div>
-        </div>
-        <div class="flex items-center gap-1.5 sm:gap-2">
-            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400" title="Ganti Tema">
-                <i class="fa-solid fa-sun text-base"></i>
-            </button>
-            <button onclick="muatSeluruhRekapDashboard()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap"><i class="fa-solid fa-rotate"></i></button>
-            <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
+            
+            <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t sm:border-t-0 border-slate-800/50 pt-2.5 sm:pt-0">
+                <div class="flex items-center gap-2">
+                    <span id="labelAdmin" class="bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700/60 px-3 py-1.5 rounded-xl font-bold tracking-wide text-xs dynamic-text-main flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                        Admin: Loading...
+                    </span>
+                    <button onclick="prosesLogout()" class="bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white px-3 py-1.5 rounded-xl font-bold text-xs tracking-wide flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer">
+                        <i class="fa-solid fa-power-off text-[11px]"></i>
+                        <span class="hidden sm:inline">Keluar</span>
+                    </button>
+                </div>
+                <button onclick="toggleTheme()" class="hidden sm:flex inner-box w-9 h-9 rounded-xl items-center justify-center text-amber-500 hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                    <i id="theme-icon-desktop" class="fa-solid fa-sun text-sm"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 sm:gap-8 flex-1">
+    <main class="max-w-7xl mx-auto w-full px-4 mt-6 flex flex-col gap-6 flex-1">
         
-        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 no-print">
-            <div class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
-                <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-camera text-indigo-900 text-base"></i></div>
-                <div class="mt-3">
-                    <h2 class="text-sm sm:text-base font-black text-yellow-300 uppercase tracking-wide">Daftar Wajah Santri</h2>
-                    <p class="text-[11px] text-slate-100 font-medium mt-1 leading-relaxed opacity-90">Input koordinat landmark struktur wajah santri ke master_santri.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="card-box rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-lg"><i class="fa-solid fa-clock animate-pulse"></i></div>
+                    <div>
+                        <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Waktu Realtime</div>
+                        <div id="liveClock" class="text-lg font-black tracking-widest font-mono text-indigo-500">00:00:00 WIB</div>
+                    </div>
                 </div>
-                <a href="daftarwajah.html" class="text-xs font-black text-yellow-400 flex items-center gap-1 uppercase tracking-widest mt-4 hover:underline">BUKA MENU <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
-
-            <div class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
-                <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-face-viewfinder text-indigo-900 text-base"></i></div>
-                <div class="mt-3">
-                    <h2 class="text-sm sm:text-base font-black text-yellow-300 uppercase tracking-wide">Absensi Scan Wajah</h2>
-                    <p class="text-[11px] text-slate-100 font-medium mt-1 leading-relaxed opacity-90">Terminal Kiosk otomatis pencocokan wajah kegiatan jamaah.</p>
+            <div class="card-box rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-lg"><i class="fa-solid fa-calendar-day"></i></div>
+                    <div>
+                        <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Kalender Masehi</div>
+                        <div id="liveDate" class="text-sm font-extrabold tracking-wide dynamic-text-main">Loading Tanggal...</div>
+                    </div>
                 </div>
-                <a href="scan-wajah.html" class="text-xs font-black text-yellow-400 flex items-center gap-1 uppercase tracking-widest mt-4 hover:underline">BUKA ALAT <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
-
-            <div class="gold-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:grid-cols-1 sm:aspect-auto sm:min-h-[160px] sm:col-span-2 md:col-span-1">
-                <div class="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-yellow-400 text-base"></i></div>
-                <div class="mt-3">
-                    <h2 class="text-sm sm:text-base font-black text-indigo-950 uppercase tracking-wide">Absen Guru PDF</h2>
-                    <p class="text-[11px] text-indigo-900 font-bold mt-1 leading-relaxed opacity-85">Filter ustadz pondok. Berdiri sendiri, rekap lengkap tabel hadir & gaib.</p>
+            <div class="card-box rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-lg"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Santri PPMUY Pusat</div>
+                        <div class="text-sm font-extrabold tracking-wide dynamic-text-main"><span id="txtTotalSantri" class="text-amber-500 font-black">0</span> Aktif Terdata</div>
+                    </div>
                 </div>
-                <a href="absen-guru.html" class="text-xs font-black text-indigo-950 flex items-center gap-1 uppercase tracking-widest mt-4 text-left cursor-pointer hover:underline">BUKA PORTAL <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
-        </section>
+        </div>
 
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
+        <section class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 px-1">
+                <i class="fa-solid fa-star text-yellow-500 text-xs"></i>
+                <h2 class="text-xs font-black tracking-widest text-slate-400 uppercase">Fitur Inti Biometrik & Mengajar</h2>
+            </div>
             
-            <div class="lg:col-span-2 flex flex-col gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="registrasi-wajah.html" class="card-box group rounded-3xl p-5 hover:shadow-xl hover:shadow-yellow-500/5 hover:border-yellow-500/30 transition-all flex flex-col justify-between h-40 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-slate-800/10 dark:text-slate-900/40 text-8xl font-black group-hover:scale-110 transition-transform"><i class="fa-solid fa-face-laugh"></i></div>
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center text-white text-xl shadow-md"><i class="fa-solid fa-user-plus"></i></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 px-2.5 py-1 rounded-full border border-yellow-500/20">Biometrik AI</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black tracking-wide dynamic-text-main group-hover:text-yellow-500 transition-colors">Daftar Wajah Santri</h3>
+                        <p class="text-[11px] dynamic-text-muted mt-0.5 leading-relaxed">Kunci vektor koordinat wajah baru santri ke dalam pangkalan database cloud AI.</p>
+                    </div>
+                </a>
+
+                <a href="scan-wajah.html" class="card-box group rounded-3xl p-5 hover:shadow-xl hover:shadow-emerald-500/5 hover:border-emerald-500/30 transition-all flex flex-col justify-between h-40 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-slate-800/10 dark:text-slate-900/40 text-8xl font-black group-hover:scale-110 transition-transform"><i class="fa-solid fa-expand"></i></div>
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xl shadow-md"><i class="fa-solid fa-camera-retro"></i></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">Kiosk Kamera</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black tracking-wide dynamic-text-main group-hover:text-emerald-500 transition-colors">Scan Wajah (Kiosk)</h3>
+                        <p class="text-[11px] dynamic-text-muted mt-0.5 leading-relaxed">Buka terminal pemindai mandiri untuk pencatatan otomatis siklus jamaah shalat.</p>
+                    </div>
+                </a>
+
+                <a href="portal-absen-guru.html" class="card-box group rounded-3xl p-5 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-500/30 transition-all flex flex-col justify-between h-40 relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-slate-800/10 dark:text-slate-900/40 text-8xl font-black group-hover:scale-110 transition-transform"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white text-xl shadow-md"><i class="fa-solid fa-chalkboard-user"></i></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-full border border-indigo-500/20">Jadwal Sync</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black tracking-wide dynamic-text-main group-hover:text-indigo-500 transition-colors">Absen Guru (PDF Map)</h3>
+                        <p class="text-[11px] dynamic-text-muted mt-0.5 leading-relaxed">Eksekusi pencatatan kehadiran mengajar asatidzah berbasis matriks jadwal sekolah.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-3">
+            <div class="flex items-center gap-2 px-1">
+                <i class="fa-solid fa-cubes text-indigo-500 text-xs"></i>
+                <h2 class="text-xs font-black tracking-widest text-slate-400 uppercase">Administrasi Pondok & Manajemen Sistem</h2>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-sm">
-                        <span class="text-[10px] font-black dynamic-text-muted tracking-wider block uppercase">TOTAL SANTRI</span>
-                        <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
+                <a href="jadwal-oprak.html" class="card-box group rounded-2xl p-3.5 hover:border-rose-500/40 hover:bg-rose-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-sm">
-                        <span class="text-[10px] font-black text-emerald-500 tracking-wider block uppercase">SUDAH REGISTRASI</span>
-                        <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Oprak</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Operasi Keamanan</p>
                     </div>
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-sm">
-                        <span class="text-[10px] font-black text-amber-500 tracking-wider block uppercase">BELUM REGISTRASI</span>
-                        <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
-                    </div>
-                </div>
+                </a>
 
-                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm">
-                    <h3 class="text-xs font-black text-cyan-500 uppercase tracking-widest mb-4 flex items-center gap-1.5"><i class="fa-solid fa-chart-simple text-sm"></i> SCAN JAMAAH SHALAT HARI INI</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
-                        <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
-                            <span class="text-[9px] font-black dynamic-text-muted block uppercase">SUBUH</span>
-                            <span id="v-subuh" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
-                        </div>
-                        <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
-                            <span class="text-[9px] font-black dynamic-text-muted block uppercase">DZUHUR</span>
-                            <span id="v-dzuhur" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
-                        </div>
-                        <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
-                            <span class="text-[9px] font-black dynamic-text-muted block uppercase">ASHAR</span>
-                            <span id="v-ashar" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
-                        </div>
-                        <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
-                            <span class="text-[9px] font-black dynamic-text-muted block uppercase">MAGHRIB</span>
-                            <span id="v-maghrib" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
-                        </div>
-                        <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl col-span-2 sm:col-span-1">
-                            <span class="text-[9px] font-black dynamic-text-muted block uppercase">ISYA</span>
-                            <span id="v-isya" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
-                        </div>
+                <a href="perizinan-santri.html" class="card-box group rounded-2xl p-3.5 hover:border-teal-500/40 hover:bg-teal-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-id-badge"></i>
                     </div>
-                </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Perizinan</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Izin Keluar Pondok</p>
+                    </div>
+                </a>
 
-                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 sm:p-5 flex flex-col h-72 shadow-sm">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 border-b dynamic-border pb-3">
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button id="btn-tab-belum" onclick="gantiTabRekap('BELUM')" class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer flex-1 sm:flex-none">BELUM DAFTAR</button>
-                            <button id="btn-tab-sudah" onclick="gantiTabRekap('SUDAH')" class="text-[11px] sm:text-xs font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer flex-1 sm:flex-none">SUDAH DAFTAR</button>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden sm:inline">VALIDASI MASTER DATA</span>
+                <a href="pelanggaran-santri.html" class="card-box group rounded-2xl p-3.5 hover:border-amber-500/40 hover:bg-amber-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
-                    
-                    <div class="overflow-y-auto flex-1 pr-1">
-                        <table class="w-full text-left text-[11px]">
-                            <thead>
-                                <tr class="border-b dynamic-border dynamic-text-muted font-black uppercase">
-                                    <th class="py-2">NAMA SANTRI</th>
-                                    <th class="py-2">KELAS</th>
-                                    <th class="py-2 text-right">STATUS</th>
-                                </tr>
-                            </thead>
-                        </table>
-                        <div class="overflow-y-auto max-h-[130px]">
-                            <table class="w-full text-left text-[11px]">
-                                <tbody id="tbl-wajah-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
-                                    <tr><td colspan="3" class="py-3 text-center text-slate-500">Memuat data analisis...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Pelanggaran</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Log Poin Takzir</p>
                     </div>
+                </a>
+
+                <a href="dispensasi-khusus.html" class="card-box group rounded-2xl p-3.5 hover:border-sky-500/40 hover:bg-sky-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Dispensasi</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Sakit / Tugas Khusus</p>
+                    </div>
+                </a>
+
+                <a href="jadwal-piket.html" class="card-box group rounded-2xl p-3.5 hover:border-emerald-500/40 hover:bg-emerald-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-broom"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Piket</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Kebersihan Kompleks</p>
+                    </div>
+                </a>
+
+                <a href="absen-ustadz-manual.html" class="card-box group rounded-2xl p-3.5 hover:border-indigo-500/40 hover:bg-indigo-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-clipboard-user"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Absen Ustadz</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Backup Jalur Manual</p>
+                    </div>
+                </a>
+
+                <a href="rekap-absensi.html" class="card-box group rounded-2xl p-3.5 hover:border-purple-500/40 hover:bg-purple-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Rekap & Data</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Download Excel/PDF</p>
+                    </div>
+                </a>
+
+                <a href="evaluasi-sistem.html" class="card-box group rounded-2xl p-3.5 hover:border-cyan-500/40 hover:bg-cyan-500/[0.02] transition-all flex items-center gap-3 active:scale-[0.98]">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 text-base shadow-sm group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Evaluasi</h4>
+                        <p class="text-[10px] text-slate-400 truncate mt-0.5">Grafik Performa Sistem</p>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <div class="card-box rounded-3xl p-4 lg:col-span-2 flex flex-col gap-3 shadow-sm">
+                <div class="flex justify-between items-center px-1">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <h3 class="text-xs font-black tracking-widest text-slate-400 uppercase">Live Feed Kiosk Santri (Hari Ini)</h3>
+                    </div>
+                    <span class="text-[10px] bg-slate-800 text-slate-400 font-mono px-2 py-0.5 rounded-md">Maks 10 Log</span>
+                </div>
+                <div id="liveFeedBox" class="inner-box rounded-2xl p-1 max-h-[290px] overflow-y-auto flex flex-col gap-1 text-[11px]">
+                    <div class="text-center py-8 text-slate-500 font-medium italic">Sedang menyinkronkan aktivitas gerbang biometrik...</div>
                 </div>
             </div>
 
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 flex flex-col h-full min-h-[380px] lg:max-h-[530px] shadow-sm">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish animate-pulse text-sm"></i> LIVE KIOSK TRACKER</h3>
-                    <span class="text-[9px] bg-emerald-500/10 text-emerald-500 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">HARI INI</span>
+            <div class="card-box rounded-3xl p-4 flex flex-col gap-3 shadow-sm">
+                <div class="flex justify-between items-center px-1">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                        </span>
+                        <h3 class="text-xs font-black tracking-widest text-slate-400 uppercase">Absen Mengajar Guru (Hari Ini)</h3>
+                    </div>
+                    <span id="badgeGuruCount" class="text-[10px] bg-indigo-500 text-white font-bold px-2 py-0.5 rounded-full">0</span>
                 </div>
-                <div id="box-live-feed" class="flex flex-col gap-2.5 overflow-y-auto flex-1 pr-1">
-                    <div class="text-center text-xs py-6 text-slate-500 font-bold uppercase tracking-wider">Menghubungkan ke terminal kiosk...</div>
+                <div id="liveFeedGuruBox" class="inner-box rounded-2xl p-1 h-[290px] overflow-y-auto flex flex-col gap-1 text-[11px]">
+                    <div class="text-center py-8 text-slate-500 font-medium italic">Menghubungkan ke log absensi sekolah...</div>
                 </div>
             </div>
 
         </section>
-    </div>
 
-    <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN CORE ECOSYSTEM</footer>
+    </main>
+
+    <footer class="max-w-7xl mx-auto w-full px-4 mt-8 text-center">
+        <p class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">E-Pesantren v4.2 • Cloud Gateway Secure Lock Integration • @2026</p>
+    </footer>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
-        let dataRekapGlobal = { listBelum: [], listSudah: [] };
-        let tabAktif = "BELUM";
+        // MASUKKAN URL DEPLOYMENT WEB APP SCRIPT ANDA DISINI
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxj_gR-UjXq3bN-2bVwF6YV_EXAMPLE/exec";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const nama = localStorage.getItem('session_nama');
-            const role = localStorage.getItem('session_role');
-            if (!nama || !role) { window.location.href = "index.html"; return; }
-            document.getElementById('txt-user-nama').innerText = nama;
-            document.getElementById('badge-role').innerText = role;
-
-            const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
-            setTemaAplikasi(temaSimpanan);
-
-            muatSeluruhRekapDashboard();
+        window.addEventListener("DOMContentLoaded", () => {
+            proteksiHalaman();
+            startClock();
+            ambilRekapDashboardPusat();
+            ambilRekapGuruRealtime();
+            setInterval(ambilRekapDashboardPusat, 30000); // Auto refresh tiap 30 detik
+            setInterval(ambilRekapGuruRealtime, 35000); // Auto refresh tiap 35 detik
         });
 
-        function toggleTema() {
-            const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
-            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
-            setTemaAplikasi(newTheme);
-        }
-
-        function setTemaAplikasi(tema) {
-            const btnTema = document.getElementById('btn-tema');
-            const isLight = (tema === 'theme-light');
-            if (isLight) {
-                document.body.classList.remove('theme-dark'); document.body.classList.add('theme-light');
-                if(btnTema) {
-                    btnTema.innerHTML = `<i class="fa-solid fa-moon text-base text-indigo-950"></i>`;
-                    btnTema.className = "w-10 h-10 rounded-xl bg-slate-200 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-300 shadow text-indigo-950";
-                }
-                localStorage.setItem('dashboard_theme', 'theme-light');
-            } else {
-                document.body.classList.remove('theme-light'); document.body.classList.add('theme-dark');
-                if(btnTema) {
-                    btnTema.innerHTML = `<i class="fa-solid fa-sun text-base"></i>`;
-                    btnTema.className = "w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400";
-                }
-                localStorage.setItem('dashboard_theme', 'theme-dark');
-            }
-            gantiTabRekap(tabAktif);
-        }
-
-        function gantiTabRekap(jenis) {
-            tabAktif = jenis;
-            const btnBelum = document.getElementById('btn-tab-belum');
-            const btnSudah = document.getElementById('btn-tab-sudah');
-            const isLight = document.body.classList.contains('theme-light');
-            if (jenis === "BELUM") {
-                if(btnBelum) btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer transition-all";
-                if(btnSudah) btnSudah.className = isLight 
-                    ? "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all"
-                    : "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
-            } else {
-                if(btnBelum) btnBelum.className = isLight 
-                    ? "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all"
-                    : "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
-                if(btnSudah) btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 uppercase cursor-pointer transition-all";
-            }
-            renderTabelWajah();
-        }
-
-        function renderTabelWajah() {
-            const tblBody = document.getElementById('tbl-wajah-body');
-            if(!tblBody) return;
-            tblBody.innerHTML = '';
-            
-            let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
-            if (!listData || listData.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 uppercase font-bold text-[10px]">Data tidak ditemukan.</td></tr>`;
+        function proteksiHalaman() {
+            const nama = localStorage.getItem("admin_nama");
+            const role = localStorage.getItem("admin_role");
+            if (!nama || !role) {
+                window.location.href = "login.html";
                 return;
             }
-
-            listData.forEach(s => {
-                let row = document.createElement('tr');
-                row.className = "border-b dynamic-border-row hover:opacity-80";
-                let badgeStatus = (tabAktif === "BELUM") 
-                    ? `<span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[9px] font-black">BELUM DAFTAR</span>`
-                    : `<span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black">SUDAH AKTIF</span>`;
-
-                row.innerHTML = `
-                    <td class="py-2.5 uppercase font-black tracking-wide">${s.nama}</td>
-                    <td class="py-2.5 font-mono text-slate-400">${s.kelas}</td>
-                    <td class="py-2.5 text-right">${badgeStatus}</td>
-                `;
-                tblBody.appendChild(row);
-            });
+            document.getElementById("labelAdmin").innerHTML = `
+                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                ${nama} (${role})
+            `;
         }
 
-        async function muatSeluruhRekapDashboard() {
-            const feedBox = document.getElementById('box-live-feed');
-            const isLight = document.body.classList.contains('theme-light');
+        function startClock() {
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("liveDate").innerText = new Date().toLocaleDateString('id-ID', optionsDate);
+            
+            setInterval(() => {
+                const now = new Date();
+                let h = now.getHours().toString().padStart(2, '0');
+                let m = now.getMinutes().toString().padStart(2, '0');
+                let s = now.getSeconds().toString().padStart(2, '0');
+                document.getElementById("liveClock").innerText = `${h}:${m}:${s} WIB`;
+            }, 1000);
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            const iDesk = document.getElementById("theme-icon-desktop");
+            const iMobi = document.getElementById("theme-icon-mobile");
+            if (b.classList.contains("theme-dark")) {
+                b.classList.replace("theme-dark", "theme-light");
+                iDesk.className = "fa-solid fa-moon text-slate-700";
+                iMobi.className = "fa-solid fa-moon text-slate-700";
+            } else {
+                b.classList.replace("theme-light", "theme-dark");
+                iDesk.className = "fa-solid fa-sun text-amber-400";
+                iMobi.className = "fa-solid fa-sun text-amber-400";
+            }
+        }
+
+        // AMBIL REKAP DASHBOARD UTAMA (SANTRI & SIKLUS SHALAT)
+        async function ambilRekapDashboardPusat() {
+            const feedBox = document.getElementById("liveFeedBox");
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
-                let r = await res.json();
-
-                if (r.status === "success") {
-                    dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
-                    dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
-
-                    document.getElementById('stat-total').innerText = r.rekapWajah.total;
-                    document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah;
-                    document.getElementById('stat-belum').innerText = r.rekapWajah.belum;
-
-                    document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh;
-                    document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur;
-                    document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar;
-                    document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib;
-                    document.getElementById('v-isya').innerText = r.rekapShalat.Isya;
-
-                    renderTabelWajah();
-                    if(feedBox) {
-                        feedBox.innerHTML = '';
-                        if (!r.liveFeed || r.liveFeed.length === 0) {
-                            feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
+                let urlCall = `${SCRIPT_URL}?aksi=ambil_rekap_dashboard`;
+                let res = await fetch(urlCall);
+                let obj = await res.json();
+                
+                if (obj.status === "success") {
+                    document.getElementById("txtTotalSantri").innerText = obj.rekapWajah.total || 0;
+                    
+                    if (feedBox) {
+                        feedBox.innerHTML = "";
+                        let feed = obj.liveFeed || [];
+                        if (feed.length === 0) {
+                            feedBox.innerHTML = `<div class="text-center text-slate-500 py-6 italic">Belum ada log aktivitas masuk hari ini.</div>`;
                         } else {
-                            r.liveFeed.forEach(log => {
-                                let div = document.createElement('div');
-                                div.className = isLight
-                                    ? "bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm"
-                                    : "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm";
-                                     
+                            feed.forEach(log => {
+                                let div = document.createElement("div");
+                                div.className = "dynamic-border-row border-b p-2 flex justify-between items-center hover:bg-slate-500/5 transition-all rounded-lg";
                                 div.innerHTML = `
                                     <div class="flex flex-col gap-0.5">
-                                        <span class="dynamic-text-main uppercase tracking-wide">${log.nama}</span>
-                                        <span class="text-[9px] text-slate-400">Kiosk: <span class="text-yellow-600 dark:text-yellow-400">${log.petugas}</span></span>
+                                        <span class="dynamic-text-main font-bold uppercase">${log.nama}</span>
+                                        <span class="text-[9px] text-slate-400">Petugas: <span class="text-amber-500 font-medium">${log.petugas}</span></span>
                                     </div>
                                     <div class="text-right flex flex-col gap-0.5">
-                                        <span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider block w-max ml-auto">${log.shalat}</span>
-                                        <span class="text-[9px] text-slate-400 font-mono mt-0.5 block">${log.jam} WIB</span>
+                                        <span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] block w-max ml-auto">${log.shalat}</span>
+                                        <span class="text-[9px] text-slate-400 font-mono mt-0.5">${log.jam} WIB</span>
                                     </div>
                                 `;
                                 feedBox.appendChild(div);
@@ -334,11 +392,52 @@
                     }
                 }
             } catch(e) {
-                if(feedBox) feedBox.innerHTML = `<div class="text-center text-xs py-4 text-red-500 font-bold uppercase">Gagal sinkronisasi data rekap.</div>`;
+                if (feedBox) feedBox.innerHTML = `<div class="text-center text-xs py-4 text-rose-500 font-bold uppercase">Gagal sinkronisasi data rekap santri.</div>`;
             }
         }
 
-        function prosesLogout() { localStorage.clear(); window.location.href = "index.html"; }
+        // AMBIL REKAP DOSEN / GURU REALTIME (AKSI BARU YANG BARUSAN KITA SUNTIK DI GATEWAY)
+        async function ambilRekapGuruRealtime() {
+            const guruBox = document.getElementById("liveFeedGuruBox");
+            try {
+                let urlCall = `${SCRIPT_URL}?aksi=ambil_rekap_guru_realtime`;
+                let res = await fetch(urlCall);
+                let obj = await res.json();
+                
+                if (obj.status === "success" && guruBox) {
+                    guruBox.innerHTML = "";
+                    let listGuru = obj.liveFeedGuru || [];
+                    document.getElementById("badgeGuruCount").innerText = listGuru.length;
+                    
+                    if (listGuru.length === 0) {
+                        guruBox.innerHTML = `<div class="text-center text-slate-500 py-8 italic">Belum ada guru mengajar yang tercatat hari ini.</div>`;
+                    } else {
+                        listGuru.forEach(guru => {
+                            let div = document.createElement("div");
+                            div.className = "dynamic-border-row border-b p-2 flex justify-between items-center hover:bg-slate-500/5 transition-all rounded-lg";
+                            div.innerHTML = `
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="dynamic-text-main font-bold uppercase">${guru.nama}</span>
+                                    <span class="text-[9px] text-slate-400">Mapel: <span class="text-indigo-400 font-medium">${guru.petugas}</span></span>
+                                </div>
+                                <div class="text-right flex flex-col gap-0.5">
+                                    <span class="bg-indigo-500/10 text-indigo-500 dark:text-indigo-300 font-extrabold px-2 py-0.5 rounded-md text-[9px] block w-max ml-auto">${guru.shalat}</span>
+                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5">${guru.jam} WIB</span>
+                                </div>
+                            `;
+                            guruBox.appendChild(div);
+                        });
+                    }
+                }
+            } catch(err) {
+                if (guruBox) guruBox.innerHTML = `<div class="text-center text-xs py-4 text-rose-500 font-bold uppercase">Gagal sinkronisasi data rekap guru.</div>`;
+            }
+        }
+
+        function prosesLogout() { 
+            localStorage.clear(); 
+            window.location.href = "login.html"; 
+        }
     </script>
 </body>
 </html>
