@@ -3,513 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PPMUY CORE v2.0 - Sistem Manajemen Terpadu</title>
-    <!-- Library Eksternal -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Terminal Kiosk Wajah AI - Core</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        .sidebar-link.active { background-color: #e0f2fe; border-left-width: 4px; border-color: #0284c7; color: #0369a1; font-weight: 700; }
-        .menu-content { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        video { object-fit: cover; border-radius: 2rem; background: #000; border: 4px solid #1e293b; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col md:flex-row font-sans antialiased overflow-x-hidden">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
 
-    <!-- 1. HALAMAN LOGIN -->
-    <div id="halaman-login" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-4">
-        <div class="w-full max-w-sm bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl text-center space-y-6">
-            <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center font-black text-2xl text-slate-950 mx-auto shadow-lg shadow-amber-500/20">P</div>
-            <div>
-                <h1 class="text-xl font-black text-amber-400 tracking-tight uppercase">PPMUY CORE</h1>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Otorisasi Manajemen Terpadu</p>
-            </div>
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Username</label>
-                    <input type="text" id="login-user" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl outline-none focus:border-amber-500 text-sm font-bold">
+    <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xs font-black text-cyan-400 uppercase tracking-wider"><i class="fa-solid fa-face-viewfinder mr-1"></i> TERMINAL KIOSK SCAN WAJAH</h1>
+            <p id="txt-db-status" class="text-[11px] text-amber-400 font-bold animate-pulse">Menghubungkan cloud...</p>
+        </div>
+        <select id="pilihan-kegiatan" class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-3 py-3 text-xs font-black text-white outline-none focus:border-cyan-500 cursor-pointer">
+            <option value="Subuh">Jamaah Subuh</option>
+            <option value="Dzuhur">Jamaah Dzuhur</option>
+            <option value="Ashar">Jamaah Ashar</option>
+            <option value="Maghrib">Jamaah Maghrib</option>
+            <option value="Isya">Jamaah Isya</option>
+        </select>
+    </div>
+
+    <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center items-center">
+        <div class="relative w-full aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+            <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div id="kotak-scan" class="w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300">
+                    <span id="instruksi" class="text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30">Memasang AI...</span>
                 </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">PIN Password</label>
-                    <input type="password" id="login-pass" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl outline-none focus:border-amber-500 text-sm font-bold">
-                </div>
-                <button onclick="eksekusiLogin()" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition-all text-xs uppercase tracking-widest">Masuk Sistem</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. SIDEBAR UTAMA -->
-    <aside id="sidebar-utama" class="hidden w-full md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10 shadow-sm">
-        <div class="p-5 border-b flex items-center gap-3 bg-blue-50/30">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-md">U</div>
-            <div class="overflow-hidden">
-                <h1 id="txt-user-nama" class="font-black text-blue-700 text-xs truncate uppercase">User Name</h1>
-                <p id="badge-role" class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Admin</p>
-            </div>
+    <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali</a></div>
+
+    <div id="pop-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
+        <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-bounce">
+            <span class="text-xs font-black tracking-widest block opacity-75">🔊 LOG JAMAAH DICATAT</span>
+            <span class="font-black text-xl block mt-1 tracking-wide" id="txt-nama-sukses">Nama Santri</span>
         </div>
-        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            <button onclick="bukaMenu('menu-dashboard')" id="btn-menu-dashboard" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600 active">
-                <i class="fa-solid fa-chart-pie w-4"></i> DASHBOARD UTAMA
-            </button>
-            <button onclick="bukaMenu('menu-scan')" id="btn-menu-scan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
-                <i class="fa-solid fa-camera w-4"></i> ABSENSI KEGIATAN
-            </button>
-            <button onclick="bukaMenu('menu-daftar-wajah')" id="btn-menu-daftar-wajah" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
-                <i class="fa-solid fa-user-plus w-4"></i> REGISTRASI WAJAH
-            </button>
-            <div class="pt-4 pb-2 px-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Fitur Manajemen</div>
-            <button class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-400 opacity-50 cursor-not-allowed">
-                <i class="fa-solid fa-user-tie w-4"></i> ABSEN USTADZ
-            </button>
-            <button class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-400 opacity-50 cursor-not-allowed">
-                <i class="fa-solid fa-paper-plane w-4"></i> PERIZINAN (WA)
-            </button>
-            <button class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-400 opacity-50 cursor-not-allowed">
-                <i class="fa-solid fa-gavel w-4"></i> TAKZIR & POIN
-            </button>
-        </nav>
-        <div class="p-4 border-t">
-            <button onclick="eksekusiLogout()" class="w-full py-2.5 text-rose-600 text-[10px] font-black uppercase flex items-center justify-center gap-2 hover:bg-rose-50 rounded-xl transition-all">
-                <i class="fa-solid fa-right-from-bracket"></i> Keluar Sistem
-            </button>
-        </div>
-    </aside>
+    </div>
 
-    <!-- 3. KONTEN UTAMA -->
-    <main id="konten-utama" class="hidden flex-1 flex flex-col min-w-0 bg-slate-50 text-slate-800 overflow-x-hidden">
-        <header class="h-16 border-b bg-white flex items-center justify-between px-6 shadow-sm shrink-0">
-            <h2 id="judul-halaman" class="text-xs font-black uppercase tracking-widest text-slate-700">Dashboard Utama</h2>
-            <div class="flex items-center gap-3">
-                <span id="txt-db-status" class="text-[10px] bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full border border-emerald-100 font-bold uppercase">
-                    <i class="fa-solid fa-circle-check mr-1"></i> Sinkron Aktif
-                </span>
-            </div>
-        </header>
-
-        <div class="flex-1 p-6 space-y-6 overflow-y-auto">
-
-            <!-- TAB: DASHBOARD -->
-            <section id="menu-dashboard" class="menu-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Santri</p>
-                            <h3 id="stat-total" class="text-3xl font-black text-slate-800">0</h3>
-                        </div>
-                        <i class="fa-solid fa-users text-3xl text-slate-100"></i>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm flex items-center justify-between border-l-4 border-l-emerald-500">
-                        <div>
-                            <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Sudah Daftar</p>
-                            <h3 id="stat-sudah" class="text-3xl font-black text-emerald-600">0</h3>
-                        </div>
-                        <i class="fa-solid fa-face-smile text-3xl text-emerald-50"></i>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm flex items-center justify-between border-l-4 border-l-amber-500">
-                        <div>
-                            <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Belum Daftar</p>
-                            <h3 id="stat-belum" class="text-3xl font-black text-amber-600">0</h3>
-                        </div>
-                        <i class="fa-solid fa-face-frown text-3xl text-amber-50"></i>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Shalat Stats -->
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm space-y-4">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest"><i class="fa-solid fa-chart-bar mr-1"></i> Scan Shalat Hari Ini</h4>
-                        <div class="grid grid-cols-5 gap-2">
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">Subuh</span>
-                                <span id="v-subuh" class="text-xl font-black text-blue-600">0</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">Dzuhur</span>
-                                <span id="v-dzuhur" class="text-xl font-black text-blue-600">0</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">Ashar</span>
-                                <span id="v-ashar" class="text-xl font-black text-blue-600">0</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">Maghrib</span>
-                                <span id="v-maghrib" class="text-xl font-black text-blue-600">0</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-2xl text-center border">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">Isya</span>
-                                <span id="v-isya" class="text-xl font-black text-blue-600">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Live Tracker -->
-                    <div class="bg-white p-6 rounded-[2rem] border shadow-sm flex flex-col h-80">
-                        <h4 class="text-xs font-black text-emerald-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-satellite-dish animate-pulse"></i> Live Kiosk Tracker
-                        </h4>
-                        <div id="box-live-feed" class="flex-1 overflow-y-auto space-y-2 pr-2">
-                            <p class="text-center text-[11px] text-slate-400 font-bold py-10 uppercase">Menghubungkan ke Terminal...</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB: KIOSK SCAN (LOGIKA BERHASIL) -->
-            <section id="menu-scan" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl flex flex-col items-center">
-                    <h3 class="text-xs font-black text-cyan-400 mb-6 uppercase tracking-widest"><i class="fa-solid fa-face-viewfinder mr-2"></i> Terminal Kiosk Wajah</h3>
-                    
-                    <div class="w-full mb-6">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 block mb-1">Target Kegiatan:</label>
-                        <select id="kiosk-kegiatan" class="w-full bg-slate-800 border-2 border-slate-700 p-4 rounded-2xl text-xs font-black outline-none focus:border-cyan-500">
-                            <option value="Subuh">Jamaah Subuh</option>
-                            <option value="Dzuhur">Jamaah Dzuhur</option>
-                            <option value="Ashar">Jamaah Ashar</option>
-                            <option value="Maghrib">Jamaah Maghrib</option>
-                            <option value="Isya">Jamaah Isya</option>
-                        </select>
-                    </div>
-
-                    <div class="relative w-72 h-72 rounded-[2rem] overflow-hidden border-4 border-slate-800">
-                        <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
-                        <div id="kotak-scan" class="absolute inset-0 border-4 border-dashed border-cyan-500/30 rounded-[2rem] flex items-center justify-center transition-all duration-300">
-                            <span id="instruksi" class="text-[10px] bg-slate-950/90 text-cyan-400 px-5 py-2.5 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30">Menyiapkan AI...</span>
-                        </div>
-                    </div>
-
-                    <p id="txt-scan-status" class="mt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] animate-pulse">Hadapkan Wajah Ke Kamera</p>
-                </div>
-            </section>
-
-            <!-- TAB: REGISTRASI WAJAH (LOGIKA BERHASIL) -->
-            <section id="menu-daftar-wajah" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl space-y-6">
-                    <h3 class="text-xs font-black text-amber-400 uppercase tracking-widest text-center"><i class="fa-solid fa-user-plus mr-2"></i> Registrasi Biometrik</h3>
-                    
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 block mb-1">Cari Nama Santri:</label>
-                        <input type="text" id="input-cari-nama" placeholder="Ketik nama untuk mencari..." class="w-full bg-slate-800 border-2 border-slate-700 p-4 rounded-2xl text-xs font-black outline-none focus:border-amber-500">
-                        <div id="dropdown-hasil" class="absolute left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-2xl max-h-40 overflow-y-auto hidden z-50 shadow-2xl"></div>
-                    </div>
-
-                    <div id="info-santri-reg" class="hidden bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-700 text-center">
-                        <p class="text-[10px] font-black text-emerald-400 uppercase mb-1">Target Sinkronisasi:</p>
-                        <p id="lbl-nama-reg" class="text-sm font-black text-white"></p>
-                        <input type="hidden" id="nik-reg-terpilih">
-                    </div>
-
-                    <div class="relative w-64 h-64 mx-auto rounded-[2rem] overflow-hidden border-4 border-slate-800">
-                        <video id="video-daftar" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
-                        <div id="kotak-frame-reg" class="absolute inset-0 border-4 border-dashed border-amber-500/30 rounded-[2rem] flex items-center justify-center">
-                             <span id="txt-instruksi-reg" class="text-[10px] bg-slate-950/90 text-amber-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest">Mencari Wajah...</span>
-                        </div>
-                    </div>
-
-                    <button id="btn-simpan-wajah" disabled class="w-full py-4 bg-slate-800 text-slate-500 font-black rounded-2xl text-[11px] uppercase tracking-widest shadow-lg transition-all cursor-not-allowed">Wajah Belum Terdeteksi</button>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- POPUP SUKSES SCAN -->
-    <div id="pop-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-[200]">
-        <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-8 rounded-[2.5rem] text-center shadow-2xl border-4 border-emerald-400 animate-bounce">
-            <i class="fa-solid fa-circle-check text-5xl mb-4"></i>
-            <span class="text-[10px] font-black tracking-widest block opacity-75 uppercase">Log Jamaah Dicatat</span>
-            <span class="font-black text-xl block mt-1 tracking-tight uppercase" id="txt-nama-sukses">Nama Santri</span>
+    <div id="pop-warning" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
+        <div class="bg-amber-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-amber-400">
+            <span class="text-xs font-black tracking-widest block opacity-75"><i class="fa-solid fa-triangle-exclamation mr-1"></i> AKSES DITOLAK</span>
+            <span class="font-black text-base block mt-1 tracking-wide" id="txt-nama-peringatan">NAMA SANTRI</span>
+            <span class="text-[11px] font-bold block mt-1 bg-slate-950/20 py-1 rounded-lg uppercase tracking-wider">Sudah Absen Pada Kegiatan Ini!</span>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
-        
-        let dbSantriMaster = [];
+        let video = document.getElementById('video-selfie');
+        let label = document.getElementById('instruksi');
+        let kotakScan = document.getElementById('kotak-scan');
+        let dbStatus = document.getElementById('txt-db-status');
         let isProcessing = false;
-        let aiReady = false;
-        let posisiWajahTerakhir = null;
-        let scanInterval = null;
+        let databaseSantri = [];
 
-        // 1. SISTEM LOGIN & AUTH
-        window.addEventListener('DOMContentLoaded', () => {
-            const sessionNama = localStorage.getItem('session_nama');
-            if (sessionNama) {
-                tampilkanAppUtama(sessionNama, localStorage.getItem('session_role'));
-            }
-        });
-
-        async function eksekusiLogin() {
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
-            const btn = document.querySelector('#halaman-login button');
-
-            if(!u || !p) return Swal.fire('Error', 'Lengkapi Username dan PIN!', 'warning');
-            
-            btn.disabled = true; btn.innerText = "VALIDASI CLOUD...";
-            
-            const params = new URLSearchParams({ aksi: 'login_admin', username: u, password: p });
-
-            try {
-                const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params.toString() });
-                const r = await res.json();
-                
-                if (r.status === "success") {
-                    localStorage.setItem('session_nama', r.nama);
-                    localStorage.setItem('session_role', r.role);
-                    tampilkanAppUtama(r.nama, r.role);
-                } else {
-                    Swal.fire('Akses Ditolak', r.message, 'error');
-                }
-            } catch(e) { Swal.fire('Error', 'Gagal terhubung ke server!', 'error'); }
-            finally { btn.disabled = false; btn.innerText = "Masuk Sistem"; }
-        }
-
-        function tampilkanAppUtama(nama, role) {
-            document.getElementById('halaman-login').classList.add('hidden');
-            document.getElementById('sidebar-utama').classList.remove('hidden');
-            document.getElementById('konten-utama').classList.remove('hidden');
-            document.getElementById('txt-user-nama').innerText = nama;
-            document.getElementById('badge-role').innerText = role;
-            initAppEngine();
-        }
-
-        function eksekusiLogout() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        // 2. INITIALIZATION ENGINE
-        async function initAppEngine() {
-            Swal.fire({ title: 'Menyiapkan Cloud AI...', text: 'Memuat model biometrik wajah', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
-                await muatDataCloud();
-                aiReady = true;
-                Swal.close();
-            } catch(e) { Swal.fire('AI Error', 'Gagal memuat model deteksi!', 'error'); }
-        }
-
-        async function muatDataCloud() {
-            try {
-                // Tarik rekap dashboard & database
-                const r1 = await fetch(`${API_URL}?aksi=ambil_database`);
-                const j1 = await r1.json();
-                if(j1.status === "success") dbSantriMaster = j1.data;
-
-                const r2 = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`);
-                const j2 = await r2.json();
-                if(j2.status === "success") updateDashboardUI(j2);
-
-            } catch(e) { console.error("Gagal sinkron data"); }
-        }
-
-        function updateDashboardUI(data) {
-            document.getElementById('stat-total').innerText = data.rekapWajah.total;
-            document.getElementById('stat-sudah').innerText = data.rekapWajah.sudah;
-            document.getElementById('stat-belum').innerText = data.rekapWajah.belum;
-
-            document.getElementById('v-subuh').innerText = data.rekapShalat.Subuh;
-            document.getElementById('v-dzuhur').innerText = data.rekapShalat.Dzuhur;
-            document.getElementById('v-ashar').innerText = data.rekapShalat.Ashar;
-            document.getElementById('v-maghrib').innerText = data.rekapShalat.Maghrib;
-            document.getElementById('v-isya').innerText = data.rekapShalat.Isya;
-
-            const feed = document.getElementById('box-live-feed');
-            feed.innerHTML = '';
-            if(data.liveFeed.length === 0) {
-                feed.innerHTML = `<p class="text-center text-[11px] text-slate-400 font-bold py-10 uppercase">Belum ada scan hari ini</p>`;
-            } else {
-                data.liveFeed.forEach(log => {
-                    let div = document.createElement('div');
-                    div.className = "bg-slate-50 border p-3 rounded-2xl flex justify-between items-center text-[11px] font-bold";
-                    div.innerHTML = `
-                        <div class="flex flex-col">
-                            <span class="text-slate-800 uppercase">${log.nama}</span>
-                            <span class="text-[9px] text-slate-400 uppercase">${log.shalat}</span>
-                        </div>
-                        <span class="text-[10px] text-blue-600 font-mono">${log.jam}</span>
-                    `;
-                    feed.appendChild(div);
-                });
-            }
-        }
-
-        // 3. NAVIGASI MENU (SPA)
-        function bukaMenu(id) {
-            document.querySelectorAll('.menu-content').forEach(m => m.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById('btn-'+id).classList.add('active');
-            document.getElementById('judul-halaman').innerText = id.replace('menu-','').replace('-',' ').toUpperCase();
-
-            // Reset Camera & Loops
-            stopSemuaKamera();
-            clearInterval(scanInterval);
-
-            if(id === 'menu-scan') startKioskMode();
-            if(id === 'menu-daftar-wajah') startRegMode();
-            if(id === 'menu-dashboard') muatDataCloud();
-        }
-
-        function stopSemuaKamera() {
-            const v1 = document.getElementById('video-selfie');
-            const v2 = document.getElementById('video-daftar');
-            if(v1.srcObject) v1.srcObject.getTracks().forEach(t => t.stop());
-            if(v2.srcObject) v2.srcObject.getTracks().forEach(t => t.stop());
-        }
-
-        // 4. LOGIKA KIOSK SCAN (FIXED)
-        async function startKioskMode() {
-            const video = document.getElementById('video-selfie');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-            video.srcObject = stream;
-            document.getElementById('instruksi').innerText = "HADAPKAN WAJAH KE KAMERA";
-
-            scanInterval = setInterval(async () => {
-                if (isProcessing || !aiReady || video.paused) return;
-                const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
+                const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
+                const json = await res.json();
                 
-                if (deteksi) {
-                    isProcessing = true;
-                    document.getElementById('kotak-scan').className = "absolute inset-0 border-4 border-solid border-emerald-400 rounded-[2rem] bg-emerald-500/10 scale-105";
-                    document.getElementById('instruksi').innerText = "MENCOCOKKAN...";
-                    
-                    let koordinatKamera = deteksi.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
-                    prosesVerifikasi(koordinatKamera);
+                if (json.status === "success") {
+                    databaseSantri = json.data;
+                    dbStatus.innerText = `🟢 Cloud Kiosk Ready (${databaseSantri.length} Santri)`;
                 }
-            }, 300);
-        }
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                video.srcObject = stream;
+                label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                
+                setInterval(async () => {
+                    if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
+                    
+                    if (hasilKamera) {
+                        isProcessing = true;
+                        kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
+                        label.innerText = "MENCOCOKKAN BIOMETRIK...";
+                        
+                        let koordinatKamera = hasilKamera.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
+                        verifikasiWajahLokal(koordinatKamera);
+                    }
+                }, 300);
+            } catch (e) { label.innerText = "AI OFFLINE"; }
+        });
 
-        async function prosesVerifikasi(posKamera) {
-            let ketemu = null;
+        async function verifikasiWajahLokal(posisiKamera) {
+            let santriDitemukan = null; 
             let skorTerbaik = 999;
 
-            for (let santri of dbSantriMaster) {
-                if(!santri.vektor) continue;
-                let jarak = hitungJarak(posKamera, JSON.parse(santri.vektor));
-                if (jarak < skorTerbaik && jarak < 12.0) { 
-                    skorTerbaik = jarak; 
-                    ketemu = santri; 
-                }
+            for (let santri of databaseSantri) {
+                try {
+                    let dataVektor = santri.vektor;
+                    if(!dataVektor) continue;
+                    
+                    let jarak = hitungJarakMatematika(posisiKamera, JSON.parse(dataVektor));
+                    if (jarak < skorTerbaik && jarak < 12.0) { 
+                        skorTerbaik = jarak; 
+                        santriDitemukan = santri; 
+                    }
+                } catch(e){}
             }
 
-            if (ketemu) {
-                const keg = document.getElementById('kiosk-kegiatan').value;
-                const p = new URLSearchParams({ aksi: 'absen_santri', nik: ketemu.nik, kegiatan: keg, petugas: localStorage.getItem('session_nama') });
+            if (santriDitemukan) {
+                const kegiatan = document.getElementById('pilihan-kegiatan').value;
                 
-                try {
-                    await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: p.toString() });
-                    document.getElementById('txt-nama-sukses').innerText = ketemu.nama;
-                    document.getElementById('pop-success').classList.remove('hidden');
-                } catch(e) {}
+                // --- STRATEGI ANTI SPAM & ANTI DUPLIKAT ---
+                // Buat tanda pengenal unik berbasis tanggal lokal hari ini
+                const hariIni = new Date().toISOString().split('T')[0]; 
+                const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
+                // Cek apakah key identitas ini sudah tersimpan dalam memori local mesin kiosk
+                if (localStorage.getItem(storageKey)) {
+                    // Jika terdeteksi sudah absen, langsung tolak di tempat
+                    document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
+                    document.getElementById('pop-warning').classList.remove('hidden');
+                    label.innerText = "SUDAH ABSEN SEBELUMNYA";
+                    kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
+                    
+                    setTimeout(() => {
+                        document.getElementById('pop-warning').classList.add('hidden');
+                        isProcessing = false;
+                        label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                        kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
+                    }, 2500);
+                    return; // Menghentikan proses pengiriman data ke web apps script
+                }
+
+                // Jika belum pernah absen, lanjutkan pengiriman data absensi
+                const fp = new URLSearchParams();
+                fp.append('aksi', 'absen_santri');
+                fp.append('nik', santriDitemukan.nik);
+                fp.append('kegiatan', kegiatan);
+                fp.append('petugas', localStorage.getItem('session_nama'));
+
+                try {
+                    let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
+                    let r = await res.json();
+                    if(r.status === "success") {
+                        // Kunci status absensi santri tersebut di memori lokal agar tidak bisa melakukan spam kembali
+                        localStorage.setItem(storageKey, "TERCATAT");
+
+                        document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
+                        document.getElementById('pop-success').classList.remove('hidden');
+                        
+                        try {
+                            // Feedback audio opsional jika file suara tersedia
+                            let audio = new Audio("https://cdn.jsdelivr.net/gh/pesantren-dev/assets/success.mp3");
+                            audio.play();
+                        } catch(p){}
+                    }
+                } catch(e){}
+                
                 setTimeout(() => {
                     document.getElementById('pop-success').classList.add('hidden');
-                    isProcessing = false;
-                    document.getElementById('instruksi').innerText = "HADAPKAN WAJAH KE KAMERA";
-                    document.getElementById('kotak-scan').className = "absolute inset-0 border-4 border-dashed border-cyan-500/30 rounded-[2rem]";
+                    isProcessing = false; 
+                    label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                    kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                 }, 2000);
+
             } else {
-                document.getElementById('instruksi').innerText = "TIDAK DIKENAL";
-                document.getElementById('kotak-scan').className = "absolute inset-0 border-4 border-solid border-rose-500 rounded-[2rem] bg-rose-500/10";
-                setTimeout(() => { isProcessing = false; document.getElementById('instruksi').innerText = "HADAPKAN WAJAH KE KAMERA"; document.getElementById('kotak-scan').className = "absolute inset-0 border-4 border-dashed border-cyan-500/30 rounded-[2rem]"; }, 1500);
+                isProcessing = false; 
+                label.innerText = "WAJAH TIDAK DIKENAL";
+                kotakScan.className = "w-64 h-64 border-4 border-solid border-red-500 rounded-3xl flex items-center justify-center bg-red-500/10";
+                setTimeout(() => { 
+                    label.innerText = "HADAPKAN WAJAH KE KAMERA"; 
+                    kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
+                }, 1200);
             }
         }
 
-        // 5. LOGIKA REGISTRASI (FIXED)
-        async function startRegMode() {
-            const video = document.getElementById('video-daftar');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-            video.srcObject = stream;
-
-            scanInterval = setInterval(async () => {
-                if (!aiReady || video.paused) return;
-                const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
-                const btn = document.getElementById('btn-simpan-wajah');
-
-                if (deteksi) {
-                    posisiWajahTerakhir = deteksi.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
-                    document.getElementById('kotak-frame-reg').className = "absolute inset-0 border-4 border-solid border-emerald-400 rounded-[2rem] bg-emerald-500/10";
-                    document.getElementById('txt-instruksi-reg').innerText = "WAJAH TERKUNCI";
-                    
-                    if (document.getElementById('nik-reg-terpilih').value) {
-                        btn.disabled = false;
-                        btn.innerText = "SIMPAN KOORDINAT WAJAH";
-                        btn.className = "w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl text-[11px] uppercase tracking-widest cursor-pointer shadow-lg";
-                    }
-                } else {
-                    posisiWajahTerakhir = null;
-                    document.getElementById('kotak-frame-reg').className = "absolute inset-0 border-4 border-dashed border-amber-500/30 rounded-[2rem]";
-                    document.getElementById('txt-instruksi-reg').innerText = "MENCARI WAJAH...";
-                    btn.disabled = true;
-                    btn.innerText = "WAJAH BELUM TERDETEKSI";
-                    btn.className = "w-full py-4 bg-slate-800 text-slate-500 font-black rounded-2xl text-[11px] uppercase tracking-widest cursor-not-allowed";
-                }
-            }, 300);
-        }
-
-        // Search Logic
-        document.getElementById('input-cari-nama').addEventListener('input', (e) => {
-            const k = e.target.value.toLowerCase();
-            const d = document.getElementById('dropdown-hasil');
-            d.innerHTML = '';
-            if (k.length < 2) { d.classList.add('hidden'); return; }
-            
-            const matches = dbSantriMaster.filter(s => s.nama.toLowerCase().includes(k));
-            matches.slice(0, 5).forEach(s => {
-                let item = document.createElement('div');
-                item.className = "px-4 py-3 text-xs font-bold border-b border-slate-700 hover:bg-amber-500 hover:text-slate-950 cursor-pointer";
-                item.innerHTML = `${s.nama.toUpperCase()} <span class="block text-[9px] opacity-50">${s.nik} | ${s.kelas}</span>`;
-                item.onclick = () => {
-                    document.getElementById('nik-reg-terpilih').value = s.nik;
-                    document.getElementById('lbl-nama-reg').innerText = s.nama.toUpperCase();
-                    document.getElementById('info-santri-reg').classList.remove('hidden');
-                    document.getElementById('input-cari-nama').value = s.nama;
-                    d.classList.add('hidden');
-                };
-                d.appendChild(item);
-            });
-            d.classList.remove('hidden');
-        });
-
-        document.getElementById('btn-simpan-wajah').addEventListener('click', async () => {
-            const nik = document.getElementById('nik-reg-terpilih').value;
-            if(!nik || !posisiWajahTerakhir) return;
-
-            const btn = document.getElementById('btn-simpan-wajah');
-            btn.disabled = true; btn.innerText = "MENGIRIM...";
-
-            const p = new URLSearchParams({ aksi: 'daftar_wajah_saja', nik: nik, vektor: JSON.stringify(posisiWajahTerakhir) });
-
-            try {
-                const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: p.toString() });
-                const r = await res.json();
-                if(r.status === "success") {
-                    Swal.fire('Berhasil', 'Koordinat wajah berhasil dikunci!', 'success');
-                    bukaMenu('menu-dashboard');
-                } else { Swal.fire('Gagal', r.message, 'error'); }
-            } catch(e) { Swal.fire('Error', 'Gagal koneksi!', 'error'); }
-        });
-
-        // Utils
-        function hitungJarak(t1, t2) {
-            let total = 0; 
-            let n = Math.min(t1.length, t2.length);
-            for (let i = 0; i < n; i++) {
-                total += Math.pow(t1[i].x - t2[i].x, 2) + Math.pow(t1[i].y - t2[i].y, 2);
+        function hitungJarakMatematika(titik1, titik2) {
+            let totalJarak = 0; 
+            let jumlah = Math.min(titik1.length, titik2.length);
+            for (let i = 0; i < jumlah; i++) {
+                totalJarak += Math.pow(titik1[i].x - titik2[i].x, 2) + Math.pow(titik1[i].y - titik2[i].y, 2);
             }
-            return Math.sqrt(total) / n;
+            return Math.sqrt(totalJarak) / jumlah;
         }
-
     </script>
 </body>
 </html>
