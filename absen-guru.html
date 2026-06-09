@@ -7,12 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Efek transisi halus saat ganti tema */
         body, header, div, section, button, table, td, th, footer, select {
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
         
-        /* Variabel Warna Mode Malam */
         .theme-dark {
             --bg-main: #0f172a;
             --bg-box: #020617;
@@ -23,7 +21,6 @@
             --border-row: rgba(15, 23, 42, 0.4);
         }
 
-        /* Variabel Warna Mode Siang */
         .theme-light {
             --bg-main: #f1f5f9;
             --bg-box: #ffffff;
@@ -132,7 +129,7 @@
                             <tr class="border-b dynamic-border dynamic-text-muted font-black uppercase">
                                 <th class="py-2 pl-2">WAKTU LOG</th>
                                 <th class="py-2">NAMA GURU</th>
-                                <th class="py-2">MATA PELAJARAN</th>
+                                <th class="py-2">JADWAL JAM / MAPEL</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-hadir-body" class="divide-y dynamic-border-row font-bold">
@@ -149,7 +146,7 @@
                     <h3 class="text-xs font-black text-red-500 uppercase tracking-widest flex items-center gap-1.5">
                         <i class="fa-solid fa-circle-exclamation"></i> SISA BELUM ABSEN / GAIB (<span id="txt-gaib">0</span>)
                     </h3>
-                    <span class="text-[9px] bg-red-500/10 text-red-500 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Sisa Jadwal</span>
+                    <span class="text-[9px] bg-red-500/10 text-red-400 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Sisa Jadwal</span>
                 </div>
                 <div class="overflow-y-auto flex-1 pr-1">
                     <table class="w-full text-left text-[11px] border-collapse">
@@ -181,20 +178,16 @@
         let masterJadwal = [];
         let logHadirHariIni = [];
 
-        // Kontrol Jam Realtime
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('id-ID') + " WIB";
         }, 1000);
 
-        // Lifecycle Pertama Kali Terbuka
         window.addEventListener('DOMContentLoaded', () => {
             inisialisasiTemaSistem();
             sinkronisasikanSistem();
         });
 
-        // ================= LOGIKA PENGATURAN TEMA (SIANG / MALAM) =================
         function inisialisasiTemaSistem() {
-            // Ambil preferensi tema yang disimpan dashboard, jika tidak ada default ke dark
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             terapkanTemaKeHTML(temaSimpanan);
         }
@@ -202,8 +195,6 @@
         function toggleTemaManual() {
             const temaSekarang = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
             const temaBaru = (temaSekarang === 'theme-dark') ? 'theme-light' : 'theme-dark';
-            
-            // Simpan ke localStorage agar sinkron dengan dashboard
             localStorage.setItem('dashboard_theme', temaBaru);
             terapkanTemaKeHTML(temaBaru);
         }
@@ -218,13 +209,13 @@
                 if(icon) icon.className = "fa-solid fa-moon text-slate-700";
             }
         }
-        // =========================================================================
 
         async function sinkronisasikanSistem() {
             document.getElementById('loader-guru').classList.remove('hidden');
             try {
-                await tarikLiveFeedHadirDashboard();
+                // SINKRONISASI SEARAH: Ambil Master Jadwal Dulu, baru Log Absensi agar Nama Jam bisa dicocokkan
                 await muatDataJadwalGuru();
+                await tarikLiveFeedHadirDashboard();
                 distribusikanRekapData();
             } catch (error) {
                 console.error("Gagal sinkronisasi data portal:", error);
@@ -240,12 +231,21 @@
                 let r = await res.json();
                 if (r.status === "success" && r.liveFeed) {
                     r.liveFeed.forEach(log => {
-                        // PERBAIKAN TOTAL FILTER: Mengunci agar data scan santri tidak masuk ke rekap guru
                         if (log.shalat === "BEBAS" || log.petugas.toLowerCase().includes("sekolah")) {
+                            let namaClean = log.nama.toUpperCase().trim();
+                            
+                            // PERBAIKAN LOGIKA JAM: Cari guru ini di masterJadwal untuk mendeteksi dia mestinya "Jam ke berapa"
+                            let dataJadwalAsli = masterJadwal.find(j => j.nama.toUpperCase().trim() === namaClean);
+                            
+                            // Jika di jadwal ketemu (misal "Jam 1"), pakai itu. Jika tidak ketemu baru fallback ke log.jam / BEBAS
+                            let labelJamDanMapel = dataJadwalAsli 
+                                ? `${dataJadwalAsli.jam || "Mengajar"} - ${dataJadwalAsli.mapel}`
+                                : `BEBAS - ${log.shalat || "Mengajar"}`;
+
                             logHadirHariIni.push({
-                                jam: log.jam || "Hari Ini",
-                                nama: log.nama.toUpperCase().trim(),
-                                mapel: log.shalat || "Mengajar"
+                                jamLog: log.jam || "Hari Ini",
+                                nama: namaClean,
+                                mapel: labelJamDanMapel
                             });
                         }
                     });
@@ -291,9 +291,9 @@
                     let trH = document.createElement('tr');
                     trH.className = "border-b dynamic-border-row bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors";
                     trH.innerHTML = `
-                        <td class="py-2.5 pl-2 font-mono text-emerald-500">${h.jam} WIB</td>
+                        <td class="py-2.5 pl-2 font-mono text-emerald-500">${h.jamLog} WIB</td>
                         <td class="py-2.5 uppercase font-black tracking-wide"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> ${h.nama}</td>
-                        <td class="py-2.5 dynamic-text-muted italic">${h.mapel}</td>
+                        <td class="py-2.5 dynamic-text-muted italic text-[10px]">${h.mapel}</td>
                     `;
                     tbodyHadir.appendChild(trH);
                 });
@@ -313,16 +313,16 @@
                 let namaClean = guru.nama.toUpperCase().trim();
                 let sudahAbsen = logHadirHariIni.some(h => h.nama === namaClean);
 
-                // SOLUSI TOTAL KARTU HILANG: Jika guru terdeteksi sudah absen, baris render kartu ini langsung dilewati (skip)
                 if (sudahAbsen) return;
 
                 sounterGaib++;
                 
-                // Membuat kartu interaktif khusus guru yang belum absen
                 let divKartu = document.createElement('div');
                 divKartu.className = "dynamic-bg-box hover:opacity-90 p-4 rounded-2xl border dynamic-border text-xs flex flex-col justify-between items-center gap-2 cursor-pointer text-center duration-300 shadow-md transition-all hover:-translate-y-0.5 hover:border-yellow-500/50";
                 divKartu.innerHTML = `
-                    <div class="w-8 h-8 bg-yellow-400/10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-tie text-yellow-500"></i></div>
+                    <div class="w-8 h-8 bg-yellow-400/10 rounded-xl flex items-center justify-center">
+                        <span class="text-[9px] font-black text-yellow-500">${guru.jam || 'JAM'}</span>
+                    </div>
                     <div class="flex flex-col">
                         <span class="font-black text-[11px] uppercase tracking-wide leading-tight">${namaClean}</span>
                         <span class="text-[9px] dynamic-text-muted font-mono mt-0.5 italic">${guru.mapel}</span>
@@ -335,21 +335,19 @@
                 });
                 boxKartu.appendChild(divKartu);
 
-                // Membuat baris rekap ke dalam Tabel Gaib
                 let trG = document.createElement('tr');
                 trG.className = "border-b dynamic-border-row hover:opacity-80 transition-colors";
                 trG.innerHTML = `
                     <td class="py-2.5 pl-2 uppercase font-black">${namaClean}</td>
                     <td class="py-2.5"><span class="dynamic-bg-input dynamic-text-muted px-2 py-0.5 rounded font-mono text-[9px] font-bold">${guru.kelas || "A"}</span></td>
-                    <td class="py-2.5 dynamic-text-muted font-medium italic">${guru.mapel}</td>
-                    <td class="py-2.5 text-center"><span class="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded-md font-black text-[9px] uppercase tracking-wider">GAIB</span></td>
+                    <td class="py-2.5 dynamic-text-muted font-medium italic">${guru.jam || ''} - ${guru.mapel}</td>
+                    <td class="py-2.5 text-center"><span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-md font-black text-[9px] uppercase tracking-wider">GAIB</span></td>
                 `;
                 tbodyGaib.appendChild(trG);
             });
 
             document.getElementById('txt-gaib').innerText = sounterGaib;
 
-            // Jika sisa jadwal kosong, berikan feedback sukses
             if (sounterGaib === 0) {
                 boxKartu.innerHTML = `<div class="col-span-full text-center text-emerald-500 dynamic-bg-box font-bold text-xs py-12 uppercase border border-dashed border-emerald-500/30 rounded-2xl bg-emerald-500/5"><i class="fa-solid fa-circle-check text-base mb-1 block"></i> Semua ustadz di jadwal ini sudah absen masuk!</div>`;
                 tbodyGaib.innerHTML = `<tr><td colspan="4" class="py-8 text-center dynamic-text-muted italic">Sisa jadwal nihil. Semua hadir.</td></tr>`;
@@ -382,10 +380,14 @@
                 
                 if(rAbsen.status === "success") {
                     let jamKlik = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                    
+                    // Langsung mapping data jam dan mapel secara instan sesaat setelah klik berhasil
+                    let labelJamDanMapel = `${guruData.jam || "Mengajar"} - ${guruData.mapel}`;
+                    
                     logHadirHariIni.push({
-                        jam: jamKlik,
+                        jamLog: jamKlik,
                         nama: guruData.nama.toUpperCase().trim(),
-                        mapel: guruData.mapel
+                        mapel: labelJamDanMapel
                     });
                     distribusikanRekapData();
                 } else {
