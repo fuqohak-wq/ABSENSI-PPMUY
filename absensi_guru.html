@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Absensi Guru PDF - E-Pesantren</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-guru {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card-guru:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <div>
+            <h4 class="fw-bold text-success m-0"><i class="fas fa-user-check me-2"></i>Panel Absensi Guru PDF</h4>
+            <small class="text-muted">Khusus Otoritas Kepala Pondok Pesantren</small>
+        </div>
+        <a href="dashboard.html" class="btn btn-sm btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded shadow-sm border-start border-4 border-info">
+                <small class="text-muted text-uppercase fw-bold d-block">Total Jadwal Jam Ini</small>
+                <span class="h3 fw-bold text-dark" id="txt-total-jadwal">0</span>
+                <small class="text-muted d-block mt-1">Guru Mengajar</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded shadow-sm border-start border-4 border-success">
+                <small class="text-muted text-uppercase fw-bold d-block">Total Hadir</small>
+                <span class="h3 fw-bold text-success" id="txt-total-hadir">0</span>
+                <small class="text-muted d-block mt-1">Sudah Diverifikasi</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded shadow-sm border-start border-4 border-danger">
+                <small class="text-muted text-uppercase fw-bold d-block">Total Gaib</small>
+                <span class="h3 fw-bold text-danger" id="txt-total-gaib">0</span>
+                <small class="text-muted d-block mt-1">Belum Terlihat</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded shadow-sm border-start border-4 border-warning">
+                <small class="text-muted text-uppercase fw-bold d-block">Metode Input</small>
+                <span class="h5 fw-bold text-warning d-block my-1">1-Tap Verifikasi</span>
+                <small class="text-muted d-block">Klik Kartu = Absen Sukses</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white fw-bold">
+            <i class="fas fa-filter me-2"></i>Filter Jadwal Aktif Komparatif
+        </div>
+        <div class="card-body">
+            <form id="form-filter" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted">1. Pilih Hari</label>
+                    <select class="form-select border-success" id="filter-hari" required>
+                        <option value="Sabtu">Sabtu</option>
+                        <option value="Minggu">Minggu</option>
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted">2. Jam Ke</label>
+                    <select class="form-select border-success" id="filter-jam" required>
+                        <option value="I">Jam ke I</option>
+                        <option value="II">Jam ke II</option>
+                        <option value="III">Jam ke III</option>
+                        <option value="IV">Jam ke IV</option>
+                        <option value="V">Jam ke V</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted">3. Gender Saring</label>
+                    <select class="form-select border-success" id="filter-gender" required>
+                        <option value="LAKI-LAKI">LAKI-LAKI (ULA/WUSTHO Pusat)</option>
+                        <option value="PEREMPUAN">PEREMPUAN (Khadijah/Putri)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100 fw-bold" id="btn-tarik">
+                        <i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h5 class="fw-bold text-secondary mb-3"><i class="fas fa-th-large me-2"></i>Daftar Guru Mengajar (Klik kartu untuk verifikasi Hadir)</h5>
+    
+    <div class="row g-3" id="kontainer-kartu-guru">
+        <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-muted">
+            <i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i>
+            <p class="m-0 fw-bold">Belum ada data ditarik.</p>
+            <small>Silakan tentukan filter Hari, Jam, & Gender di atas lalu klik Tampilkan Kartu Jadwal.</small>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL SCRIPT WEB APP (Ganti sesuai dengan Web App URL milik Anda yang dipublikasikan dari code1.gs)
+    const API_URL = "https://script.google.com/macros/s/1qPqHP9rmkd1WClAv30U0S1tYEGX88TcpuoqEuzf1u_I/exec"; 
+
+    let counterJadwal = 0;
+    let counterHadir = 0;
+    let counterGaib = 0;
+
+    // 1. EVENT AKSI TARIK DATA JADWAL GURU
+    document.getElementById('form-filter').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const hari = document.getElementById('filter-hari').value;
+        const jam = document.getElementById('filter-jam').value;
+        const gender = document.getElementById('filter-gender').value;
+        const kontainer = document.getElementById('kontainer-kartu-guru');
+        const btnTarik = document.getElementById('btn-tarik');
+
+        // Tampilkan loading state
+        btnTarik.disabled = true;
+        btnTarik.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Mencari Data...`;
+        kontainer.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-success mb-2" role="status"></div>
+                <p class="text-muted fw-bold">Menghubungkan ke Cloud Database Sheet...</p>
+            </div>`;
+
+        // Eksekusi GET ke code1.gs
+        fetch(`${API_URL}?aksi=ambil_guru_pdf&hari=${hari}&jam=${jam}&gender=${gender}`)
+        .then(response => response.json())
+        .then(res => {
+            btnTarik.disabled = false;
+            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL`;
+
+            if (res.status === "success" && res.data.length > 0) {
+                // Inisialisasi Angka Rekap
+                counterJadwal = res.data.length;
+                counterHadir = 0;
+                counterGaib = counterJadwal;
+                updateWidgetRekap();
+
+                // Render Kartu
+                kontainer.innerHTML = "";
+                res.data.forEach(guru => {
+                    const idKartu = 'guru-' + btoa(guru.nama).replace(/=/g, ''); // Generate ID unik aman
+                    
+                    const htmlCard = `
+                        <div class="col-12 col-md-4" id="${idKartu}">
+                            <div class="card card-guru border-0 shadow-sm bg-white overflow-hidden" 
+                                 onclick="prosesKlikAbsen('${guru.nama}', '${guru.mapel}', '${guru.kelas}', '${jam}', '${gender}', '${idKartu}')">
+                                <div class="bg-emerald-600 p-2 text-white text-center small fw-bold tracking-wider">
+                                    CLASSROOM: ${guru.kelas}
+                                </div>
+                                <div class="card-body text-center p-4">
+                                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-user-tie fa-2x text-emerald-700"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">${guru.nama}</h6>
+                                    <p class="text-emerald-700 font-semibold small m-0 mb-3"><i class="fas fa-book-reader me-1"></i> ${guru.mapel}</p>
+                                    <div class="badge bg-danger rounded-pill px-3 py-2 text-xs font-bold tracking-wide">
+                                        <i class="fas fa-ghost me-1"></i> STATUS: GAIB
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    kontainer.innerHTML += htmlCard;
+                });
+            } else {
+                // Jika jadwal kosong
+                resetWidgetRekap();
+                kontainer.innerHTML = `
+                    <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-danger">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <p class="m-0 fw-bold">JADWAL MENGAJAR KOSONG / TIDAK DITEMUKAN</p>
+                        <small class="text-muted">Tidak ada data guru mengajar di hari ${hari}, ${jam} untuk gender ${gender}.</small>
+                    </div>`;
+            }
+        })
+        .catch(err => {
+            btnTarik.disabled = false;
+            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL`;
+            resetWidgetRekap();
+            kontainer.innerHTML = `
+                <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-danger">
+                    <i class="fas fa-wifi fa-3x mb-3"></i>
+                    <p class="m-0 fw-bold">Gagal Mengambil Data</p>
+                    <small>${err.toString()}</small>
+                </div>`;
+        });
+    });
+
+    // 2. FITUR UTAMA: KLIK KARTU -> SEND DATA KE CLOUD -> ANIMASI LANGSUNG HILANG
+    function prosesKlikAbsen(nama, mapel, kelas, jam, gender, idElement) {
+        const targetCard = document.getElementById(idElement);
+        if (!targetCard || targetCard.classList.contains('fade-out')) return;
+
+        // Kunci kartu sementara agar tidak di-double click
+        targetCard.style.pointerEvents = "none";
+        
+        // Buat data payload POST
+        const formData = new URLSearchParams();
+        formData.append("aksi", "absen_guru_click");
+        formData.append("nama", nama);
+        formData.append("mapel", mapel);
+        formData.append("kelas", kelas);
+        formData.append("jam", jam);
+        formData.append("gender", gender);
+
+        // Kirim log ke sheet absensi_sekolah via code1.gs
+        fetch(API_URL, {
+            method: "POST",
+            body: formData,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "success") {
+                // Beri efek animasi hilang (Fade Out)
+                targetCard.classList.add('fade-out');
+                
+                // Kurangi counter secara realtime setelah animasi selesai
+                setTimeout(() => {
+                    targetCard.remove();
+                    
+                    counterHadir++;
+                    counterGaib--;
+                    updateWidgetRekap();
+
+                    // Jika semua kartu sudah diklik habis
+                    if (counterGaib === 0) {
+                        document.getElementById('kontainer-kartu-guru').innerHTML = `
+                            <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-success">
+                                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                <p class="m-0 fw-bold">ALHAMDULILLAH, SELESAI!</p>
+                                <small class="text-muted">Semua guru mengajar pada jam ini telah tervalidasi hadir di ruang kelas.</small>
+                            </div>`;
+                    }
+                }, 400);
+            } else {
+                alert("Gagal mencatat absensi: " + res.message);
+                targetCard.style.pointerEvents = "auto";
+            }
+        })
+        .catch(err => {
+            alert("Kesalahan Jaringan Server: " + err.toString());
+            targetCard.style.pointerEvents = "auto";
+        });
+    }
+
+    // 3. FUNGSI UPDATE MATEMATIKA WIDGET REKAP DI ATAS
+    function updateWidgetRekap() {
+        document.getElementById('txt-total-jadwal').innerText = counterJadwal;
+        document.getElementById('txt-total-hadir').innerText = counterHadir;
+        document.getElementById('txt-total-gaib').innerText = counterGaib;
+    }
+
+    function resetWidgetRekap() {
+        counterJadwal = 0; counterHadir = 0; counterGaib = 0;
+        updateWidgetRekap();
+    }
+</script>
+
+</body>
+</html>
