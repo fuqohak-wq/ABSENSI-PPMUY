@@ -3,351 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Presensi Mengajar Guru - E-Pesantren</title>
+    <title>Portal Absensi Mengajar Guru - E-Pesantren</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col justify-between">
 
-    <header class="bg-slate-950 border-b border-slate-800 py-4 px-6 shadow-xl sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <a href="index.html" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center border border-slate-700 text-slate-350 transition-all" title="Kembali ke Dashboard Utama">
-                    <i class="fa-solid fa-arrow-left text-sm"></i>
-                </a>
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30">
-                    <i class="fa-solid fa-graduation-cap text-emerald-400 text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-black text-sm tracking-wider uppercase text-emerald-400">E-PESANTREN UTAMA</h1>
-                    <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Portal Khusus Presensi Mengajar Ustadz</p>
-                </div>
+    <header class="w-full bg-slate-900 border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-md no-print">
+        <div class="flex items-center gap-3">
+            <a href="dashboard.html" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center border border-slate-700 text-yellow-400 transition-all" title="Kembali ke Dashboard Utama">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-graduation-cap text-slate-950 text-lg"></i>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-[10px] bg-slate-900 text-emerald-400 px-3 py-1.5 rounded-full border border-slate-800 font-mono font-bold" id="liveClock">00:00:00 WIB</span>
+            <div>
+                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">PORTAL ABSENSI GURU</h1>
+                <span class="text-[9px] bg-yellow-400 text-indigo-950 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">MANAJEMEN GURU</span>
             </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] bg-slate-950 text-yellow-400 px-3 py-2 rounded-xl border border-slate-800 font-mono font-bold" id="liveClock">00:00:00 WIB</span>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <main class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
         
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-lg h-fit">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-emerald-400"></i> Parameter Mengajar
-                </h2>
+            <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl h-fit">
+                <h3 class="text-xs font-black text-cyan-500 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders"></i> PARAMETER JADWAL
+                </h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pilih Hari</label>
-                        <select id="selectHari" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-emerald-500">
-                            <option value="Senin">SENIN</option>
-                            <option value="Selasa" selected>SELASA</option>
-                            <option value="Rabu">RABU</option>
-                            <option value="Kamis">KAMIS</option>
-                            <option value="Jumat">JUMAT</option>
-                            <option value="Sabtu">SABTU</option>
-                            <option value="Ahad">AHAD</option>
+                        <label class="text-[10px] font-black text-slate-450 uppercase block mb-1">Pilih Hari:</label>
+                        <select id="g-hari" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-white outline-none focus:border-yellow-400">
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa" selected>Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Klaster Gender</label>
-                        <select id="selectGender" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-emerald-500">
-                            <option value="Laki-laki">USTADZ (LAKI-LAKI)</option>
-                            <option value="Perempuan">USTADZAH (PEREMPUAN)</option>
+                        <label class="text-[10px] font-black text-slate-450 uppercase block mb-1">Kompleks / Gender:</label>
+                        <select id="g-gender" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-white outline-none focus:border-yellow-400">
+                            <option value="Laki-laki">Putra (Laki-laki)</option>
+                            <option value="Perempuan">Putri (Perempuan)</option>
                         </select>
                     </div>
-                    <button onclick="pindaiDanMuatSistem()" class="w-full mt-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-emerald-950/20 active:scale-[0.98] cursor-pointer">
-                        <i class="fa-solid fa-rotate mr-1"></i> Tarik & Muat Jadwal
+                    <button onclick="sinkronisasikanSistem()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black text-xs uppercase py-3.5 rounded-xl tracking-widest transition-all cursor-pointer shadow-md">
+                        <i class="fa-solid fa-sync mr-1"></i> SINKRON DATA
                     </button>
                 </div>
             </section>
 
-            <section class="lg:col-span-3 bg-slate-950 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa-solid fa-address-card text-emerald-400"></i> Ketuk Kartu Untuk Absen Masuk Kelas
-                    </h2>
-                    <div id="loaderStatus" class="hidden text-xs text-emerald-400 font-bold animate-pulse flex items-center gap-1.5">
-                        <i class="fa-solid fa-spinner animate-spin"></i> Sinkronisasi Cloud...
+            <section class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col min-h-[220px]">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
+                    <h3 class="text-xs font-black text-yellow-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <i class="fa-solid fa-address-card"></i> KETUK KARTU UNTUK ABSEN MASUK
+                    </h3>
+                    <div id="loader-guru" class="text-[10px] text-yellow-400 font-black uppercase animate-pulse hidden">
+                        <i class="fa-solid fa-spin fa-spinner mr-1"></i> Sinkronisasi Cloud...
                     </div>
                 </div>
-
-                <div id="boxJadwalGuru" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="col-span-full text-center font-bold text-xs py-12 text-slate-500 uppercase tracking-wider border border-dashed border-slate-800 rounded-xl">
-                        Silakan klik tombol "Tarik & Muat Jadwal" untuk menampilkan daftar ustadz.
+                
+                <div id="box-daftar-guru" class="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 overflow-y-auto max-h-72 pr-1">
+                    <div class="col-span-full text-center text-slate-500 font-bold text-xs py-12 uppercase border border-dashed border-slate-800 rounded-2xl">
+                        Silakan tekan tombol "SINKRON DATA" untuk menarik jadwal mengajar.
                     </div>
                 </div>
             </section>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 border-t border-slate-800 pt-6">
             
-            <section class="bg-slate-950 border border-emerald-950/40 rounded-2xl p-5 shadow-xl">
-                <div class="flex justify-between items-center mb-4 border-b border-slate-900 pb-3">
-                    <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check"></i> Daftar Ustadz Hadir (<span id="countHadir">0</span>)
-                    </h2>
-                    <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Realtime</span>
+            <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col h-72">
+                <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i> DAFTAR USTADZ HADIR (<span id="txt-hadir">0</span>)
+                    </h3>
+                    <span class="text-[9px] bg-emerald-500/10 text-emerald-400 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Terbuku</span>
                 </div>
-                <div class="overflow-x-auto max-h-72 overflow-y-auto rounded-xl border border-slate-900">
-                    <table class="w-full text-left border-collapse text-xs">
+                <div class="overflow-y-auto flex-1 pr-1">
+                    <table class="w-full text-left text-[11px] border-collapse">
                         <thead>
-                            <tr class="bg-slate-900 border-b border-slate-850 text-slate-400 font-bold">
-                                <th class="p-3">Jam Absen</th>
-                                <th class="p-3">Nama Ustadz</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Mapel</th>
+                            <tr class="border-b border-slate-800 text-slate-400 font-black uppercase">
+                                <th class="py-2 pl-2">WAKTU LOG</th>
+                                <th class="py-2">NAMA GURU</th>
+                                <th class="py-2">MATA PELAJARAN</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelHadirBody" class="divide-y divide-slate-900">
+                        <tbody id="tabel-hadir-body" class="divide-y divide-slate-800/40 font-bold text-slate-300">
                             <tr>
-                                <td colspan="4" class="p-6 text-center text-slate-500 italic">Belum ada guru yang melakukan absensi hari ini.</td>
+                                <td colspan="3" class="py-8 text-center text-slate-500 italic">Belum ada guru terdata masuk kelas hari ini.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <section class="bg-slate-950 border border-red-950/40 rounded-2xl p-5 shadow-xl">
-                <div class="flex justify-between items-center mb-4 border-b border-slate-900 pb-3">
-                    <h2 class="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa-solid fa-circle-exclamation"></i> Daftar Belum Absen / Gaib (<span id="countGaib">0</span>)
-                    </h2>
-                    <span class="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Sisa Jadwal</span>
+            <section class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col h-72">
+                <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+                    <h3 class="text-xs font-black text-red-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-exclamation"></i> SISA BELUM ABSEN / GAIB (<span id="txt-gaib">0</span>)
+                    </h3>
+                    <span class="text-[9px] bg-red-500/10 text-red-400 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Sisa Jadwal</span>
                 </div>
-                <div class="overflow-x-auto max-h-72 overflow-y-auto rounded-xl border border-slate-900">
-                    <table class="w-full text-left border-collapse text-xs">
+                <div class="overflow-y-auto flex-1 pr-1">
+                    <table class="w-full text-left text-[11px] border-collapse">
                         <thead>
-                            <tr class="bg-slate-900 border-b border-slate-850 text-slate-400 font-bold">
-                                <th class="p-3">Nama Ustadz</th>
-                                <th class="p-3">Kelas</th>
-                                <th class="p-3">Mapel</th>
-                                <th class="p-3 text-center">Status</th>
+                            <tr class="border-b border-slate-800 text-slate-400 font-black uppercase">
+                                <th class="py-2 pl-2">NAMA GURU</th>
+                                <th class="py-2">KELAS</th>
+                                <th class="py-2">MAPEL</th>
+                                <th class="py-2 text-center">STATUS</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelGaibBody" class="divide-y divide-slate-900">
+                        <tbody id="tabel-gaib-body" class="divide-y divide-slate-800/40 font-bold text-slate-300">
                             <tr>
-                                <td colspan="4" class="p-6 text-center text-slate-500 italic">Silakan tarik jadwal terlebih dahulu.</td>
+                                <td colspan="4" class="py-8 text-center text-slate-500 italic">Data kosong. Silakan muat sinkronisasi jadwal.</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+
         </div>
     </main>
 
+    <footer class="w-full text-center py-3 text-[9px] text-slate-500 font-extrabold tracking-widest border-t border-slate-900 bg-slate-950 no-print">E-PESANTREN CORE ECOSYSTEM</footer>
+
     <script>
-        // KUNCI UTAMA: PASTIKAN URL WEBAPP ANDA SUDAH BENAR DI SINI!
-        const API_URL = "https://script.google.com/macros/s/AKfycbz_K_N9M-iXb3gYmO6YQp_1xep63N1YfRscIqG8S8C1ZtSveS89-2rB-o_f6nKjB2Y/exec"; 
+        // MENGGUNAKAN INDUK API_URL YANG SAMA PERSIS DENGAN FILE DASHBOARD ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
 
-        // State Penyimpanan Data Sementara Lokal
-        let masterJadwalHariIni = [];
-        let masterAbsensiHariIni = [];
+        let masterJadwal = [];
+        let logHadirHariIni = [];
 
-        // Penunjuk Jam Otomatis
+        // Jam Realtime
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('id-ID') + " WIB";
         }, 1000);
 
-        // Fungsi Otomatis saat Halaman Diakses Pertama Kali
-        window.onload = function() {
-            pindaiDanMuatSistem();
-        };
+        // Otomatis Sinkron saat Halaman Terbuka
+        window.addEventListener('DOMContentLoaded', () => {
+            sinkronisasikanSistem();
+        });
 
-        // Fungsi Induk Pengendali Alur Data
-        async function pindaiDanMuatSistem() {
-            document.getElementById("loaderStatus").classList.remove('hidden');
+        // Pengendali Alur Data
+        async function sinkronisasikanSistem() {
+            document.getElementById('loader-guru').classList.remove('hidden');
             try {
-                await ambilLogAbsensiSekolah();
-                await ambilJadwalSesuaiFilter();
-                prosesSinkronisasiRekapData();
+                await tarikLiveFeedHadirDashboard();
+                await muatDataJadwalGuru();
+                distribusikanRekapData();
             } catch (error) {
-                console.error("Gagal memuat portal absensi:", error);
+                console.error("Gagal sinkronisasi data portal:", error);
             } finally {
-                document.getElementById("loaderStatus").classList.add('hidden');
+                document.getElementById('loader-guru').classList.add('hidden');
             }
         }
 
-        // 1. Ambil Log Guru yang SUDAH ABSEN dari sheet absensi_sekolah hari ini
-        async function ambilLogAbsensiSekolah() {
-            masterAbsensiHariIni = [];
-            // Kita tembak rekap dashboard karena di dalamnya sudah mengantongi data absensi_sekolah hari ini
-            let link = `${API_URL}?aksi=ambil_rekap_dashboard`;
+        // 1. Tarik Log Siapa yang SUDAH ABSEN dengan memanfaatkan data liveFeed Dashboard Anda
+        async function tarikLiveFeedHadirDashboard() {
+            logHadirHariIni = [];
             try {
-                let respon = await fetch(link);
-                let json = await respon.json();
-                
-                // Jika sheet absensi_sekolah ada di sistem, Google Apps Script akan melemparkannya.
-                // Namun karena fungsi rekap dashboard bawaan hanya melempar angka jumlah total, kita ambil dari log live feed/data yang ada.
-                // Jika Anda ingin mengambil data absensi mentah secara utuh, kita manfaatkan response terintegrasi dari server.
-                if(json.status === "success") {
-                     // Kita simpan untuk pencocokan nanti
-                     // Catatan: Jika script di Apps Script Anda belum melempar list nama, kita lakukan pencatatan fallback lokal saat klik.
-                }
-            } catch(e) { console.log("Gagal memuat log absensi sekolah bawaan."); }
-        }
-
-        // 2. Ambil Semua Jadwal Mengajar dari Google Sheets lewat code2.gs terintegrasi code1.gs
-        async function ambilJadwalSesuaiFilter() {
-            let hSelected = document.getElementById("selectHari").value;
-            let gSelected = document.getElementById("selectGender").value;
-            
-            let link = `${API_URL}?aksi=ambil_guru_pdf&hari=${encodeURIComponent(hSelected)}&gender=${encodeURIComponent(gSelected)}`;
-            
-            try {
-                let respon = await fetch(link);
-                let json = await respon.json();
-                if(json.status === "success" && json.data) {
-                    masterJadwalHariIni = json.data;
-                } else {
-                    masterJadwalHariIni = [];
-                }
-            } catch(e) {
-                masterJadwalHariIni = [];
-                alert("Gagal terhubung dengan server Google Sheets!");
-            }
-        }
-
-        // 3. Logika Inti: Pisahkan data mana yang Hadir dan mana yang Gaib
-        function prosesSinkronisasiRekapData() {
-            let boxKartu = document.getElementById("boxJadwalGuru");
-            let tbodyHadir = document.getElementById("tabelHadirBody");
-            let tbodyGaib = document.getElementById("tabelGaibBody");
-
-            boxKartu.innerHTML = "";
-            tbodyGaib.innerHTML = "";
-            
-            if(masterJadwalHariIni.length === 0) {
-                boxKartu.innerHTML = `<div class="col-span-full text-center font-bold text-xs py-12 text-slate-500 uppercase tracking-wider border border-dashed border-slate-800 rounded-xl">Jadwal mengajar kosong / Tidak ada kecocokan data.</div>`;
-                tbodyGaib.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500 italic">Tidak ada jadwal tersisa.</td></tr>`;
-                document.getElementById("countGaib").innerText = "0";
-                return;
-            }
-
-            let jumlahGaib = 0;
-
-            masterJadwalHariIni.forEach((guru, indeks) => {
-                // Periksa apakah guru ini namanya sudah masuk di daftar absensi lokal kita
-                let sudahAbsen = masterAbsensiHariIni.some(a => a.nama.toLowerCase().trim() === guru.nama.toLowerCase().trim() && a.kelas.toLowerCase().trim() === guru.kelas.toLowerCase().trim());
-
-                // A. RENDER PANEL KARTU ATAS (Hanya yang BELUM absen yang tombolnya aktif)
-                let kartu = document.createElement("div");
-                kartu.className = `border rounded-xl p-4 flex flex-col justify-between transition-all ${sudahAbsen ? 'bg-slate-900/40 border-slate-850 opacity-40' : 'bg-slate-900 border-slate-800 hover:border-emerald-500/40 shadow-md'}`;
-                
-                kartu.innerHTML = `
-                    <div class="space-y-1.5 mb-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[9px] bg-slate-800 text-emerald-400 px-2 py-0.5 rounded font-black tracking-wider uppercase">${guru.kelas}</span>
-                            <span class="text-[9px] font-mono text-slate-500 font-bold">${guru.jam || "BEBAS"}</span>
-                        </div>
-                        <h3 class="text-xs font-black tracking-wide text-slate-100 uppercase">${guru.nama}</h3>
-                        <p class="text-[11px] text-slate-400 font-medium italic"><i class="fa-solid fa-book text-[10px] text-slate-500 mr-1"></i> ${guru.mapel}</p>
-                    </div>
-                    ${sudahAbsen ? 
-                        `<div class="w-full bg-slate-950 text-emerald-500 text-center font-bold text-[10px] uppercase tracking-wider py-2 rounded-lg border border-emerald-950/30"><i class="fa-solid fa-check mr-1"></i> Terbuku Hadir</div>` : 
-                        `<button onclick="eksekusiKlikAbsen(this, ${indeks})" class="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400 font-black text-[11px] uppercase tracking-wider py-2.5 rounded-lg transition-all active:scale-95 cursor-pointer shadow-md shadow-emerald-950/20"><i class="fa-solid fa-bolt mr-1"></i> Masuk Kelas</button>`
-                    }
-                `;
-                boxKartu.appendChild(kartu);
-
-                // B. RENDER TABEL GAIB (KANAN BAWAH) - Jika belum absen masukkan ke tabel gaib
-                if(!sudahAbsen) {
-                    jumlahGaib++;
-                    let rowG = document.createElement("tr");
-                    rowG.className = "hover:bg-slate-900/50 transition-colors";
-                    rowG.innerHTML = `
-                        <td class="p-3 font-bold text-slate-200 uppercase">${guru.nama}</td>
-                        <td class="p-3"><span class="bg-slate-900 text-slate-400 px-2 py-0.5 rounded text-[10px] font-bold">${guru.kelas}</span></td>
-                        <td class="p-3 text-slate-400 italic">${guru.mapel}</td>
-                        <td class="p-3 text-center"><span class="text-[10px] font-black text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider">Gaib</span></td>
-                    `;
-                    tbodyGaib.appendChild(rowG);
-                }
-            });
-
-            document.getElementById("countGaib").innerText = jumlahGaib;
-        }
-
-        // 4. Aksi Eksekusi Perekaman Absensi saat tombol "Masuk Kelas" di klik
-        async function eksekusiKlikAbsen(btn, indeksJadwal) {
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i> Mengunci...`;
-            
-            let guru = masterJadwalHariIni[indeksJadwal];
-            let gGender = document.getElementById("selectGender").value;
-
-            let params = new URLSearchParams();
-            params.append('aksi', 'absen_guru_click');
-            params.append('nama', guru.nama);
-            params.append('mapel', guru.mapel);
-            params.append('kelas', guru.kelas);
-            params.append('jam', guru.jam || "BEBAS");
-            params.append('gender', gGender);
-
-            try {
-                let respon = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: params.toString()
-                });
-                let hasil = await respon.json();
-
-                if(hasil.status === "success") {
-                    // Masukkan ke array absensi lokal agar tabel dan kartu langsung berubah secara instan tanpa reload browser
-                    let waktuSekarang = new Date().toLocaleTimeString('id-ID') + " WIB";
-                    masterAbsensiHariIni.push({
-                        jamAbsen: waktuSekarang,
-                        nama: guru.nama,
-                        kelas: guru.kelas,
-                        mapel: guru.mapel
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
+                let r = await res.json();
+                if (r.status === "success" && r.liveFeed) {
+                    r.liveFeed.forEach(log => {
+                        // Memisahkan log absensi mengajar ustadz/sekolah
+                        if (log.shalat === "BEBAS" || log.petugas.includes("Sekolah") || log.jam) {
+                            logHadirHariIni.push({
+                                jam: log.jam || "Hari Ini",
+                                nama: log.nama.toUpperCase().trim(),
+                                mapel: log.shalat || "Mengajar"
+                            });
+                        }
                     });
+                }
+            } catch(e) { console.log("Log absensi lokal masih kosong."); }
+        }
 
-                    // Update UI Tabel Hadir (Kiri Bawah)
-                    perbaruiTabelHadirUI();
-                    // Sinkronisasi ulang kartu dan tabel gaib
-                    prosesSinkronisasiRekapData();
+        // 2. Tarik Seluruh Jadwal Mengajar Sesuai Filter Parameter Hari & Gender
+        async function muatDataJadwalGuru() {
+            const hari = document.getElementById('g-hari').value;
+            const gender = document.getElementById('g-gender').value;
+            const urlAmbil = `${API_URL}?aksi=ambil_guru_pdf&hari=${encodeURIComponent(hari)}&gender=${encodeURIComponent(gender)}`;
+            
+            try {
+                let res = await fetch(urlAmbil, { method: "GET" });
+                let r = await res.json();
+                if (r.status === "success" && r.data) {
+                    masterJadwal = r.data;
                 } else {
-                    alert("Gagal mencatat absensi ke Google Sheets: " + hasil.message);
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-bolt mr-1"></i> Masuk Kelas`;
+                    masterJadwal = [];
                 }
             } catch(e) {
-                alert("Masalah Jaringan! Gagal menghubungi server awan.");
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-bolt mr-1"></i> Masuk Kelas`;
+                masterJadwal = [];
+                alert("Gagal menghubungi server awan!");
             }
         }
 
-        // 5. Perbarui Tampilan Tabel Ustadz Hadir di Sisi Kiri Bawah
-        function perbaruiTabelHadirUI() {
-            let tbodyHadir = document.getElementById("tabelHadirBody");
-            tbodyHadir.innerHTML = "";
+        // 3. Logika Utama Pembagian Data Ke Tiga Sektor Screen (Kartu, Tabel Hadir, Tabel Gaib)
+        function distribusikanRekapData() {
+            const boxKartu = document.getElementById('box-daftar-guru');
+            const tbodyHadir = document.getElementById('tabel-hadir-body');
+            const tbodyGaib = document.getElementById('tabel-gaib-body');
 
-            if(masterAbsensiHariIni.length === 0) {
-                tbodyHadir.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-500 italic">Belum ada guru yang melakukan absensi hari ini.</td></tr>`;
-                document.getElementById("countHadir").innerText = "0";
+            boxKartu.innerHTML = '';
+            tbodyHadir.innerHTML = '';
+            tbodyGaib.innerHTML = '';
+
+            // A. RENDER TABEL GURU HADIR (KIRI BAWAH)
+            if (logHadirHariIni.length === 0) {
+                tbodyHadir.innerHTML = `<tr><td colspan="3" class="py-8 text-center text-slate-500 italic">Belum ada guru terdata masuk kelas hari ini.</td></tr>`;
+                document.getElementById('txt-hadir').innerText = "0";
+            } else {
+                document.getElementById('txt-hadir').innerText = logHadirHariIni.length;
+                // Urutkan log dari yang paling terbaru berada di atas
+                [...logHadirHariIni].reverse().forEach(h => {
+                    let trH = document.createElement('tr');
+                    trH.className = "border-b border-slate-900 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors";
+                    trH.innerHTML = `
+                        <td class="py-2.5 pl-2 font-mono text-emerald-400">${h.jam} WIB</td>
+                        <td class="py-2.5 uppercase font-black tracking-wide text-slate-200"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> ${h.nama}</td>
+                        <td class="py-2.5 text-slate-400 italic">${h.mapel}</td>
+                    `;
+                    tbodyHadir.appendChild(trH);
+                });
+            }
+
+            // B. RENDER KARTU KLIK & TABEL GURU GAIB (KANAN BAWAH)
+            if (masterJadwal.length === 0) {
+                boxKartu.innerHTML = `<div class="col-span-full text-center text-slate-500 font-bold text-xs py-12 uppercase border border-dashed border-slate-800 rounded-2xl">Tidak ada daftar jadwal guru mengajar yang cocok.</div>`;
+                tbodyGaib.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500 italic">Jadwal kosong.</td></tr>`;
+                document.getElementById('txt-gaib').innerText = "0";
                 return;
             }
 
-            // Urutkan dari yang paling baru absen berada di baris paling atas
-            let listDibalik = [...masterAbsensiHariIni].reverse();
+            let sounterGaib = 0;
 
-            listDibalik.forEach(absen => {
-                let rowH = document.createElement("tr");
-                rowH.className = "hover:bg-slate-900/50 transition-colors border-b border-slate-900/40 bg-emerald-950/5";
-                rowH.innerHTML = `
-                    <td class="p-3 font-mono font-bold text-emerald-450">${absen.jamAbsen}</td>
-                    <td class="p-3 font-bold text-slate-100 uppercase flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-check text-[10px] text-emerald-400"></i> ${absen.nama}
-                    </td>
-                    <td class="p-3"><span class="bg-slate-900 text-slate-400 px-2 py-0.5 rounded text-[10px] font-bold">${absen.kelas}</span></td>
-                    <td class="p-3 text-slate-400 italic">${absen.mapel}</td>
-                `;
-                tbodyHadir.appendChild(rowH);
+            masterJadwal.forEach(guru => {
+                let namaClean = guru.nama.toUpperCase().trim();
+                let sudahAbsen = logHadirHariIni.some(h => h.nama === namaClean);
+
+                // Buat Struktur Kartu Atas
+                let divKartu = document.createElement('div');
+                if (sudahAbsen) {
+                    divKartu.className = "bg-slate-950/60 border border-slate-900 p-4 rounded-2xl flex flex-col justify-between items-center text-center opacity-30 select-none duration-300";
+                    divKartu.innerHTML = `
+                        <div class="w-8 h-8 bg-slate-900 rounded-xl flex items-center justify-center mb-1"><i class="fa-solid fa-check text-emerald-400"></i></div>
+                        <span class="font-black text-[11px] uppercase text-slate-400 leading-tight">${namaClean}</span>
+                        <span class="text-[9px] text-slate-600 font-mono mt-1">${guru.mapel}</span>
+                    `;
+                } else {
+                    sounterGaib++;
+                    divKartu.className = "bg-slate-900 hover:bg-slate-850 text-slate-100 font-bold p-4 rounded-2xl border border-slate-800 text-xs flex flex-col justify-between items-center gap-2 cursor-pointer text-center duration-300 shadow-md transition-all hover:-translate-y-0.5 hover:border-yellow-500/50";
+                    divKartu.innerHTML = `
+                        <div class="w-8 h-8 bg-yellow-400/10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-tie text-yellow-500"></i></div>
+                        <div class="flex flex-col">
+                            <span class="font-black text-[11px] uppercase tracking-wide leading-tight text-slate-200">${namaClean}</span>
+                            <span class="text-[9px] text-slate-400 font-mono mt-0.5 italic">${guru.mapel}</span>
+                        </div>
+                        <button class="w-full bg-yellow-400 text-slate-950 font-black text-[10px] py-1.5 rounded-lg uppercase tracking-wider mt-1 pointer-events-none">MASUK</button>
+                    `;
+                    
+                    // Trigger Aksi Klik Absen Masuk Kelas
+                    divKartu.addEventListener('click', () => {
+                        eksekusiTombolAbsen(divKartu, guru);
+                    });
+                }
+                boxKartu.appendChild(divKartu);
+
+                // Buat Struktur Baris Tabel Gaib jika terbukti belum absen
+                if (!sudahAbsen) {
+                    let trG = document.createElement('tr');
+                    trG.className = "border-b border-slate-900 hover:bg-slate-900/40 transition-colors";
+                    trG.innerHTML = `
+                        <td class="py-2.5 pl-2 uppercase font-black text-slate-200">${namaClean}</td>
+                        <td class="py-2.5"><span class="bg-slate-950 text-slate-400 px-2 py-0.5 rounded font-mono text-[9px] font-bold">${guru.kelas || "A"}</span></td>
+                        <td class="py-2.5 text-slate-400 font-medium italic">${guru.mapel}</td>
+                        <td class="py-2.5 text-center"><span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-md font-black text-[9px] uppercase tracking-wider">GAIB</span></td>
+                    `;
+                    tbodyGaib.appendChild(trG);
+                }
             });
 
-            document.getElementById("countHadir").innerText = masterAbsensiHariIni.length;
+            document.getElementById('txt-gaib').innerText = sounterGaib;
+        }
+
+        // 4. Eksekusi Penguncian Absen Guru ke Google Sheets Cloud
+        async function eksekusiTombolAbsen(cardElement, guruData) {
+            // Lock card agar tidak bisa diklik ganda
+            cardElement.style.pointerEvents = "none";
+            const originalHTML = cardElement.innerHTML;
+            cardElement.innerHTML = `
+                <i class="fa-solid fa-spinner animate-spin text-xl text-yellow-400 my-4"></i>
+                <span class="text-[10px] text-yellow-400 font-black uppercase tracking-widest">KUNCI DATA...</span>
+            `;
+
+            const gender = document.getElementById('g-gender').value;
+            let paramsAbsen = new URLSearchParams();
+            paramsAbsen.append('aksi', 'absen_guru_click');
+            paramsAbsen.append('nama', guruData.nama);
+            paramsAbsen.append('mapel', guruData.mapel);
+            paramsAbsen.append('kelas', guruData.kelas || "A");
+            paramsAbsen.append('gender', gender);
+
+            try {
+                let resAbsen = await fetch(API_URL, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" }, 
+                    body: paramsAbsen.toString() 
+                });
+                let rAbsen = await resAbsen.json();
+                
+                if(rAbsen.status === "success") {
+                    let jamKlik = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                    // Langsung suntik ke rekap log lokal secara instan tanpa perlu reload browser
+                    logHadirHariIni.push({
+                        jam: jamKlik,
+                        nama: guruData.nama.toUpperCase().trim(),
+                        mapel: guruData.mapel
+                    });
+                    // Refresh tampilan layar secara real-time
+                    distribusikanRekapData();
+                } else {
+                    alert("Gagal mencatat absensi: " + rAbsen.message);
+                    cardElement.style.pointerEvents = "auto";
+                    cardElement.innerHTML = originalHTML;
+                }
+            } catch(e) {
+                alert("Gangguan jaringan cloud, silakan coba lagi!");
+                cardElement.style.pointerEvents = "auto";
+                cardElement.innerHTML = originalHTML;
+            }
         }
     </script>
 </body>
