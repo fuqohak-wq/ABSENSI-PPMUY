@@ -91,19 +91,30 @@
             <p id="print-tanggal" class="text-[10px] font-mono mt-1 text-slate-500">Tanggal Cetak: --:--:--</p>
         </div>
 
-        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 flex flex-col md:flex-row gap-4 justify-between items-center shadow-sm no-print">
-            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-                <div class="flex flex-col gap-1 w-full sm:w-auto">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Pilih Golongan</label>
-                    <select id="filter-golongan" onchange="filterDanRenderData()" class="dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 flex flex-col lg:flex-row gap-4 justify-between items-end shadow-sm no-print">
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3 w-full lg:w-auto flex-1">
+                
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Golongan</label>
+                    <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full sm:w-44 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
                         <option value="SANTRI" selected>SANTRI (13 Kegiatan)</option>
                         <option value="USTADZ">USTADZ (5 Kegiatan)</option>
                     </select>
                 </div>
-                <div class="flex flex-col gap-1 w-full sm:w-auto">
+
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Gender / Asrama</label>
+                    <select id="filter-gender" onchange="filterDanRenderData()" class="w-full sm:w-36 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                        <option value="SEMUA" selected>-- ALL GENDER --</option>
+                        <option value="L">PUTRA (Banin)</option>
+                        <option value="P">PUTRI (Banat)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Takzir</label>
-                    <select id="filter-status" onchange="filterDanRenderData()" class="dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
-                        <option value="SEMUA">-- SEMUA STATUS --</option>
+                    <select id="filter-status" onchange="filterDanRenderData()" class="w-full sm:w-48 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                        <option value="SEMUA">-- ALL STATUS --</option>
                         <option value="AMAN">🟢 AMAN (0 Poin)</option>
                         <option value="TEGURAN">🟡 TEGURAN RINGAN (1-5 Poin)</option>
                         <option value="SEDANG">🟠 TAKZIR SEDANG (6-15 Poin)</option>
@@ -114,11 +125,11 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-1 w-full md:w-64">
+            <div class="flex flex-col gap-1 w-full lg:w-64">
                 <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Cari Nama / NIK</label>
                 <div class="relative w-full">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama santri..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
+                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama / NIK..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
                 </div>
             </div>
         </section>
@@ -128,8 +139,9 @@
                 <table class="w-full text-left text-[11px] sm:text-xs border-collapse">
                     <thead>
                         <tr class="border-b-2 dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
-                            <th class="py-3 px-2 w-24">NIK</th>
-                            <th class="py-3 px-2 w-48">NAMA LENGKAP</th>
+                            <th class="py-3 px-2 w-20">NIK</th>
+                            <th class="py-3 px-2 w-44">NAMA LENGKAP</th>
+                            <th class="py-3 px-2 text-center w-14">GNDR</th>
                             <th class="py-3 px-2 text-center w-20">JUMLAH POIN</th>
                             <th class="py-3 px-2">ISI TAKZIRAN (HUMANIS-EDUKATIF)</th>
                             <th class="py-3 px-2 text-right w-36">STATUS TINGKAT</th>
@@ -137,7 +149,7 @@
                     </thead>
                     <tbody id="tbl-rekap-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
                         <tr>
-                            <td colspan="5" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
+                            <td colspan="6" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
                                 <i class="fa-solid fa-spinner animate-spin text-lg text-yellow-500 block mb-2"></i>
                                 Memuat & Mengalkulasi Sesi Log Harian...
                             </td>
@@ -154,72 +166,59 @@
     </footer>
 
     <script>
-        // Gunakan URL API yang sama dengan sistem inti Anda
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
-        
-        // Penampung data mentah global dari Google Sheet
         let masterDataMentah = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Validasi Sesi Keamanan Gerbang Utama
             const nama = localStorage.getItem('session_nama');
             const role = localStorage.getItem('session_role');
             if (!nama || !role) { window.location.href = "index.html"; return; }
 
-            // Sinkronisasi Setelan Tema Dashboard
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
 
-            // Tampilkan tanggal cetak real-time untuk arsip fisik kertas
             const opsiWaktu = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             document.getElementById('print-tanggal').innerText = `Tanggal Cetak Dokumen: ${new Date().toLocaleDateString('id-ID', opsiWaktu)} WIB`;
 
-            // Ambil data dari database
             ambilDataRekapSheet();
         });
 
-        // SIMULASI GENERATE DATA (Agar Pengurus langsung melihat visualisasi fleksibilitas rumusnya)
+        // SIMULASI GENERATE DATA (Ditambahkan variasi gender L/P)
         function generateDataSimulasi() {
             return [
-                { nik: "20260101", nama: "AHMAD REZKY MAULANA", golongan: "SANTRI", bolos: 4, piket: 0, pelanggaran: 0, izin: 3 }, // (4+0+0) - 3 = 1 Poin
-                { nik: "20260102", nama: "MUHAMMAD ILHAM HAKIM", golongan: "SANTRI", bolos: 0, piket: 10, pelanggaran: 0, izin: 0 }, // 0 + 10 = 10 Poin
-                { nik: "20260103", nama: "ZULFAKRI ARIF", golongan: "SANTRI", bolos: 12, piket: 10, pelanggaran: 5, izin: 0 }, // 12+10+5 = 27 Poin
-                { nik: "20260104", nama: "SITI NUR HALIZA", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 50, izin: 6 }, // 0+0+50-6 = 44 Poin
-                { nik: "20260105", nama: "FATHUR RAHMAN", golongan: "SANTRI", bolos: 13, piket: 10, pelanggaran: 50, izin: 3 }, // 13+10+50-3 = 70 Poin
-                { nik: "20260106", nama: "DEDI JUNAEDI", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 0, izin: 0 }, // 0 Poin (Aman)
-                { nik: "19900211", nama: "USTADZ KHIRZUL YAMANI", golongan: "USTADZ", bolos: 2, piket: 0, pelanggaran: 10, izin: 0 }, // 2+10 = 12 Poin
-                { nik: "19880514", nama: "USTADZ HASAN BASRI", golongan: "USTADZ", bolos: 0, piket: 0, pelanggaran: 0, izin: 3 } // 0 Poin
+                { nik: "20260101", nama: "AHMAD REZKY MAULANA", gender: "L", golongan: "SANTRI", bolos: 4, piket: 0, pelanggaran: 0, izin: 3 },
+                { nik: "20260102", nama: "MUHAMMAD ILHAM HAKIM", gender: "L", golongan: "SANTRI", bolos: 0, piket: 10, pelanggaran: 0, izin: 0 },
+                { nik: "20260103", nama: "ZULFAKRI ARIF", gender: "L", golongan: "SANTRI", bolos: 12, piket: 10, pelanggaran: 5, izin: 0 },
+                { nik: "20260104", nama: "SITI NUR HALIZA", gender: "P", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 50, izin: 6 },
+                { nik: "20260105", nama: "NURUL BAITI FAJRIA", gender: "P", golongan: "SANTRI", bolos: 13, piket: 10, pelanggaran: 50, izin: 3 },
+                { nik: "20260106", nama: "DEDI JUNAEDI", gender: "L", golongan: "SANTRI", bolos: 0, piket: 0, pelanggaran: 0, izin: 0 },
+                { nik: "19900211", nama: "USTADZ KHIRZUL YAMANI", gender: "L", golongan: "USTADZ", bolos: 2, piket: 0, pelanggaran: 10, izin: 0 },
+                { nik: "19950824", nama: "USTADZAH AMINA ZAHRA", gender: "P", golongan: "USTADZ", bolos: 0, piket: 0, pelanggaran: 0, izin: 3 }
             ];
         }
 
         async function ambilDataRekapSheet() {
             try {
-                // Di masa depan tinggal aktifkan fetch asli ini:
+                // Integrasi fetch otomatis masa depan:
                 // let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
                 // let r = await res.json();
                 // masterDataMentah = r.data;
 
-                // Sekarang kita gunakan basis data simulasi fleksibel yang dihitung real-time:
                 masterDataMentah = generateDataSimulasi();
                 filterDanRenderData();
             } catch (err) {
-                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran.</td></tr>`;
+                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran.</td></tr>`;
             }
         }
 
-        // FUNGSI UTAMA: MENGHITUNG FORMULA DAN MENENTUKAN MATRIKS TAKZIRAN HUMANIS
         function hitungMatriksPoinDanTakzir(item) {
-            // RUMUS FLUIDA KITA: (Bolos + Piket + Pelanggaran) - Izin/Khidmah/Melekan
             let totalHitung = (parseInt(item.bolos) + parseInt(item.piket) + parseInt(item.pelanggaran)) - parseInt(item.izin);
-            
-            // Kunci Batas Bawah: Tidak boleh ada nilai minus
             let poinAkhir = totalHitung < 0 ? 0 : totalHitung;
 
             let statusTingkat = "";
             let isiTakziran = "";
             let warnaBadge = "";
 
-            // PENCOCOKAN DENGAN MATRIKS HUMANIS YANG KITA RUMUSKAN
             if (poinAkhir === 0) {
                 statusTingkat = "AMAN";
                 isiTakziran = "Bebas Takziran (Bersih harian)";
@@ -249,27 +248,23 @@
             return { poinAkhir, statusTingkat, isiTakziran, warnaBadge };
         }
 
-        // FILTERISASI DAN RENDERING DATA KE TABEL HTML
         function filterDanRenderData() {
             const tblBody = document.getElementById('tbl-rekap-body');
             const golSelected = document.getElementById('filter-golongan').value;
+            const genSelected = document.getElementById('filter-gender').value;
             const statusSelected = document.getElementById('filter-status').value;
             const cariKeyword = document.getElementById('cari-nama').value.toUpperCase();
 
             if (!tblBody) return;
             tblBody.innerHTML = '';
 
-            // Saring data berdasarkan input kontrol pengurus
             let dataTersaring = masterDataMentah.filter(item => {
                 let hasilMatriks = hitungMatriksPoinDanTakzir(item);
                 
-                // Match 1: Golongan (Santri/Ustadz)
                 let matchGol = (item.golongan === golSelected);
-                
-                // Match 2: Kata Kunci Pencarian NIK/Nama
+                let matchGen = (genSelected === "SEMUA" || item.gender === genSelected);
                 let matchCari = (item.nama.includes(cariKeyword) || item.nik.includes(cariKeyword));
                 
-                // Match 3: Drop-down Status Tingkat Takziran
                 let matchStatus = false;
                 if (statusSelected === "SEMUA") matchStatus = true;
                 else if (statusSelected === "AMAN" && hasilMatriks.poinAkhir === 0) matchStatus = true;
@@ -279,22 +274,28 @@
                 else if (statusSelected === "BERAT" && hasilMatriks.poinAkhir >= 31 && hasilMatriks.poinAkhir <= 50) matchStatus = true;
                 else if (statusSelected === "DARURAT" && hasilMatriks.poinAkhir > 50) matchStatus = true;
 
-                return matchGol && matchCari && matchStatus;
+                return matchGol && matchGen && matchCari && matchStatus;
             });
 
             if (dataTersaring.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap takziran ditemukan yang cocok.</td></tr>`;
+                tblBody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap takziran ditemukan yang cocok.</td></tr>`;
                 return;
             }
 
-            // Suntikkan baris data ke tabel HTML
             dataTersaring.forEach(item => {
                 let m = hitungMatriksPoinDanTakzir(item);
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
+                
+                // Badge info gender penanda visual singkat
+                let badgeGender = item.gender === "L" 
+                    ? `<span class="text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded text-[10px]">LPA</span>` 
+                    : `<span class="text-pink-500 bg-pink-500/10 px-1.5 py-0.5 rounded text-[10px]">LPI</span>`;
+
                 tr.innerHTML = `
                     <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${item.nik}</td>
                     <td class="py-3 px-2 uppercase font-black tracking-wide">${item.nama}</td>
+                    <td class="py-3 px-2 text-center font-bold">${badgeGender}</td>
                     <td class="py-3 px-2 text-center font-mono text-xs font-black ${m.poinAkhir > 0 ? 'text-rose-500' : 'text-emerald-500'}">${m.poinAkhir} Ppt</td>
                     <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${m.isiTakziran}</td>
                     <td class="py-3 px-2 text-right">
@@ -307,7 +308,6 @@
             });
         }
 
-        // PENGATURAN LOGIKA TEMA (DARK / LIGHT)
         function toggleTema() {
             const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
             const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
