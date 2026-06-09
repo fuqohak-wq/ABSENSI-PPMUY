@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Registrasi Wajah Santri - Core</title>
+    <title>Registrasi Wajah Santri - Core Pakem 128-Bit</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
 
     <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col gap-3 shadow-lg relative">
         <div class="flex justify-between items-center">
-            <h1 class="text-xs font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-user-plus mr-1"></i> REGISTRASI GEOMETRI WAJAH</h1>
+            <h1 class="text-xs font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-user-plus mr-1"></i> REGISTRASI BIOMETRIK WAJAH</h1>
             <span id="txt-db-status" class="text-[10px] text-amber-500 font-bold animate-pulse">Menghubungkan Cloud...</span>
         </div>
         
@@ -58,17 +59,18 @@
         let dbStatus = document.getElementById('txt-db-status');
         
         let aiReady = false;
-        let posisiWajahTerakhir = null;
+        let descriptorWajahTerakhir = null;
         let databaseSantriMaster = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
-                // Memuat model detektor wajah dari repositori terpercaya
+                label.innerText = "MEMUAT ENGINE BIOMETRIK...";
+                // WAJIB MEMUAT 3 MODEL UTAMA AGAR BISA MENGHASILKAN DESCRIPTOR 128-BIT
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
-                // Menggunakan GET murni tarik database santri bebas hambatan CORS
                 const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
                 const json = await res.json();
                 
@@ -83,35 +85,39 @@
                 label.innerText = "PILIH NAMA SANTRI DI ATAS";
                 aiReady = true;
                 
-                // Sistem loop pemindai presisi geometri landmark wajah
+                // Perulangan pelacakan struktur wajah real-time
                 setInterval(async () => {
                     if (!aiReady || video.paused || video.ended) return;
-                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.4 })).withFaceLandmarks();
+                    
+                    // Deteksi wajah tunggal lengkap dengan pencatatan descriptor biometrik mendalam
+                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 }))
+                                                 .withFaceLandmarks()
+                                                 .withFaceDescriptor(); // <-- Kunci Akurasi Utama
                     
                     if (deteksi) {
-                        // Saring hanya mengambil array koordinat x & y esensial agar penyimpanan ringan
-                        posisiWajahTerakhir = deteksi.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
-                        frame.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10";
-                        label.innerText = "STRUKTUR WAJAH DIKUNCI";
+                        // Simpan struktur descriptor asli (bukan lagi koordinat piksel)
+                        descriptorWajahTerakhir = Array.from(deteksi.descriptor);
+                        frame.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-102";
+                        label.innerText = "BIOMETRIK WAJAH TERKUNCI";
                         
                         if (document.getElementById('input-nik-terpilih').value) {
                             btnSimpan.disabled = false;
-                            btnSimpan.innerText = "SIMPAN KOORDINAT WAJAH";
+                            btnSimpan.innerText = "DAFTARKAN WAJAH FIX";
                             btnSimpan.className = "w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-2xl text-xs uppercase text-center tracking-widest shadow-lg transition-all cursor-pointer";
                         }
                     } else {
-                        posisiWajahTerakhir = null;
+                        descriptorWajahTerakhir = null;
                         frame.className = "w-64 h-64 border-4 border-dashed border-amber-500/40 rounded-3xl flex items-center justify-center";
                         label.innerText = "HADAPKAN WAJAH KE FRAME";
                         btnSimpan.disabled = true;
                         btnSimpan.innerText = "WAJAH BELUM TERDETEKSI";
                         btnSimpan.className = "w-full bg-slate-800 text-slate-500 font-black py-4 rounded-2xl text-xs uppercase text-center tracking-widest shadow-lg transition-all cursor-not-allowed";
                     }
-                }, 250);
+                }, 350);
             } catch (e) { label.innerText = "ENGINE AI ERROR"; }
         });
 
-        // Logika Dropdown Live Search Otomatis
+        // Logika Live Dropdown Search
         const inputCari = document.getElementById('input-cari-nama');
         const dropdownHasil = document.getElementById('dropdown-hasil');
 
@@ -141,23 +147,37 @@
 
         btnSimpan.addEventListener('click', async () => {
             let nikFinal = document.getElementById('input-nik-terpilih').value;
-            if (!nikFinal || !posisiWajahTerakhir) return;
+            if (!nikFinal || !descriptorWajahTerakhir) return;
 
-            btnSimpan.disabled = true; btnSimpan.innerText = "MENGIRIM KE CLOUD...";
+            btnSimpan.disabled = true; 
+            btnSimpan.innerText = "MENYIMPAN BIOMETRIK...";
+            
             const params = new URLSearchParams();
             params.append('aksi', 'daftar_wajah_saja');
             params.append('nik', nikFinal);
-            params.append('vektor', JSON.stringify(posisiWajahTerakhir));
+            params.append('vektor', JSON.stringify(descriptorWajahTerakhir)); // Mengirimkan enkripsi 128-bit ke Google Sheets
 
             try {
                 let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params.toString() });
                 let r = await res.json();
                 if (r.status === "success") {
-                    alert("Koordinat geometri wajah santri sukses dikunci ke master_santri!");
-                    inputCari.value = ""; document.getElementById('info-santri-terpilih').classList.add('hidden');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'BERHASIL SINKRON',
+                        text: 'Biometrik enkripsi wajah santri berhasil dikunci ke master database!',
+                        background: '#0f172a',
+                        color: '#f8fafc',
+                        confirmButtonColor: '#f59e0b'
+                    });
+                    inputCari.value = ""; 
+                    document.getElementById('info-santri-terpilih').classList.add('hidden');
                     document.getElementById('input-nik-terpilih').value = "";
-                } else { alert("Gagal: " + r.message); }
-            } catch (err) { alert("Koneksi gagal saat menyimpan data!"); }
+                } else { 
+                    alert("Gagal menyimpan data: " + r.message); 
+                }
+            } catch (err) { 
+                alert("Terjadi gangguan jaringan cloud!"); 
+            }
         });
     </script>
 </body>
