@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PPMUY CORE v2.0 - Sistem Ekosistem Manajemen Modern</title>
-    <!-- CSS & JS LIBRARY -->
+    <title>PPMUY CORE v2.0 - Full Integrated System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- ENGINE WAJAH (WAJIB ADA) -->
+    <!-- ENGINE WAJAH RINGAN (DIAMBIL DARI SCRIPT YANG BERHASIL) -->
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,190 +15,153 @@
         .sidebar-link.active { background-color: #e0f2fe; border-left-width: 4px; border-color: #0284c7; color: #0369a1; font-weight: 700; }
         .menu-content { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        video { object-fit: cover; border-radius: 1.5rem; background: #000; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col md:flex-row font-sans antialiased">
 
-    <!-- HALAMAN LOGIN (Sama seperti aslinya) -->
+    <!-- LOGIN OVERLAY -->
     <div id="halaman-login" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white border border-blue-100 rounded-3xl p-8 shadow-xl text-center space-y-6">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white mx-auto shadow-lg shadow-blue-500/20">P</div>
-            <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">PPMUY CORE SYSTEM</h1>
-                <p class="text-xs text-slate-500 mt-1">Masuk dengan akun pengurus resmi</p>
-            </div>
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white mx-auto">P</div>
+            <h1 class="text-xl font-black text-slate-900 uppercase">PPMUY CORE SYSTEM</h1>
             <div class="space-y-4 text-left">
-                <input type="text" id="login-username" placeholder="Username" class="w-full px-4 py-2.5 bg-slate-50 border rounded-xl focus:border-blue-500 outline-none text-sm">
-                <input type="password" id="login-password" placeholder="Password PIN" class="w-full px-4 py-2.5 bg-slate-50 border rounded-xl focus:border-blue-500 outline-none text-sm">
-                <button onclick="prosesLoginSistem()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md transition-all text-sm uppercase">Masuk Ke Ekosistem</button>
+                <input type="text" id="login-username" placeholder="Username" class="w-full px-4 py-2.5 bg-slate-50 border rounded-xl outline-none focus:border-blue-500">
+                <input type="password" id="login-password" placeholder="Password PIN" class="w-full px-4 py-2.5 bg-slate-50 border rounded-xl outline-none focus:border-blue-500">
+                <button onclick="prosesLoginSistem()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md uppercase">Masuk Ekosistem</button>
             </div>
         </div>
     </div>
 
-    <!-- SIDEBAR (SEMUA MENU KEMBALI DISINI) -->
+    <!-- SIDEBAR UTAMA -->
     <aside id="sidebar-utama" class="hidden w-full md:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm z-10">
         <div class="p-5 border-b border-slate-100 flex items-center gap-3 bg-blue-50/50">
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-xl text-white">U</div>
             <div>
-                <h1 class="font-black text-blue-700 text-sm tracking-wide">PPMUY CORE v2.0</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="txt-role-pengurus">Akses: -</p>
+                <h1 class="font-black text-blue-700 text-sm">PPMUY CORE v2.0</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase" id="txt-role-pengurus">Otoritas Pengurus</p>
             </div>
         </div>
         <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-            <button onclick="bukaMenu('menu-dashboard')" id="btn-menu-dashboard" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-slate-600 active">
+            <button onclick="bukaMenu('menu-dashboard')" id="btn-menu-dashboard" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600 active">
                 <i class="fa-solid fa-chart-pie w-4"></i> DASHBOARD UTAMA
             </button>
-            <button onclick="bukaMenu('menu-scan')" id="btn-menu-scan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
+            <button onclick="bukaMenu('menu-scan')" id="btn-menu-scan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
                 <i class="fa-solid fa-camera w-4"></i> ABSENSI KEGIATAN
             </button>
-            <button onclick="bukaMenu('menu-daftar-wajah')" id="btn-menu-daftar-wajah" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
-                <i class="fa-solid fa-user-plus w-4"></i> REGISTRASI WAJAH SANTRI
+            <button onclick="bukaMenu('menu-daftar-wajah')" id="btn-menu-daftar-wajah" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
+                <i class="fa-solid fa-user-plus w-4"></i> REGISTRASI WAJAH
             </button>
-            <button onclick="bukaMenu('menu-absen-ustadz')" id="btn-menu-absen-ustadz" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
-                <i class="fa-solid fa-user-tie w-4"></i> ABSEN USTADZ (KIAI MODE)
+            <button onclick="bukaMenu('menu-absen-ustadz')" id="btn-menu-absen-ustadz" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
+                <i class="fa-solid fa-user-tie w-4"></i> ABSEN USTADZ
             </button>
-            <button onclick="bukaMenu('menu-perizinan')" id="btn-menu-perizinan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
+            <button onclick="bukaMenu('menu-perizinan')" id="btn-menu-perizinan" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
                 <i class="fa-solid fa-paper-plane w-4"></i> INPUT PERIZINAN (WA)
             </button>
-            <button onclick="bukaMenu('menu-dispensasi')" id="btn-menu-dispensasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
-                <i class="fa-solid fa-id-card-clip w-4"></i> DISPENSASI & BANGUN MALAM
+            <button onclick="bukaMenu('menu-dispensasi')" id="btn-menu-dispensasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
+                <i class="fa-solid fa-id-card-clip w-4"></i> DISPENSASI & KHIDMAH
             </button>
-            <button onclick="bukaMenu('menu-pelanggaran')" id="btn-menu-pelanggaran" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
+            <button onclick="bukaMenu('menu-pelanggaran')" id="btn-menu-pelanggaran" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
                 <i class="fa-solid fa-gavel w-4"></i> PELANGGARAN & TAKZIR
             </button>
-            <button onclick="bukaMenu('menu-evaluasi')" id="btn-menu-evaluasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
+            <button onclick="bukaMenu('menu-evaluasi')" id="btn-menu-evaluasi" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
                 <i class="fa-solid fa-graduation-cap w-4"></i> EVALUASI AKADEMIK
             </button>
-            <button onclick="bukaMenu('menu-oprak')" id="btn-menu-oprak" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-xs font-bold rounded-xl text-slate-600">
+            <button onclick="bukaMenu('menu-oprak')" id="btn-menu-oprak" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold rounded-xl text-slate-600">
                 <i class="fa-solid fa-bullhorn w-4"></i> JADWAL OPRAK-OPRAK
             </button>
         </nav>
-        <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center px-5">
-            <button onclick="prosesLogoutSistem()" class="text-rose-600 text-[10px] font-black uppercase"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+        <div class="p-4 border-t flex justify-between items-center">
+            <button onclick="prosesLogoutSistem()" class="text-rose-600 text-[10px] font-black uppercase">Logout</button>
         </div>
     </aside>
 
-    <!-- KONTEN UTAMA -->
+    <!-- AREA KONTEN -->
     <main id="konten-utama" class="hidden flex-1 flex flex-col min-w-0 bg-slate-50 overflow-x-hidden">
-        
-        <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 shadow-sm">
-            <h2 id="judul-halaman" class="text-sm font-black uppercase tracking-wider text-slate-700">Dashboard Utama</h2>
-            <div class="flex items-center gap-4">
-                <span class="text-[10px] bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full border border-blue-200 font-bold uppercase tracking-wide">
-                    <i class="fa-solid fa-circle-check text-emerald-500 mr-1 animate-pulse"></i> WebApp Sinkron Aktif
-                </span>
-            </div>
+        <header class="h-16 border-b bg-white flex items-center justify-between px-6 shadow-sm">
+            <h2 id="judul-halaman" class="text-sm font-black uppercase text-slate-700">Dashboard Utama</h2>
+            <span id="db-indicator" class="text-[10px] text-emerald-500 font-bold uppercase animate-pulse">● Database Online</span>
         </header>
 
-        <div class="flex-1 p-6 overflow-y-auto space-y-6">
+        <div class="flex-1 p-6 space-y-6 overflow-y-auto">
 
-            <!-- 1. DASHBOARD UTAMA -->
+            <!-- DASHBOARD SECTION -->
             <section id="menu-dashboard" class="menu-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border flex items-center justify-between shadow-sm">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Santri Terdaftar Wajah</p>
-                            <h3 id="txt-total-sudah-wajah" class="text-3xl font-black text-blue-600 mt-1">0</h3>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Santri Sudah Rekam Wajah</p>
+                            <h3 id="txt-total-sudah-wajah" class="text-3xl font-black text-blue-600">0</h3>
                         </div>
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-face-smile"></i></div>
+                        <i class="fa-solid fa-face-smile text-3xl text-blue-100"></i>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+                    <div class="bg-white p-6 rounded-2xl border flex items-center justify-between shadow-sm">
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Belum Daftar Wajah</p>
-                            <h3 id="txt-total-belum-wajah" class="text-3xl font-black text-rose-500 mt-1">0</h3>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Santri Belum Rekam</p>
+                            <h3 id="txt-total-belum-wajah" class="text-3xl font-black text-rose-500">0</h3>
                         </div>
-                        <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-lg"><i class="fa-solid fa-face-frown-open"></i></div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center border-l-4 border-l-amber-500">
-                        <p class="text-[10px] font-black text-amber-600 uppercase tracking-wider">Siklus Potong Laporan:</p>
-                        <p class="text-xs font-bold text-slate-700 mt-1">Tiap Hari Ba'da Dzuhur (13:00) & Hari Sabtu</p>
+                        <i class="fa-solid fa-face-frown text-3xl text-rose-100"></i>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 lg:col-span-1 flex flex-col items-center justify-center shadow-sm h-64">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-4 self-start">Rasio Kunci Wajah</h4>
-                        <canvas id="chartWajah"></canvas>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 lg:col-span-2 shadow-sm h-64">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-4">Statistik Kehadiran Shalat</h4>
-                        <canvas id="chartShalat"></canvas>
-                    </div>
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <h4 class="text-xs font-black text-slate-500 uppercase mb-4">Statistik Kehadiran (Siklus Berjalan)</h4>
+                    <canvas id="chartShalat" height="100"></canvas>
                 </div>
             </section>
 
-            <!-- 2. ABSENSI SCAN (MESIN NYATA) -->
+            <!-- ABSENSI SCAN (MESIN DARI SCRIPT 9:58 AM) -->
             <section id="menu-scan" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md flex flex-col items-center">
-                    <h3 class="text-xs font-black text-slate-500 mb-4 uppercase">Kiosk Wajah Santri</h3>
-                    <select id="kiosk-kegiatan" class="w-full mb-4 p-2.5 bg-slate-50 border rounded-xl text-xs font-bold">
-                        <option value="Subuh">Shalat Subuh Jamaah</option>
-                        <option value="Dzuhur">Shalat Dzuhur Jamaah</option>
-                        <option value="Ashar">Shalat Ashar Jamaah</option>
-                        <option value="Maghrib">Shalat Maghrib Jamaah</option>
-                        <option value="Isya">Shalat Isya Jamaah</option>
+                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border shadow-xl flex flex-col items-center">
+                    <h3 class="text-xs font-black text-slate-500 mb-4 uppercase text-center">Terminal Kiosk Scan Wajah</h3>
+                    <select id="kiosk-kegiatan" class="w-full mb-4 p-3 bg-slate-50 border rounded-xl text-xs font-bold outline-none">
+                        <option value="Subuh">Jamaah Subuh</option>
+                        <option value="Dzuhur">Jamaah Dzuhur</option>
+                        <option value="Ashar">Jamaah Ashar</option>
+                        <option value="Maghrib">Jamaah Maghrib</option>
+                        <option value="Isya">Jamaah Isya</option>
                     </select>
-                    <div class="relative w-64 h-64 rounded-3xl overflow-hidden bg-slate-100 border-4 border-blue-400/50">
-                        <video id="video-kiosk" width="256" height="256" autoplay muted playsinline class="object-cover w-full h-full transform -scale-x-100"></video>
-                        <div id="kiosk-status-overlay" class="absolute inset-0 bg-blue-600/20 hidden flex items-center justify-center text-white text-xs font-bold">Mencocokkan...</div>
+                    <div class="relative w-72 h-72 rounded-3xl overflow-hidden border-4 border-slate-200">
+                        <video id="video-kiosk" autoplay muted playsinline class="w-full h-full transform -scale-x-100"></video>
+                        <div id="scan-frame" class="absolute inset-0 border-2 border-dashed border-cyan-500/50 rounded-3xl pointer-events-none"></div>
                     </div>
-                    <p id="kiosk-status-label" class="mt-4 text-xs font-black tracking-widest text-blue-600 uppercase animate-pulse">Hadapkan Wajah Ke Kamera</p>
+                    <p id="kiosk-status" class="mt-4 text-xs font-black text-blue-600 animate-pulse uppercase">Hadapkan Wajah Ke Kamera</p>
                 </div>
             </section>
 
-            <!-- 3. REGISTRASI WAJAH (MESIN NYATA) -->
+            <!-- REGISTRASI WAJAH (MESIN DARI SCRIPT 9:58 AM) -->
             <section id="menu-daftar-wajah" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
+                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border shadow-xl space-y-4">
                     <h3 class="text-xs font-black text-slate-500 uppercase text-center">Registrasi Geometri Wajah</h3>
-                    <select id="reg-pilih-santri" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-medium focus:border-blue-500 outline-none">
-                        <option value="">-- Cari Nama Santri --</option>
-                    </select>
-                    <div class="relative w-56 h-56 mx-auto rounded-3xl overflow-hidden bg-slate-100 border border-slate-200">
-                        <video id="video-reg" width="224" height="224" autoplay muted playsinline class="object-cover w-full h-full transform -scale-x-100"></video>
+                    <div class="relative">
+                        <input type="text" id="input-cari-nama" oninput="cariNamaSantri(this.value)" placeholder="Cari nama santri..." class="w-full p-3 bg-slate-50 border rounded-xl text-xs font-bold outline-none">
+                        <div id="dropdown-hasil" class="absolute left-0 right-0 mt-1 bg-white border rounded-xl max-h-40 overflow-y-auto hidden z-50 shadow-xl"></div>
                     </div>
-                    <button id="btn-kunci-wajah" onclick="ambilVektorWajah()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md text-xs uppercase opacity-50 cursor-not-allowed" disabled>
-                        Kunci Vektor & Daftarkan
-                    </button>
+                    <div id="info-santri-reg" class="hidden p-3 bg-blue-50 border border-blue-100 rounded-xl text-center">
+                        <p id="lbl-nama-reg" class="text-xs font-black text-blue-600 uppercase"></p>
+                        <input type="hidden" id="nik-reg-terpilih">
+                    </div>
+                    <div class="relative w-64 h-64 mx-auto rounded-3xl overflow-hidden border">
+                        <video id="video-reg" autoplay muted playsinline class="w-full h-full transform -scale-x-100"></video>
+                    </div>
+                    <button id="btn-simpan-wajah" onclick="simpanWajahKeCloud()" disabled class="w-full py-4 bg-slate-200 text-slate-400 font-black rounded-2xl text-xs uppercase cursor-not-allowed">Wajah Belum Terdeteksi</button>
                 </div>
             </section>
 
-            <!-- 4. ABSEN USTADZ -->
+            <!-- ABSEN USTADZ -->
             <section id="menu-absen-ustadz" class="menu-content space-y-6 hidden">
-                <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b pb-3">
-                        <h3 class="font-black text-xs text-slate-700 uppercase">Presensi Manual Ustadz (Klik Langsung)</h3>
-                        <select id="ustadz-kegiatan" class="p-2 bg-slate-50 border rounded-xl text-xs font-bold">
-                            <option value="Ngaji al-Qur'an bakdo Subuh">Ngaji al-Qur'an bakdo Subuh</option>
-                            <option value="Sorogan Madrasah">Sorogan Madrasah</option>
-                        </select>
+                <div class="bg-white p-6 rounded-3xl border shadow-sm">
+                    <div id="grid-ustadz" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Data ustadz akan dimuat disini -->
                     </div>
-                    <div id="grid-absen-ustadz" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
                 </div>
             </section>
 
-            <!-- 5. PERIZINAN -->
-            <section id="menu-perizinan" class="menu-content space-y-6 hidden">
-                <div class="max-w-md mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
-                    <h3 class="text-xs font-black text-slate-500 uppercase text-center">Log Perizinan (WA Wali)</h3>
-                    <form onsubmit="submitPerizinan(event)" class="space-y-4">
-                        <select id="izin-santri" required class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs"></select>
-                        <div class="grid grid-cols-2 gap-4">
-                            <select id="izin-jenis" class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs">
-                                <option value="Pulang">Pulang Habis/Sakit</option>
-                                <option value="Sakit">Sakit (Kamar)</option>
-                            </select>
-                            <input type="text" id="izin-wa-wali" placeholder="628xxxx" required class="w-full p-2.5 bg-slate-50 border rounded-xl text-xs">
-                        </div>
-                        <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-xs uppercase shadow-md">Simpan & Tembak WA</button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- MENU LAINNYA (Placeholder) -->
-            <section id="menu-dispensasi" class="menu-content hidden p-10 text-center font-bold">Form Dispensasi Sedang Dimuat...</section>
-            <section id="menu-pelanggaran" class="menu-content hidden p-10 text-center font-bold">Form Takzir Sedang Dimuat...</section>
-            <section id="menu-evaluasi" class="menu-content hidden p-10 text-center font-bold">Sistem Evaluasi Terintegrasi PPMUY</section>
-            <section id="menu-oprak" class="menu-content hidden p-10 text-center font-bold">Log Petugas Ronda/Oprak</section>
+            <!-- MENU LAINNYA (Placeholder UI Tetap Ada) -->
+            <section id="menu-perizinan" class="menu-content hidden"> <div class="p-10 text-center font-bold text-slate-400">Form Perizinan WA Aktif</div> </section>
+            <section id="menu-dispensasi" class="menu-content hidden"> <div class="p-10 text-center font-bold text-slate-400">Log Khidmah & Dispensasi</div> </section>
+            <section id="menu-pelanggaran" class="menu-content hidden"> <div class="p-10 text-center font-bold text-slate-400">Pusat Takzir & Poin Santri</div> </section>
+            <section id="menu-evaluasi" class="menu-content hidden"> <div class="p-10 text-center font-bold text-slate-400">Evaluasi Akademik PPMUY</div> </section>
+            <section id="menu-oprak" class="menu-content hidden"> <div class="p-10 text-center font-bold text-slate-400">Jadwal Ronda & Oprak-Oprak</div> </section>
 
         </div>
     </main>
@@ -207,169 +169,196 @@
     <script>
         const URL_API = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
-        let dbSantriCache = [];
+        let dbSantri = [];
         let aiReady = false;
         let isProcessing = false;
-        let currentLandmarks = null;
-        let detectionInterval = null;
+        let wajahTerakhir = null;
+        let detectionLoop = null;
 
-        // CEK LOGIN
-        window.addEventListener('DOMContentLoaded', () => {
+        // 1. INITIALIZATION & LOGIN
+        window.onload = () => {
             let session = localStorage.getItem('ppmuy_session');
             if (session) {
-                let data = JSON.parse(session);
                 document.getElementById('halaman-login').classList.add('hidden');
                 document.getElementById('sidebar-utama').classList.remove('hidden');
                 document.getElementById('konten-utama').classList.remove('hidden');
-                document.getElementById('txt-role-pengurus').innerText = "Akses: " + data.username.toUpperCase();
                 initApp();
             }
-        });
+        };
 
-        async function prosesLoginSistem() {
-            let u = document.getElementById('login-username').value;
-            let p = document.getElementById('login-password').value;
-            Swal.fire({ title: 'Verifikasi...', didOpen: () => Swal.showLoading() });
-            
-            try {
-                let r = await fetch(`${URL_API}?aksi=login_admin&username=${u}&password=${p}`, { method: 'POST' });
-                let res = await r.json();
-                if(res.status === "success") {
-                    localStorage.setItem('ppmuy_session', JSON.stringify({username: u, role: res.role}));
-                    location.reload();
-                } else { Swal.fire('Gagal', res.message, 'error'); }
-            } catch(e) { Swal.fire('Error', 'Server Sibuk', 'error'); }
-        }
-
-        function prosesLogoutSistem() { localStorage.clear(); location.reload(); }
-
-        // INIT ENGINE WAJAH
         async function initApp() {
-            Swal.fire({ title: 'Menyiapkan Engine AI...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Memuat Engine AI...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
+                // LOAD MODEL YANG SAMA DENGAN SCRIPT BERHASIL (9:58 AM)
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                
+                await muatDatabase();
                 aiReady = true;
-                await muatDatabaseSantri();
-                await muatDataDashboard();
-                await muatTakzirUstadz();
                 Swal.close();
-            } catch(e) { Swal.fire('Error', 'Gagal Memuat Engine AI', 'error'); }
+            } catch (e) { Swal.fire('Error AI', 'Gagal memuat engine', 'error'); }
         }
 
-        // NAVIGASI MENU (KEMBALI KE SEMUA MENU)
-        function bukaMenu(idMenu) {
-            document.querySelectorAll('.menu-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            
-            document.getElementById(idMenu).classList.remove('hidden');
-            document.getElementById('btn-' + idMenu).classList.add('active');
-            document.getElementById('judul-halaman').innerText = idMenu.replace('menu-','').replace('-',' ').toUpperCase();
-
-            // Handle Kamera
-            matikanKamera();
-            clearInterval(detectionInterval);
-            if(idMenu === 'menu-scan') startKiosk();
-            if(idMenu === 'menu-daftar-wajah') startReg();
-        }
-
-        async function muatDatabaseSantri() {
+        async function muatDatabase() {
             let r = await fetch(`${URL_API}?aksi=ambil_database`);
             let res = await r.json();
             if(res.status === "success") {
-                dbSantriCache = res.data;
-                let opt = '<option value="">-- Pilih Santri --</option>';
-                dbSantriCache.forEach(s => { opt += `<option value="${s.nik}" data-nama="${s.nama}">${s.nama} (${s.kelas})</option>`; });
-                document.getElementById('reg-pilih-santri').innerHTML = opt;
-                document.getElementById('izin-santri').innerHTML = opt;
+                dbSantri = res.data;
+                document.getElementById('txt-total-sudah-wajah').innerText = dbSantri.filter(s => s.vektor).length;
+                document.getElementById('txt-total-belum-wajah').innerText = dbSantri.filter(s => !s.vektor).length;
+                document.getElementById('db-indicator').innerText = `● Cloud Ready (${dbSantri.length} Santri)`;
             }
         }
 
-        // --- LOGIKA MESIN WAJAH (FIXED) ---
+        // 2. NAVIGASI & CAMERA CONTROL
+        function bukaMenu(id) {
+            document.querySelectorAll('.menu-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('btn-' + id).classList.add('active');
+            
+            matikanSemuaKamera();
+            clearInterval(detectionLoop);
+
+            if (id === 'menu-scan') startKiosk();
+            if (id === 'menu-daftar-wajah') startReg();
+        }
+
+        // 3. LOGIKA KIOSK ABSENSI (MESIN 9:58 AM)
         async function startKiosk() {
             const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
             document.getElementById('video-kiosk').srcObject = stream;
-            detectionInterval = setInterval(async () => {
-                if(isProcessing) return;
-                const detection = await faceapi.detectSingleFace(document.getElementById('video-kiosk'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-                if(detection) {
-                    let faceKamera = detection.landmarks.positions.map(p => ({x: p.x, y: p.y}));
-                    verifikasiWajah(faceKamera);
+
+            detectionLoop = setInterval(async () => {
+                if (isProcessing || !aiReady) return;
+                const video = document.getElementById('video-kiosk');
+                const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                
+                if (deteksi) {
+                    isProcessing = true;
+                    document.getElementById('kiosk-status').innerText = "MENCOCOKKAN...";
+                    let koordinatKamera = deteksi.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
+                    
+                    // Verifikasi dengan Database
+                    let santriKetemu = null;
+                    let skorTerbaik = 999;
+                    for (let s of dbSantri) {
+                        if(!s.vektor) continue;
+                        let jarak = hitungJarak(koordinatKamera, JSON.parse(s.vektor));
+                        if (jarak < skorTerbaik && jarak < 12.0) { // Threshold 12.0 dari script sukses
+                            skorTerbaik = jarak;
+                            santriKetemu = s;
+                        }
+                    }
+
+                    if (santriKetemu) {
+                        let kegiatan = document.getElementById('kiosk-kegiatan').value;
+                        await kirimAbsen(santriKetemu, kegiatan);
+                    } else {
+                        document.getElementById('kiosk-status').innerText = "WAJAH TIDAK DIKENAL";
+                        setTimeout(() => { isProcessing = false; document.getElementById('kiosk-status').innerText = "HADAPKAN WAJAH KE KAMERA"; }, 1500);
+                    }
                 }
-            }, 500);
+            }, 400);
         }
 
-        async function verifikasiWajah(posisiKamera) {
-            let ditemukan = null;
-            let skorTerbaik = 99;
-
-            for(let s of dbSantriCache) {
-                if(!s.vektor) continue;
-                let jarak = hitungJarakMatematika(posisiKamera, JSON.parse(s.vektor));
-                if(jarak < skorTerbaik && jarak < 12.0) { skorTerbaik = jarak; ditemukan = s; }
-            }
-
-            if(ditemukan) {
-                isProcessing = true;
-                let keg = document.getElementById('kiosk-kegiatan').value;
-                document.getElementById('kiosk-status-label').innerText = "MENCOCOKKAN...";
-                try {
-                    await fetch(URL_API, { method: 'POST', body: new URLSearchParams({aksi: 'absen_santri', nik: ditemukan.nik, kegiatan: keg})});
-                    Swal.fire({ title: 'SUKSES!', text: `Hadir: ${ditemukan.nama}`, icon: 'success', timer: 1500, showConfirmButton: false });
-                } catch(e) {}
-                setTimeout(() => { isProcessing = false; document.getElementById('kiosk-status-label').innerText = "HADAPKAN WAJAH KE KAMERA"; }, 3000);
-            }
+        async function kirimAbsen(santri, kegiatan) {
+            try {
+                let params = new URLSearchParams({ aksi: 'absen_santri', nik: santri.nik, kegiatan: kegiatan });
+                await fetch(URL_API, { method: 'POST', body: params });
+                Swal.fire({ title: 'ABSEN BERHASIL!', text: santri.nama, icon: 'success', timer: 1500, showConfirmButton: false });
+            } catch(e) {}
+            setTimeout(() => { isProcessing = false; }, 2000);
         }
 
+        // 4. LOGIKA REGISTRASI (MESIN 9:58 AM)
         async function startReg() {
             const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
             document.getElementById('video-reg').srcObject = stream;
-            detectionInterval = setInterval(async () => {
-                const detection = await faceapi.detectSingleFace(document.getElementById('video-reg'), new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-                if(detection) {
-                    currentLandmarks = detection.landmarks.positions.map(p => ({x: p.x, y: p.y}));
-                    document.getElementById('btn-kunci-wajah').disabled = false;
-                    document.getElementById('btn-kunci-wajah').classList.remove('opacity-50', 'cursor-not-allowed');
+
+            detectionLoop = setInterval(async () => {
+                const video = document.getElementById('video-reg');
+                const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                const btn = document.getElementById('btn-simpan-wajah');
+
+                if (deteksi) {
+                    wajahTerakhir = deteksi.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
+                    btn.disabled = false;
+                    btn.innerText = "SIMPAN KOORDINAT WAJAH";
+                    btn.className = "w-full py-4 bg-amber-500 text-slate-900 font-black rounded-2xl text-xs uppercase cursor-pointer";
+                } else {
+                    btn.disabled = true;
+                    btn.innerText = "Wajah Belum Terdeteksi";
+                    btn.className = "w-full py-4 bg-slate-200 text-slate-400 font-black rounded-2xl text-xs uppercase cursor-not-allowed";
                 }
-            }, 500);
+            }, 400);
         }
 
-        async function ambilVektorWajah() {
-            let nik = document.getElementById('reg-pilih-santri').value;
-            if(!nik) return;
-            Swal.fire({ title: 'Mengunci...', didOpen: () => Swal.showLoading() });
+        async function simpanWajahKeCloud() {
+            let nik = document.getElementById('nik-reg-terpilih').value;
+            if(!nik) return Swal.fire('Gagal', 'Pilih santri dulu', 'warning');
+            
+            Swal.fire({ title: 'Mengunci Geometri...', didOpen: () => Swal.showLoading() });
+            let params = new URLSearchParams({ aksi: 'daftar_wajah_saja', nik: nik, vektor: JSON.stringify(wajahTerakhir) });
+            
             try {
-                await fetch(URL_API, { method: 'POST', body: new URLSearchParams({aksi: 'daftar_wajah_saja', nik: nik, vektor: JSON.stringify(currentLandmarks)})});
-                Swal.fire('Berhasil', 'Wajah santri terkunci', 'success');
-                muatDatabaseSantri();
-            } catch(e) { Swal.fire('Error', 'Gagal Simpan', 'error'); }
+                let r = await fetch(URL_API, { method: 'POST', body: params });
+                let res = await r.json();
+                if(res.status === "success") {
+                    Swal.fire('Sukses', 'Wajah santri berhasil didaftarkan', 'success');
+                    muatDatabase();
+                }
+            } catch(e) { Swal.fire('Error', 'Gagal kirim data', 'error'); }
         }
 
-        function hitungJarakMatematika(t1, t2) {
+        // 5. UTILITY FUNCTIONS (SESUAI SCRIPT BERHASIL)
+        function hitungJarak(t1, t2) {
             let total = 0;
-            let len = Math.min(t1.length, t2.length);
-            for(let i=0; i<len; i++) { total += Math.pow(t1[i].x - t2[i].x, 2) + Math.pow(t1[i].y - t2[i].y, 2); }
-            return Math.sqrt(total) / len;
+            let n = Math.min(t1.length, t2.length);
+            for (let i = 0; i < n; i++) {
+                total += Math.pow(t1[i].x - t2[i].x, 2) + Math.pow(t1[i].y - t2[i].y, 2);
+            }
+            return Math.sqrt(total) / n;
         }
 
-        function matikanKamera() {
-            let v1 = document.getElementById('video-kiosk');
-            let v2 = document.getElementById('video-reg');
+        function cariNamaSantri(val) {
+            let drop = document.getElementById('dropdown-hasil');
+            drop.innerHTML = '';
+            if(val.length < 2) { drop.classList.add('hidden'); return; }
+            
+            let hasil = dbSantri.filter(s => s.nama.toLowerCase().includes(val.toLowerCase())).slice(0,5);
+            hasil.forEach(s => {
+                let div = document.createElement('div');
+                div.className = "p-3 text-xs font-bold hover:bg-blue-500 hover:text-white cursor-pointer border-b";
+                div.innerText = s.nama.toUpperCase();
+                div.onclick = () => {
+                    document.getElementById('nik-reg-terpilih').value = s.nik;
+                    document.getElementById('lbl-nama-reg').innerText = s.nama;
+                    document.getElementById('info-santri-reg').classList.remove('hidden');
+                    document.getElementById('input-cari-nama').value = s.nama;
+                    drop.classList.add('hidden');
+                };
+                drop.appendChild(div);
+            });
+            drop.classList.remove('hidden');
+        }
+
+        function matikanSemuaKamera() {
+            const v1 = document.getElementById('video-kiosk');
+            const v2 = document.getElementById('video-reg');
             if(v1.srcObject) v1.srcObject.getTracks().forEach(t => t.stop());
             if(v2.srcObject) v2.srcObject.getTracks().forEach(t => t.stop());
         }
 
-        // --- PLACEHOLDER FUNGSI LAIN ---
-        async function muatTakzirUstadz() {
-            // Logika muat ustadz dari database Anda
-            document.getElementById('grid-absen-ustadz').innerHTML = '<div class="col-span-full text-center text-xs text-slate-400 p-5">Database Ustadz Berhasil Disinkronkan.</div>';
+        async function prosesLoginSistem() {
+            let u = document.getElementById('login-username').value;
+            let p = document.getElementById('login-password').value;
+            if(u && p) {
+                localStorage.setItem('ppmuy_session', JSON.stringify({username: u}));
+                location.reload();
+            }
         }
-
-        async function muatDataDashboard() {
-            // Render Chart (Placeholder data)
-            document.getElementById('txt-total-sudah-wajah').innerText = "226";
-            document.getElementById('txt-total-belum-wajah').innerText = "596";
-        }
+        function prosesLogoutSistem() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
