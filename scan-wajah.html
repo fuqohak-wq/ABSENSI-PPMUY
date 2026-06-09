@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali</a></div>
+    <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali ke Dashboard</a></div>
 
     <div id="pop-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
         <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-bounce">
@@ -60,6 +60,28 @@
         let dbStatus = document.getElementById('txt-db-status');
         let isProcessing = false;
         let databaseSantri = [];
+
+        // Fungsi internal untuk menghasilkan bunyi bip murni tanpa file mp3
+        function bunyikanBeep(frekuensi, durasi) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.value = frekuensi;
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + durasi);
+                oscillator.stop(audioCtx.currentTime + durasi);
+            } catch (e) {
+                console.error("Gagal mengeluarkan suara sistem audio:", e);
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
@@ -113,30 +135,30 @@
 
             if (santriDitemukan) {
                 const kegiatan = document.getElementById('pilihan-kegiatan').value;
-                
-                // --- STRATEGI ANTI SPAM & ANTI DUPLIKAT ---
-                // Buat tanda pengenal unik berbasis tanggal lokal hari ini
                 const hariIni = new Date().toISOString().split('T')[0]; 
                 const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
-                // Cek apakah key identitas ini sudah tersimpan dalam memori local mesin kiosk
+                // JIKA SANTRI SUDAH PRESENSI HARI INI (ANTI SPAM)
                 if (localStorage.getItem(storageKey)) {
-                    // Jika terdeteksi sudah absen, langsung tolak di tempat
                     document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
                     document.getElementById('pop-warning').classList.remove('hidden');
                     label.innerText = "SUDAH ABSEN SEBELUMNYA";
                     kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
                     
+                    // Bunyi beep peringatan gagal/sudah absen (dua bip nada rendah pendek)
+                    bunyikanBeep(440, 0.08);
+                    setTimeout(() => bunyikanBeep(440, 0.08), 120);
+
                     setTimeout(() => {
                         document.getElementById('pop-warning').classList.add('hidden');
                         isProcessing = false;
                         label.innerText = "HADAPKAN WAJAH KE KAMERA";
                         kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                     }, 2500);
-                    return; // Menghentikan proses pengiriman data ke web apps script
+                    return;
                 }
 
-                // Jika belum pernah absen, lanjutkan pengiriman data absensi
+                // JIKA BELUM ABSEN -> KIRIM DATA KE GOOGLE SHEET
                 const fp = new URLSearchParams();
                 fp.append('aksi', 'absen_santri');
                 fp.append('nik', santriDitemukan.nik);
@@ -147,17 +169,14 @@
                     let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
                     let r = await res.json();
                     if(r.status === "success") {
-                        // Kunci status absensi santri tersebut di memori lokal agar tidak bisa melakukan spam kembali
+                        // Kunci di memori lokal agar tidak bisa di-spam hari ini
                         localStorage.setItem(storageKey, "TERCATAT");
 
                         document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
                         document.getElementById('pop-success').classList.remove('hidden');
                         
-                        try {
-                            // Feedback audio opsional jika file suara tersedia
-                            let audio = new Audio("https://cdn.jsdelivr.net/gh/pesantren-dev/assets/success.mp3");
-                            audio.play();
-                        } catch(p){}
+                        // Bunyi beep berhasil (satu bip nada tinggi nyaring)
+                        bunyikanBeep(1000, 0.25);
                     }
                 } catch(e){}
                 
@@ -169,9 +188,14 @@
                 }, 2000);
 
             } else {
+                // WAJAH TIDAK DIKENAL
                 isProcessing = false; 
                 label.innerText = "WAJAH TIDAK DIKENAL";
                 kotakScan.className = "w-64 h-64 border-4 border-solid border-red-500 rounded-3xl flex items-center justify-center bg-red-500/10";
+                
+                // Bunyi error dengung rendah agak panjang
+                bunyikanBeep(220, 0.4);
+
                 setTimeout(() => { 
                     label.innerText = "HADAPKAN WAJAH KE KAMERA"; 
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
