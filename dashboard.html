@@ -171,8 +171,7 @@
                                     <th class="py-2 text-right">STATUS</th>
                                 </tr>
                             </thead>
-                        </table>
-                        <div class="overflow-y-auto max-h-[160px]">
+                        </table> <div class="overflow-y-auto max-h-[130px]">
                             <table class="w-full text-left text-[11px]">
                                 <tbody id="tbl-wajah-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
                                     <tr><td colspan="3" class="py-3 text-center text-slate-500">Memuat data analisis...</td></tr>
@@ -208,11 +207,11 @@
 
             <div class="grid grid-cols-2 gap-2 mb-3 no-print">
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2 text-center">
-                    <span class="text-[9px] font-black text-emerald-700 block uppercase tracking-wider">TOTAL HADIR</span>
+                    <span class="text-[9px] font-black text-emerald-700 block uppercase tracking-wider">TOTAL HADIR (DIKLIK)</span>
                     <span id="modal-txt-hadir" class="text-sm font-black text-emerald-600">0</span>
                 </div>
                 <div class="bg-red-50 border border-red-200 rounded-xl p-2 text-center">
-                    <span class="text-[9px] font-black text-red-700 block uppercase tracking-wider">TOTAL GAIB</span>
+                    <span class="text-[9px] font-black text-red-700 block uppercase tracking-wider">BELUM ABSEN (SISA)</span>
                     <span id="modal-txt-gaib" class="text-sm font-black text-red-600">0</span>
                 </div>
             </div>
@@ -252,7 +251,7 @@
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
 
-        // Global Variable Tambahan untuk Penghitung Kartu Guru
+        // Variabel penampung hitungan kartu guru di dalam modal
         let mCounterHadir = 0;
         let mCounterGaib = 0;
 
@@ -263,16 +262,12 @@
             document.getElementById('txt-user-nama').innerText = nama;
             document.getElementById('badge-role').innerText = role;
 
-            // Memuat preferensi tema terakhir yang disimpan user
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
 
             muatSeluruhRekapDashboard();
         });
 
-        // ==========================================
-        // SISTEM ENGINE SAKELAR DUAL THEME (SIANG/MALAM)
-        // ==========================================
         function toggleTema() {
             const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
             const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
@@ -289,11 +284,10 @@
                 document.body.classList.add('theme-light');
                 btnTema.innerHTML = `<i class="fa-solid fa-moon text-base text-indigo-950"></i>`;
                 btnTema.className = "w-10 h-10 rounded-xl bg-slate-200 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-300 shadow text-indigo-950";
-                // Penyesuaian tombol internal tab rekap biar kontras saat mode terang
                 if (tabAktif === "BELUM") {
-                    btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all";
+                    if(btnSudah) btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all";
                 } else {
-                    btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all";
+                    if(btnBelum) btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all";
                 }
                 localStorage.setItem('dashboard_theme', 'theme-light');
             } else {
@@ -302,9 +296,9 @@
                 btnTema.innerHTML = `<i class="fa-solid fa-sun text-base"></i>`;
                 btnTema.className = "w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400";
                 if (tabAktif === "BELUM") {
-                    btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
+                    if(btnSudah) btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
                 } else {
-                    btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
+                    if(btnBelum) btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
                 }
                 localStorage.setItem('dashboard_theme', 'theme-dark');
             }
@@ -316,25 +310,26 @@
             const btnSudah = document.getElementById('btn-tab-sudah');
             const isLight = document.body.classList.contains('theme-light');
             if (jenis === "BELUM") {
-                btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer transition-all";
-                btnSudah.className = isLight 
+                if(btnBelum) btnBelum.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer transition-all";
+                if(btnSudah) btnSudah.className = isLight 
                     ? "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all"
                     : "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
             } else {
-                btnBelum.className = isLight 
+                if(btnBelum) btnBelum.className = isLight 
                     ? "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-200 text-slate-600 hover:text-slate-900 uppercase cursor-pointer transition-all"
                     : "text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all";
-                btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 uppercase cursor-pointer transition-all";
+                if(btnSudah) btnSudah.className = "text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 uppercase cursor-pointer transition-all";
             }
             renderTabelWajah();
         }
 
         function renderTabelWajah() {
             const tblBody = document.getElementById('tbl-wajah-body');
+            if(!tblBody) return;
             tblBody.innerHTML = '';
             
             let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
-            if (listData.length === 0) {
+            if (!listData || listData.length === 0) {
                 tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 uppercase font-bold text-[10px]">Data tidak ditemukan / Kosong.</td></tr>`;
                 return;
             }
@@ -364,8 +359,8 @@
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    dataRekapGlobal.listBelum = r.rekapWajah.listBelum;
-                    dataRekapGlobal.listSudah = r.rekapWajah.listSudah;
+                    dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
+                    dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
 
                     document.getElementById('stat-total').innerText = r.rekapWajah.total;
                     document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah;
@@ -379,44 +374,44 @@
 
                     renderTabelWajah();
 
-                    feedBox.innerHTML = '';
-                    if (r.liveFeed.length === 0) {
-                        feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
-                    } else {
-                        r.liveFeed.forEach(log => {
-                            let div = document.createElement('div');
-                            div.className = isLight
-                                ? "bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm"
-                                : "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm";
-                                
-                            div.innerHTML = `
-                                <div class="flex flex-col gap-0.5">
-                                    <span class="dynamic-text-main uppercase tracking-wide">${log.nama}</span>
-                                    <span class="text-[9px] text-slate-400">Kiosk: <span class="text-yellow-600 dark:text-yellow-400">${log.petugas}</span></span>
-                                </div>
-                                <div class="text-right flex flex-col gap-0.5">
-                                    <span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider block w-max ml-auto">${log.shalat}</span>
-                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5 block">${log.jam} WIB</span>
-                                </div>
-                            `;
-                            feedBox.appendChild(div);
-                        });
+                    if(feedBox) {
+                        feedBox.innerHTML = '';
+                        if (!r.liveFeed || r.liveFeed.length === 0) {
+                            feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
+                        } else {
+                            r.liveFeed.forEach(log => {
+                                let div = document.createElement('div');
+                                div.className = isLight
+                                    ? "bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm"
+                                    : "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm";
+                                    
+                                div.innerHTML = `
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="dynamic-text-main uppercase tracking-wide">${log.nama}</span>
+                                        <span class="text-[9px] text-slate-400">Kiosk: <span class="text-yellow-600 dark:text-yellow-400">${log.petugas}</span></span>
+                                    </div>
+                                    <div class="text-right flex flex-col gap-0.5">
+                                        <span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider block w-max ml-auto">${log.shalat}</span>
+                                        <span class="text-[9px] text-slate-400 font-mono mt-0.5 block">${log.jam} WIB</span>
+                                    </div>
+                                `;
+                                feedBox.appendChild(div);
+                            });
+                        }
                     }
                 }
             } catch(e) {
-                feedBox.innerHTML = `<div class="text-center text-xs py-4 text-red-500 font-bold uppercase">Gagal sinkronisasi data rekap.</div>`;
+                if(feedBox) feedBox.innerHTML = `<div class="text-center text-xs py-4 text-red-500 font-bold uppercase">Gagal sinkronisasi data rekap.</div>`;
             }
         }
 
         function bukaModalGuru() { 
-            document.getElementById('modal-guru').classList.remove('hidden');
-            // Reset counter statistik modal ke posisi awal tiap kali dibuka
+            document.getElementById('modal-guru').classList.remove('hidden'); 
             mCounterHadir = 0;
             mCounterGaib = 0;
-            document.getElementById('modal-txt-hadir').innerText = "0";
-            document.getElementById('modal-txt-gaib').innerText = "0";
+            document.getElementById('modal-txt-hadir').innerText = mCounterHadir;
+            document.getElementById('modal-txt-gaib').innerText = mCounterGaib;
         }
-        
         function tutupModalGuru() { document.getElementById('modal-guru').classList.add('hidden'); }
         function prosesLogout() { localStorage.clear(); window.location.href = "index.html"; }
 
@@ -434,8 +429,7 @@
                 let res = await fetch(urlAmbil, { method: "GET" });
                 let r = await res.json();
                 
-                if (r.status === "success" && r.data.length > 0) {
-                    // Set angka awal statistik internal modal
+                if (r.status === "success" && r.data && r.data.length > 0) {
                     mCounterHadir = 0;
                     mCounterGaib = r.data.length;
                     document.getElementById('modal-txt-hadir').innerText = mCounterHadir;
@@ -461,20 +455,14 @@
                                 let resAbsen = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: paramsAbsen.toString() });
                                 let rAbsen = await resAbsen.json();
                                 if(rAbsen.status === "success") {
-                                    // Efek animasi mengecil & menghilang saat sukses diklik
                                     btn.style.transform = "scale(0)";
                                     btn.style.opacity = "0";
-                                    
                                     setTimeout(() => { 
                                         btn.remove(); 
-                                        
-                                        // Update status counter rekap real-time di atas kartu
                                         mCounterHadir++;
                                         mCounterGaib--;
                                         document.getElementById('modal-txt-hadir').innerText = mCounterHadir;
                                         document.getElementById('modal-txt-gaib').innerText = mCounterGaib;
-
-                                        // Tetap jalankan update background log utama
                                         muatSeluruhRekapDashboard(); 
                                     }, 300);
                                 } else { 
@@ -483,8 +471,8 @@
                                     btn.innerHTML = `<i class="fa-solid fa-user-tie text-base text-indigo-900 opacity-60"></i><span>${guru.nama.toUpperCase()}</span><span class="text-[9px] text-indigo-700 font-mono">${guru.mapel} (${guru.kelas})</span>`;
                                 }
                             } catch(e) { 
-                                alert("Masalah jaringan!");
-                                btn.disabled = false; 
+                                alert("Masalah jaringan!"); 
+                                btn.disabled = false;
                                 btn.innerHTML = `<i class="fa-solid fa-user-tie text-base text-indigo-900 opacity-60"></i><span>${guru.nama.toUpperCase()}</span><span class="text-[9px] text-indigo-700 font-mono">${guru.mapel} (${guru.kelas})</span>`;
                             }
                         });
