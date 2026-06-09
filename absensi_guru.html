@@ -30,7 +30,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
         <div>
             <h4 class="fw-bold text-success m-0"><i class="fas fa-user-check me-2"></i>Panel Absensi Guru PDF</h4>
-            <small class="text-muted">Khusus Otoritas Kepala Pondok Pesantren</small>
+            <small class="text-muted">Khusus Otoritas Kepala Pondok Pesantren (Mode Bebas Jam Pelajaran)</small>
         </div>
         <a href="dashboard.html" class="btn btn-sm btn-secondary">
             <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard
@@ -40,7 +40,7 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="bg-white p-3 rounded shadow-sm border-start border-4 border-info">
-                <small class="text-muted text-uppercase fw-bold d-block">Total Jadwal Jam Ini</small>
+                <small class="text-muted text-uppercase fw-bold d-block">Total Jadwal Hari Ini</small>
                 <span class="h3 fw-bold text-dark" id="txt-total-jadwal">0</span>
                 <small class="text-muted d-block mt-1">Guru Mengajar</small>
             </div>
@@ -80,32 +80,28 @@
                         <option value="Sabtu">Sabtu</option>
                         <option value="Minggu">Minggu</option>
                         <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
+                        <option value="Selasa" selected>Selasa</option>
                         <option value="Rabu">Rabu</option>
                         <option value="Kamis">Kamis</option>
                         <option value="Jumat">Jumat</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-bold small text-muted">2. Jam Ke</label>
-                    <select class="form-select border-success" id="filter-jam" required>
-                        <option value="I">Jam ke I</option>
-                        <option value="II">Jam ke II</option>
-                        <option value="III">Jam ke III</option>
-                        <option value="IV">Jam ke IV</option>
-                        <option value="V">Jam ke V</option>
+                    <label class="form-label fw-bold small text-muted">2. Jam Ke (Abaikan/Bebas Jam)</label>
+                    <select class="form-select border-secondary bg-light text-muted" id="filter-jam" disabled>
+                        <option value="BEBAS" selected>Semua Jam Terbuka</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold small text-muted">3. Gender Saring</label>
                     <select class="form-select border-success" id="filter-gender" required>
-                        <option value="LAKI-LAKI">LAKI-LAKI (ULA/WUSTHO Pusat)</option>
-                        <option value="PEREMPUAN">PEREMPUAN (Khadijah/Putri)</option>
+                        <option value="Laki-laki">Laki-laki (ULA/WUSTHO Pusat)</option>
+                        <option value="Perempuan">Perempuan (Khadijah/Putri)</option>
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-success w-100 fw-bold" id="btn-tarik">
-                        <i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL
+                        <i class="fas fa-sync-alt me-2"></i>TAMPILKAN JADWAL HARI INI
                     </button>
                 </div>
             </form>
@@ -118,13 +114,13 @@
         <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-muted">
             <i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i>
             <p class="m-0 fw-bold">Belum ada data ditarik.</p>
-            <small>Silakan tentukan filter Hari, Jam, & Gender di atas lalu klik Tampilkan Kartu Jadwal.</small>
+            <small>Silakan tentukan filter Hari & Gender di atas lalu klik Tampilkan Jadwal Hari Ini.</small>
         </div>
     </div>
 </div>
 
 <script>
-    // URL SCRIPT WEB APP (Ganti sesuai dengan Web App URL milik Anda yang dipublikasikan dari code1.gs)
+    // URL SCRIPT WEB APP (Ganti sesuai dengan Web App URL milik Anda dari deploy code1.gs)
     const API_URL = "https://script.google.com/macros/s/1qPqHP9rmkd1WClAv30U0S1tYEGX88TcpuoqEuzf1u_I/exec"; 
 
     let counterJadwal = 0;
@@ -136,7 +132,6 @@
         e.preventDefault();
         
         const hari = document.getElementById('filter-hari').value;
-        const jam = document.getElementById('filter-jam').value;
         const gender = document.getElementById('filter-gender').value;
         const kontainer = document.getElementById('kontainer-kartu-guru');
         const btnTarik = document.getElementById('btn-tarik');
@@ -150,29 +145,27 @@
                 <p class="text-muted fw-bold">Menghubungkan ke Cloud Database Sheet...</p>
             </div>`;
 
-        // Eksekusi GET ke code1.gs
-        fetch(`${API_URL}?aksi=ambil_guru_pdf&hari=${hari}&jam=${jam}&gender=${gender}`)
+        // Eksekusi GET ke script Google dengan parameter hari dan gender saja
+        fetch(`${API_URL}?aksi=ambil_guru_pdf&hari=${hari}&gender=${gender}`)
         .then(response => response.json())
         .then(res => {
             btnTarik.disabled = false;
-            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL`;
+            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN JADWAL HARI INI`;
 
             if (res.status === "success" && res.data.length > 0) {
-                // Inisialisasi Angka Rekap
                 counterJadwal = res.data.length;
                 counterHadir = 0;
                 counterGaib = counterJadwal;
                 updateWidgetRekap();
 
-                // Render Kartu
                 kontainer.innerHTML = "";
                 res.data.forEach(guru => {
-                    const idKartu = 'guru-' + btoa(guru.nama).replace(/=/g, ''); // Generate ID unik aman
+                    const idKartu = 'guru-' + btoa(encodeURIComponent(guru.nama)).replace(/=/g, ''); 
                     
                     const htmlCard = `
                         <div class="col-12 col-md-4" id="${idKartu}">
                             <div class="card card-guru border-0 shadow-sm bg-white overflow-hidden" 
-                                 onclick="prosesKlikAbsen('${guru.nama}', '${guru.mapel}', '${guru.kelas}', '${jam}', '${gender}', '${idKartu}')">
+                                 onclick="prosesKlikAbsen('${guru.nama.replace(/'/g, "\\'")}', '${guru.mapel.replace(/'/g, "\\'")}', '${guru.kelas.replace(/'/g, "\\'")}', '${gender}', '${idKartu}')">
                                 <div class="bg-emerald-600 p-2 text-white text-center small fw-bold tracking-wider">
                                     CLASSROOM: ${guru.kelas}
                                 </div>
@@ -191,19 +184,18 @@
                     kontainer.innerHTML += htmlCard;
                 });
             } else {
-                // Jika jadwal kosong
                 resetWidgetRekap();
                 kontainer.innerHTML = `
                     <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-danger">
                         <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
                         <p class="m-0 fw-bold">JADWAL MENGAJAR KOSONG / TIDAK DITEMUKAN</p>
-                        <small class="text-muted">Tidak ada data guru mengajar di hari ${hari}, ${jam} untuk gender ${gender}.</small>
+                        <small class="text-muted">Tidak ada data guru mengajar di hari ${hari} untuk kelompok gender ${gender}.</small>
                     </div>`;
             }
         })
         .catch(err => {
             btnTarik.disabled = false;
-            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN KARTU JADWAL`;
+            btnTarik.innerHTML = `<i class="fas fa-sync-alt me-2"></i>TAMPILKAN JADWAL HARI INI`;
             resetWidgetRekap();
             kontainer.innerHTML = `
                 <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-danger">
@@ -215,23 +207,20 @@
     });
 
     // 2. FITUR UTAMA: KLIK KARTU -> SEND DATA KE CLOUD -> ANIMASI LANGSUNG HILANG
-    function prosesKlikAbsen(nama, mapel, kelas, jam, gender, idElement) {
+    function prosesKlikAbsen(nama, mapel, kelas, gender, idElement) {
         const targetCard = document.getElementById(idElement);
         if (!targetCard || targetCard.classList.contains('fade-out')) return;
 
-        // Kunci kartu sementara agar tidak di-double click
         targetCard.style.pointerEvents = "none";
         
-        // Buat data payload POST
         const formData = new URLSearchParams();
         formData.append("aksi", "absen_guru_click");
         formData.append("nama", nama);
         formData.append("mapel", mapel);
         formData.append("kelas", kelas);
-        formData.append("jam", jam);
+        formData.append("jam", "BEBAS"); // Otomatis mengirimkan tanda BEBAS jam ke database
         formData.append("gender", gender);
 
-        // Kirim log ke sheet absensi_sekolah via code1.gs
         fetch(API_URL, {
             method: "POST",
             body: formData,
@@ -240,10 +229,8 @@
         .then(response => response.json())
         .then(res => {
             if (res.status === "success") {
-                // Beri efek animasi hilang (Fade Out)
                 targetCard.classList.add('fade-out');
                 
-                // Kurangi counter secara realtime setelah animasi selesai
                 setTimeout(() => {
                     targetCard.remove();
                     
@@ -251,13 +238,12 @@
                     counterGaib--;
                     updateWidgetRekap();
 
-                    // Jika semua kartu sudah diklik habis
                     if (counterGaib === 0) {
                         document.getElementById('kontainer-kartu-guru').innerHTML = `
                             <div class="col-12 text-center py-5 bg-white rounded shadow-sm text-success">
                                 <i class="fas fa-check-circle fa-3x mb-3"></i>
                                 <p class="m-0 fw-bold">ALHAMDULILLAH, SELESAI!</p>
-                                <small class="text-muted">Semua guru mengajar pada jam ini telah tervalidasi hadir di ruang kelas.</small>
+                                <small class="text-muted">Semua ustadz mengajar pada hari ini telah tervalidasi hadir oleh Kepala Pondok.</small>
                             </div>`;
                     }
                 }, 400);
@@ -272,7 +258,6 @@
         });
     }
 
-    // 3. FUNGSI UPDATE MATEMATIKA WIDGET REKAP DI ATAS
     function updateWidgetRekap() {
         document.getElementById('txt-total-jadwal').innerText = counterJadwal;
         document.getElementById('txt-total-hadir').innerText = counterHadir;
