@@ -97,8 +97,8 @@
                 <div class="flex flex-col gap-1">
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Golongan</label>
                     <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full sm:w-44 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
-                        <option value="SANTRI" selected>SANTRI (13 Kegiatan)</option>
-                        <option value="USTADZ">USTADZ (5 Kegiatan)</option>
+                        <option value="SANTRI" selected>SANTRI</option>
+                        <option value="USTADZ">USTADZ</option>
                     </select>
                 </div>
 
@@ -115,12 +115,12 @@
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Takzir</label>
                     <select id="filter-status" onchange="filterDanRenderData()" class="w-full sm:w-48 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
                         <option value="SEMUA">-- ALL STATUS --</option>
-                        <option value="AMAN">🟢 AMAN (0 Poin)</option>
-                        <option value="TEGURAN">🟡 TEGURAN RINGAN (1-5 Poin)</option>
-                        <option value="SEDANG">🟠 TAKZIR SEDANG (6-15 Poin)</option>
-                        <option value="KERAS">🔴 PERINGATAN KERAS (16-30 Poin)</option>
-                        <option value="BERAT">🚨 PELANGGARAN BERAT (31-50 Poin)</option>
-                        <option value="DARURAT">⚫ DARURAT / EVALUASI (>50 Poin)</option>
+                        <option value="AMAN">🟢 AMAN</option>
+                        <option value="TEGURAN RINGAN">🟡 TEGURAN RINGAN</option>
+                        <option value="TAKZIR SEDANG">🟠 TAKZIR SEDANG</option>
+                        <option value="PERINGATAN KERAS">🔴 PERINGATAN KERAS</option>
+                        <option value="PELANGGARAN BERAT">🚨 PELANGGARAN BERAT</option>
+                        <option value="DARURAT / EVALUASI">⚫ DARURAT / EVALUASI</option>
                     </select>
                 </div>
             </div>
@@ -185,7 +185,6 @@
 
         async function ambilDataRekapSheet() {
             try {
-                // INTEGRASI LIVE FETCH: Mengambil data asli langsung dari Google Apps Script
                 let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
                 let r = await res.json();
                 
@@ -201,41 +200,15 @@
             }
         }
 
-        function hitungMatriksPoinDanTakzir(item) {
-            let totalHitung = (parseInt(item.bolos || 0) + parseInt(item.piket || 0) + parseInt(item.pelanggaran || 0)) - parseInt(item.izin || 0);
-            let poinAkhir = totalHitung < 0 ? 0 : totalHitung;
-
-            let statusTingkat = "";
-            let isiTakziran = "";
-            let warnaBadge = "";
-
-            if (poinAkhir === 0) {
-                statusTingkat = "AMAN";
-                isiTakziran = "Bebas Takziran (Bersih harian)";
-                warnaBadge = "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
-            } else if (poinAkhir >= 1 && poinAkhir <= 5) {
-                statusTingkat = "TEGURAN RINGAN";
-                isiTakziran = "Sanksi Literasi: Merangkum 1 lembar halaman kitab akhlak/sejarah nabi di perpustakaan pondok.";
-                warnaBadge = "bg-amber-500/15 text-amber-600 dark:text-amber-400";
-            } else if (poinAkhir >= 6 && poinAkhir <= 15) {
-                statusTingkat = "TAKZIR SEDANG";
-                isiTakziran = "Khidmah Fasilitas Umum: Merapikan rak literasi buku perpustakaan atau ro'an membersihkan area halaman masjid.";
-                warnaBadge = "bg-orange-500/15 text-orange-600 dark:text-orange-400";
-            } else if (poinAkhir >= 16 && poinAkhir <= 30) {
-                statusTingkat = "PERINGATAN KERAS";
-                isiTakziran = "Khidmah Dapur Umum: Membantu tim logistik dapur mengupas bahan masakan dan cuci peralatan masak besar selama 1 hari.";
-                warnaBadge = "bg-rose-500/15 text-rose-600 dark:text-rose-400";
-            } else if (poinAkhir >= 31 && poinAkhir <= 50) {
-                statusTingkat = "PELANGGARAN BERAT";
-                isiTakziran = "Isolasi Spiritual Mandiri: Wajib i'tikaf di saf pertama masjid membaca Al-Qur'an dari ba'da Ashar sampai Maghrib (3 hari rutin).";
-                warnaBadge = "bg-red-600 text-white dark:bg-red-950 dark:text-red-300";
-            } else {
-                statusTingkat = "DARURAT / EVALUASI";
-                isiTakziran = "Sidang Pengasuh & Khidmah Ndalem Terbimbing: Pemanggilan Orang Tua ke pondok serta tugas bantu kebersihan area ndalem Kyai.";
-                warnaBadge = "bg-slate-950 text-yellow-400 border border-yellow-500";
-            }
-
-            return { poinAkhir, statusTingkat, isiTakziran, warnaBadge };
+        // Fungsi pewarnaan badge otomatis dinamis berdasarkan teks status dari Sheet Anda
+        function dapatkanWarnaBadge(status) {
+            const s = String(status).toUpperCase();
+            if (s.includes("AMAN")) return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
+            if (s.includes("TEGURAN")) return "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+            if (s.includes("SEDANG")) return "bg-orange-500/15 text-orange-600 dark:text-orange-400";
+            if (s.includes("KERAS")) return "bg-rose-500/15 text-rose-600 dark:text-rose-400";
+            if (s.includes("BERAT")) return "bg-red-600 text-white dark:bg-red-950 dark:text-red-300";
+            return "bg-slate-950 text-yellow-400 border border-yellow-500"; // Untuk status DARURAT / EVALUASI
         }
 
         function filterDanRenderData() {
@@ -249,20 +222,17 @@
             tblBody.innerHTML = '';
 
             let dataTersaring = masterDataMentah.filter(item => {
-                let hasilMatriks = hitungMatriksPoinDanTakzir(item);
-                
-                let matchGol = (item.golongan === golSelected);
-                let matchGen = (genSelected === "SEMUA" || item.gender === genSelected);
-                let matchCari = (item.nama.toUpperCase().includes(cariKeyword) || item.nik.includes(cariKeyword));
-                
-                let matchStatus = false;
-                if (statusSelected === "SEMUA") matchStatus = true;
-                else if (statusSelected === "AMAN" && hasilMatriks.poinAkhir === 0) matchStatus = true;
-                else if (statusSelected === "TEGURAN" && hasilMatriks.poinAkhir >= 1 && hasilMatriks.poinAkhir <= 5) matchStatus = true;
-                else if (statusSelected === "SEDANG" && hasilMatriks.poinAkhir >= 6 && hasilMatriks.poinAkhir <= 15) matchStatus = true;
-                else if (statusSelected === "KERAS" && hasilMatriks.poinAkhir >= 16 && hasilMatriks.poinAkhir <= 30) matchStatus = true;
-                else if (statusSelected === "BERAT" && hasilMatriks.poinAkhir >= 31 && hasilMatriks.poinAkhir <= 50) matchStatus = true;
-                else if (statusSelected === "DARURAT" && hasilMatriks.poinAkhir > 50) matchStatus = true;
+                // Menyamakan properti agar fleksibel terhadap huruf besar/kecil key JSON dari Apps Script
+                const itemGolongan = String(item.golongan || item.Golongan || "SANTRI").toUpperCase();
+                const itemGender = String(item.gender || item.Gender || "").toUpperCase();
+                const itemNama = String(item.nama || item.Nama || "").toUpperCase();
+                const itemNik = String(item.nik || item.NIK || "");
+                const itemStatus = String(item.status || item.Status || "").toUpperCase();
+
+                let matchGol = (itemGolongan === golSelected);
+                let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
+                let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
+                let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
 
                 return matchGol && matchGen && matchCari && matchStatus;
             });
@@ -273,23 +243,32 @@
             }
 
             dataTersaring.forEach(item => {
-                let m = hitungMatriksPoinDanTakzir(item);
+                // Mapping property murni dari kolom Google Sheet Anda
+                const nik = item.nik || item.NIK || "-";
+                const nama = item.nama || item.Nama || "-";
+                const gender = String(item.gender || item.Gender || "L").toUpperCase();
+                const jumlahPoin = item.jumlah_poin || item["Jumlah Poin"] || 0;
+                const isiTakziran = item.isi_takziran || item["Isi Takziran"] || "Tidak ada keterangan takziran.";
+                const statusStr = item.status || item.Status || "AMAN";
+
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
                 
-                let badgeGender = item.gender === "L" 
+                let badgeGender = gender === "L" 
                     ? `<span class="text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded text-[10px]">LPA</span>` 
                     : `<span class="text-pink-500 bg-pink-500/10 px-1.5 py-0.5 rounded text-[10px]">LPI</span>`;
 
+                let warnaBadge = dapatkanWarnaBadge(statusStr);
+
                 tr.innerHTML = `
-                    <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${item.nik}</td>
-                    <td class="py-3 px-2 uppercase font-black tracking-wide">${item.nama}</td>
+                    <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${nik}</td>
+                    <td class="py-3 px-2 uppercase font-black tracking-wide">${nama}</td>
                     <td class="py-3 px-2 text-center font-bold">${badgeGender}</td>
-                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${m.poinAkhir > 0 ? 'text-rose-500' : 'text-emerald-500'}">${m.poinAkhir} Ppt</td>
-                    <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${m.isiTakziran}</td>
+                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${parseInt(jumlahPoin) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${jumlahPoin} Ppt</td>
+                    <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${isiTakziran}</td>
                     <td class="py-3 px-2 text-right">
-                        <span class="badge-print px-2.5 py-1 rounded-md text-[9px] font-black tracking-wider inline-block ${m.warnaBadge}">
-                            ${m.statusTingkat}
+                        <span class="badge-print px-2.5 py-1 rounded-md text-[9px] font-black tracking-wider inline-block ${warnaBadge}">
+                            ${statusStr.toUpperCase()}
                         </span>
                     </td>
                 `;
