@@ -24,7 +24,10 @@
                 <span id="badge-role" class="text-[9px] bg-yellow-400 text-indigo-950 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase">ROLE</span>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+            <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-1.5 rounded-xl border border-emerald-500/20 font-bold uppercase tracking-wider hidden sm:inline-block">
+                <i class="fa-solid fa-circle text-[7px] text-emerald-400 animate-pulse mr-1"></i> Live Tracker Aktif
+            </span>
             <button onclick="muatSeluruhRekapDashboard()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap"><i class="fa-solid fa-rotate"></i></button>
             <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow-md transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -81,7 +84,7 @@
                 </div>
 
                 <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
-                    <h3 class="text-xs font-black text-cyan-400 uppercase tracking-widest mb-4 flex items-center gap-1.5"><i class="fa-solid fa-chart-simple"></i> SCAN JAMAAH SHALAT SIKLUS HARI INI</h3>
+                    <h3 class="text-xs font-black text-cyan-400 uppercase tracking-widest mb-4 flex items-center gap-1.5"><i class="fa-solid fa-chart-simple"></i> SCAN JAMAAH SHALAT HARI INI</h3>
                     <div class="grid grid-cols-5 gap-2 text-center">
                         <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl">
                             <span class="text-[9px] font-black text-slate-400 block uppercase">SUBUH</span>
@@ -112,7 +115,7 @@
                             <button id="btn-tab-belum" onclick="gantiTabRekap('BELUM')" class="text-xs font-black px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 uppercase cursor-pointer transition-all">BELUM DAFTAR</button>
                             <button id="btn-tab-sudah" onclick="gantiTabRekap('SUDAH')" class="text-xs font-black px-3 py-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white uppercase cursor-pointer transition-all">SUDAH DAFTAR</button>
                         </div>
-                        <span id="txt-judul-kolom-i" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">VALIDASI SIGNATURE</span>
+                        <span id="txt-judul-kolom-i" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">VALIDASI MASTER DATA</span>
                     </div>
                     
                     <div class="overflow-y-auto flex-1 pr-1">
@@ -121,7 +124,7 @@
                                 <tr class="border-b border-slate-900 text-slate-400 font-black uppercase">
                                     <th class="py-2">NAMA SANTRI</th>
                                     <th class="py-2">KELAS</th>
-                                    <th class="py-2 text-right">STATUS (KOLOM I)</th>
+                                    <th class="py-2 text-right">STATUS</th>
                                 </tr>
                             </thead>
                             <tbody id="tbl-wajah-body" class="divide-y divide-slate-900 font-bold text-slate-300">
@@ -135,7 +138,7 @@
             <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col h-full min-h-80 max-h-[500px]">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish animate-pulse"></i> LIVE KIOSK TRACKER</h3>
-                    <span class="text-[9px] bg-emerald-500/10 text-emerald-400 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">REALTIME LOG</span>
+                    <span id="sync-timer-label" class="text-[8px] bg-emerald-500/10 text-emerald-400 font-mono px-2 py-0.5 rounded-full uppercase tracking-wider">SYNCING...</span>
                 </div>
                 <div id="box-live-feed" class="flex flex-col gap-2 overflow-y-auto flex-1 pr-1">
                     <div class="text-center text-xs py-6 text-slate-500 font-bold uppercase tracking-wider">Menghubungkan ke terminal kiosk...</div>
@@ -190,6 +193,7 @@
         
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
+        let autoSyncInterval = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const nama = localStorage.getItem('session_nama');
@@ -198,12 +202,22 @@
             document.getElementById('txt-user-nama').innerText = nama;
             document.getElementById('badge-role').innerText = role;
 
+            // Pemuatan data awal pertama kali masuk halaman
             muatSeluruhRekapDashboard();
+
+            // Set background auto-refresh setiap 5000ms (5 detik) untuk membaca live tracker dari kiosk
+            autoSyncInterval = setInterval(() => {
+                jalankanAutoRefreshLiveTracker();
+            }, 5000);
         });
 
         function bukaModalGuru() { document.getElementById('modal-guru').classList.remove('hidden'); }
         function tutupModalGuru() { document.getElementById('modal-guru').classList.add('hidden'); }
-        function prosesLogout() { localStorage.clear(); window.location.href = "index.html"; }
+        function prosesLogout() { 
+            if(autoSyncInterval) clearInterval(autoSyncInterval);
+            localStorage.clear(); 
+            window.location.href = "index.html"; 
+        }
 
         function gantiTabRekap(jenis) {
             tabAktif = jenis;
@@ -226,7 +240,7 @@
             
             let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
 
-            if (!listData || listData.length === 0) {
+            if (listData.length === 0) {
                 tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500 uppercase font-bold text-[10px]">Data tidak ditemukan / Kosong.</td></tr>`;
                 return;
             }
@@ -241,65 +255,98 @@
 
                 row.innerHTML = `
                     <td class="py-2.5 text-slate-200 uppercase font-black">${s.nama}</td>
-                    <td class="py-2.5 font-mono text-slate-400">${s.kelas}</td>
+                    <td class="py-2.5 font-mono text-slate-400">${s.kelas || '-'}</td>
                     <td class="py-2.5 text-right">${badgeStatus}</td>
                 `;
                 tblBody.appendChild(row);
             });
         }
 
+        // FUNGSI UTAMA: MENARIK SELURUH DATA REKAP DAN LIVE FEED
         async function muatSeluruhRekapDashboard() {
             const feedBox = document.getElementById('box-live-feed');
+            const syncLabel = document.getElementById('sync-timer-label');
+            syncLabel.innerText = "REFRESHING...";
+
             try {
                 let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    dataRekapGlobal.listBelum = r.rekapWajah.listBelum;
-                    dataRekapGlobal.listSudah = r.rekapWajah.listSudah;
+                    dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
+                    dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
 
-                    // 1. Set Angka Dashboard Atas
                     document.getElementById('stat-total').innerText = r.rekapWajah.total || "0";
                     document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah || "0";
                     document.getElementById('stat-belum').innerText = r.rekapWajah.belum || "0";
 
-                    // 2. Set Indikator Jam Shalat Berdasarkan Hasil Siklus Apps Script
                     document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || "0";
                     document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || "0";
                     document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || "0";
                     document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || "0";
                     document.getElementById('v-isya').innerText = r.rekapShalat.Isya || "0";
 
-                    // 3. Jalankan Render Tabel Berdasarkan Data Terbaru
                     renderTabelWajah();
-
-                    // 4. Bangun Log Live Feed Monitor Kiosk Tracker
-                    feedBox.innerHTML = '';
-                    if (!r.liveFeed || r.liveFeed.length === 0) {
-                        feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah dalam siklus hari ini.</div>`;
-                    } else {
-                        r.liveFeed.forEach(log => {
-                            let div = document.createElement('div');
-                            div.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm animate-fade-in";
-                            div.innerHTML = `
-                                <div class="flex flex-col gap-0.5">
-                                    <span class="text-white uppercase tracking-wide">${log.nama}</span>
-                                    <span class="text-[9px] text-slate-400">Kiosk: <span class="text-yellow-400">${log.petugas || 'Mandiri'}</span></span>
-                                </div>
-                                <div class="text-right flex flex-col gap-0.5">
-                                    <span class="bg-emerald-500/10 text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider block w-max ml-auto">${log.shalat}</span>
-                                    <span class="text-[9px] text-slate-500 font-mono mt-0.5 block">${log.jam} WIB</span>
-                                </div>
-                            `;
-                            feedBox.appendChild(div);
-                        });
-                    }
+                    prosesRenderLiveFeed(r.liveFeed);
+                    syncLabel.innerText = "UPDATED";
                 }
             } catch(e) {
                 feedBox.innerHTML = `<div class="text-center text-xs py-4 text-red-500 font-bold uppercase">Gagal sinkronisasi data rekap.</div>`;
+                syncLabel.innerText = "OFFLINE";
             }
         }
 
+        // FUNGSI BACKGROUND BACKGROUND AUTO-REFRESH LIVE FEED SAJA (RINGAN TANPA BERAT)
+        async function jalankanAutoRefreshLiveTracker() {
+            const syncLabel = document.getElementById('sync-timer-label');
+            syncLabel.innerText = "SYNCING...";
+            try {
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
+                let r = await res.json();
+                if (r.status === "success") {
+                    // Update Indikator Shalat Atas barangkali ada santri baru masuk scan
+                    document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || "0";
+                    document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || "0";
+                    document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || "0";
+                    document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || "0";
+                    document.getElementById('v-isya').innerText = r.rekapShalat.Isya || "0";
+                    
+                    prosesRenderLiveFeed(r.liveFeed);
+                    syncLabel.innerText = "LIVE";
+                }
+            } catch(e) {
+                syncLabel.innerText = "RETRYING";
+            }
+        }
+
+        // FUNGSI KHUSUS UNTUK MENAMPILKAN DATA LIVE TRACKER KIOSK KE LAYAR
+        function prosesRenderLiveFeed(dataFeed) {
+            const feedBox = document.getElementById('box-live-feed');
+            feedBox.innerHTML = '';
+
+            if (!dataFeed || dataFeed.length === 0) {
+                feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
+                return;
+            }
+
+            dataFeed.forEach(log => {
+                let div = document.createElement('div');
+                div.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-[11px] font-bold shadow-sm";
+                div.innerHTML = `
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-white uppercase tracking-wide">${log.nama}</span>
+                        <span class="text-[9px] text-slate-400">Kiosk: <span class="text-yellow-400">${log.petugas || 'System'}</span></span>
+                    </div>
+                    <div class="text-right flex flex-col gap-0.5">
+                        <span class="bg-emerald-500/10 text-emerald-400 font-black px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider block w-max ml-auto">${log.shalat}</span>
+                        <span class="text-[9px] text-slate-500 font-mono mt-0.5 block">${log.jam || '--:--'} WIB</span>
+                    </div>
+                `;
+                feedBox.appendChild(div);
+            });
+        }
+
+        // JADWAL GURU JURUSAN UTUH & TETAP BERFUNGSI SEMPURNA
         async function muatDataGuruPDF() {
             const loader = document.getElementById('loader-guru');
             const box = document.getElementById('box-daftar-guru');
