@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Kiosk Wajah AI - Core</title>
+    <title>Terminal Kiosk Wajah AI - Core Pakem</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,26 +61,20 @@
         let isProcessing = false;
         let databaseSantri = [];
 
-        // Fungsi internal untuk menghasilkan bunyi bip murni tanpa file mp3
         function bunyikanBeep(frekuensi, durasi) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-
                 oscillator.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
-
                 oscillator.type = 'sine';
                 oscillator.frequency.value = frekuensi;
                 gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-
                 oscillator.start();
                 gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + durasi);
                 oscillator.stop(audioCtx.currentTime + durasi);
-            } catch (e) {
-                console.error("Gagal mengeluarkan suara sistem audio:", e);
-            }
+            } catch (e) {}
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -109,24 +103,31 @@
                         kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                         label.innerText = "MENCOCOKKAN BIOMETRIK...";
                         
-                        let koordinatKamera = hasilKamera.landmarks.positions.map(p => ({ x: p.x, y: p.y }));
-                        verifikasiWajahLokal(koordinatKamera);
+                        // Kirim seluruh objek landmark hasil kamera untuk dinormalisasi skalanya
+                        verifikasiWajahLokal(hasilKamera.landmarks);
                     }
                 }, 300);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
-        async function verifikasiWajahLokal(posisiKamera) {
+        // ALGORITMA BARU: MATRIKS NORMALISASI DAN JARAK AKTUAL PRESISI TINGGI
+        async function verifikasiWajahLokal(landmarksKamera) {
             let santriDitemukan = null; 
             let skorTerbaik = 999;
 
+            // Ekstrak dan normalisasi struktur wajah dari kamera langsung
+            let vektorKameraNormal = dapatkanVektorNormal(landmarksKamera);
+
             for (let santri of databaseSantri) {
                 try {
-                    let dataVektor = santri.vektor;
-                    if(!dataVektor) continue;
+                    let dataVektorRaw = santri.vektor;
+                    if(!dataVektorRaw) continue;
                     
-                    let jarak = hitungJarakMatematika(posisiKamera, JSON.parse(dataVektor));
-                    if (jarak < skorTerbaik && jarak < 12.0) { 
+                    // Hitung kemiripan geometris struktur data master dengan kamera nyata
+                    let jarak = hitungJarakSkalaSama(vektorKameraNormal, JSON.parse(dataVektorRaw));
+                    
+                    // Batas toleransi strict (0.055) setelah dinormalisasi agar tidak tertukar orang lain
+                    if (jarak < skorTerbaik && jarak < 0.055) { 
                         skorTerbaik = jarak; 
                         santriDitemukan = santri; 
                     }
@@ -138,14 +139,12 @@
                 const hariIni = new Date().toISOString().split('T')[0]; 
                 const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
-                // JIKA SANTRI SUDAH PRESENSI HARI INI (ANTI SPAM)
                 if (localStorage.getItem(storageKey)) {
                     document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
                     document.getElementById('pop-warning').classList.remove('hidden');
                     label.innerText = "SUDAH ABSEN SEBELUMNYA";
                     kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
                     
-                    // Bunyi beep peringatan gagal/sudah absen (dua bip nada rendah pendek)
                     bunyikanBeep(440, 0.08);
                     setTimeout(() => bunyikanBeep(440, 0.08), 120);
 
@@ -158,7 +157,6 @@
                     return;
                 }
 
-                // JIKA BELUM ABSEN -> KIRIM DATA KE GOOGLE SHEET
                 const fp = new URLSearchParams();
                 fp.append('aksi', 'absen_santri');
                 fp.append('nik', santriDitemukan.nik);
@@ -169,13 +167,9 @@
                     let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
                     let r = await res.json();
                     if(r.status === "success") {
-                        // Kunci di memori lokal agar tidak bisa di-spam hari ini
                         localStorage.setItem(storageKey, "TERCATAT");
-
                         document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
                         document.getElementById('pop-success').classList.remove('hidden');
-                        
-                        // Bunyi beep berhasil (satu bip nada tinggi nyaring)
                         bunyikanBeep(1000, 0.25);
                     }
                 } catch(e){}
@@ -188,12 +182,9 @@
                 }, 2000);
 
             } else {
-                // WAJAH TIDAK DIKENAL
                 isProcessing = false; 
                 label.innerText = "WAJAH TIDAK DIKENAL";
                 kotakScan.className = "w-64 h-64 border-4 border-solid border-red-500 rounded-3xl flex items-center justify-center bg-red-500/10";
-                
-                // Bunyi error dengung rendah agak panjang
                 bunyikanBeep(220, 0.4);
 
                 setTimeout(() => { 
@@ -203,13 +194,47 @@
             }
         }
 
-        function hitungJarakMatematika(titik1, titik2) {
-            let totalJarak = 0; 
-            let jumlah = Math.min(titik1.length, titik2.length);
-            for (let i = 0; i < jumlah; i++) {
-                totalJarak += Math.pow(titik1[i].x - titik2[i].x, 2) + Math.pow(titik1[i].y - titik2[i].y, 2);
+        // FUNGSI UTAMA: MENGUBAH KOORDINAT PIKSEL MENJADI MATRIKS RASIO (ANTI-PERUBAHAN JARAK KAMERA)
+        function dapatkanVektorNormal(landmarks) {
+            const posisi = landmarks.positions;
+            // Titik acuan hidung (indeks 30) sebagai pusat koordinat (0,0)
+            const pusatX = posisi[30].x;
+            const pusatY = posisi[30].y;
+
+            // Hitung lebar wajah aktual di kamera (Mata Kiri ke Mata Kanan) untuk pembagi skala
+            const mataKiriX = posisi[36].x;
+            const mataKananX = posisi[45].x;
+            const skalaWajah = Math.max(1, Math.abs(mataKananX - mataKiriX));
+
+            // Geser pusat ke hidung dan bagi dengan skala wajah agar ukuran wajah selalu konisten (1:1)
+            return posisi.map(p => ({
+                x: (p.x - pusatX) / skalaWajah,
+                y: (p.y - pusatY) / skalaWajah
+            }));
+        }
+
+        // FUNGSI UTAMA: MENGHITUNG SELISIH AKURAT SEBELUM & SESUDAH DAFTAR WAJAH
+        function hitungJarakSkalaSama(vektorKamera, vektorDatabase) {
+            let totalJarak = 0;
+            let jumlahTitik = Math.min(vektorKamera.length, vektorDatabase.length);
+            
+            // Jika basis data pendaftaran lama belum menggunakan sistem normalisasi normal, lakukan konversi otomatis
+            let vDbNormal = vektorDatabase;
+            if (vektorDatabase[0] && vektorDatabase[0].x > 1) {
+                // Konversi fallback jika array database masih berupa koordinat piksel mentah asli
+                const pX = vektorDatabase[30].x; const pY = vektorDatabase[30].y;
+                const sW = Math.max(1, Math.abs(vektorDatabase[45].x - vektorDatabase[36].x));
+                vDbNormal = vektorDatabase.map(p => ({ x: (p.x - pX) / sW, y: (p.y - pY) / sW }));
             }
-            return Math.sqrt(totalJarak) / jumlah;
+
+            for (let i = 0; i < jumlahTitik; i++) {
+                // Berikan bobot pembobot (weight) lebih ketat pada area mata, alis, hidung, mulut (indeks 17-67)
+                let bobot = (i >= 17) ? 2.0 : 0.5; 
+                let dX = vektorKamera[i].x - vDbNormal[i].x;
+                let dY = vektorKamera[i].y - vDbNormal[i].y;
+                totalJarak += (dX * dX + dY * dY) * bobot;
+            }
+            return Math.sqrt(totalJarak) / jumlahTitik;
         }
     </script>
 </body>
