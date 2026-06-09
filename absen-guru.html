@@ -213,7 +213,6 @@
         async function sinkronisasikanSistem() {
             document.getElementById('loader-guru').classList.remove('hidden');
             try {
-                // SINKRONISASI SEARAH: Ambil Master Jadwal Dulu, baru Log Absensi agar Nama Jam bisa dicocokkan
                 await muatDataJadwalGuru();
                 await tarikLiveFeedHadirDashboard();
                 distribusikanRekapData();
@@ -231,16 +230,15 @@
                 let r = await res.json();
                 if (r.status === "success" && r.liveFeed) {
                     r.liveFeed.forEach(log => {
-                        if (log.shalat === "BEBAS" || log.petugas.toLowerCase().includes("sekolah")) {
+                        // Jika kolom shalat berisi kata "JAM" atau "BEBAS", atau petugas mengandung kata "sekolah"
+                        if (log.shalat.toUpperCase().includes("JAM") || log.shalat === "BEBAS" || log.petugas.toLowerCase().includes("sekolah")) {
                             let namaClean = log.nama.toUpperCase().trim();
                             
-                            // PERBAIKAN LOGIKA JAM: Cari guru ini di masterJadwal untuk mendeteksi dia mestinya "Jam ke berapa"
                             let dataJadwalAsli = masterJadwal.find(j => j.nama.toUpperCase().trim() === namaClean);
                             
-                            // Jika di jadwal ketemu (misal "Jam 1"), pakai itu. Jika tidak ketemu baru fallback ke log.jam / BEBAS
                             let labelJamDanMapel = dataJadwalAsli 
                                 ? `${dataJadwalAsli.jam || "Mengajar"} - ${dataJadwalAsli.mapel}`
-                                : `BEBAS - ${log.shalat || "Mengajar"}`;
+                                : `${log.shalat} - ${log.petugas}`;
 
                             logHadirHariIni.push({
                                 jamLog: log.jam || "Hari Ini",
@@ -281,7 +279,6 @@
             tbodyHadir.innerHTML = '';
             tbodyGaib.innerHTML = '';
 
-            // A. RENDER TABEL GURU HADIR (KIRI BAWAH)
             if (logHadirHariIni.length === 0) {
                 tbodyHadir.innerHTML = `<tr><td colspan="3" class="py-8 text-center dynamic-text-muted italic">Belum ada guru terdata masuk kelas hari ini.</td></tr>`;
                 document.getElementById('txt-hadir').innerText = "0";
@@ -299,7 +296,6 @@
                 });
             }
 
-            // B. RENDER KARTU KLIK & TABEL GURU GAIB
             if (masterJadwal.length === 0) {
                 boxKartu.innerHTML = `<div class="col-span-full text-center dynamic-text-muted font-bold text-xs py-12 uppercase border border-dashed dynamic-border rounded-2xl">Tidak ada daftar jadwal guru mengajar yang cocok.</div>`;
                 tbodyGaib.innerHTML = `<tr><td colspan="4" class="py-8 text-center dynamic-text-muted italic">Jadwal kosong.</td></tr>`;
@@ -369,6 +365,8 @@
             paramsAbsen.append('mapel', guruData.mapel);
             paramsAbsen.append('kelas', guruData.kelas || "A");
             paramsAbsen.append('gender', gender);
+            // KUNCI UTAMA: Ikut kirimkan string "Jam 1", "Jam 2", dll ke Apps Script
+            paramsAbsen.append('jam', guruData.jam || "BEBAS"); 
 
             try {
                 let resAbsen = await fetch(API_URL, { 
@@ -380,8 +378,6 @@
                 
                 if(rAbsen.status === "success") {
                     let jamKlik = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-                    
-                    // Langsung mapping data jam dan mapel secara instan sesaat setelah klik berhasil
                     let labelJamDanMapel = `${guruData.jam || "Mengajar"} - ${guruData.mapel}`;
                     
                     logHadirHariIni.push({
