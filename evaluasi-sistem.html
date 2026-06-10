@@ -46,7 +46,15 @@
         .dynamic-border-row { border-color: var(--border-row); }
         .dynamic-text-row { color: var(--text-row); }
 
-        /* Mode Cetak Surat / Dokumen Laporan */
+        /* Batasi tinggi teks takziran agar seragam dan rapi di layar hp */
+        .truncate-two-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         @media print {
             body * { visibility: hidden; background: transparent !important; color: #000 !important; }
             #area-cetak, #area-cetak * { visibility: visible; }
@@ -55,7 +63,6 @@
             .badge-print { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
@@ -83,7 +90,7 @@
         </div>
     </header>
 
-    <main id="area-cetak" class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
+    <main id="area-cetak" class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-4 flex-1">
         
         <div class="hidden print:flex flex-col items-center text-center border-b-4 border-double border-slate-900 pb-4 mb-4">
             <h2 class="text-lg font-black tracking-wide uppercase">PONDOK PESANTREN MODERN PUSAT YOGYAKARTA (PPMUY)</h2>
@@ -91,30 +98,37 @@
             <p id="print-tanggal" class="text-[10px] font-mono mt-1 text-slate-500">Tanggal Cetak: --:--:--</p>
         </div>
 
-        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 flex flex-col lg:flex-row gap-4 justify-between items-end shadow-sm no-print">
-            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3 w-full lg:w-auto flex-1">
+        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 flex flex-col gap-3 justify-between shadow-sm no-print">
+            <div class="grid grid-cols-2 md:flex md:flex-wrap items-center gap-3 w-full">
                 
-                <div class="flex flex-col gap-1">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Kelas / Golongan</label>
-                    <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full sm:w-44 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
-                        <option value="SEMUA">-- SEMUA KELAS --</option>
+                <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[150px]">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Golongan</label>
+                    <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                        <option value="SEMUA">-- ALL GOLONGAN --</option>
                         <option value="SANTRI" selected>SANTRI MURNI</option>
                         <option value="USTADZ">USTADZ / PENGURUS</option>
                     </select>
                 </div>
 
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[150px]">
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Spesifik Kelas</label>
+                    <select id="filter-kelas" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                        <option value="SEMUA" selected>-- ALL KELAS --</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[130px]">
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Gender / Asrama</label>
-                    <select id="filter-gender" onchange="filterDanRenderData()" class="w-full sm:w-36 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                    <select id="filter-gender" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL GENDER --</option>
                         <option value="L">PUTRA (Banin)</option>
                         <option value="P">PUTRI (Banat)</option>
                     </select>
                 </div>
 
-                <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
+                <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[160px] col-span-2">
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Sanksi Harian</label>
-                    <select id="filter-status" onchange="filterDanRenderData()" class="w-full sm:w-48 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
+                    <select id="filter-status" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL STATUS --</option>
                         <option value="AMAN">🟢 AMAN</option>
                         <option value="TEGURAN RINGAN">🟡 TEGURAN RINGAN</option>
@@ -126,34 +140,23 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-1 w-full lg:w-64">
+            <div class="flex flex-col gap-1 w-full">
                 <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Cari Nama / NIK</label>
                 <div class="relative w-full">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama / NIK..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
+                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama atau NIK santri..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
                 </div>
             </div>
         </section>
 
-        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-4 sm:p-5 shadow-sm flex-1 flex flex-col">
-            <div class="overflow-x-auto flex-1">
-                <table class="w-full text-left text-[11px] sm:text-xs border-collapse">
-                    <thead>
-                        <tr class="border-b-2 dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
-                            <th class="py-3 px-2 w-20">NIK</th>
-                            <th class="py-3 px-2 w-48">NAMA LENGKAP</th>
-                            <th class="py-3 px-2 text-center w-14">GNDR</th>
-                            <th class="py-3 px-2 text-center w-24">POIN HARIAN</th>
-                            <th class="py-3 px-2 text-center w-36">AKUMULASI MINGGUAN</th>
-                            <th class="py-3 px-2">DESKRIPSI SANKSI / TAKZIRAN</th>
-                            <th class="py-3 px-2 text-right w-36">STATUS TINGKAT</th>
-                        </tr>
-                    </thead>
+        <section class="dynamic-bg-box border dynamic-border rounded-2xl p-2 sm:p-4 shadow-sm flex-1 flex flex-col">
+            <div class="overflow-x-hidden flex-1">
+                <table class="w-full text-left border-collapse">
                     <tbody id="tbl-rekap-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
                         <tr>
-                            <td colspan="7" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
+                            <td class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest text-xs italic">
                                 <i class="fa-solid fa-spinner animate-spin text-lg text-yellow-500 block mb-2"></i>
-                                Memuat & Mengalkulasi Sesi Log Harian Server...
+                                Menyinkronkan Data Matang Akademik Server...
                             </td>
                         </tr>
                     </tbody>
@@ -190,19 +193,21 @@
                 let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
                 let r = await res.json();
                 
-                // Mendukung format respons data murni array maupun pembungkus {status: "success", data: [...]}
                 if (Array.isArray(r)) {
                     masterDataMentah = r;
-                    filterDanRenderData();
                 } else if (r.status === "success" || r.data) {
                     masterDataMentah = r.data;
-                    filterDanRenderData();
                 } else {
                     throw new Error(r.message || "Gagal memproses struktur data json.");
                 }
+
+                // Jalankan deteksi dropdown kelas otomatis & render
+                inisialisasiFilterKelasDinamis();
+                filterDanRenderData();
+
             } catch (err) {
                 console.error(err);
-                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran Server.</td></tr>`;
+                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td class="py-10 text-center text-red-500 font-black uppercase text-xs tracking-wider">Gagal Menyinkronkan Log Rekap Takziran Server.</td></tr>`;
             }
         }
 
@@ -216,52 +221,42 @@
             return "bg-slate-950 text-yellow-400 border border-yellow-500"; 
         }
 
-        // =========================================================================
-        // ENGINE DETEKSI KELAS OTOMATIS & RENDER DATA COMPACT (RAMAH HP)
-        // =========================================================================
-        
-        // Fungsi pembantu untuk mendeteksi seluruh kelas unik yang ada di data server
+        // Fungsi otomatis mendeteksi seluruh kelas unik yang ada di data server
         function inisialisasiFilterKelasDinamis() {
             const selectKelas = document.getElementById('filter-kelas');
             if (!selectKelas) return;
 
-            // Simpan pilihan yang sedang terpilih agar tidak reset saat dirender ulang
             const nilaiSekarang = selectKelas.value;
-            
-            // Bersihkan opsi, sisakan opsi default "SEMUA KELAS"
-            selectKelas.innerHTML = '<option value="SEMUA">-- SEMUA KELAS --</option>';
+            selectKelas.innerHTML = '<option value="SEMUA">-- ALL KELAS --</option>';
 
             if (!masterDataMentah || masterDataMentah.length === 0) return;
 
-            // Ambil daftar kelas unik, bersihkan spasi, abaikan jika kosong atau ustadz/pengurus
             let daftarKelasUnik = [];
             masterDataMentah.forEach(item => {
-                let kelasRaw = String(item["Kelas/Golongan"] || "").trim();
+                let kelasRaw = String(item["Kelas/Golongan"] || item.kelas || "").trim();
                 let kelasUpper = kelasRaw.toUpperCase();
                 
                 if (kelasRaw && !kelasUpper.includes("USTADZ") && !kelasUpper.includes("PENGURUS")) {
-                    if (!daftarKelasUnik.includes(kelasRaw)) {
-                        daftarKelasUnik.push(kelasRaw);
+                    if (!daftarKelasUnik.includes(kelasUpper)) {
+                        daftarKelasUnik.push(kelasUpper);
                     }
                 }
             });
 
-            // Urutkan nama kelas agar rapi (misal: 10A, 10B, 11A)
+            // Urutkan alfabet nama kelas agar rapi
             daftarKelasUnik.sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
 
-            // Suntikkan kelas hasil deteksi ke dalam element <select> HTML
             daftarKelasUnik.forEach(kls => {
                 let opt = document.createElement('option');
-                opt.value = kls.toUpperCase();
-                opt.textContent = `KELAS ${kls.toUpperCase()}`;
+                opt.value = kls;
+                opt.textContent = `KELAS ${kls}`;
                 selectKelas.appendChild(opt);
             });
 
-            // Kembalikan posisi filter ke pilihan user sebelumnya jika ada
             if (nilaiSekarang) selectKelas.value = nilaiSekarang;
         }
 
-        // Fungsi utama filter dan render menggunakan struktur layout "Satu Baris, Dua Lantai"
+        // Fungsi utama filter dan render menggunakan struktur layout "Satu Baris, Dua Lantai" (Compact Screen)
         function filterDanRenderData() {
             const tblBody = document.getElementById('tbl-rekap-body');
             const golSelected = document.getElementById('filter-golongan').value;
@@ -273,18 +268,17 @@
             if (!tblBody) return;
             tblBody.innerHTML = '';
 
-            // Proteksi awal jika data belum termuat dari server
             if (!masterDataMentah || masterDataMentah.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Data kosong atau belum tersinkronisasi dari server.</td></tr>`;
+                tblBody.innerHTML = `<tr><td class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Data kosong atau belum tersinkronisasi dari server.</td></tr>`;
                 return;
             }
 
             let dataTersaring = masterDataMentah.filter(item => {
-                const itemGolongan = String(item["Kelas/Golongan"] || "").toUpperCase();
-                const itemGender = String(item.gender || item.Gender || "").toUpperCase();
+                const itemGolongan = String(item["Kelas/Golongan"] || item.kelas || "").toUpperCase();
+                const itemGender = String(item.gender || item.Gender || "L").toUpperCase();
                 const itemNama = String(item.nama || item.Nama || "").toUpperCase();
                 const itemNik = String(item.nik || item.NIK || "");
-                const itemStatus = String(item["Status (Harian)"] || "").toUpperCase();
+                const itemStatus = String(item["Status (Harian)"] || item.status || "").toUpperCase();
 
                 // 1. Filter Golongan (Santri vs Ustadz)
                 let matchGol = false;
@@ -296,79 +290,28 @@
                     matchGol = (itemGolongan.includes("USTADZ") || itemGolongan.includes("PENGURUS"));
                 }
 
-                // 2. Filter Spesifik Kelas (Dijalankan jika filter golongan diset ke SANTRI atau SEMUA)
+                // 2. Filter Spesifik Kelas
                 let matchKelas = (kelasSelected === "SEMUA" || itemGolongan === kelasSelected);
 
                 // 3. Filter Gender, Pencarian Kata Kunci, dan Status Sanksi
-                let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
+                let matchGen = (genSelected === "SEMUA" || itemGender === genSelected || (genSelected === "L" && itemGender === "PUTRA") || (genSelected === "P" && itemGender === "PUTRI"));
                 let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
                 let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
 
                 return matchGol && matchKelas && matchGen && matchCari && matchStatus;
             });
 
-            // Tampilkan pesan informatif jika hasil filter kosong
             if (dataTersaring.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada data santri yang cocok dengan filter.</td></tr>`;
+                tblBody.innerHTML = `<tr><td class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada data santri yang cocok dengan filter.</td></tr>`;
                 return;
             }
 
-            // Loop Proses Pembuatan Baris Tabel Ringkas (Compact Layout)
+            // Loop rendering baris tabel ringkas "Satu Baris, Dua Lantai"
             dataTersaring.forEach(item => {
-                const nik = item.nik || item.NIK || "-";
                 const nama = item.nama || item.Nama || "-";
                 const gender = String(item.gender || item.Gender || "L").toUpperCase();
-                const kelas = String(item["Kelas/Golongan"] || "-").toUpperCase();
-                const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : 0;
-                const poinMingguanStatus = item["Poin Mingguan + Status"] || "0 (AMAN)";
-                const isiTakziran = item["Isi Takziran (Harian)"] || "Pertahankan kedisiplinan.";
-                const statusStr = item["Status (Harian)"] || "AMAN";
-
-                let tr = document.createElement('tr');
-                tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
-                
-                // Badge Gender Mini
-                let badgeGender = (gender === "L" || gender === "PUTRA" || gender === "LPA") 
-                    ? `<span class="text-sky-500 bg-sky-500/5 px-1 rounded text-[9px] font-bold">LPA</span>` 
-                    : `<span class="text-pink-500 bg-pink-500/5 px-1 rounded text-[9px] font-bold">LPI</span>`;
-
-                let warnaBadge = dapatkanWarnaBadge(statusStr);
-
-                // DESAIN UTAMA: SATU BARIS DUA LANTAI (SANGAT COMPACT & ANTI GESER HORIZONTAL)
-                tr.innerHTML = `
-                    <td colspan="7" class="py-2.5 px-3">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <div class="truncate max-w-[55%] flex items-center gap-1.5">
-                                ${badgeGender}
-                                <span class="font-black text-xs tracking-wide uppercase truncate text-slate-200">${nama}</span>
-                                <span class="text-[10px] font-bold text-slate-400 shrink-0">(${kelas})</span>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0 text-right">
-                                <div class="flex flex-col items-end leading-none">
-                                    <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
-                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5">Wk: ${poinMingguanStatus.split(' ')[0]} Pts</span>
-                                </div>
-                                <span class="badge-print px-2 py-0.5 rounded text-[9px] font-black tracking-wider inline-block ${warnaBadge}">
-                                    ${statusStr.toUpperCase()}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="text-[10px] text-slate-400 leading-relaxed pl-1 italic flex items-start gap-1">
-                            <span class="text-amber-500 shrink-0 font-bold">❯</span>
-                            <span class="truncate-two-lines">${isiTakziran}</span>
-                        </div>
-                    </td>
-                `;
-                tblBody.appendChild(tr);
-            });
-        }
-
-            dataTersaring.forEach(item => {
-                // Ekstraksi nilai aman dari double mapping Apps Script
-                const nik = item.NIK || item.nik || "-";
-                const nama = item.Nama || item.nama || "-";
-                const gender = String(item.Gender || item.gender || "L").toUpperCase();
-                const poinHarian = item["Poin Harian"] || item.poin_harian || 0;
+                const kelas = String(item["Kelas/Golongan"] || item.kelas || "-").toUpperCase();
+                const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : (item.poin_harian !== undefined ? item.poin_harian : 0);
                 const poinMingguanStatus = item["Poin Mingguan + Status"] || item.poin_mingguan_status || "0 (AMAN)";
                 const isiTakziran = item["Isi Takziran (Harian)"] || item.isi_takziran_harian || "Pertahankan kedisiplinan.";
                 const statusStr = item["Status (Harian)"] || item.status || "AMAN";
@@ -376,23 +319,40 @@
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
                 
-                let badgeGender = gender === "L" 
-                    ? `<span class="text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded text-[10px]">LPA</span>` 
-                    : `<span class="text-pink-500 bg-pink-500/10 px-1.5 py-0.5 rounded text-[10px]">LPI</span>`;
+                // Badge Gender Mini
+                let badgeGender = (gender === "L" || gender === "PUTRA" || gender === "LPA") 
+                    ? `<span class="text-sky-500 bg-sky-500/10 px-1 rounded text-[9px] font-black shrink-0">LPA</span>` 
+                    : `<span class="text-pink-500 bg-pink-500/10 px-1 rounded text-[9px] font-black shrink-0">LPI</span>`;
 
                 let warnaBadge = dapatkanWarnaBadge(statusStr);
 
+                // EKSTRASI ANGKA POIN MINGGUAN SAJA UNTUK POP-UP MINI SEJAJAR
+                let angkaMingguan = poinMingguanStatus.split(' ')[0] || "0";
+
+                // LAYOUT SATU BARIS DUA LANTAI
                 tr.innerHTML = `
-                    <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${nik}</td>
-                    <td class="py-3 px-2 uppercase font-black tracking-wide">${nama}</td>
-                    <td class="py-3 px-2 text-center font-bold">${badgeGender}</td>
-                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</td>
-                    <td class="py-3 px-2 text-center font-mono text-[11px] text-slate-400">${poinMingguanStatus}</td>
-                    <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${isiTakziran}</td>
-                    <td class="py-3 px-2 text-right">
-                        <span class="badge-print px-2.5 py-1 rounded-md text-[9px] font-black tracking-wider inline-block ${warnaBadge}">
-                            ${statusStr.toUpperCase()}
-                        </span>
+                    <td class="py-2.5 px-2 sm:px-3 block w-full">
+                        <div class="flex items-center justify-between gap-1 w-full">
+                            <div class="truncate flex items-center gap-1.5 max-w-[60%]">
+                                ${badgeGender}
+                                <span class="font-black text-xs tracking-wide uppercase truncate text-slate-200 dark:text-slate-100">${nama}</span>
+                                <span class="text-[9px] font-bold text-slate-400 shrink-0">(${kelas})</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <div class="flex flex-col items-end leading-none">
+                                    <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
+                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5">Wk: ${angkaMingguan} Pts</span>
+                                </div>
+                                <span class="badge-print px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-black tracking-wider inline-block ${warnaBadge} uppercase shrink-0">
+                                    ${statusStr.replace('AMAN', 'AMN').replace('TEGURAN RINGAN', 'TEGURAN RGN').toUpperCase()}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="text-[10px] text-slate-400 font-medium leading-relaxed mt-1 pl-1 flex items-start gap-1">
+                            <span class="text-amber-500 shrink-0 font-bold">❯</span>
+                            <span class="truncate-two-lines italic">${isiTakziran}</span>
+                        </div>
                     </td>
                 `;
                 tblBody.appendChild(tr);
