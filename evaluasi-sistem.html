@@ -216,9 +216,56 @@
             return "bg-slate-950 text-yellow-400 border border-yellow-500"; 
         }
 
+        // =========================================================================
+        // ENGINE DETEKSI KELAS OTOMATIS & RENDER DATA COMPACT (RAMAH HP)
+        // =========================================================================
+        
+        // Fungsi pembantu untuk mendeteksi seluruh kelas unik yang ada di data server
+        function inisialisasiFilterKelasDinamis() {
+            const selectKelas = document.getElementById('filter-kelas');
+            if (!selectKelas) return;
+
+            // Simpan pilihan yang sedang terpilih agar tidak reset saat dirender ulang
+            const nilaiSekarang = selectKelas.value;
+            
+            // Bersihkan opsi, sisakan opsi default "SEMUA KELAS"
+            selectKelas.innerHTML = '<option value="SEMUA">-- SEMUA KELAS --</option>';
+
+            if (!masterDataMentah || masterDataMentah.length === 0) return;
+
+            // Ambil daftar kelas unik, bersihkan spasi, abaikan jika kosong atau ustadz/pengurus
+            let daftarKelasUnik = [];
+            masterDataMentah.forEach(item => {
+                let kelasRaw = String(item["Kelas/Golongan"] || "").trim();
+                let kelasUpper = kelasRaw.toUpperCase();
+                
+                if (kelasRaw && !kelasUpper.includes("USTADZ") && !kelasUpper.includes("PENGURUS")) {
+                    if (!daftarKelasUnik.includes(kelasRaw)) {
+                        daftarKelasUnik.push(kelasRaw);
+                    }
+                }
+            });
+
+            // Urutkan nama kelas agar rapi (misal: 10A, 10B, 11A)
+            daftarKelasUnik.sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
+
+            // Suntikkan kelas hasil deteksi ke dalam element <select> HTML
+            daftarKelasUnik.forEach(kls => {
+                let opt = document.createElement('option');
+                opt.value = kls.toUpperCase();
+                opt.textContent = `KELAS ${kls.toUpperCase()}`;
+                selectKelas.appendChild(opt);
+            });
+
+            // Kembalikan posisi filter ke pilihan user sebelumnya jika ada
+            if (nilaiSekarang) selectKelas.value = nilaiSekarang;
+        }
+
+        // Fungsi utama filter dan render menggunakan struktur layout "Satu Baris, Dua Lantai"
         function filterDanRenderData() {
             const tblBody = document.getElementById('tbl-rekap-body');
             const golSelected = document.getElementById('filter-golongan').value;
+            const kelasSelected = document.getElementById('filter-kelas') ? document.getElementById('filter-kelas').value : "SEMUA";
             const genSelected = document.getElementById('filter-gender').value;
             const statusSelected = document.getElementById('filter-status').value;
             const cariKeyword = document.getElementById('cari-nama').value.toUpperCase();
@@ -226,35 +273,95 @@
             if (!tblBody) return;
             tblBody.innerHTML = '';
 
-            let dataTersaring = masterDataMentah.filter(item => {
-                // Penyelarasan properti multi-case (CamelCase dan PascalCase dari double mapping)
-                const itemGolongan = String(item["Kelas/Golongan"] || item.golongan || item.Golongan || "SANTRI").toUpperCase();
-                const itemGender = String(item.Gender || item.gender || "").toUpperCase();
-                const itemNama = String(item.Nama || item.nama || "").toUpperCase();
-                const itemNik = String(item.NIK || item.nik || "");
-                const itemStatus = String(item["Status (Harian)"] || item.status || "").toUpperCase();
+            // Proteksi awal jika data belum termuat dari server
+            if (!masterDataMentah || masterDataMentah.length === 0) {
+                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Data kosong atau belum tersinkronisasi dari server.</td></tr>`;
+                return;
+            }
 
-                // Evaluasi kecocokan filter golongan
+            let dataTersaring = masterDataMentah.filter(item => {
+                const itemGolongan = String(item["Kelas/Golongan"] || "").toUpperCase();
+                const itemGender = String(item.gender || item.Gender || "").toUpperCase();
+                const itemNama = String(item.nama || item.Nama || "").toUpperCase();
+                const itemNik = String(item.nik || item.NIK || "");
+                const itemStatus = String(item["Status (Harian)"] || "").toUpperCase();
+
+                // 1. Filter Golongan (Santri vs Ustadz)
                 let matchGol = false;
                 if (golSelected === "SEMUA") {
                     matchGol = true;
                 } else if (golSelected === "SANTRI") {
                     matchGol = (!itemGolongan.includes("USTADZ") && !itemGolongan.includes("PENGURUS"));
-                } else {
+                } else if (golSelected === "USTADZ") {
                     matchGol = (itemGolongan.includes("USTADZ") || itemGolongan.includes("PENGURUS"));
                 }
 
+                // 2. Filter Spesifik Kelas (Dijalankan jika filter golongan diset ke SANTRI atau SEMUA)
+                let matchKelas = (kelasSelected === "SEMUA" || itemGolongan === kelasSelected);
+
+                // 3. Filter Gender, Pencarian Kata Kunci, dan Status Sanksi
                 let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
                 let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
                 let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
 
-                return matchGol && matchGen && matchCari && matchStatus;
+                return matchGol && matchKelas && matchGen && matchCari && matchStatus;
             });
 
+            // Tampilkan pesan informatif jika hasil filter kosong
             if (dataTersaring.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap data kedisiplinan yang cocok dengan parameter filter.</td></tr>`;
+                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada data santri yang cocok dengan filter.</td></tr>`;
                 return;
             }
+
+            // Loop Proses Pembuatan Baris Tabel Ringkas (Compact Layout)
+            dataTersaring.forEach(item => {
+                const nik = item.nik || item.NIK || "-";
+                const nama = item.nama || item.Nama || "-";
+                const gender = String(item.gender || item.Gender || "L").toUpperCase();
+                const kelas = String(item["Kelas/Golongan"] || "-").toUpperCase();
+                const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : 0;
+                const poinMingguanStatus = item["Poin Mingguan + Status"] || "0 (AMAN)";
+                const isiTakziran = item["Isi Takziran (Harian)"] || "Pertahankan kedisiplinan.";
+                const statusStr = item["Status (Harian)"] || "AMAN";
+
+                let tr = document.createElement('tr');
+                tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
+                
+                // Badge Gender Mini
+                let badgeGender = (gender === "L" || gender === "PUTRA" || gender === "LPA") 
+                    ? `<span class="text-sky-500 bg-sky-500/5 px-1 rounded text-[9px] font-bold">LPA</span>` 
+                    : `<span class="text-pink-500 bg-pink-500/5 px-1 rounded text-[9px] font-bold">LPI</span>`;
+
+                let warnaBadge = dapatkanWarnaBadge(statusStr);
+
+                // DESAIN UTAMA: SATU BARIS DUA LANTAI (SANGAT COMPACT & ANTI GESER HORIZONTAL)
+                tr.innerHTML = `
+                    <td colspan="7" class="py-2.5 px-3">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <div class="truncate max-w-[55%] flex items-center gap-1.5">
+                                ${badgeGender}
+                                <span class="font-black text-xs tracking-wide uppercase truncate text-slate-200">${nama}</span>
+                                <span class="text-[10px] font-bold text-slate-400 shrink-0">(${kelas})</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 text-right">
+                                <div class="flex flex-col items-end leading-none">
+                                    <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
+                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5">Wk: ${poinMingguanStatus.split(' ')[0]} Pts</span>
+                                </div>
+                                <span class="badge-print px-2 py-0.5 rounded text-[9px] font-black tracking-wider inline-block ${warnaBadge}">
+                                    ${statusStr.toUpperCase()}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-slate-400 leading-relaxed pl-1 italic flex items-start gap-1">
+                            <span class="text-amber-500 shrink-0 font-bold">❯</span>
+                            <span class="truncate-two-lines">${isiTakziran}</span>
+                        </div>
+                    </td>
+                `;
+                tblBody.appendChild(tr);
+            });
+        }
 
             dataTersaring.forEach(item => {
                 // Ekstraksi nilai aman dari double mapping Apps Script
