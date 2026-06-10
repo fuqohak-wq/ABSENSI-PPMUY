@@ -121,8 +121,8 @@
                     <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Gender / Asrama</label>
                     <select id="filter-gender" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL GENDER --</option>
-                        <option value="L">LAKI-LAKI</option>
-                        <option value="P">PEREMPUAN</option>
+                        <option value="LAKI-LAKI">PUTRA (Banin)</option>
+                        <option value="PEREMPUAN">PUTRI (Banat)</option>
                     </select>
                 </div>
 
@@ -275,7 +275,7 @@
 
             let dataTersaring = masterDataMentah.filter(item => {
                 const itemGolongan = String(item["Kelas/Golongan"] || item.kelas || "").toUpperCase();
-                const itemGender = String(item.gender || item.Gender || "L").toUpperCase();
+                const itemGender = String(item.gender || item.Gender || "").toUpperCase();
                 const itemNama = String(item.nama || item.Nama || "").toUpperCase();
                 const itemNik = String(item.nik || item.NIK || "");
                 const itemStatus = String(item["Status (Harian)"] || item.status || "").toUpperCase();
@@ -293,8 +293,10 @@
                 // 2. Filter Spesifik Kelas
                 let matchKelas = (kelasSelected === "SEMUA" || itemGolongan === kelasSelected);
 
-                // 3. Filter Gender, Pencarian Kata Kunci, dan Status Sanksi
-                let matchGen = (genSelected === "SEMUA" || itemGender === genSelected || (genSelected === "L" && itemGender === "PUTRA") || (genSelected === "P" && itemGender === "PUTRI"));
+                // 3. Filter Gender Mutlak (Sangat Saklek & Akurat sesuai Google Sheet)
+                let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
+                
+                // 4. Pencarian Kata Kunci Nama / NIK & Status Sanksi
                 let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
                 let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
 
@@ -309,7 +311,7 @@
             // Loop rendering baris tabel ringkas "Satu Baris, Dua Lantai"
             dataTersaring.forEach(item => {
                 const nama = item.nama || item.Nama || "-";
-                const gender = String(item.gender || item.Gender || "L").toUpperCase();
+                const gender = String(item.gender || item.Gender || "LAKI-LAKI").toUpperCase();
                 const kelas = String(item["Kelas/Golongan"] || item.kelas || "-").toUpperCase();
                 const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : (item.poin_harian !== undefined ? item.poin_harian : 0);
                 const poinMingguanStatus = item["Poin Mingguan + Status"] || item.poin_mingguan_status || "0 (AMAN)";
@@ -319,17 +321,17 @@
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
                 
-                // Badge Gender Mini
-                let badgeGender = (gender === "L" || gender === "PUTRA" || gender === "LPA") 
+                // Tampilan Label Gender Mini Berdasarkan Nilai Saklek Google Sheet
+                let badgeGender = (gender === "LAKI-LAKI") 
                     ? `<span class="text-sky-500 bg-sky-500/10 px-1 rounded text-[9px] font-black shrink-0">LPA</span>` 
                     : `<span class="text-pink-500 bg-pink-500/10 px-1 rounded text-[9px] font-black shrink-0">LPI</span>`;
 
                 let warnaBadge = dapatkanWarnaBadge(statusStr);
 
-                // EKSTRASI ANGKA POIN MINGGUAN SAJA UNTUK POP-UP MINI SEJAJAR
+                // Ekstrasi Angka Poin Mingguan Sejajar
                 let angkaMingguan = poinMingguanStatus.split(' ')[0] || "0";
 
-                // LAYOUT SATU BARIS DUA LANTAI
+                // LAYOUT SATU BARIS DUA LANTAI (COMPACT SCREEN - ANTI GESER KANAN KIRI)
                 tr.innerHTML = `
                     <td class="py-2.5 px-2 sm:px-3 block w-full">
                         <div class="flex items-center justify-between gap-1 w-full">
