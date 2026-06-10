@@ -11,6 +11,7 @@
             transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
         }
         
+        /* Tema Gelap Tetap Elegan */
         .theme-dark {
             --bg-main: #0f172a;
             --bg-header: #020617;
@@ -21,18 +22,21 @@
             --border-color: #1e293b;
             --border-row: #020617;
             --text-row: #cbd5e1;
+            --text-name: #ffffff;
         }
 
+        /* PREMIUM MODE SIANG: Full Biru Cerah Berkelas, Kontras Tinggi & Segar */
         .theme-light {
-            --bg-main: #f0f4f8;
-            --bg-header: #ffffff;
-            --bg-box: #ffffff;
-            --bg-inner: #f8fafc;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --border-row: #f1f5f9;
-            --text-row: #334155;
+            --bg-main: #eef6ff;      /* Latar belakang full biru muda segar */
+            --bg-header: #ffffff;    /* Putih bersih bersinar */
+            --bg-box: #ffffff;       /* Putih kontras tinggi */
+            --bg-inner: #dbeafe;     /* Aksen dalam biru cerah lembut */
+            --text-main: #0f2d59;    /* Navy gelap super kontras */
+            --text-muted: #2563eb;   /* Biru core cerah untuk label */
+            --border-color: #bfdbfe; /* Garis pembatas biru transparan */
+            --border-row: #eff6ff;   /* Baris tabel lembut */
+            --text-row: #1e3a8a;     /* Teks baris navy tegas */
+            --text-name: #0f172a;    /* Nama santri hitam pekat */
         }
 
         body { background-color: var(--bg-main); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; }
@@ -56,26 +60,26 @@
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #2563eb; border-radius: 10px; }
     </style>
 </head>
 <body class="theme-dark min-h-screen flex flex-col justify-between antialiased">
 
     <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-sm no-print">
         <div class="flex items-center gap-3">
-            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-yellow-400 border dynamic-border shadow-sm">
+            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-slate-800 dark:bg-slate-800 flex items-center justify-center text-yellow-400 border dynamic-border shadow-sm">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div>
                 <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">REKAP TAKZIRAN & POIN KEDISIPLINAN</h1>
-                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">SISTEM INTEGRASI</span>
+                <span class="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">SISTEM INTEGRASI</span>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow text-amber-400">
+            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow text-amber-500">
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
-            <button onclick="window.print()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-sky-400 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow" title="Cetak PDF/Kertas">
+            <button onclick="window.print()" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:scale-105 text-sky-500 flex items-center justify-center cursor-pointer transition-all border dynamic-border shadow" title="Cetak PDF/Kertas">
                 <i class="fa-solid fa-print"></i>
             </button>
         </div>
@@ -93,8 +97,8 @@
             <div class="grid grid-cols-2 md:flex md:flex-wrap items-center gap-3 w-full">
                 
                 <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[150px]">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Golongan</label>
-                    <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                    <label class="text-[9px] font-black tracking-wider dynamic-text-muted uppercase">Golongan</label>
+                    <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA">-- ALL GOLONGAN --</option>
                         <option value="SANTRI" selected>SANTRI MURNI</option>
                         <option value="USTADZ">USTADZ / PENGURUS</option>
@@ -102,15 +106,15 @@
                 </div>
 
                 <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[150px]">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Spesifik Kelas</label>
-                    <select id="filter-kelas" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                    <label class="text-[9px] font-black tracking-wider dynamic-text-muted uppercase">Spesifik Kelas</label>
+                    <select id="filter-kelas" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL KELAS --</option>
                     </select>
                 </div>
 
                 <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[130px]">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Gender / Asrama</label>
-                    <select id="filter-gender" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                    <label class="text-[9px] font-black tracking-wider dynamic-text-muted uppercase">Gender / Asrama</label>
+                    <select id="filter-gender" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL GENDER --</option>
                         <option value="LAKI-LAKI">PUTRA (Banin)</option>
                         <option value="PEREMPUAN">PUTRI (Banat)</option>
@@ -118,8 +122,8 @@
                 </div>
 
                 <div class="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[160px] col-span-2">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Sanksi Harian</label>
-                    <select id="filter-status" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
+                    <label class="text-[9px] font-black tracking-wider dynamic-text-muted uppercase">Status Sanksi Harian</label>
+                    <select id="filter-status" onchange="filterDanRenderData()" class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 focus:outline-none focus:border-yellow-500 cursor-pointer">
                         <option value="SEMUA" selected>-- ALL STATUS --</option>
                         <option value="AMAN">🟢 AMAN</option>
                         <option value="TEGURAN RINGAN">🟡 TEGURAN RINGAN</option>
@@ -132,10 +136,10 @@
             </div>
 
             <div class="flex flex-col gap-1 w-full">
-                <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Cari Nama / NIK</label>
+                <label class="text-[9px] font-black tracking-wider dynamic-text-muted uppercase">Cari Nama / NIK</label>
                 <div class="relative w-full">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></span>
-                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama atau NIK santri..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-yellow-500">
+                    <input type="text" id="cari-nama" oninput="filterDanRenderData()" placeholder="Ketik nama atau NIK santri..." class="w-full dynamic-bg-inner border dynamic-border text-xs font-bold pl-9 pr-4 py-2 rounded-xl text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-yellow-500">
                 </div>
             </div>
         </section>
@@ -203,12 +207,12 @@
 
         function dapatkanWarnaBadge(status) {
             const s = String(status).toUpperCase();
-            if (s.includes("AMAN")) return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
-            if (s.includes("TEGURAN")) return "bg-amber-500/15 text-amber-600 dark:text-amber-400";
-            if (s.includes("SEDANG")) return "bg-orange-500/15 text-orange-600 dark:text-orange-400";
-            if (s.includes("KERAS")) return "bg-rose-500/15 text-rose-600 dark:text-rose-400";
-            if (s.includes("BERAT")) return "bg-red-600 text-white dark:bg-red-950 dark:text-red-300";
-            return "bg-slate-950 text-yellow-400 border border-yellow-500"; 
+            if (s.includes("AMAN")) return "bg-emerald-500/15 text-emerald-600 font-black";
+            if (s.includes("TEGURAN")) return "bg-amber-500/15 text-amber-600 font-black";
+            if (s.includes("SEDANG")) return "bg-orange-500/15 text-orange-600 font-black";
+            if (s.includes("KERAS")) return "bg-rose-500/15 text-rose-600 font-black";
+            if (s.includes("BERAT")) return "bg-red-600 text-white font-black";
+            return "bg-slate-900 text-yellow-400 border border-yellow-500"; 
         }
 
         function inisialisasiFilterKelasDinamis() {
@@ -289,36 +293,45 @@
                 return;
             }
 
-            // Loop rendering baris tabel SUPER CLEAN (Hanya Nama Jelas, Poin, dan Takziran Full)
+            // Loop rendering baris tabel PREMIUM (Poin Harian & Mingguan Tampil Berdampingan di Atas)
             dataTersaring.forEach(item => {
                 const nama = item.nama || item.Nama || "-";
                 const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : (item.poin_harian !== undefined ? item.poin_harian : 0);
+                const poinMingguanStr = item["Poin Mingguan + Status"] || item.poin_mingguan || "0 (AMAN)";
                 const isiTakziran = item["Isi Takziran (Harian)"] || item.isi_takziran_harian || "Pertahankan kedisiplinan.";
                 const statusStr = item["Status (Harian)"] || item.status || "AMAN";
 
                 let tr = document.createElement('tr');
-                tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
+                tr.className = "border-b dynamic-border-row hover:bg-blue-500/5 transition-colors";
                 
                 let warnaBadge = dapatkanWarnaBadge(statusStr);
 
-                // DESAIN MINIMALIS UTK HP: BEBAS ATRIBUT BERULANG & TEXT TAKZIRAN TERBUKA LEBAR (FULL TEXT)
+                // DUA AKSEN POIN (HARIAN & MINGGUAN) TERPAMPANG DI POJOK ATAS YANG LONGGAR
                 tr.innerHTML = `
-                    <td class="py-3 px-2 sm:px-3 block w-full">
-                        <div class="flex items-center justify-between gap-2 w-full">
-                            <div class="truncate max-w-[75%]">
-                                <span class="font-black text-sm tracking-wide uppercase text-slate-100 dark:text-slate-100 block truncate">${nama}</span>
+                    <td class="py-4 px-2 sm:px-4 block w-full">
+                        <div class="flex items-center justify-between gap-3 w-full">
+                            <div class="truncate max-w-[55%]">
+                                <span class="font-black text-sm tracking-wide uppercase block truncate" style="color: var(--text-name);">${nama}</span>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
-                                <span class="badge-print px-1.5 py-0.5 rounded text-[8px] font-black tracking-wider inline-block ${warnaBadge} uppercase shrink-0">
+                            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                                <div class="text-right">
+                                    <span class="block text-[8px] tracking-wider uppercase opacity-60 text-slate-500 dark:text-slate-400 font-extrabold">Hari Ini</span>
+                                    <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
+                                </div>
+                                <div class="h-6 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
+                                <div class="text-left">
+                                    <span class="block text-[8px] tracking-wider uppercase opacity-60 text-slate-500 dark:text-slate-400 font-extrabold">Mingguan</span>
+                                    <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">${poinMingguanStr}</span>
+                                </div>
+                                <span class="badge-print px-2 py-1 rounded-lg text-[8px] font-black tracking-wider inline-block ${warnaBadge} uppercase shrink-0 ml-1 shadow-sm">
                                     ${statusStr.replace('AMN', 'AMAN').toUpperCase()}
                                 </span>
                             </div>
                         </div>
                         
-                        <div class="text-[11px] text-slate-400 dark:text-slate-300 font-medium leading-relaxed mt-1.5 pl-0.5 flex items-start gap-1.5">
+                        <div class="text-[11px] font-medium leading-relaxed mt-2 pl-0.5 flex items-start gap-1.5 opacity-90" style="color: var(--text-row);">
                             <span class="text-amber-500 shrink-0 font-bold">❯</span>
-                            <span class="italic break-words w-full">${isiTakziran}</span>
+                            <span class="italic break-words w-full font-semibold">${isiTakziran}</span>
                         </div>
                     </td>
                 `;
@@ -337,7 +350,7 @@
             if (tema === 'theme-light') {
                 document.body.classList.remove('theme-dark');
                 document.body.classList.add('theme-light');
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-indigo-950"></i>`;
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-blue-900"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-light');
             } else {
                 document.body.classList.remove('theme-light');
