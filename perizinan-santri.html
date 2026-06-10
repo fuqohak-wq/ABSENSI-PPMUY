@@ -85,7 +85,7 @@
                 <span id="stat-diluar" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
             </div>
             <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-rose-500 shadow-sm">
-                <span class="text-[10px] font-black text-rose-600 dark:text-rose-400 tracking-wider block uppercase">TERLAMBAT (DENDA AKTIF)</span>
+                <span class="text-[10px] font-black text-rose-600 dark:text-rose-400 tracking-wider block uppercase">TERLAMBAT (TAKZIR AKTIF)</span>
                 <span id="stat-terlambat" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
             </div>
         </div>
@@ -192,7 +192,7 @@
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
 
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT BERGANG ANDA DISINI
+        // MASUKKAN URL WEB APPS KODE ANDA DISINI (URL EXEC DEPLOY TERBARU)
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         let masterSantriCache = [];
@@ -250,9 +250,9 @@
             let waktuSekarang = new Date();
 
             databaseIzinGlobal.forEach(item => {
-                let status = String(item.Status_Persetujuan || item[7] || "").toUpperCase();
-                let tglKembali = item.Waktu_Kembali || item[11];
-                let janjiKembali = new Date(item.Janji_Kembali || item[6]);
+                let status = String(item.Status_Persetujuan || "").toUpperCase();
+                let tglKembali = item.Waktu_Kembali;
+                let janjiKembali = new Date(item.Janji_Kembali);
 
                 if(status === "PENDING") pending++;
                 if((status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
@@ -273,8 +273,8 @@
             tbody.innerHTML = '';
 
             let dataFilter = databaseIzinGlobal.filter(item => {
-                let tglKembali = item.Waktu_Kembali || item[11];
-                let status = String(item.Status_Persetujuan || item[7] || "").toUpperCase();
+                let tglKembali = item.Waktu_Kembali;
+                let status = String(item.Status_Persetujuan || "").toUpperCase();
                 
                 if(filterTabSekarang === "AKTIF") {
                     return (status === "PENDING" || status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "");
@@ -288,18 +288,17 @@
                 return;
             }
 
-            // Membalikkan data agar entri terbaru muncul di atas table log
             dataFilter.reverse();
 
             dataFilter.forEach(item => {
                 let row = document.createElement('tr');
                 row.className = "border-b dynamic-border-row hover:bg-blue-500/5 transition-all text-xs";
                 
-                let janjiData = item.Janji_Kembali || item[6];
+                let janjiData = item.Janji_Kembali;
                 let tglJanji = new Date(janjiData);
-                let tglKembali = item.Waktu_Kembali || item[11];
-                let statusStr = String(item.Status_Persetujuan || item[7] || "").toUpperCase();
-                let dendaAmt = parseInt(item.Denda_Kumulatif || item[13]) || 0;
+                let tglKembali = item.Waktu_Kembali;
+                let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
+                let dendaAmt = parseInt(item.Denda_Kumulatif) || 0;
                 
                 let isTerlambat = (new Date() > tglJanji && (!tglKembali || String(tglKembali).trim() === ""));
                 
@@ -314,20 +313,19 @@
                     badge = `<span class="bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">DI LUAR PONDOK</span>`;
                 }
 
-                let dataIzinEscaped = encodeURIComponent(JSON.stringify(item));
-                let idIzin = item.ID_Izin || item[0];
-                let namaSantri = item.Nama_Santri || item[2];
-                let nikSantri = item.NIK || item[1];
-                let kelasSantri = item.Kelas || item[3];
-                let jenisIzin = item.Jenis_Izin || item[4];
-                let alasanIzin = item.Alasan || item[5];
+                let idIzin = item.ID_Izin;
+                let namaSantri = item.Nama_Santri;
+                let nikSantri = item.NIK;
+                let kelasSantri = item.Kelas;
+                let jenisIzin = item.Jenis_Izin;
+                let alasanIzin = item.Alasan;
 
                 let aksiButton = "";
                 if(statusStr === "PENDING") {
                     aksiButton = `
                         <div class="flex justify-end gap-1.5">
-                            <button onclick="eksekusiAccPengasuh('${idIzin}', 'SETUJU')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400 cursor-pointer">ACC</button>
-                            <button onclick="eksekusiAccPengasuh('${idIzin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
+                            <button onclick="eksekusiAccPortal('${idIzin}', 'SETUJU')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400 cursor-pointer">ACC</button>
+                            <button onclick="eksekusiAccPortal('${idIzin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
                         </div>
                     `;
                 } else if((statusStr === "DISETUJUI" || statusStr === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
@@ -340,7 +338,6 @@
                     aksiButton = `<span class="text-slate-500 text-[10px] italic">Logged by Kiosk</span>`;
                 }
 
-                // Format tampilan rekap data hajat + info denda
                 let infoDendaTeks = dendaAmt > 0 ? `<span class="text-rose-500 font-extrabold block text-[10px] mt-0.5"><i class="fa-solid fa-hand-holding-dollar mr-0.5"></i> Denda Tagihan: Rp ${dendaAmt.toLocaleString('id-ID')}</span>` : '';
 
                 row.innerHTML = `
@@ -370,8 +367,8 @@
             dropdown.innerHTML = "";
             
             let cocok = masterSantriCache.filter(s => 
-                String(s.nama || s[1] || "").toUpperCase().includes(query) || 
-                String(s.nik || s[0] || "").toUpperCase().includes(query)
+                String(s.nama || "").toUpperCase().includes(query) || 
+                String(s.nik || "").toUpperCase().includes(query)
             ).slice(0, 5);
 
             if(cocok.length === 0) {
@@ -381,13 +378,10 @@
             }
 
             cocok.forEach(s => {
-                let vNik = s.nik || s[0];
-                let vNama = s.nama || s[1];
-                let vKelas = s.kelas || s[7] || 'Tanpa Kelas';
                 let div = document.createElement('div');
                 div.className = "p-2 rounded-lg text-left text-slate-300 hover:bg-blue-600 hover:text-white cursor-pointer font-bold text-[11px] uppercase transition-all";
-                div.innerHTML = `<div>${vNama}</div><div class="text-[9px] opacity-75 font-mono">${vNik} - ${vKelas}</div>`;
-                div.onclick = () => kunciPilihanSantri(vNik, vNama, vKelas);
+                div.innerHTML = `<div>${s.nama}</div><div class="text-[9px] opacity-75 font-mono">${s.nik} - ${s.kelas}</div>`;
+                div.onclick = () => kunciPilihanSantri(s.nik, s.nama, s.kelas);
                 dropdown.appendChild(div);
             });
             dropdown.classList.remove('hidden');
@@ -426,10 +420,10 @@
                 { facingMode: "environment" }, 
                 { fps: 10, qrbox: 250 },
                 (decodedText) => {
-                    let sKetemu = masterSantriCache.find(s => (s.nik || s[0]).toString().trim() === decodedText.toString().trim());
+                    let sKetemu = masterSantriCache.find(s => s.nik.toString().trim() === decodedText.toString().trim());
                     if(sKetemu) {
-                        kunciPilihanSantri(sKetemu.nik || sKetemu[0], sKetemu.nama || sKetemu[1], sKetemu.kelas || sKetemu[7] || 'Tanpa Kelas');
-                        alert("SANTRI TERDETEKSI: " + (sKetemu.nama || sKetemu[1]));
+                        kunciPilihanSantri(sKetemu.nik, sKetemu.nama, sKetemu.kelas);
+                        alert("SANTRI TERDETEKSI: " + sKetemu.nama);
                     } else {
                         alert("QR Code terbaca: " + decodedText + " (Tidak ditemukan di Master)");
                     }
@@ -447,7 +441,7 @@
         }
 
         async function prosesUsulkanIzin() {
-            if(!santriTerpilihNIK) { alert("Pilih nama/Scan QR santri dahulu!"); return; }
+            if(!santriTerpilihNIK) { alert("Pilih nama atau Scan QR santri terlebih dahulu!"); return; }
             
             const jenisIzin = document.getElementById('select-jenis-izin').value;
             const tglMulai = document.getElementById('input-tgl-mulai').value;
@@ -467,7 +461,7 @@
                         nama: namaSantri,
                         kelas: kelasSantri,
                         jenis: jenisIzin,
-                        mulai: tglMulai,
+                        mulai: tglMulai.replace('T', ' '),
                         janji: janjiKembali.replace('T', ' '),
                         alasan: alasan,
                         status: statusAwal
@@ -475,14 +469,14 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
-                    alert("Aktivitas keluar berhasil dilog! Pesan verifikasi cloud telah berjalan.");
+                    alert("Alhamdulillah, proses izin selesai!");
                     resetFormIzin();
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Koneksi cloud bermasalah untuk input perizinan."); }
         }
 
-        async function eksekusiAccPengasuh(idIzin, tindakan) {
+        async function eksekusiAccPortal(idIzin, tindakan) {
             let statusBaru = (tindakan === "SETUJU") ? "DISETUJUI" : "REJECTED";
             try {
                 let res = await fetch(API_URL, {
@@ -491,7 +485,7 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
-                    alert("Status perizinan diperbarui: " + statusBaru);
+                    alert("Status perizinan diperbarui dari Portal: " + statusBaru);
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Gagal update validasi."); }
