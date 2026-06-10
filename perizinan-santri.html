@@ -6,6 +6,7 @@
     <title>Sistem Perizinan Santri - E-Pesantren Core</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body, header, div, section, button, table, td, th, footer, input, select {
             transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
@@ -52,9 +53,42 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-area { display: block !important; border: 2px dashed #000; p: 20px; }
+        }
     </style>
 </head>
 <body class="theme-dark font-sans min-h-screen flex flex-col justify-between dynamic-bg-main text-slate-100">
+
+    <div id="cetak-surat-izin" class="hidden fixed inset-0 bg-white text-slate-900 p-8 font-serif print-area z-[9999]">
+        <div class="text-center border-b-2 border-double border-slate-900 pb-4 mb-6">
+            <h2 class="text-xl font-bold tracking-wide uppercase">PONDOK PESANTREN AL-ANWAR</h2>
+            <p class="text-xs italic">Jl. Raya Pusat No. 01, Ngrukem, Yogyakarta</p>
+            <h1 class="text-lg font-black mt-3 tracking-widest decoration-double underline uppercase">SURAT KETERANGAN IZIN SANTRI</h1>
+        </div>
+        <table class="w-full text-sm mb-6 flex-col gap-2 font-mono">
+            <tr><td class="w-1/3 py-1 font-bold">NAMA SANTRI</td><td id="p-nama">: -</td></tr>
+            <tr><td class="py-1 font-bold">NIK / KELAS</td><td id="p-nik-kelas">: -</td></tr>
+            <tr><td class="py-1 font-bold">HAJAT IZIN</td><td id="p-hajat">: -</td></tr>
+            <tr><td class="py-1 font-bold">ALASAN DETAIL</td><td id="p-alasan">: -</td></tr>
+            <tr><td class="py-1 font-bold">WAKTU KELUAR</td><td id="p-mulai">: -</td></tr>
+            <tr><td class="py-1 font-bold">JANJI KEMBALI</td><td id="p-janji" class="text-red-600 font-black">: -</td></tr>
+        </table>
+        <div class="grid grid-cols-2 text-center text-xs mt-12 font-sans">
+            <div>
+                <p>Mengetahui,</p>
+                <p class="font-bold mt-16">( Pengasuh / Kamtib )</p>
+            </div>
+            <div>
+                <p>Yogyakarta, <span id="p-tgl-cetak">-</span></p>
+                <p class="font-bold mt-16">( Keamanan Gerbang )</p>
+            </div>
+        </div>
+        <p class="text-[9px] text-center mt-12 italic border-t pt-2 border-slate-300 font-sans">Catatan: Surat ini wajib dibawa kembali saat masuk lingkungan pesantren untuk divalidasi barcode/Check-in.</p>
+    </div>
 
     <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-md no-print">
         <div class="flex items-center gap-3">
@@ -72,7 +106,7 @@
         </div>
     </header>
 
-    <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
+    <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1 no-print">
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-sm border-l-4 border-l-amber-500">
@@ -104,6 +138,11 @@
                                 <button onclick="setMetodeInput('CARI')" id="btn-metode-cari" class="py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider">Pencarian NIK/Nama</button>
                                 <button onclick="setMetodeInput('QR')" id="btn-metode-qr" class="py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider"><i class="fa-solid fa-qrcode mr-1"></i> Scan QR Code</button>
                             </div>
+                        </div>
+
+                        <div id="box-qr-scanner" class="hidden border-2 border-dashed border-slate-700 rounded-xl p-2 bg-slate-950">
+                            <div id="reader" style="width: 100%;"></div>
+                            <button onclick="stopQrScanner()" class="w-full mt-2 py-1 bg-rose-600 text-white rounded font-black text-[10px]">TUTUP KAMERA</button>
                         </div>
 
                         <div id="box-pencarian" class="relative">
@@ -186,14 +225,14 @@
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
 
     <script>
-        // MENGGUNAKAN API BACKEND UTAMA ANDA TANPA MENGUBAHNYA
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
-        const TELP_PENGASUH = "085326311019";
+        const WA_GRUP_PENGASUH = "085326311019"; // Ganti dengan nomor Admin/Tautan API Gateway Anda jika ada
         
         let masterSantriCache = []; 
         let databaseIzinGlobal = [];
         let filterTabSekarang = "AKTIF";
         let santriTerpilihNIK = null;
+        let html5QrcodeScanner = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const role = localStorage.getItem('session_role') || "KEAMANAN";
@@ -212,10 +251,9 @@
             document.getElementById('input-janji-kembali').value = besok.toISOString().slice(0,16);
 
             muatDataPerizinan();
-            muatMasterSantri(); // Memanggil fungsi pencari data induk
+            muatMasterSantri();
         });
 
-        // REVISI 1: Menembak 'aksi=ambil_database' sesuai dengan izin yang terdaftar di code1.gs
         async function muatMasterSantri() {
             try {
                 let res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
@@ -229,10 +267,8 @@
         async function muatDataPerizinan() {
             const tbody = document.getElementById('tbl-izin-body');
             try {
-                // Catatan: Jika Anda membuat rekap izin baru di code2.gs, sesuaikan parameternya di sini
                 let res = await fetch(`${API_URL}?aksi=ambil_perizinan`, { method: "GET" });
                 let r = await res.json();
-                
                 if(r.status === "success") {
                     databaseIzinGlobal = r.data || [];
                     kalkulasiStatistikDanRender();
@@ -252,12 +288,9 @@
                 let janjiKembali = new Date(item.Janji_Kembali);
 
                 if(status === "PENDING") pending++;
-                
                 if(status === "DISETUJUI" && (!tglKembali || String(tglKembali).trim() === "")) {
                     diluar++;
-                    if(waktuSekarang > janjiKembali) {
-                        terlambat++;
-                    }
+                    if(waktuSekarang > janjiKembali) terlambat++;
                 }
             });
 
@@ -295,9 +328,9 @@
                 
                 let tglJanji = new Date(item.Janji_Kembali);
                 let isTerlambat = (new Date() > tglJanji && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === ""));
+                let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
                 
                 let badge = "";
-                let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
                 if(statusStr === "PENDING") {
                     badge = `<span class="bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">WAITING PENGASUH</span>`;
                 } else if(isTerlambat) {
@@ -307,19 +340,39 @@
                 }
 
                 if(filterTabSekarang === "RIWAYAT") {
-                    badge = `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">SELESAI / GUGUR ACTIVITI</span>`;
+                    badge = `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">SELESAI</span>`;
                 }
 
-                let aksiButton = `<span class="text-slate-500 text-[10px] italic">No Action Needed</span>`;
+                // MENU AKSI UTAMA DENGAN INTEGRASI WHATSAPP DAN PRINT NYATA
+                let nomorWali = item.No_Wali || ""; 
+                let dataIzinEscaped = encodeURIComponent(JSON.stringify(item));
+
+                let btnKirimWali = nomorWali ? `
+                    <button onclick="kirimSuratWhatsAppWali('${dataIzinEscaped}')" class="p-1 rounded bg-green-600 text-white text-[10px]" title="Kirim WA Wali"><i class="fa-brands fa-whatsapp"></i></button>
+                ` : '';
+
+                let aksiButton = `
+                    <div class="flex justify-end gap-1">
+                        <button onclick="cetakSuratIzinFisik('${dataIzinEscaped}')" class="p-1 rounded bg-slate-700 text-slate-200 text-[10px]" title="Cetak Surat"><i class="fa-solid fa-print"></i></button>
+                        ${btnKirimWali}
+                    </div>
+                `;
+
                 if(statusStr === "PENDING") {
                     aksiButton = `
                         <div class="flex justify-end gap-1.5">
-                            <button onclick="eksekusiAccPengasuh('${item.ID_Izin}', 'SETUJU')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase cursor-pointer hover:bg-emerald-400">ACC</button>
-                            <button onclick="eksekusiAccPengasuh('${item.ID_Izin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase cursor-pointer hover:bg-rose-400">TOLAK</button>
+                            <button onclick="eksekusiAccPengasuh('${item.ID_Izin}', 'SETUJU', '${dataIzinEscaped}')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400">ACC</button>
+                            <button onclick="eksekusiAccPengasuh('${item.ID_Izin}', 'TOLAK', '${dataIzinEscaped}')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400">TOLAK</button>
                         </div>
                     `;
                 } else if(statusStr === "DISETUJUI" && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === "")) {
-                    aksiButton = `<button onclick="tutupIzinManual('${item.ID_Izin}')" class="px-2 py-1 rounded bg-slate-700 text-slate-200 font-black text-[9px] uppercase cursor-pointer hover:bg-slate-600">FORCE CHECK-IN</button>`;
+                    aksiButton = `
+                        <div class="flex justify-end gap-1.5 items-center">
+                            <button onclick="cetakSuratIzinFisik('${dataIzinEscaped}')" class="p-1 rounded bg-slate-700 text-slate-200 text-[10px]" title="Cetak Fisik"><i class="fa-solid fa-print"></i></button>
+                            ${btnKirimWali}
+                            <button onclick="tutupIzinManual('${item.ID_Izin}')" class="px-2 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 font-black text-[9px] uppercase hover:bg-slate-600">CHECK-IN</button>
+                        </div>
+                    `;
                 }
 
                 row.innerHTML = `
@@ -341,11 +394,9 @@
             });
         }
 
-        // REVISI 2: Menyesuaikan properti pencarian karena code1.gs mengembalikan lowercase objek key (nik, nama, kelas)
         function cariLiveSantri() {
             const query = document.getElementById('input-nik-nama').value.toUpperCase().trim();
             const dropdown = document.getElementById('dropdown-hasil-cari');
-            
             if(query.length < 2) { dropdown.classList.add('hidden'); return; }
             dropdown.innerHTML = "";
 
@@ -364,9 +415,7 @@
                 let div = document.createElement('div');
                 div.className = "p-2 rounded-lg text-left text-slate-300 hover:bg-blue-600 hover:text-white cursor-pointer font-bold text-[11px] uppercase transition-all";
                 div.innerHTML = `<div>${s.nama}</div><div class="text-[9px] opacity-75 font-mono">${s.nik} - ${s.kelas || '-'}</div>`;
-                div.onclick = () => {
-                    kunciPilihanSantri(s.nik, s.nama, s.kelas || 'Tanpa Kelas');
-                };
+                div.onclick = () => kunciPilihanSantri(s.nik, s.nama, s.kelas || 'Tanpa Kelas');
                 dropdown.appendChild(div);
             });
             dropdown.classList.remove('hidden');
@@ -376,34 +425,76 @@
             santriTerpilihNIK = nik;
             document.getElementById('input-nik-nama').value = nik;
             document.getElementById('dropdown-hasil-cari').classList.add('hidden');
-
             document.getElementById('prev-nama').innerText = nama;
             document.getElementById('prev-kelas').innerText = kelas;
             document.getElementById('preview-santri').classList.remove('hidden');
+            stopQrScanner();
         }
 
-        async function prosesUsulkanIzin() {
-            if(!santriTerpilihNIK) { alert("Pilih / kunci nama santri dari sistem pencarian terlebih dahulu, Bos!"); return; }
-            
-            let cekDoble = databaseIzinGlobal.find(item => item.NIK === santriTerpilihNIK && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === ""));
-            if(cekDoble) {
-                alert(`PROTEKSI DIKUNCI! Santri ini terdeteksi masih berstatus di LUAR PONDOK atau memiliki izin aktif.`);
-                return;
+        // =========================================================================
+        // IMPLEMENTASI AMBIL DATA DARI KAMERA QR CODE
+        // =========================================================================
+        function setMetodeInput(m) {
+            const btnCari = document.getElementById('btn-metode-cari');
+            const btnQR = document.getElementById('btn-metode-qr');
+            if(m === "CARI") {
+                btnCari.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider";
+                btnQR.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider";
+                document.getElementById('box-pencarian').classList.remove('hidden');
+                stopQrScanner();
+            } else {
+                btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider";
+                btnQR.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider";
+                document.getElementById('box-pencarian').classList.add('hidden');
+                startQrScanner();
             }
+        }
 
+        function startQrScanner() {
+            document.getElementById('box-qr-scanner').classList.remove('hidden');
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    let sKetemu = masterSantriCache.find(s => s.nik.toString().trim() === decodedText.toString().trim());
+                    if(sKetemu) {
+                        kunciPilihanSantri(sKetemu.nik, sKetemu.nama, sKetemu.kelas);
+                        alert("SANTRI TERDETEKSI: " + sKetemu.nama);
+                    } else {
+                        alert("QR Code terbaca: " + decodedText + " (Tidak ada di master_santri)");
+                    }
+                },
+                (errorMessage) => {}
+            ).catch(err => { console.error("Kamera gagal diakses.", err); });
+        }
+
+        function stopQrScanner() {
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById('box-qr-scanner').classList.add('hidden');
+                }).catch(err => {});
+            }
+        }
+
+        // =========================================================================
+        // FITUR OTOMATISASI DAN NOTIFIKASI WHATSAPP
+        // =========================================================================
+        async function prosesUsulkanIzin() {
+            if(!santriTerpilihNIK) { alert("Pilih nama/Scan QR santri dahulu!"); return; }
+            
             const jenisIzin = document.getElementById('select-jenis-izin').value;
             const tglMulai = document.getElementById('input-tgl-mulai').value;
             const janjiKembali = document.getElementById('input-janji-kembali').value;
             const alasan = document.getElementById('input-alasan').value;
             const namaSantri = document.getElementById('prev-nama').innerText;
+            const kelasSantri = document.getElementById('prev-kelas').innerText;
 
-            let statusAwal = "DISETUJUI";
-            
-            if(jenisIzin === "PULANG") {
-                statusAwal = "PENDING";
-                let pesanWA = `Assalamu'alaikum Wr. Wb. Pengasuh E-Pesantren, mengusulkan izin PULANG atas Nama: ${namaSantri} (${document.getElementById('prev-kelas').innerText}), Alasan: ${alasan}.`;
-                window.open(`https://api.whatsapp.com/send?phone=${TELP_PENGASUH}&text=${encodeURIComponent(pesanWA)}`, '_blank');
-            }
+            let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
+
+            // Trigger Otomatis Kirim Notifikasi ke Pengasuh/Grup Pengasuh saat Izin dibuat
+            let pesanGrup = `*LOG USULAN PERIZINAN BARU*\n----------------------------------------\n*Santri:* ${namaSantri}\n*Kelas:* ${kelasSantri}\n*Hajat:* ${jenisIzin}\n*Alasan:* ${alasan}\n*Rencana Keluar:* ${formatTanggalLokal(tglMulai)}\n*Target Kembali:* ${formatTanggalLokal(janjiKembali)}\n*Status:* __${statusAwal}__\n\n_Mohon Admin/Pengasuh cek Dashboard Portal Perizinan untuk validasi._`;
+            window.open(`https://api.whatsapp.com/send?phone=${WA_GRUP_PENGASUH}&text=${encodeURIComponent(pesanGrup)}`, '_blank');
 
             try {
                 let res = await fetch(API_URL, {
@@ -412,7 +503,7 @@
                         aksi: "simpan_usulan_izin",
                         nik: santriTerpilihNIK,
                         nama: namaSantri,
-                        kelas: document.getElementById('prev-kelas').innerText,
+                        kelas: kelasSantri,
                         jenis: jenisIzin,
                         mulai: tglMulai,
                         janji: janjiKembali,
@@ -422,14 +513,39 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
-                    alert(jenisIzin === "PULANG" ? "Usulan berhasil dikirim ke sistem & notifikasi pengasuh dipicu!" : "Izin Auto-ACC Berhasil dimasukkan ke Log!");
+                    alert("Catatan Izin Berhasil Disimpan ke Sheet & Log Notifikasi Dikirim!");
                     resetFormIzin();
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Koneksi cloud bermasalah untuk input perizinan."); }
         }
 
-        async function eksekusiAccPengasuh(idIzin, tindakan) {
+        // CETAK SURAT IZIN FISIK SECARA NYATA
+        function cetakSuratIzinFisik(dataEscaped) {
+            let item = JSON.parse(decodeURIComponent(dataEscaped));
+            document.getElementById('p-nama').innerText = `: ${item.Nama_Santri}`;
+            document.getElementById('p-nik-kelas').innerText = `: ${item.NIK} / ${item.Kelas || '-'}`;
+            document.getElementById('p-hajat').innerText = `: ${item.Jenis_Izin}`;
+            document.getElementById('p-alasan').innerText = `: ${item.Alasan || '-'}`;
+            document.getElementById('p-mulai').innerText = `: ${formatTanggalLokal(item.Tgl_Mulai || item.Timestamp)}`;
+            document.getElementById('p-janji').innerText = `: ${formatTanggalLokal(item.Janji_Kembali)}`;
+            document.getElementById('p-tgl-cetak').innerText = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'});
+            
+            window.print();
+        }
+
+        // BERBAGI NOTIFIKASI SURAT IZIN RESMI KE WHATSAPP WALI SANTRI
+        function kirimSuratWhatsAppWali(dataEscaped) {
+            let item = JSON.parse(decodeURIComponent(dataEscaped));
+            let noWaliClean = item.No_Wali.toString().replace(/[^0-9]/g, '');
+            if(noWaliClean.startsWith('0')) noWaliClean = '62' + noWaliClean.slice(1);
+
+            let teksWali = `*SURAT IZIN SANTRI RESMI*\n_Pondok Pesantren Al-Anwar_\n\n*Pemberitahuan Wali Santri:*\nAnanda *${item.Nama_Santri}* (${item.Kelas}) telah diberikan izin meninggalkan area pesantren untuk keperluan *${item.Jenis_Izin}* (${item.Alasan || '-'}).\n\n*Waktu Keluar:* ${formatTanggalLokal(item.Tgl_Mulai || item.Timestamp)}\n*Batas Kembali:* ${formatTanggalLokal(item.Janji_Kembali)}\n\n_Dimohon Bapak/Ibu Wali untuk ikut memantau pergerakan ananda agar kembali ke pesantren tepat waktu sesuai aturan kesepakatan sanksi takziran._`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=${noWaliClean}&text=${encodeURIComponent(teksWali)}`, '_blank');
+        }
+
+        async function eksekusiAccPengasuh(idIzin, tindakan, dataEscaped) {
             let statusBaru = (tindakan === "SETUJU") ? "DISETUJUI" : "REJECTED";
             try {
                 let res = await fetch(API_URL, {
@@ -438,13 +554,14 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
+                    alert("Status perizinan diperbarui: " + statusBaru);
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Gagal update validasi."); }
         }
 
         async function tutupIzinManual(idIzin) {
-            if(!confirm("Tutup perizinan ini secara manual?")) return;
+            if(!confirm("Proses santri Check-In masuk pondok?")) return;
             try {
                 let res = await fetch(API_URL, {
                     method: "POST",
@@ -455,20 +572,6 @@
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Gagal memproses check-in."); }
-        }
-
-        function setMetodeInput(m) {
-            const btnCari = document.getElementById('btn-metode-cari');
-            const btnQR = document.getElementById('btn-metode-qr');
-            if(m === "CARI") {
-                btnCari.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider";
-                btnQR.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider";
-                document.getElementById('box-pencarian').classList.remove('hidden');
-            } else {
-                btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider";
-                btnQR.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider";
-                alert("Kamera Scanner QR Diaktifkan.");
-            }
         }
 
         function gantiTabFilter(tab) {
