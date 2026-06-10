@@ -69,7 +69,7 @@
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div>
-                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">REKAP TAKZIRAN & POIN HARIAN</h1>
+                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">REKAP TAKZIRAN & POIN KEDISIPLINAN</h1>
                 <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">SISTEM INTEGRASI</span>
             </div>
         </div>
@@ -83,7 +83,7 @@
         </div>
     </header>
 
-    <main id="area-cetak" class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
+    <main id="area-cetak" class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
         
         <div class="hidden print:flex flex-col items-center text-center border-b-4 border-double border-slate-900 pb-4 mb-4">
             <h2 class="text-lg font-black tracking-wide uppercase">PONDOK PESANTREN MODERN PUSAT YOGYAKARTA (PPMUY)</h2>
@@ -95,10 +95,11 @@
             <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3 w-full lg:w-auto flex-1">
                 
                 <div class="flex flex-col gap-1">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Golongan</label>
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Kelas / Golongan</label>
                     <select id="filter-golongan" onchange="filterDanRenderData()" class="w-full sm:w-44 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
-                        <option value="SANTRI" selected>SANTRI</option>
-                        <option value="USTADZ">USTADZ</option>
+                        <option value="SEMUA">-- SEMUA KELAS --</option>
+                        <option value="SANTRI" selected>SANTRI MURNI</option>
+                        <option value="USTADZ">USTADZ / PENGURUS</option>
                     </select>
                 </div>
 
@@ -112,9 +113,9 @@
                 </div>
 
                 <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
-                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Takzir</label>
+                    <label class="text-[9px] font-black tracking-wider text-slate-400 uppercase">Status Sanksi Harian</label>
                     <select id="filter-status" onchange="filterDanRenderData()" class="w-full sm:w-48 dynamic-bg-inner border dynamic-border text-xs font-bold px-3 py-2 rounded-xl text-slate-300 focus:outline-none focus:border-yellow-500">
-                        <option value="SEMUA">-- ALL STATUS --</option>
+                        <option value="SEMUA" selected>-- ALL STATUS --</option>
                         <option value="AMAN">🟢 AMAN</option>
                         <option value="TEGURAN RINGAN">🟡 TEGURAN RINGAN</option>
                         <option value="TAKZIR SEDANG">🟠 TAKZIR SEDANG</option>
@@ -140,18 +141,19 @@
                     <thead>
                         <tr class="border-b-2 dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
                             <th class="py-3 px-2 w-20">NIK</th>
-                            <th class="py-3 px-2 w-44">NAMA LENGKAP</th>
+                            <th class="py-3 px-2 w-48">NAMA LENGKAP</th>
                             <th class="py-3 px-2 text-center w-14">GNDR</th>
-                            <th class="py-3 px-2 text-center w-20">JUMLAH POIN</th>
-                            <th class="py-3 px-2">ISI TAKZIRAN (HUMANIS-EDUKATIF)</th>
+                            <th class="py-3 px-2 text-center w-24">POIN HARIAN</th>
+                            <th class="py-3 px-2 text-center w-36">AKUMULASI MINGGUAN</th>
+                            <th class="py-3 px-2">DESKRIPSI SANKSI / TAKZIRAN</th>
                             <th class="py-3 px-2 text-right w-36">STATUS TINGKAT</th>
                         </tr>
                     </thead>
                     <tbody id="tbl-rekap-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
+                            <td colspan="7" class="py-12 text-center text-slate-400 uppercase font-bold tracking-widest italic">
                                 <i class="fa-solid fa-spinner animate-spin text-lg text-yellow-500 block mb-2"></i>
-                                Memuat & Mengalkulasi Sesi Log Harian...
+                                Memuat & Mengalkulasi Sesi Log Harian Server...
                             </td>
                         </tr>
                     </tbody>
@@ -188,19 +190,22 @@
                 let res = await fetch(`${API_URL}?aksi=ambil_rekap_takziran_harian`);
                 let r = await res.json();
                 
-                if (r.status === "success") {
+                // Mendukung format respons data murni array maupun pembungkus {status: "success", data: [...]}
+                if (Array.isArray(r)) {
+                    masterDataMentah = r;
+                    filterDanRenderData();
+                } else if (r.status === "success" || r.data) {
                     masterDataMentah = r.data;
                     filterDanRenderData();
                 } else {
-                    throw new Error(r.message || "Gagal mendapatkan data.");
+                    throw new Error(r.message || "Gagal memproses struktur data json.");
                 }
             } catch (err) {
                 console.error(err);
-                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="6" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran Server.</td></tr>`;
+                document.getElementById('tbl-rekap-body').innerHTML = `<tr><td colspan="7" class="py-4 text-center text-red-500 font-bold uppercase">Gagal Menyinkronkan Log Rekap Takziran Server.</td></tr>`;
             }
         }
 
-        // Fungsi pewarnaan badge otomatis dinamis berdasarkan teks status dari Sheet Anda
         function dapatkanWarnaBadge(status) {
             const s = String(status).toUpperCase();
             if (s.includes("AMAN")) return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
@@ -208,7 +213,7 @@
             if (s.includes("SEDANG")) return "bg-orange-500/15 text-orange-600 dark:text-orange-400";
             if (s.includes("KERAS")) return "bg-rose-500/15 text-rose-600 dark:text-rose-400";
             if (s.includes("BERAT")) return "bg-red-600 text-white dark:bg-red-950 dark:text-red-300";
-            return "bg-slate-950 text-yellow-400 border border-yellow-500"; // Untuk status DARURAT / EVALUASI
+            return "bg-slate-950 text-yellow-400 border border-yellow-500"; 
         }
 
         function filterDanRenderData() {
@@ -222,14 +227,23 @@
             tblBody.innerHTML = '';
 
             let dataTersaring = masterDataMentah.filter(item => {
-                // Menyamakan properti agar fleksibel terhadap huruf besar/kecil key JSON dari Apps Script
-                const itemGolongan = String(item.golongan || item.Golongan || "SANTRI").toUpperCase();
-                const itemGender = String(item.gender || item.Gender || "").toUpperCase();
-                const itemNama = String(item.nama || item.Nama || "").toUpperCase();
-                const itemNik = String(item.nik || item.NIK || "");
-                const itemStatus = String(item.status || item.Status || "").toUpperCase();
+                // Penyelarasan properti multi-case (CamelCase dan PascalCase dari double mapping)
+                const itemGolongan = String(item["Kelas/Golongan"] || item.golongan || item.Golongan || "SANTRI").toUpperCase();
+                const itemGender = String(item.Gender || item.gender || "").toUpperCase();
+                const itemNama = String(item.Nama || item.nama || "").toUpperCase();
+                const itemNik = String(item.NIK || item.nik || "");
+                const itemStatus = String(item["Status (Harian)"] || item.status || "").toUpperCase();
 
-                let matchGol = (itemGolongan === golSelected);
+                // Evaluasi kecocokan filter golongan
+                let matchGol = false;
+                if (golSelected === "SEMUA") {
+                    matchGol = true;
+                } else if (golSelected === "SANTRI") {
+                    matchGol = (!itemGolongan.includes("USTADZ") && !itemGolongan.includes("PENGURUS"));
+                } else {
+                    matchGol = (itemGolongan.includes("USTADZ") || itemGolongan.includes("PENGURUS"));
+                }
+
                 let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
                 let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
                 let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
@@ -238,18 +252,19 @@
             });
 
             if (dataTersaring.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap takziran ditemukan yang cocok.</td></tr>`;
+                tblBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-slate-400 uppercase font-black text-[10px] tracking-wider">Tidak ada rekap data kedisiplinan yang cocok dengan parameter filter.</td></tr>`;
                 return;
             }
 
             dataTersaring.forEach(item => {
-                // Mapping property murni dari kolom Google Sheet Anda
-                const nik = item.nik || item.NIK || "-";
-                const nama = item.nama || item.Nama || "-";
-                const gender = String(item.gender || item.Gender || "L").toUpperCase();
-                const jumlahPoin = item.jumlah_poin || item["Jumlah Poin"] || 0;
-                const isiTakziran = item.isi_takziran || item["Isi Takziran"] || "Tidak ada keterangan takziran.";
-                const statusStr = item.status || item.Status || "AMAN";
+                // Ekstraksi nilai aman dari double mapping Apps Script
+                const nik = item.NIK || item.nik || "-";
+                const nama = item.Nama || item.nama || "-";
+                const gender = String(item.Gender || item.gender || "L").toUpperCase();
+                const poinHarian = item["Poin Harian"] || item.poin_harian || 0;
+                const poinMingguanStatus = item["Poin Mingguan + Status"] || item.poin_mingguan_status || "0 (AMAN)";
+                const isiTakziran = item["Isi Takziran (Harian)"] || item.isi_takziran_harian || "Pertahankan kedisiplinan.";
+                const statusStr = item["Status (Harian)"] || item.status || "AMAN";
 
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
@@ -264,7 +279,8 @@
                     <td class="py-3 px-2 font-mono dynamic-text-muted text-[11px] tracking-wide">${nik}</td>
                     <td class="py-3 px-2 uppercase font-black tracking-wide">${nama}</td>
                     <td class="py-3 px-2 text-center font-bold">${badgeGender}</td>
-                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${parseInt(jumlahPoin) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${jumlahPoin} Ppt</td>
+                    <td class="py-3 px-2 text-center font-mono text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</td>
+                    <td class="py-3 px-2 text-center font-mono text-[11px] text-slate-400">${poinMingguanStatus}</td>
                     <td class="py-3 px-2 text-[11px] font-medium leading-relaxed max-w-sm">${isiTakziran}</td>
                     <td class="py-3 px-2 text-right">
                         <span class="badge-print px-2.5 py-1 rounded-md text-[9px] font-black tracking-wider inline-block ${warnaBadge}">
