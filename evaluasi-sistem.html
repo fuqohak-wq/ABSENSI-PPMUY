@@ -46,15 +46,6 @@
         .dynamic-border-row { border-color: var(--border-row); }
         .dynamic-text-row { color: var(--text-row); }
 
-        /* Batasi tinggi teks takziran agar seragam dan rapi di layar hp */
-        .truncate-two-lines {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
         @media print {
             body * { visibility: hidden; background: transparent !important; color: #000 !important; }
             #area-cetak, #area-cetak * { visibility: visible; }
@@ -201,7 +192,6 @@
                     throw new Error(r.message || "Gagal memproses struktur data json.");
                 }
 
-                // Jalankan deteksi dropdown kelas otomatis & render
                 inisialisasiFilterKelasDinamis();
                 filterDanRenderData();
 
@@ -221,7 +211,6 @@
             return "bg-slate-950 text-yellow-400 border border-yellow-500"; 
         }
 
-        // Fungsi otomatis mendeteksi seluruh kelas unik yang ada di data server
         function inisialisasiFilterKelasDinamis() {
             const selectKelas = document.getElementById('filter-kelas');
             if (!selectKelas) return;
@@ -243,7 +232,6 @@
                 }
             });
 
-            // Urutkan alfabet nama kelas agar rapi
             daftarKelasUnik.sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
 
             daftarKelasUnik.forEach(kls => {
@@ -256,7 +244,6 @@
             if (nilaiSekarang) selectKelas.value = nilaiSekarang;
         }
 
-        // Fungsi utama filter dan render menggunakan struktur layout "Satu Baris, Dua Lantai" (Compact Screen)
         function filterDanRenderData() {
             const tblBody = document.getElementById('tbl-rekap-body');
             const golSelected = document.getElementById('filter-golongan').value;
@@ -280,7 +267,6 @@
                 const itemNik = String(item.nik || item.NIK || "");
                 const itemStatus = String(item["Status (Harian)"] || item.status || "").toUpperCase();
 
-                // 1. Filter Golongan (Santri vs Ustadz)
                 let matchGol = false;
                 if (golSelected === "SEMUA") {
                     matchGol = true;
@@ -290,13 +276,8 @@
                     matchGol = (itemGolongan.includes("USTADZ") || itemGolongan.includes("PENGURUS"));
                 }
 
-                // 2. Filter Spesifik Kelas
                 let matchKelas = (kelasSelected === "SEMUA" || itemGolongan === kelasSelected);
-
-                // 3. Filter Gender Mutlak (Sangat Saklek & Akurat sesuai Google Sheet)
                 let matchGen = (genSelected === "SEMUA" || itemGender === genSelected);
-                
-                // 4. Pencarian Kata Kunci Nama / NIK & Status Sanksi
                 let matchCari = (itemNama.includes(cariKeyword) || itemNik.includes(cariKeyword));
                 let matchStatus = (statusSelected === "SEMUA" || itemStatus.includes(statusSelected));
 
@@ -308,52 +289,36 @@
                 return;
             }
 
-            // Loop rendering baris tabel ringkas "Satu Baris, Dua Lantai"
+            // Loop rendering baris tabel SUPER CLEAN (Hanya Nama Jelas, Poin, dan Takziran Full)
             dataTersaring.forEach(item => {
                 const nama = item.nama || item.Nama || "-";
-                const gender = String(item.gender || item.Gender || "LAKI-LAKI").toUpperCase();
-                const kelas = String(item["Kelas/Golongan"] || item.kelas || "-").toUpperCase();
                 const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : (item.poin_harian !== undefined ? item.poin_harian : 0);
-                const poinMingguanStatus = item["Poin Mingguan + Status"] || item.poin_mingguan_status || "0 (AMAN)";
                 const isiTakziran = item["Isi Takziran (Harian)"] || item.isi_takziran_harian || "Pertahankan kedisiplinan.";
                 const statusStr = item["Status (Harian)"] || item.status || "AMAN";
 
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-slate-500/5 transition-colors";
                 
-                // Tampilan Label Gender Mini Berdasarkan Nilai Saklek Google Sheet
-                let badgeGender = (gender === "LAKI-LAKI") 
-                    ? `<span class="text-sky-500 bg-sky-500/10 px-1 rounded text-[9px] font-black shrink-0">LPA</span>` 
-                    : `<span class="text-pink-500 bg-pink-500/10 px-1 rounded text-[9px] font-black shrink-0">LPI</span>`;
-
                 let warnaBadge = dapatkanWarnaBadge(statusStr);
 
-                // Ekstrasi Angka Poin Mingguan Sejajar
-                let angkaMingguan = poinMingguanStatus.split(' ')[0] || "0";
-
-                // LAYOUT SATU BARIS DUA LANTAI (COMPACT SCREEN - ANTI GESER KANAN KIRI)
+                // DESAIN MINIMALIS UTK HP: BEBAS ATRIBUT BERULANG & TEXT TAKZIRAN TERBUKA LEBAR (FULL TEXT)
                 tr.innerHTML = `
-                    <td class="py-2.5 px-2 sm:px-3 block w-full">
-                        <div class="flex items-center justify-between gap-1 w-full">
-                            <div class="truncate flex items-center gap-1.5 max-w-[60%]">
-                                ${badgeGender}
-                                <span class="font-black text-xs tracking-wide uppercase truncate text-slate-200 dark:text-slate-100">${nama}</span>
-                                <span class="text-[9px] font-bold text-slate-400 shrink-0">(${kelas})</span>
+                    <td class="py-3 px-2 sm:px-3 block w-full">
+                        <div class="flex items-center justify-between gap-2 w-full">
+                            <div class="truncate max-w-[75%]">
+                                <span class="font-black text-sm tracking-wide uppercase text-slate-100 dark:text-slate-100 block truncate">${nama}</span>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <div class="flex flex-col items-end leading-none">
-                                    <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
-                                    <span class="text-[9px] text-slate-400 font-mono mt-0.5">Wk: ${angkaMingguan} Pts</span>
-                                </div>
-                                <span class="badge-print px-2 py-0.5 rounded text-[8px] sm:text-[9px] font-black tracking-wider inline-block ${warnaBadge} uppercase shrink-0">
-                                    ${statusStr.replace('AMAN', 'AMN').replace('TEGURAN RINGAN', 'TEGURAN RGN').toUpperCase()}
+                                <span class="text-xs font-black ${parseInt(poinHarian) > 0 ? 'text-rose-500' : 'text-emerald-500'}">${poinHarian} Pts</span>
+                                <span class="badge-print px-1.5 py-0.5 rounded text-[8px] font-black tracking-wider inline-block ${warnaBadge} uppercase shrink-0">
+                                    ${statusStr.replace('AMN', 'AMAN').toUpperCase()}
                                 </span>
                             </div>
                         </div>
                         
-                        <div class="text-[10px] text-slate-400 font-medium leading-relaxed mt-1 pl-1 flex items-start gap-1">
+                        <div class="text-[11px] text-slate-400 dark:text-slate-300 font-medium leading-relaxed mt-1.5 pl-0.5 flex items-start gap-1.5">
                             <span class="text-amber-500 shrink-0 font-bold">❯</span>
-                            <span class="truncate-two-lines italic">${isiTakziran}</span>
+                            <span class="italic break-words w-full">${isiTakziran}</span>
                         </div>
                     </td>
                 `;
