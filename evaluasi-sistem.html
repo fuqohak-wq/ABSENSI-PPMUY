@@ -234,7 +234,7 @@
                 let kelasRaw = String(item["Kelas/Golongan"] || item.kelas || "").trim();
                 let kelasUpper = kelasRaw.toUpperCase();
                 
-                if (kelasRaw && !kelasUpper.includes("USTADZ") && !kelasUpper.includes("PENGURUS")) {
+                if (kelasRaw) {
                     if (!daftarKelasUnik.includes(kelasUpper)) {
                         daftarKelasUnik.push(kelasUpper);
                     }
@@ -246,7 +246,12 @@
             daftarKelasUnik.forEach(kls => {
                 let opt = document.createElement('option');
                 opt.value = kls;
-                opt.textContent = `KELAS ${kls}`;
+                // Jika data mengandung kata USTADZ/PENGURUS, tidak perlu ditambah embel-embel tulisan "KELAS" di depannya
+                if (kls.includes("USTADZ") || kls.includes("PENGURUS")) {
+                    opt.textContent = kls;
+                } else {
+                    opt.textContent = `KELAS ${kls}`;
+                }
                 selectKelas.appendChild(opt);
             });
 
