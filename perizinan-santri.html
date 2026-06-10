@@ -106,10 +106,10 @@
                             </div>
                         </div>
 
-                        <div id="box-pencarian">
+                        <div id="box-pencarian" class="relative">
                             <label class="block text-[10px] text-slate-400 uppercase mb-1">NIK atau Nama Santri</label>
-                            <input type="text" id="input-nik-nama" onkeyup="cariLiveSantri()" placeholder="Ketik NIK atau sebagian Nama..." class="w-full p-2.5 rounded-xl bg-slate-900/10 border dynamic-border text-xs focus:border-blue-500 outline-none">
-                            <div id="dropdown-hasil-cari" class="hidden max-h-40 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl mt-1 p-1 flex flex-col gap-1 absolute z-50 w-[240px]"></div>
+                            <input type="text" id="input-nik-nama" onkeyup="cariLiveSantri()" placeholder="Ketik NIK atau sebagian Nama..." class="w-full p-2.5 rounded-xl bg-slate-900/10 border border-slate-700 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                            <div id="dropdown-hasil-cari" class="hidden max-h-40 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl mt-1 p-1 flex flex-col gap-1 absolute z-50 w-full left-0 shadow-xl"></div>
                         </div>
 
                         <div id="preview-santri" class="hidden dynamic-bg-inner p-3 rounded-xl border border-dashed dynamic-border">
@@ -186,6 +186,7 @@
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
 
     <script>
+        // MENGGUNAKAN API BACKEND UTAMA ANDA TANPA MENGUBAHNYA
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         const TELP_PENGASUH = "085326311019";
         
@@ -195,15 +196,12 @@
         let santriTerpilihNIK = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Ambil session login untuk sinkronisasi role tampilan
-            const nama = localStorage.getItem('session_nama') || "Petugas Gerbang";
             const role = localStorage.getItem('session_role') || "KEAMANAN";
             document.getElementById('txt-role-badge').innerText = role;
 
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Set default datetime input ke waktu sekarang
             let skrg = new Date();
             skrg.setMinutes(skrg.getMinutes() - skrg.getTimezoneOffset());
             document.getElementById('input-tgl-mulai').value = skrg.toISOString().slice(0,16);
@@ -214,13 +212,13 @@
             document.getElementById('input-janji-kembali').value = besok.toISOString().slice(0,16);
 
             muatDataPerizinan();
-            muatMasterSantri();
+            muatMasterSantri(); // Memanggil fungsi pencari data induk
         });
 
-        // AMBIL MASTER DATA SANTRI UNTUK FITUR SMART SEARCH NIK/NAMA
+        // REVISI 1: Menembak 'aksi=ambil_database' sesuai dengan izin yang terdaftar di code1.gs
         async function muatMasterSantri() {
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_santri`, { method: "GET" });
+                let res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
                 let r = await res.json();
                 if(r.status === "success") {
                     masterSantriCache = r.data || [];
@@ -228,10 +226,10 @@
             } catch(e) { console.error("Gagal sinkronisasi master cache santri", e); }
         }
 
-        // AMBIL DATA REKAP PERIZINAN DARI GOOGLE SHEET
         async function muatDataPerizinan() {
             const tbody = document.getElementById('tbl-izin-body');
             try {
+                // Catatan: Jika Anda membuat rekap izin baru di code2.gs, sesuaikan parameternya di sini
                 let res = await fetch(`${API_URL}?aksi=ambil_perizinan`, { method: "GET" });
                 let r = await res.json();
                 
@@ -244,7 +242,6 @@
             }
         }
 
-        // HITUNG COUNTER ATAS & PILIH DATA YANG DI-RENDER KE TABEL
         function kalkulasiStatistikDanRender() {
             let pending = 0, diluar = 0, terlambat = 0;
             let waktuSekarang = new Date();
@@ -271,7 +268,6 @@
             renderTabelIzin();
         }
 
-        // ATUR RENDER DATA BERDASARKAN FILTER TAB YANG AKTIF
         function renderTabelIzin() {
             const tbody = document.getElementById('tbl-izin-body');
             if(!tbody) return;
@@ -282,10 +278,8 @@
                 let status = String(item.Status_Persetujuan || "").toUpperCase();
                 
                 if(filterTabSekarang === "AKTIF") {
-                    // Tampilkan yang masih pending atau yang masih di luar pondok (belum klik kembali/belum scan gugur)
                     return (status === "PENDING" || (status === "DISETUJUI" && (!tglKembali || String(tglKembali).trim() === "")));
                 } else {
-                    // Riwayat histori yang sudah kembali/sehat/gugur
                     return (status === "REJECTED" || status === "SELESAI" || (tglKembali && String(tglKembali).trim() !== ""));
                 }
             });
@@ -302,7 +296,6 @@
                 let tglJanji = new Date(item.Janji_Kembali);
                 let isTerlambat = (new Date() > tglJanji && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === ""));
                 
-                // Badge Status Desain Kreatif
                 let badge = "";
                 let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
                 if(statusStr === "PENDING") {
@@ -317,7 +310,6 @@
                     badge = `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">SELESAI / GUGUR ACTIVITI</span>`;
                 }
 
-                // Kolom Aksi Khusus Pengurus/Validator
                 let aksiButton = `<span class="text-slate-500 text-[10px] italic">No Action Needed</span>`;
                 if(statusStr === "PENDING") {
                     aksiButton = `
@@ -327,7 +319,6 @@
                         </div>
                     `;
                 } else if(statusStr === "DISETUJUI" && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === "")) {
-                    // Keamanan bisa menutup manual jika santri lupa scan wajah kegiatan
                     aksiButton = `<button onclick="tutupIzinManual('${item.ID_Izin}')" class="px-2 py-1 rounded bg-slate-700 text-slate-200 font-black text-[9px] uppercase cursor-pointer hover:bg-slate-600">FORCE CHECK-IN</button>`;
                 }
 
@@ -350,7 +341,7 @@
             });
         }
 
-        // FITUR LIVE SEARCH SMART PADA INPUT NIK/NAMA SANTRI
+        // REVISI 2: Menyesuaikan properti pencarian karena code1.gs mengembalikan lowercase objek key (nik, nama, kelas)
         function cariLiveSantri() {
             const query = document.getElementById('input-nik-nama').value.toUpperCase().trim();
             const dropdown = document.getElementById('dropdown-hasil-cari');
@@ -361,10 +352,10 @@
             let cocok = masterSantriCache.filter(s => 
                 String(s.nama || "").toUpperCase().includes(query) || 
                 String(s.nik || "").toUpperCase().includes(query)
-            ).slice(0, 5); // Ambil top 5 kemiripan data
+            ).slice(0, 5); 
 
             if(cocok.length === 0) {
-                dropdown.innerHTML = `<div class="p-2 text-[10px] text-slate-400 italic font-medium">Santri tidak terdaftar...</div>`;
+                dropdown.innerHTML = `<div class="p-2 text-[10px] text-slate-400 italic font-medium">Santri tidak ditemukan...</div>`;
                 dropdown.classList.remove('hidden');
                 return;
             }
@@ -372,9 +363,9 @@
             cocok.forEach(s => {
                 let div = document.createElement('div');
                 div.className = "p-2 rounded-lg text-left text-slate-300 hover:bg-blue-600 hover:text-white cursor-pointer font-bold text-[11px] uppercase transition-all";
-                div.innerHTML = `<div>${s.nama}</div><div class="text-[9px] opacity-75 font-mono">${s.nik} - ${s.kelas}</div>`;
+                div.innerHTML = `<div>${s.nama}</div><div class="text-[9px] opacity-75 font-mono">${s.nik} - ${s.kelas || '-'}</div>`;
                 div.onclick = () => {
-                    kunciPilihanSantri(s.nik, s.nama, s.kelas);
+                    kunciPilihanSantri(s.nik, s.nama, s.kelas || 'Tanpa Kelas');
                 };
                 dropdown.appendChild(div);
             });
@@ -391,14 +382,12 @@
             document.getElementById('preview-santri').classList.remove('hidden');
         }
 
-        // LOGIKA BIROKRASI PERIZINAN BERDASARKAN JENIS HAJAT
         async function prosesUsulkanIzin() {
             if(!santriTerpilihNIK) { alert("Pilih / kunci nama santri dari sistem pencarian terlebih dahulu, Bos!"); return; }
             
-            // 1. PROTEKSI IZIN GANDA: Periksa apakah santri ini datanya masih aktif di luar pondok
             let cekDoble = databaseIzinGlobal.find(item => item.NIK === santriTerpilihNIK && (!item.Tgl_Kembali || String(item.Tgl_Kembali).trim() === ""));
             if(cekDoble) {
-                alert(`PROTEKSI DIKUNCI! Santri ini terdeteksi masih berstatus di LUAR PONDOK atau memiliki izin aktif. Tidak bisa mengajukan izin ganda sebelum melakukan scan wajah kegiatan pondok.`);
+                alert(`PROTEKSI DIKUNCI! Santri ini terdeteksi masih berstatus di LUAR PONDOK atau memiliki izin aktif.`);
                 return;
             }
 
@@ -408,18 +397,14 @@
             const alasan = document.getElementById('input-alasan').value;
             const namaSantri = document.getElementById('prev-nama').innerText;
 
-            let statusAwal = "DISETUJUI"; // Default untuk Sakit / Keluar Sebentar (Auto-ACC)
+            let statusAwal = "DISETUJUI";
             
-            // 2. CABANG PULANG: Operasional diarahkan via notifikasi Pengasuh
             if(jenisIzin === "PULANG") {
                 statusAwal = "PENDING";
-                let pesanWA = `Assalamu'alaikum Wr. Wb. Pengasuh E-Pesantren, mengusulkan izin PULANG atas Nama: ${namaSantri} (${document.getElementById('prev-kelas').innerText}), Alasan: ${alasan}. Ketik Balas 'OK' atau klik tombol Dashboard Core untuk ACC sistem otomatis Gerbang.`;
-                
-                // Trigger Buka WhatsApp / API gateway pengiriman pesan ke nomor Pengasuh
+                let pesanWA = `Assalamu'alaikum Wr. Wb. Pengasuh E-Pesantren, mengusulkan izin PULANG atas Nama: ${namaSantri} (${document.getElementById('prev-kelas').innerText}), Alasan: ${alasan}.`;
                 window.open(`https://api.whatsapp.com/send?phone=${TELP_PENGASUH}&text=${encodeURIComponent(pesanWA)}`, '_blank');
             }
 
-            // Kirim payload data ke Apps Script backend
             try {
                 let res = await fetch(API_URL, {
                     method: "POST",
@@ -444,7 +429,6 @@
             } catch(e) { alert("Koneksi cloud bermasalah untuk input perizinan."); }
         }
 
-        // AKSI EKSEKUSI OLEH USTADZ/PENGASUH (DARI WEB APPS)
         async function eksekusiAccPengasuh(idIzin, tindakan) {
             let statusBaru = (tindakan === "SETUJU") ? "DISETUJUI" : "REJECTED";
             try {
@@ -459,9 +443,8 @@
             } catch(e) { alert("Gagal update validasi."); }
         }
 
-        // AKSI FORCE CHECK-IN JIKA LUPA SCAN WAJAH KEGIATAN
         async function tutupIzinManual(idIzin) {
-            if(!confirm("Tutup perizinan ini secara manual? (Sistem otomatis menghitung takziran jika terlambat)")) return;
+            if(!confirm("Tutup perizinan ini secara manual?")) return;
             try {
                 let res = await fetch(API_URL, {
                     method: "POST",
@@ -474,7 +457,6 @@
             } catch(e) { alert("Gagal memproses check-in."); }
         }
 
-        // UTILITY INTERFACES & FORMATTING
         function setMetodeInput(m) {
             const btnCari = document.getElementById('btn-metode-cari');
             const btnQR = document.getElementById('btn-metode-qr');
@@ -485,7 +467,7 @@
             } else {
                 btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider";
                 btnQR.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider";
-                alert("Kamera Scanner QR Diaktifkan. Silakan sorot QR Code Kartu Santri ke Kamera Pos Keamanan.");
+                alert("Kamera Scanner QR Diaktifkan.");
             }
         }
 
