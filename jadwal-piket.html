@@ -63,7 +63,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 24px;
-      padding: 24px;
+      padding: 20px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -71,35 +71,63 @@
     }
 
     .title-area h1 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
     
     .title-area p {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
       margin-top: 4px;
+    }
+
+    .action-header-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-nav-back {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-nav-back:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
 
     .theme-toggle-btn {
       background: var(--accent);
       border: none;
       color: white;
-      width: 46px;
-      height: 46px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     /* FUN STATS INTERAKTIF */
     .fun-stats-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-bottom: 25px;
     }
@@ -109,7 +137,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 20px;
-      padding: 20px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -117,23 +145,23 @@
     }
 
     .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 18px;
       color: white;
     }
 
     .stat-info h3 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
     }
 
     .stat-info p {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
     }
 
@@ -143,7 +171,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 20px;
-      padding: 16px 20px;
+      padding: 14px 20px;
       margin-bottom: 25px;
       display: flex;
       flex-wrap: wrap;
@@ -172,8 +200,8 @@
     .seg-btn {
       background: transparent;
       border: none;
-      padding: 8px 16px;
-      font-size: 13px;
+      padding: 6px 14px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: 9px;
@@ -189,72 +217,48 @@
       background: var(--card-bg);
       color: var(--text-main);
       border: 1px solid var(--border-color);
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 12px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       outline: none;
       cursor: pointer;
     }
 
-    /* GRID TAMPILAN UTAMA */
+    /* GRID TAMPILAN UTAMA (KARTU DIKECILKAN) */
     .piket-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
     }
 
     .piket-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
-      border-radius: 20px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 14px;
       cursor: pointer;
       position: relative;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 85px;
     }
 
     .piket-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: var(--accent);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
     }
 
     .santri-name {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .meta-line {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-badge {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 30px;
-      text-transform: uppercase;
-      display: inline-block;
-      margin-top: 12px;
-    }
-
-    .status-badge.gaib {
-      background: rgba(229, 62, 62, 0.15);
-      color: #e53e3e;
-    }
-    
-    .status-badge.aman {
-      background: rgba(56, 161, 105, 0.15);
-      color: #38a169;
+      line-height: 1.3;
+      word-break: break-word;
     }
 
     .loader-container, .empty-state {
@@ -266,8 +270,8 @@
 
     .spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border-left-color: var(--accent);
       animation: spin 1s linear infinite;
@@ -283,11 +287,16 @@
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-broom" style="color: var(--accent); margin-right: 6px;"></i> Radar Operasi Piket Kebersihan</h1>
-        <p>Klik kartu santri untuk konfirmasi kehadiran piket. Santri yang tersisa di layar otomatis berstatus Gaib.</p>
+        <p>Klik nama santri untuk konfirmasi kehadiran. Santri yang tersisa otomatis berstatus Gaib.</p>
       </div>
-      <button class="theme-toggle-btn" onclick="toggleTheme()">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
-      </button>
+      <div class="action-header-buttons">
+        <button onclick="kembaliKeDashboard()" class="btn-nav-back">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
     </header>
 
     <div class="fun-stats-container">
@@ -319,8 +328,8 @@
         <span style="font-size: 13px; font-weight:600;"><i class="fa-solid fa-venus-mars"></i> Sektor:</span>
         <div class="segmented-control">
           <button class="seg-btn active" onclick="setGender('semua', this)">Semua</button>
-          <button class="seg-btn" onclick="setGender('putra', this)">Putra</button>
-          <button class="seg-btn" onclick="setGender('putri', this)">Putri</button>
+          <button class="seg-btn" onclick="setGender('LAKI-LAKI', this)">Laki-Laki</button>
+          <button class="seg-btn" onclick="setGender('PEREMPUAN', this)">Perempuan</button>
         </div>
       </div>
 
@@ -341,10 +350,16 @@
   </div>
 
   <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+    // URL dinamis otomatis mengambil origin script Apps Script Anda
+    const urlScript = window.location.href.split('?')[0];
     let dataPiketLokal = [];
     let filterGender = "semua";
     let filterKelas = "semua";
+
+    function kembaliKeDashboard() {
+      // Mengarahkan kembali ke dashboard utama Apps Script Anda
+      window.top.location.href = urlScript + "?page=dashboard";
+    }
 
     function toggleTheme() {
       const body = document.body;
@@ -413,14 +428,16 @@
       const grid = document.getElementById("grid-piket");
       grid.innerHTML = "";
 
+      // Hanya menampilkan santri yang masih belum absen ("") agar bisa diklik hilang
       const disaring = dataPiketLokal.filter(s => {
-        const matchGen = (filterGender === "semua") || (s.gender === filterGender);
+        if (s.kehadiran !== "") return false; 
+        const matchGen = (filterGender === "semua") || (s.gender.toUpperCase() === filterGender.toUpperCase());
         const matchKls = (filterKelas === "semua") || (s.kelas === filterKelas);
         return matchGen && matchKls;
       });
 
       if(disaring.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--accent);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib!</div>`;
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--aman-color);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib! Semua sudah piket.</div>`;
         return;
       }
 
@@ -428,47 +445,32 @@
         const card = document.createElement("div");
         card.className = "piket-card";
         
-        // Mode Instan Klik: Langsung coret/hilangkan jika berstatus gaib
-        if(s.kehadiran === "") {
-          card.addEventListener("click", function() {
-            eksekusiPiketKilat(s.nik, card);
-          });
-        }
+        card.addEventListener("click", function() {
+          eksekusiPiketKilat(s.nik, card);
+        });
 
-        const badgeText = s.kehadiran === "HADIR" ? "Aman Piket" : "Gaib (Belum Piket)";
-        const badgeClass = s.kehadiran === "HADIR" ? "status-badge aman" : "status-badge gaib";
-        const iconGender = s.gender === "putri" ? "fa-venus" : "fa-mars";
-
-        card.innerHTML = `
-          <div>
-            <div class="santri-name">${s.nama}</div>
-            <div class="meta-line"><i class="fa-solid fa-fingerprint"></i> NIK: ${s.nik}</div>
-            <div class="meta-line"><i class="fa-solid fa-graduation-cap"></i> Kelas: ${s.kelas}</div>
-            <div class="meta-line"><i class="fa-solid ${iconGender}"></i> Sektor: ${s.gender.toUpperCase()}</div>
-          </div>
-          <div>
-            <span class="${badgeClass}">${badgeText}</span>
-          </div>
-        `;
+        // Hanya merender komponen Nama Santri agar ukuran kartu ringkas & efisien
+        card.innerHTML = `<div class="santri-name">${s.nama}</div>`;
         grid.appendChild(card);
       });
     }
 
     function eksekusiPiketKilat(nik, elemen) {
+      // Efek visual klik animasi mengecil dan memudar
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
 
       setTimeout(() => {
-        // Cari objek di ram lokal dan ubah statusnya secara reaktif
         let idx = dataPiketLokal.findIndex(item => item.nik === nik);
         if(idx !== -1) {
           dataPiketLokal[idx].kehadiran = "HADIR";
         }
         elemen.remove();
         hitungUlangMeters();
-        renderGridPiket();
-      }, 300);
+        renderGridPiket(); // Gambar ulang sisa santri yang gaib
+      }, 250);
 
+      // Kirim data ke pelayan cloud Google Apps Script (piket.gs)
       fetch(`${urlScript}?aksi=konfirmasi_hadir_piket&nik=${nik}`, { method: 'POST' })
       .then(r => r.json())
       .then(res => {
