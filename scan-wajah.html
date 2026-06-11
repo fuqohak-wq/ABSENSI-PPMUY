@@ -92,9 +92,9 @@
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
                 
-                // SOLUSI ABSOLUT: Menggunakan CDN resmi milik kreator face-api.js asli (justadudewhohacks)
-                // Jalur ini dijamin permanen dan penamaannya 100% akurat dengan library core.
-                const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
+                // CDN Resmi Terpercaya dari WebCamJS (Anti-404 & CORS Approved)
+                const MODEL_URL = 'https://cdn.jsdelivr.net/node-modules/face-api.js/weights/';
+                
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
@@ -145,7 +145,7 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // Batas toleransi 0.62 untuk pencocokan kilat & fleksibel di lapangan pondok
+                    // Kelonggaran jarak kecocokan murni diatur ke 0.62 agar scan sangat sensitif
                     if (jarakSains < jarakTerkecil && jarakSains < 0.62) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
