@@ -22,6 +22,12 @@
       height: 0 !important;
       border: none !important;
     }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-custom {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body id="mainBody" class="bg-zinc-950 font-sans text-zinc-200 min-h-screen transition-colors duration-300">
@@ -54,8 +60,11 @@
         <label id="lblKegiatan" class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 font-mono">Pilih Agenda Kegiatan</label>
         <div class="relative">
           <select id="selectKegiatan" class="input-field w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 transition">
-            <option value="Subuhan, Ngajar al-Qur'an & Kursus">📚 Subuhan, Ngajar al-Qur'an & Kursus</option>
-            <option value="Maghriban, Fathul Wahhab, Syawir & Sorogan">🕌 Maghriban, Fathul Wahhab, Syawir & Sorogan</option>
+            <option value="Kajian Kitab Sore">📚 Kajian Kitab Sore</option>
+            <option value="Madrasah Diniyah">🕌 Madrasah Diniyah</option>
+            <option value="Tahfidzul Qur'an">📖 Tahfidzul Qur'an</option>
+            <option value="Rapat Koordinasi">💼 Rapat Koordinasi</option>
+            <option value="Piket Khidmah">🛡️ Piket Khidmah</option>
           </select>
         </div>
       </div>
@@ -95,14 +104,15 @@
 
       <div id="gridKartuUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         <div class="col-span-full text-center py-24 text-zinc-600 font-mono text-xs">
-          <i class="fa-solid fa-circle-notch animate-spin text-xl text-emerald-500 mb-2 block"></i> Membaca data personel ustadz dari master_santri...
+          <i class="fa-solid fa-circle-notch animate-spin-custom text-xl text-emerald-500 mb-2 block"></i> Membaca data personel ustadz dari master_santri...
         </div>
       </div>
     </section>
   </main>
 
   <script>
-    const WEB_APP_URL = "URL_WEB_APP_SCRIPT_ANDA_DI_SINI"; // Masukkan URL Web App Apps Script Anda
+    // Secara otomatis mengambil domain dasar web app tempat script ini berjalan
+    const WEB_APP_URL = window.location.href.split('?')[0]; 
 
     let listUstadz = [];
     let countHadir = 0;
@@ -112,7 +122,6 @@
       tarikDatabaseUstadz();
     });
 
-    // 1. ENGINE THEME SELECTOR (DARK MODE VS LIGHT MODE)
     function toggleTheme() {
       const body = document.getElementById("mainBody");
       const navbar = document.getElementById("navbar");
@@ -185,11 +194,9 @@
       }
     }
 
-    // 2. QUERY MASTER NAME FROM CLOUD SPREADSHEET (SINKRON KE USTADZ.GS)
     function tarikDatabaseUstadz() {
       const container = document.getElementById("gridKartuUstadz");
       
-      // Mengarahkan langsung ke fungsi filter ustadz.gs yang baru
       fetch(`${WEB_APP_URL}?aksi=ambil_database_ustadz`)
         .then(res => res.json())
         .then(res => {
@@ -201,11 +208,10 @@
             container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">ERROR SYSTEM: ${res.message}</div>`;
           }
         }).catch(err => {
-          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Terminal gagal intersept node ustadz.gs</div>`;
+          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Gagal berkomunikasi dengan cloud node server.</div>`;
         });
     }
 
-    // 3. GENERATOR GRID KARTU KECIL DISIPLIN
     function buildDeckKartu(data) {
       const container = document.getElementById("gridKartuUstadz");
       container.innerHTML = "";
@@ -218,7 +224,6 @@
       data.forEach(u => {
         const card = document.createElement("div");
         
-        // Tema Awal Mengikuti State CurrentTheme
         card.className = currentTheme === "dark"
           ? "ustadz-card card-fade bg-zinc-950 hover:bg-zinc-800/80 text-zinc-300 border border-zinc-800 p-3 rounded-lg text-center cursor-pointer shadow-md font-mono transition duration-200 relative group overflow-hidden"
           : "ustadz-card card-fade bg-slate-50 hover:bg-emerald-50 text-slate-800 border border-slate-200 p-3 rounded-lg text-center cursor-pointer shadow-sm font-mono transition duration-200 relative group overflow-hidden";
@@ -230,7 +235,6 @@
           <p class="text-xs font-bold tracking-tight line-clamp-2">${u.nama}</p>
         `;
 
-        // LOGIKA TRANSAKSI KLIK LANGSUNG HILANG
         card.addEventListener("click", function() {
           eksekusiAbsenUstadz(u.nama, card);
         });
@@ -239,11 +243,9 @@
       });
     }
 
-    // 4. TRANSMISI ABSENSI KE DATA SHEET LOG_USTADZ
     function eksekusiAbsenUstadz(namaUstadz, elementKartu) {
       const agenda = document.getElementById("selectKegiatan").value;
       
-      // Amankan element dari double-click selama loading proses
       elementKartu.style.pointerEvents = "none";
       elementKartu.classList.add("animate-pulse");
 
@@ -253,15 +255,12 @@
         .then(res => res.json())
         .then(res => {
           if(res.status === "success") {
-            // KARTU LANGSUNG AUTOMATIS HILANG (FADE OUT EFFECT)
             elementKartu.classList.remove("animate-pulse");
             elementKartu.classList.add("card-hidden");
             
-            // Perbarui Counter Telemetri Premium
             countHadir++;
             document.getElementById("txtHadir").innerText = countHadir;
 
-            // Suntik Aktivitas ke Live Feed Premium Samping
             suntikLiveFeed(namaUstadz, agenda);
           } else {
             alert("Gagal melakukan enkripsi absensi: " + res.message);
@@ -273,13 +272,12 @@
         });
     }
 
-    // 5. PREMIUM FEED COMPONENT
     function suntikLiveFeed(nama, kegiatan) {
       const feedBox = document.getElementById("logFeed");
-      if(countHadir === 1) feedBox.innerHTML = ""; // Bersihkan teks kosong awal
+      if(countHadir === 1) feedBox.innerHTML = ""; 
 
       const item = document.createElement("div");
-      item.className = "py-2 border-b border-zinc-800/30 flex items-center gap-2 animate-bounce";
+      item.className = "py-2 border-b border-zinc-800/30 flex items-center gap-2";
       
       const waktu = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
       item.innerHTML = `
@@ -292,7 +290,6 @@
       feedBox.insertBefore(item, feedBox.firstChild);
     }
 
-    // 6. DECK INTERNAL LIVE FILTER (Pencarian Dinamis Kartu)
     document.getElementById("searchDeck").addEventListener("input", function() {
       let val = this.value.trim().toLowerCase();
       const cards = document.querySelectorAll(".ustadz-card");
