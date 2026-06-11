@@ -1,1 +1,368 @@
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HQ Special Dispensation Radar - PPMUY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .card-fade { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .kegiatan-checkbox:checked + label {
+      border-color: #10b981;
+      background-color: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+  </style>
+</head>
+<body id="mainBody" class="bg-zinc-950 font-sans text-zinc-200 min-h-screen transition-colors duration-300">
+
+  <nav id="navbar" class="bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300">
+    <div class="flex items-center gap-3">
+      <div id="logoBox" class="bg-amber-600/10 border border-amber-500/30 p-2.5 rounded-lg text-amber-400 shadow-inner">
+        <i class="fa-solid fa-id-card-clip text-xl animate-pulse"></i>
+      </div>
+      <div>
+        <h1 id="navTitle" class="text-lg font-extrabold tracking-wider text-zinc-100 uppercase">YURIDIS DISPENSASI KHUSUS</h1>
+        <p id="navSub" class="text-xs text-zinc-500 font-mono tracking-widest">OTORISASI INTERNAL RADAR - PPMUY</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+      <button onclick="toggleTheme()" id="btnVisor" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm">
+        <i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR
+      </button>
+      <a href="javascript:history.back();" id="btnBack" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm">
+        <i class="fa-solid fa-arrow-left-long"></i> Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+    
+    <section class="lg:col-span-5 space-y-6">
+      
+      <div id="panelForm" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4 transition-colors duration-300">
+        <p id="formTitle" class="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-2 font-mono"><i class="fa-solid fa-file-pen mr-1"></i> Formulir Yurisdiksi</p>
+        
+        <form id="formDispensasi" onsubmit="ajukanDispensasi(event)">
+          <div class="space-y-3">
+            <div>
+              <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 font-mono">Personel Terpilih</label>
+              <input type="text" id="inputNama" readonly required placeholder="Pilih santri dari deck kanan..." 
+                class="input-field w-full px-3 py-2 bg-zinc-950 text-zinc-400 text-sm rounded-lg border border-zinc-800 outline-none focus:border-amber-500 transition font-semibold">
+              <input type="hidden" id="inputNIK" required>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 font-mono">Kategori Dispensasi</label>
+              <select id="selectKategori" onchange="aturLimitEksklusif()" class="input-field w-full px-3 py-2 bg-zinc-950 text-zinc-100 text-sm rounded-lg border border-zinc-800 outline-none focus:border-amber-500 transition">
+                <option value="Khidmah">🛡️ Khidmah (Maks. 6 Kegiatan)</option>
+                <option value="Melekan">☕ Melekan (Maks. 3 Kegiatan)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Delegasi Bebas Kegiatan</label>
+                <span id="counterLimit" class="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">0 / 6</span>
+              </div>
+              
+              <div id="boxKegiatan" class="grid grid-cols-2 gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 max-h-40 overflow-y-auto">
+                <div class="relative">
+                  <input type="checkbox" id="keg1" value="Kajian Sore" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg1" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">📚 Kajian Sore</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg2" value="Madrasah Diniyah" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg2" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">🕌 Madin</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg3" value="Tahfidz" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg3" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">📖 Tahfidz</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg4" value="Jamaah Maktubah" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg4" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">🧎 Maktubah</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg5" value="Piket Kebersihan" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg5" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">🧹 Piket Bersih</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg6" value="Rapat Organisasi" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg6" class="block text-center text-xs py-2 px-1 border border-zinc-800 rounded-md cursor-pointer truncate transition">💼 Rapat Org</label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold font-mono text-xs tracking-wider rounded-lg shadow-md transition duration-150">
+              <i class="fa-solid fa-shield-halved mr-1"></i> SIMPAN OTORISASI DISPENSASI
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div id="panelMetrics" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3 font-mono transition-colors duration-300">
+        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2"><i class="fa-solid fa-satellite-dish mr-1"></i> Telemetri Dispensasi Hari Ini</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
+            <span class="text-[9px] text-zinc-500 block">TOTAL KHIDMAH</span>
+            <span id="txtKhidmah" class="text-xl font-bold text-emerald-400">0</span>
+          </div>
+          <div class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
+            <span class="text-[9px] text-zinc-500 block">TOTAL MELEKAN</span>
+            <span id="txtMelekan" class="text-xl font-bold text-amber-400">0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panelMainDeck" class="lg:col-span-7 bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-2xl transition-colors duration-300 flex flex-col h-[600px]">
+      <div id="deckHeader" class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+        <div>
+          <h2 id="deckTitle" class="text-xs font-bold uppercase tracking-wider text-zinc-100">Database Personel Santri</h2>
+          <p id="deckSub" class="text-[9px] text-zinc-500 font-mono">Pilih santri untuk memasukkan data ke formulir dispensasi</p>
+        </div>
+        <div class="relative w-40 sm:w-56">
+          <input type="text" id="searchDeck" placeholder="Saring Nama..." autocomplete="off"
+            class="input-field w-full pl-3 pr-8 py-1.5 bg-zinc-950 text-xs text-zinc-100 placeholder-zinc-600 rounded-md border border-zinc-800 focus:outline-none focus:border-amber-500 transition">
+          <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-2.5 text-[10px] text-zinc-600"></i>
+        </div>
+      </div>
+
+      <div id="gridSantriDispo" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto flex-1 pr-1">
+        <div class="col-span-full text-center py-24 text-zinc-600 font-mono text-xs">
+          <i class="fa-solid fa-circle-notch animate-spin text-xl text-amber-500 mb-2 block"></i> Menghubungkan Terminal ke master_santri Node...
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const WEB_APP_URL = "URL_WEB_APP_SCRIPT_ANDA_DI_SINI"; // Masukkan URL Web App Apps Script Anda
+
+    let databaseSantri = [];
+    let currentTheme = "dark";
+    let maxAllowed = 6;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      tarikDatabaseMaster();
+    });
+
+    // 1. DYNAMIC CHECKBOX ACCENT & RESTRICTION
+    function aturLimitEksklusif() {
+      const kategori = document.getElementById("selectKategori").value;
+      maxAllowed = kategori === "Khidmah" ? 6 : 3;
+      
+      // Reset all checked states when switching categories
+      const checkboxes = document.querySelectorAll(".kegiatan-checkbox");
+      checkboxes.forEach(cb => cb.checked = false);
+      
+      hitungChecked();
+    }
+
+    function hitungChecked() {
+      const checkedBoxes = document.querySelectorAll(".kegiatan-checkbox:checked");
+      document.getElementById("counterLimit").innerText = `${checkedBoxes.length} / ${maxAllowed}`;
+      
+      const unCheckedBoxes = document.querySelectorAll(".kegiatan-checkbox:not(:checked)");
+      if (checkedBoxes.length >= maxAllowed) {
+        unCheckedBoxes.forEach(cb => {
+          cb.disabled = true;
+          cb.nextElementSibling.style.opacity = "0.3";
+          cb.nextElementSibling.style.cursor = "not-allowed";
+        });
+      } else {
+        const checkboxes = document.querySelectorAll(".kegiatan-checkbox");
+        checkboxes.forEach(cb => {
+          cb.disabled = false;
+          cb.nextElementSibling.style.opacity = "1";
+          cb.nextElementSibling.style.cursor = "pointer";
+        });
+      }
+    }
+
+    // 2. THEME CONTROLLER ENGINE (DARK vs LIGHT)
+    function toggleTheme() {
+      const body = document.getElementById("mainBody");
+      const navbar = document.getElementById("navbar");
+      const logoBox = document.getElementById("logoBox");
+      const btnVisor = document.getElementById("btnVisor");
+      const btnBack = document.getElementById("btnBack");
+      const panelForm = document.getElementById("panelForm");
+      const panelMetrics = document.getElementById("panelMetrics");
+      const panelMainDeck = document.getElementById("panelMainDeck");
+      const navTitle = document.getElementById("navTitle");
+      const formTitle = document.getElementById("formTitle");
+      const deckTitle = document.getElementById("deckTitle");
+      const deckHeader = document.getElementById("deckHeader");
+      const inputFields = document.querySelectorAll(".input-field");
+      const boxes = document.querySelectorAll(".box-santri");
+
+      if (currentTheme === "dark") {
+        currentTheme = "light";
+        body.className = "bg-slate-100 font-sans text-slate-800 min-h-screen transition-colors duration-300";
+        navbar.className = "bg-white border-b border-slate-200 text-slate-800 shadow-md py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
+        panelForm.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md space-y-4 transition-colors duration-300";
+        panelMetrics.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md space-y-3 font-mono transition-colors duration-300";
+        panelMainDeck.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-xl transition-colors duration-300 flex flex-col h-[600px]";
+        navTitle.className = "text-lg font-extrabold tracking-wider text-slate-900 uppercase";
+        formTitle.className = "text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 pb-2 font-mono";
+        deckTitle.className = "text-xs font-bold uppercase tracking-wider text-slate-900";
+        deckHeader.className = "flex justify-between items-center border-b border-slate-200 pb-3 mb-4";
+        logoBox.className = "bg-amber-100 border border-amber-300 p-2.5 rounded-lg text-amber-600 shadow-inner";
+        btnVisor.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnBack.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnVisor.innerHTML = `<i class="fa-solid fa-moon text-indigo-600"></i> TOGGLE VISOR`;
+
+        inputFields.forEach(el => {
+          el.className = el.className.replace(/bg-zinc-950 text-zinc-100 border-zinc-800/g, "bg-slate-50 text-slate-900 border-slate-300");
+        });
+        boxes.forEach(b => {
+          b.className = b.className.replace(/bg-zinc-950 text-zinc-300 border-zinc-800 hover:bg-zinc-800/g, "bg-slate-50 text-slate-800 border-slate-200 hover:bg-amber-50");
+        });
+      } else {
+        currentTheme = "dark";
+        body.className = "bg-zinc-950 font-sans text-zinc-200 min-h-screen transition-colors duration-300";
+        navbar.className = "bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
+        panelForm.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4 transition-colors duration-300";
+        panelMetrics.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3 font-mono transition-colors duration-300";
+        panelMainDeck.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-2xl transition-colors duration-300 flex flex-col h-[600px]";
+        navTitle.className = "text-lg font-extrabold tracking-wider text-zinc-100 uppercase";
+        formTitle.className = "text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-2 font-mono";
+        deckTitle.className = "text-xs font-bold uppercase tracking-wider text-zinc-100";
+        deckHeader.className = "flex justify-between items-center border-b border-zinc-800 pb-3 mb-4";
+        logoBox.className = "bg-amber-600/10 border border-amber-500/30 p-2.5 rounded-lg text-amber-400 shadow-inner";
+        btnVisor.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnBack.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnVisor.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR`;
+
+        inputFields.forEach(el => {
+          el.className = el.className.replace(/bg-slate-50 text-slate-900 border-slate-300/g, "bg-zinc-950 text-zinc-100 border-zinc-800");
+        });
+        boxes.forEach(b => {
+          b.className = b.className.replace(/bg-slate-50 text-slate-800 border-slate-200 hover:bg-amber-50/g, "bg-zinc-950 text-zinc-300 border-zinc-800 hover:bg-zinc-800/80");
+        });
+      }
+    }
+
+    // 3. FETCH MASTER SANTRI VIA API NODE
+    function tarikDatabaseMaster() {
+      const container = document.getElementById("gridSantriDispo");
+      fetch(`${WEB_APP_URL}?aksi=ambil_database`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "success") {
+            databaseSantri = res.data;
+            buildDeckMaster(databaseSantri);
+            tarikTelemetriHariIni();
+          }
+        }).catch(err => {
+          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Node Gagal Mengambil Data Master.</div>`;
+        });
+    }
+
+    // 4. GENERATOR DECK KARTU UTK FORM INJECTION
+    function buildDeckMaster(data) {
+      const container = document.getElementById("gridSantriDispo");
+      container.innerHTML = "";
+
+      if(data.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-600 font-mono text-xs">Tidak ada data personel.</div>`;
+        return;
+      }
+
+      data.forEach(s => {
+        const div = document.createElement("div");
+        div.className = currentTheme === "dark"
+          ? "box-santri card-fade bg-zinc-950 text-zinc-300 border border-zinc-800 p-2.5 rounded-lg text-center cursor-pointer hover:bg-zinc-800/80 transition shadow-md font-mono relative"
+          : "box-santri card-fade bg-slate-50 text-slate-800 border border-slate-200 p-2.5 rounded-lg text-center cursor-pointer hover:bg-amber-50 transition shadow-sm font-mono relative";
+        
+        div.setAttribute("data-nama", s.nama.toLowerCase());
+        div.innerHTML = `
+          <p class="text-[10px] font-bold tracking-tight line-clamp-1">${s.nama}</p>
+          <p class="text-[8px] text-zinc-500 mt-1">NIK: ${s.nik || '-'}</p>
+        `;
+
+        div.addEventListener("click", function() {
+          document.getElementById("inputNama").value = s.nama;
+          document.getElementById("inputNIK").value = s.nik || "000000";
+          
+          // Flash element effect
+          div.classList.add("ring-2", "ring-amber-500");
+          setTimeout(() => div.classList.remove("ring-2", "ring-amber-500"), 600);
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    // 5. SUBMIT DATA DISPENSASI KE GOOGLE CLOUD
+    function ajukanDispensasi(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btnSubmit");
+      
+      const nik = document.getElementById("inputNIK").value;
+      const nama = document.getElementById("inputNama").value;
+      const kategori = document.getElementById("selectKategori").value;
+      
+      const checkedBoxes = document.querySelectorAll(".kegiatan-checkbox:checked");
+      if(checkedBoxes.length === 0) {
+        alert("Minimal pilih 1 kegiatan delegasi bebas!");
+        return;
+      }
+
+      let arrKegiatan = [];
+      checkedBoxes.forEach(cb => arrKegiatan.push(cb.value));
+      const buktiStr = arrKegiatan.join(", "); // Disimpan di kolom Bukti
+
+      btn.disabled = true;
+      btn.innerText = "MENSTRANSMISIKAN DATA...";
+
+      let targetUrl = `${WEB_APP_URL}?aksi=simpan_dispensasi_khusus&nik=${encodeURIComponent(nik)}&nama=${encodeURIComponent(nama)}&kategori=${encodeURIComponent(kategori)}&bukti=${encodeURIComponent(buktiStr)}`;
+
+      fetch(targetUrl, { method: "POST" })
+        .then(res => res.json())
+        .then(res => {
+          if(res.status === "success") {
+            alert(`Dispensasi ${kategori} atas nama ${nama} Berhasil Diotorisasi!`);
+            document.getElementById("formDispensasi").reset();
+            aturLimitEksklusif();
+            tarikTelemetriHariIni();
+          } else {
+            alert("Error: " + res.message);
+          }
+        })
+        .catch(err => alert("Koneksi cloud node terputus."))
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerText = "SIMPAN OTORISASI DISPENSASI";
+        });
+    }
+
+    // 6. LIVE METRICS COUNTER TELEMETRI
+    function tarikTelemetriHariIni() {
+      fetch(`${WEB_APP_URL}?aksi=ambil_telemetri_dispensasi`)
+        .then(res => res.json())
+        .then(res => {
+          if(res.status === "success") {
+            document.getElementById("txtKhidmah").innerText = res.khidmah;
+            document.getElementById("txtMelekan").innerText = res.melekan;
+          }
+        });
+    }
+
+    // 7. INTERNAL LIVE SEARCH FILTER
+    document.getElementById("searchDeck").addEventListener("input", function() {
+      let val = this.value.trim().toLowerCase();
+      const boxes = document.querySelectorAll(".box-santri");
+      boxes.forEach(b => {
+        let text = b.getAttribute("data-nama");
+        b.style.display = text.includes(val) ? "block" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
