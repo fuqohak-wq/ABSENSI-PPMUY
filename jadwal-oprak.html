@@ -91,18 +91,40 @@
       gap: 12px;
     }
 
+    /* BUTTONS STYLE */
+    .btn-nav {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-nav:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+    }
+
     .theme-toggle-btn {
       background: var(--accent);
       border: none;
       color: white;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
@@ -154,7 +176,7 @@
 
     .oprak-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 16px;
       margin-bottom: 40px;
     }
@@ -192,7 +214,7 @@
     .santri-info .sub {
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .card-footer {
@@ -213,12 +235,12 @@
       letter-spacing: 0.5px;
     }
 
-    .badge.putri {
+    .badge.perempuan {
       background: #fff5f5;
       color: #9b2c2c;
     }
 
-    [data-theme="dark"] .badge.putri {
+    [data-theme="dark"] .badge.perempuan {
       background: rgba(254, 178, 178, 0.2);
       color: #feb2b2;
     }
@@ -277,15 +299,18 @@
     }
   </style>
 </head>
-<body data-theme="dark">
+<body>
 
   <div class="container">
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
-        <p>Klik kartu santri untuk langsung mengonfirmasi kehadiran petugas dalam siklus hari ini.</p>
+        <p>Klik kartu pengurus untuk langsung mengonfirmasi kehadiran petugas malam ini.</p>
       </div>
       <div class="header-actions">
+        <button class="btn-nav" onclick="kembaliKeDashboard()">
+          <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </button>
         <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
           <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
@@ -296,17 +321,17 @@
       <button class="filter-btn active" onclick="saringGender('semua', this)">
         <i class="fa-solid fa-users"></i> Semua
       </button>
-      <button class="filter-btn" onclick="saringGender('putra', this)">
-        <i class="fa-solid fa-mars"></i> Putra
+      <button class="filter-btn" onclick="saringGender('LAKI-LAKI', this)">
+        <i class="fa-solid fa-mars"></i> LAKI-LAKI
       </button>
-      <button class="filter-btn" onclick="saringGender('putri', this)">
-        <i class="fa-solid fa-venus"></i> Putri
+      <button class="filter-btn" onclick="saringGender('PEREMPUAN', this)">
+        <i class="fa-solid fa-venus"></i> PEREMPUAN
       </button>
     </div>
 
     <div class="section-title">
       <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
-      <span>Daftar Santri Wajib Oprak Hari Ini</span>
+      <span>Daftar Pengurus Wajib Patroli Hari Ini</span>
     </div>
 
     <div class="oprak-grid" id="container-grid">
@@ -322,23 +347,40 @@
     let dataSantriLokal = [];
     let filterSekarang = "semua";
 
+    // Auto Sinkronisasi Terang/Gelap Mengikuti Kondisi Penyimpanan State Dashboard
+    function inisialisasiTemaBawaan() {
+      const temaDisimpan = localStorage.getItem('theme') || 'dark';
+      document.body.setAttribute('data-theme', temaDisimpan);
+      const icon = document.getElementById('theme-icon');
+      icon.className = temaDisimpan === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    }
+
     function toggleTheme() {
       const body = document.body;
       const icon = document.getElementById('theme-icon');
       if(body.getAttribute('data-theme') === 'dark') {
         body.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
         icon.className = 'fa-solid fa-sun';
       } else {
         body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
         icon.className = 'fa-solid fa-moon';
       }
     }
 
+    function kembaliKeDashboard() {
+      // Mengarahkan kembali ke file utama index dashboard Anda
+      window.location.href = "index.html";
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+      inisialisasiTemaBawaan();
       muatDaftarOprak();
     });
 
     function muatDaftarOprak() {
+      // Dipanggil via parameter aksi murni yang dikenali file gs satelit
       fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
         .then(response => response.json())
         .then(res => {
@@ -352,7 +394,7 @@
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud. Pastikan Apps Script sudah di-deploy dengan benar.</div>`;
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud. Silakan coba kembali.</div>`;
         });
     }
 
@@ -360,18 +402,25 @@
       const grid = document.getElementById("container-grid");
       grid.innerHTML = "";
 
-      // Jalankan penyaringan berdasarkan state filter kontrol gender
       const dataDisaring = dataSantriLokal.filter(s => {
         if (filterSekarang === "semua") return true;
-        return (s.gender || "").toString().toLowerCase() === filterSekarang;
+        var gen = (s.gender || "").toString().toUpperCase().trim();
+        // Normalisasi toleransi data lama sheet
+        if (gen === "L" || gen === "PUTRA") gen = "LAKI-LAKI";
+        if (gen === "P" || gen === "PUTRI") gen = "PEREMPUAN";
+        return gen === filterSekarang;
       });
 
       if (dataDisaring.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Tidak ada petugas ${filterSekarang !== 'semua' ? filterSekarang : ''} yang tersisa atau perlu dikonfirmasi!</div>`;
+        var labelDisplay = filterSekarang === 'semua' ? '' : filterSekarang;
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Tidak ada petugas ${labelDisplay} yang tersisa malam ini!</div>`;
         return;
       }
 
       dataDisaring.forEach(santri => {
+        // Hanya memunculkan petugas yang status kerjanya belum absen
+        if (santri.status_kerja === "HADIR JAGA") return;
+
         const card = document.createElement("div");
         card.className = "santri-card";
         
@@ -379,15 +428,18 @@
           eksekusiHadirKilat(santri.nik, santri.nama, card);
         });
         
-        const labelGender = (santri.gender || "").toString().toUpperCase() === "PUTRI" ? "Putri" : "Putra";
-        const badgeClass = labelGender === "Putri" ? "badge putri" : "badge";
+        var genDisplay = (santri.gender || "").toString().toUpperCase().trim();
+        if (genDisplay === "L" || genDisplay === "PUTRA") genDisplay = "LAKI-LAKI";
+        if (genDisplay === "P" || genDisplay === "PUTRI") genDisplay = "PEREMPUAN";
+
+        const badgeClass = genDisplay === "PEREMPUAN" ? "badge perempuan" : "badge";
 
         card.innerHTML = `
           <div class="santri-info">
             <div class="name">${santri.nama}</div>
             <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
             <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
-            <div class="sub"><i class="fa-solid fa-venus-mars"></i> Sektor: ${labelGender}</div>
+            <div class="sub"><i class="fa-solid fa-venus-mars"></i> Kelompok: ${genDisplay}</div>
           </div>
           <div class="card-footer">
             <span class="${badgeClass}">Wajib Oprak</span>
@@ -396,6 +448,10 @@
         `;
         grid.appendChild(card);
       });
+      
+      if(gridHasNoCards() && dataSantriLokal.length > 0) {
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas untuk filter ini sudah terabsen!</div>`;
+      }
     }
 
     function saringGender(kategori, elemen) {
@@ -410,10 +466,8 @@
       elemen.style.opacity = "0";
       
       setTimeout(() => {
-        // Hapus data dari memori lokal array agar sinkron dengan UI filter
         dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
         elemen.remove();
-        
         if(gridHasNoCards()) {
           renderGrid();
         }
