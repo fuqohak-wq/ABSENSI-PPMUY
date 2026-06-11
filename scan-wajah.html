@@ -102,24 +102,29 @@
                     databaseSantri = json.data;
                     dbStatus.innerText = `🟢 Cloud Kiosk Ready (${databaseSantri.length} Santri)`;
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } }, 
+                    audio: false 
+                });
                 video.srcObject = stream;
                 label.innerText = "HADAPKAN WAJAH KE KAMERA";
                 
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // PENYESUAIAN KIOSK: inputSize dinaikkan ke 320 agar pemindaian jarak jauh super responsif
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
+                    // OPTIMASI: inputSize dinaikkan ke 416 & scoreThreshold ke 0.50 demi pemindaian sudut miring & peci yang akurat
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.50 }))
+                                                     .withFaceLandmarks()
+                                                     .withFaceDescriptor();
                     
-                    if (hasilKamera) {
+                    if (hasilKamera && hasilKamera.landmarks && hasilKamera.landmarks.positions.length === 68) {
                         isProcessing = true;
                         kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                         label.innerText = "MENCOCOKKAN BIOMETRIK...";
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 350);
+                }, 300); // Interval dipercepat sedikit ke 300ms untuk respon mengunci target yang instan
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -132,7 +137,6 @@
                     let dataVektorRaw = santri.vektor;
                     if(!dataVektorRaw) continue;
                     
-                    // Bersihkan gangguan format string otomatis Google Sheets
                     if (dataVektorRaw.startsWith("'")) {
                         dataVektorRaw = dataVektorRaw.substring(1);
                     }
@@ -144,8 +148,8 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // LONGGAR & AMAN: Threshold disesuaikan ke posisi 0.68 untuk toleransi aksesoris peci/kerudung santri
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.68) { 
+                    // PENGETATAN AKURASI: Diperketat ke 0.55 agar antar wajah kembar/mirip tidak saling tertukar aksesnya
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.55) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
