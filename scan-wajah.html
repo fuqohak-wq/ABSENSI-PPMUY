@@ -1,4 +1,68 @@
-<script>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Terminal Kiosk Wajah AI - Core Pakem Standar Industri</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
+
+    <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
+        <div class="flex justify-between items-center">
+            <h1 class="text-xs font-black text-cyan-400 uppercase tracking-wider"><i class="fa-solid fa-face-viewfinder mr-1"></i> TERMINAL KIOSK SCAN WAJAH</h1>
+            <p id="txt-db-status" class="text-[11px] text-amber-400 font-bold animate-pulse">Menghubungkan cloud...</p>
+        </div>
+        <select id="pilihan-kegiatan" class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-3 py-3 text-xs font-black text-white outline-none focus:border-cyan-500 cursor-pointer">
+            <option value="Subuh">Jamaah Subuh</option>
+            <option value="Dzuhur">Jamaah Dzuhur</option>
+            <option value="Ashar">Jamaah Ashar</option>
+            <option value="Maghrib">Jamaah Maghrib</option>
+            <option value="Isya">Jamaah Isya</option>
+            <option value="Quranan">Ngaji al-Qur'an Bakdo Subuh</option>
+            <option value="Afsahan">Ngafsahi/Kursus Bakdo al-Qur'an</option>
+            <option value="PDF 1">Sekolah PDF Jam Pertama</option>
+            <option value="PDF 2">Sekolah PDF Jam Kedua</option>
+            <option value="PDF 3">Sekolah PDF Jam Ketiga</option>
+            <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
+            <option value="Sorogan">Sorogan Kitab</option>
+            <option value="Belajar">Jam Belajar</option>
+            <option value="Belajar">Jumatan</option>
+            <option value="Belajar">Ziarah Kubur</option>
+        </select>
+    </div>
+
+    <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center items-center">
+        <div class="relative w-full aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+            <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div id="kotak-scan" class="w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300">
+                    <span id="instruksi" class="text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30">Memasang AI...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali ke Dashboard</a></div>
+
+    <div id="pop-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
+        <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400">
+            <span class="text-xs font-black tracking-widest block opacity-75">🔊 LOG JAMAAH DICATAT</span>
+            <span class="font-black text-xl block mt-1 tracking-wide" id="txt-nama-sukses">Nama Santri</span>
+        </div>
+    </div>
+
+    <div id="pop-warning" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
+        <div class="bg-amber-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-amber-400">
+            <span class="text-xs font-black tracking-widest block opacity-75"><i class="fa-solid fa-triangle-exclamation mr-1"></i> AKSES DITOLAK</span>
+            <span class="font-black text-base block mt-1 tracking-wide" id="txt-nama-peringatan">NAMA SANTRI</span>
+            <span class="text-[11px] font-bold block mt-1 bg-slate-950/20 py-1 rounded-lg uppercase tracking-wider">Sudah Absen Pada Kegiatan Ini!</span>
+        </div>
+    </div>
+
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         let video = document.getElementById('video-selfie');
         let label = document.getElementById('instruksi');
@@ -12,7 +76,7 @@
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                 oscillator.connect(gainNode);
+                oscillator.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
                 oscillator.type = 'sine';
                 oscillator.frequency.value = frekuensi;
@@ -27,7 +91,7 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
-                // Ambil model SsdMobilenetv1 untuk akurasi penguncian biometrik maksimal
+                // Menggunakan SsdMobilenetv1 untuk ekstraksi biometrik presisi tinggi demi menghindari 'Wajah Tidak Dikenal'
                 await faceapi.nets.ssdMobilenetv1.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -46,7 +110,7 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // OPTIMASI: Gunakan SsdMobilenetv1 dengan batas deteksi awal 0.55 agar pembacaan titik koordinat presisi
+                    // Eksekusi pemindaian dengan model SsdMobilenetv1 berkemampuan deteksi low-light lebih baik
                     const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.55 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
@@ -56,7 +120,7 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 500); // Interval 500ms memberikan waktu jeda CPU Kiosk untuk memproses frame gambar
+                }, 500);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -76,7 +140,7 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // OPTIMASI: Melonggarkan batas strict dari 0.50 menjadi 0.58 agar toleran terhadap variasi cahaya kiosk
+                    // Penyesuaian ambang batas toleransi dari 0.50 dinaikkan menjadi 0.58 agar lebih responsif di area kiosk
                     if (jarakSains < jarakTerkecil && jarakSains < 0.58) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
@@ -144,3 +208,5 @@
             }
         }
     </script>
+</body>
+</html>
