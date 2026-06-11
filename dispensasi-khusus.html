@@ -3,122 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HQ Special Dispensation Radar - PPMUY</title>
+  <title>Sistem Otorisasi Dispensasi Khusus - PPMUY</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    .card-fade { transition: all 0.3s ease; }
-    .kegiatan-checkbox:checked + label {
-      border-color: #10b981 !important;
-      background-color: rgba(16, 185, 129, 0.15) !important;
-      color: #10b981 !important;
+    /* Transisi Halus Global */
+    * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
+    
+    /* Kustomisasi Skema Warna Menggunakan Variabel CSS Murni */
+    body {
+      --bg-main: #09090b;       --bg-panel: #18181b;     --bg-input: #09090b;
+      --border-color: #27272a;  --text-main: #f4f4f5;    --text-muted: #71717a;
+      --bg-card: #09090b;       --bg-card-hover: #27272a;
     }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    .theme-dark ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
-    .theme-light ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    
+    body.light-mode {
+      --bg-main: #f1f5f9;       --bg-panel: #ffffff;     --bg-input: #f8fafc;
+      --border-color: #cbd5e1;  --text-main: #0f172a;    --text-muted: #64748b;
+      --bg-card: #f8fafc;       --bg-card-hover: #e2e8f0;
+    }
+
+    /* Menggunakan Variabel Pada Struktur CSS */
+    .app-bg { background-color: var(--bg-main); color: var(--text-main); }
+    .panel-bg { background-color: var(--bg-panel); border-color: var(--border-color); }
+    .input-bg { background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main); }
+    .card-bg { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
+    .card-bg:hover { background-color: var(--bg-card-hover); }
+    .text-muted-custom { color: var(--text-muted); }
+    .border-custom { border-color: var(--border-color); }
+
+    /* Animasi Kartu Saat Hilang */
+    .fade-out-card {
+      opacity: 0;
+      transform: scale(0.9) translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    /* Custom Checkbox Style */
+    .kegiatan-checkbox:checked + label {
+      border-color: #3b82f6 !important;
+      background-color: rgba(59, 130, 246, 0.15) !important;
+      color: #3b82f6 !important;
+    }
   </style>
 </head>
-<body id="mainBody" class="theme-dark bg-zinc-950 text-zinc-200 min-h-screen font-sans transition-colors duration-300">
+<body class="app-bg min-h-screen font-sans antialiased pb-12">
 
-  <nav id="navbar" class="bg-zinc-900 border-b border-zinc-800 py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+  <nav class="panel-bg border-b shadow-sm py-4 px-6 mb-8 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <div id="logoBox" class="bg-amber-600/10 border border-amber-500/30 p-2.5 rounded-lg text-amber-400">
-        <i class="fa-solid fa-id-card-clip text-xl animate-pulse"></i>
+      <div class="bg-blue-600/10 p-2 rounded-lg text-blue-500 border border-blue-500/20">
+        <i class="fa-solid fa-shield-cat text-xl"></i>
       </div>
       <div>
-        <h1 id="navTitle" class="text-lg font-extrabold tracking-wider uppercase">YURIDIS DISPENSASI KHUSUS</h1>
-        <p class="text-xs text-zinc-500 font-mono tracking-widest">OTORISASI INTERNAL RADAR - PPMUY</p>
+        <h1 class="text-md font-bold tracking-wide uppercase">Gateway Dispensasi</h1>
+        <p class="text-[10px] text-muted-custom font-mono">NODE KONTROL REGISTRASI - PPMUY</p>
       </div>
     </div>
-    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-      <button onclick="toggleTheme()" id="btnVisor" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2">
-        <i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR
-      </button>
-      <a href="javascript:history.back();" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2">
-        <i class="fa-solid fa-arrow-left-long"></i> Dashboard
-      </a>
-    </div>
+    
+    <button onclick="toggleTheme()" class="panel-bg border text-xs font-mono px-4 py-2 rounded-lg flex items-center gap-2 hover:opacity-80 shadow-sm">
+      <i id="themeIcon" class="fa-solid fa-sun text-amber-500"></i> <span id="themeText">MODE TERANG</span>
+    </button>
   </nav>
 
-  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
     
     <section class="lg:col-span-5 space-y-6">
-      <div id="panelForm" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4">
-        <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-2 font-mono"><i class="fa-solid fa-file-pen mr-1"></i> Formulir Yurisdiksi</p>
+      <div class="panel-bg border rounded-2xl p-6 shadow-sm space-y-5">
+        <h2 class="text-sm font-bold uppercase tracking-wider border-b border-custom pb-3 font-mono">
+          <i class="fa-solid fa-file-signature text-blue-500 mr-1"></i> Form Validasi Otorisasi
+        </h2>
         
         <form id="formDispensasi" onsubmit="ajukanDispensasi(event)">
-          <div class="space-y-3">
+          <div class="space-y-4">
+            
             <div>
-              <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 font-mono">Personel Terpilih</label>
-              <input type="text" id="inputNama" readonly required placeholder="Pilih santri dari deck kanan..." 
-                class="w-full px-3 py-2 bg-zinc-950 text-sm rounded-lg border border-zinc-800 outline-none focus:border-amber-500 font-semibold text-zinc-100">
+              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-muted-custom font-mono">Personel Terpilih</label>
+              <div class="relative">
+                <input type="text" id="inputNama" readonly required placeholder="Klik kartu santri di deck kanan..." 
+                  class="input-bg w-full px-4 py-2.5 text-sm rounded-xl border outline-none focus:border-blue-500 font-semibold shadow-inner placeholder-gray-500">
+                <button type="button" onclick="resetTerpilih()" id="btnResetTerpilih" class="hidden absolute right-3 top-3 text-xs text-rose-500 hover:underline font-mono">
+                  <i class="fa-solid fa-rotate-left"></i> Batal
+                </button>
+              </div>
               <input type="hidden" id="inputNIK" required>
             </div>
 
             <div>
-              <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 font-mono">Kategori Dispensasi</label>
-              <select id="selectKategori" onchange="aturLimitEksklusif()" class="w-full px-3 py-2 bg-zinc-950 text-sm rounded-lg border border-zinc-800 outline-none focus:border-amber-500 text-zinc-100">
-                <option value="Khidmah">🛡️ Khidmah (Maks. 6 Kegiatan)</option>
-                <option value="Melekan">☕ Melekan (Maks. 3 Kegiatan)</option>
+              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-muted-custom font-mono">Kategori Dispensasi</label>
+              <select id="selectKategori" onchange="aturLimitEksklusif()" class="input-bg w-full px-4 py-2.5 text-sm rounded-xl border outline-none focus:border-blue-500 font-medium">
+                <option value="Khidmah">🛡️ Kategori Khidmah (Maks. 6 Kegiatan)</option>
+                <option value="Melekan">☕ Kategori Melekan (Maks. 3 Kegiatan)</option>
               </select>
             </div>
 
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">Delegasi Bebas Kegiatan</label>
-                <span id="counterLimit" class="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">0 / 6</span>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-muted-custom font-mono">Daftar Kegiatan Bebas</label>
+                <span id="counterLimit" class="text-[10px] font-mono text-blue-500 font-bold bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md">0 / 6</span>
               </div>
               
-              <div id="boxKegiatan" class="grid grid-cols-2 gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 max-h-40 overflow-y-auto">
-                <div class="relative"><input type="checkbox" id="keg1" value="Kajian Sore" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg1" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">📚 Kajian Sore</label></div>
-                <div class="relative"><input type="checkbox" id="keg2" value="Madrasah Diniyah" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg2" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">🕌 Madin</label></div>
-                <div class="relative"><input type="checkbox" id="keg3" value="Tahfidz" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg3" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">📖 Tahfidz</label></div>
-                <div class="relative"><input type="checkbox" id="keg4" value="Jamaah Maktubah" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg4" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">🧎 Maktubah</label></div>
-                <div class="relative"><input type="checkbox" id="keg5" value="Piket Kebersihan" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg5" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">🧹 Piket Bersih</label></div>
-                <div class="relative"><input type="checkbox" id="keg6" value="Rapat Organisasi" class="kegiatan-checkbox hidden" onchange="hitungChecked()"><label for="keg6" class="block text-center text-xs py-2 px-1 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-md cursor-pointer truncate hover:bg-zinc-800">💼 Rapat Org</label></div>
+              <div class="grid grid-cols-2 gap-2 input-bg p-3 rounded-xl border max-h-44 overflow-y-auto shadow-inner">
+                <div class="relative">
+                  <input type="checkbox" id="keg1" value="Kajian Sore" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg1" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">📚 Kajian Sore</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg2" value="Madrasah Diniyah" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg2" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">🕌 Madin</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg3" value="Tahfidz" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg3" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">📖 Tahfidz</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg4" value="Jamaah Maktubah" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg4" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">🧎 Maktubah</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg5" value="Piket Kebersihan" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg5" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">🧹 Piket Bersih</label>
+                </div>
+                <div class="relative">
+                  <input type="checkbox" id="keg6" value="Rapat Organisasi" class="kegiatan-checkbox hidden" onchange="hitungChecked()">
+                  <label for="keg6" class="block text-center text-xs py-2 px-1 card-bg border rounded-lg cursor-pointer truncate font-medium">💼 Rapat Org</label>
+                </div>
               </div>
             </div>
 
-            <button type="submit" id="btnSubmit" class="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold font-mono text-xs tracking-wider rounded-lg shadow-md">
-              <i class="fa-solid fa-shield-halved mr-1"></i> SIMPAN OTORISASI DISPENSASI
+            <button type="submit" id="btnSubmit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold font-mono text-xs tracking-wider rounded-xl shadow-md transform hover:-translate-y-0.5 active:translate-y-0 transition">
+              <i class="fa-solid fa-cloud-arrow-up mr-1"></i> SIMPAN & PUBLIKASIKAN DATA
             </button>
           </div>
         </form>
       </div>
 
-      <div id="panelMetrics" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3 font-mono">
-        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2"><i class="fa-solid fa-satellite-dish mr-1"></i> Telemetri Dispensasi Hari Ini</p>
+      <div class="panel-bg border rounded-2xl p-5 shadow-sm space-y-3 font-mono">
+        <p class="text-[10px] font-bold text-muted-custom uppercase tracking-widest border-b border-custom pb-2"><i class="fa-solid fa-chart-bar mr-1"></i> Rekap Otorisasi Hari Ini</p>
         <div class="grid grid-cols-2 gap-3">
-          <div id="cardKhidmah" class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
-            <span class="text-[9px] text-zinc-500 block">TOTAL KHIDMAH</span>
-            <span id="txtKhidmah" class="text-xl font-bold text-emerald-400">0</span>
+          <div class="input-bg p-3 rounded-xl border">
+            <span class="text-[9px] text-muted-custom block">TOTAL KHIDMAH</span>
+            <span id="txtKhidmah" class="text-xl font-bold text-emerald-500">0</span>
           </div>
-          <div id="cardMelekan" class="bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
-            <span class="text-[9px] text-zinc-500 block">TOTAL MELEKAN</span>
-            <span id="txtMelekan" class="text-xl font-bold text-amber-400">0</span>
+          <div class="input-bg p-3 rounded-xl border">
+            <span class="text-[9px] text-muted-custom block">TOTAL MELEKAN</span>
+            <span id="txtMelekan" class="text-xl font-bold text-amber-500">0</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="panelMainDeck" class="lg:col-span-7 bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-2xl flex flex-col h-[600px]">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 mb-4 gap-3">
+    <section class="lg:col-span-7 panel-bg border rounded-2xl p-6 shadow-sm flex flex-col h-[620px]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-custom pb-4 mb-4 gap-3">
         <div>
-          <h2 id="deckTitle" class="text-xs font-bold uppercase tracking-wider text-zinc-100">Database Personel Santri</h2>
-          <p class="text-[9px] text-zinc-500 font-mono">Pilih santri untuk memasukkan data ke formulir dispensasi</p>
+          <h2 class="text-sm font-bold uppercase tracking-wider">Database Node Santri</h2>
+          <p class="text-[10px] text-muted-custom font-mono">Klik kartu santri untuk memindahkannya ke form disposisi</p>
         </div>
-        <div class="relative w-full sm:w-56">
-          <input type="text" id="searchDeck" placeholder="Saring Nama..." autocomplete="off"
-            class="w-full pl-3 pr-8 py-1.5 bg-zinc-950 text-xs text-zinc-100 placeholder-zinc-600 rounded-md border border-zinc-800 focus:outline-none focus:border-amber-500">
-          <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-2.5 text-[10px] text-zinc-600"></i>
+        
+        <div class="relative w-full sm:w-60">
+          <input type="text" id="searchDeck" placeholder="Cari nama santri..." autocomplete="off"
+            class="input-bg w-full pl-4 pr-9 py-2 text-xs rounded-xl border focus:outline-none focus:border-blue-500 shadow-inner">
+          <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-xs text-muted-custom"></i>
         </div>
       </div>
 
       <div class="flex-1 overflow-y-auto pr-1">
-        <div id="gridSantriDispo" class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
-          <div class="col-span-full text-center py-24 text-zinc-500 font-mono text-xs w-full">
-            <i class="fa-solid fa-circle-notch animate-spin text-xl text-amber-500 mb-2 block"></i> Menghubungkan Terminal ke master_santri Node...
+        <div id="gridSantriDispo" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div class="col-span-full text-center py-24 text-muted-custom font-mono text-xs">
+            <i class="fa-solid fa-spinner animate-spin text-xl text-blue-500 mb-2 block"></i> Membaca Data Ledger Cloud Node...
           </div>
         </div>
       </div>
@@ -130,12 +182,29 @@
     const WEB_APP_URL = "URL_WEB_APP_SCRIPT_ANDA_DI_SINI"; 
 
     let databaseSantri = [];
-    let currentTheme = "dark";
+    let santriDipilihSaatIni = null;
     let maxAllowed = 6;
 
     document.addEventListener("DOMContentLoaded", function() {
       tarikDatabaseMaster();
     });
+
+    // SISTEM TEMA DENGAN CLASS INJEKSI PADA BODY (GARANSI 100% LAYOUT AMAN)
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById("themeIcon");
+      const themeText = document.getElementById("themeText");
+      
+      if (body.classList.contains("light-mode")) {
+        body.classList.remove("light-mode");
+        themeIcon.className = "fa-solid fa-sun text-amber-500";
+        themeText.innerText = "MODE TERANG";
+      } else {
+        body.classList.add("light-mode");
+        themeIcon.className = "fa-solid fa-moon text-indigo-600";
+        themeText.innerText = "MODE GELAP";
+      }
+    }
 
     function aturLimitEksklusif() {
       const kategori = document.getElementById("selectKategori").value;
@@ -164,62 +233,10 @@
       }
     }
 
-    // LOGIKA TEMA BARU: Mengandalkan manipulasi DOM murni tanpa replace teks kaku
-    function toggleTheme() {
-      const body = document.getElementById("mainBody");
-      const navbar = document.getElementById("navbar");
-      const btnVisor = document.getElementById("btnVisor");
-      const logoBox = document.getElementById("logoBox");
-      const panelForm = document.getElementById("panelForm");
-      const panelMetrics = document.getElementById("panelMetrics");
-      const panelMainDeck = document.getElementById("panelMainDeck");
-      const boxKegiatan = document.getElementById("boxKegiatan");
-      const cardKhidmah = document.getElementById("cardKhidmah");
-      const cardMelekan = document.getElementById("cardMelekan");
-      const inputs = document.querySelectorAll("input, select");
-      const checkLabels = document.querySelectorAll("#boxKegiatan label");
-
-      if (currentTheme === "dark") {
-        currentTheme = "light";
-        body.className = "theme-light bg-slate-100 text-slate-800 min-h-screen font-sans transition-colors duration-300";
-        navbar.className = "bg-white border-b border-slate-200 text-slate-700 shadow-md py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4";
-        panelForm.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md space-y-4";
-        panelMetrics.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md space-y-3 font-mono";
-        panelMainDeck.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-xl flex flex-col h-[600px]";
-        boxKegiatan.className = "grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200 max-h-40 overflow-y-auto";
-        cardKhidmah.className = "bg-slate-50 p-3 rounded-lg border border-slate-200";
-        cardMelekan.className = "bg-slate-50 p-3 rounded-lg border border-slate-200";
-        logoBox.className = "bg-amber-100 border border-amber-300 p-2.5 rounded-lg text-amber-600 shadow-inner";
-        btnVisor.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2";
-        btnVisor.innerHTML = `<i class="fa-solid fa-moon text-indigo-600"></i> TOGGLE VISOR`;
-
-        inputs.forEach(el => el.style.backgroundColor = "#f8fafc", el.style.color = "#0f172a", el.style.borderColor = "#cbd5e1");
-        checkLabels.forEach(lbl => { lbl.style.backgroundColor = "#ffffff"; lbl.style.color = "#334155"; lbl.style.borderColor = "#e2e8f0"; });
-      } else {
-        currentTheme = "dark";
-        body.className = "theme-dark bg-zinc-950 text-zinc-200 min-h-screen font-sans transition-colors duration-300";
-        navbar.className = "bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4";
-        panelForm.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4";
-        panelMetrics.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3 font-mono";
-        panelMainDeck.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-2xl flex flex-col h-[600px]";
-        boxKegiatan.className = "grid grid-cols-2 gap-2 bg-zinc-950 p-3 rounded-lg border border-zinc-800/60 max-h-40 overflow-y-auto";
-        cardKhidmah.className = "bg-zinc-950 p-3 rounded-lg border border-zinc-800/80";
-        cardMelekan.className = "bg-zinc-950 p-3 rounded-lg border border-zinc-800/80";
-        logoBox.className = "bg-amber-600/10 border border-amber-500/30 p-2.5 rounded-lg text-amber-400 shadow-inner";
-        btnVisor.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2";
-        btnVisor.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR`;
-
-        inputs.forEach(el => el.style.backgroundColor = "#09090b", el.style.color = "#f4f4f5", el.style.borderColor = "#27272a");
-        checkLabels.forEach(lbl => { lbl.style.backgroundColor = "#18181b"; lbl.style.color = "#d4d4d8"; lbl.style.borderColor = "#27272a"; });
-      }
-
-      buildDeckMaster(databaseSantri);
-    }
-
     function tarikDatabaseMaster() {
       const container = document.getElementById("gridSantriDispo");
       if(WEB_APP_URL.includes("URL_WEB_APP_SCRIPT_ANDA")) {
-         container.innerHTML = `<div class="col-span-full text-center py-20 text-amber-500 font-mono text-xs px-4 border border-dashed border-amber-500/30 rounded-lg bg-amber-500/5">⚠️ <strong>Konfigurasi Diperlukan:</strong><br><span class="text-zinc-400 mt-1 block">Silakan letakkan tautan Web App Apps Script Anda pada variabel <code>WEB_APP_URL</code>.</span></div>`;
+         container.innerHTML = `<div class="col-span-full text-center py-16 text-amber-500 font-mono text-xs px-4 border border-dashed border-amber-500/30 rounded-2xl bg-amber-500/5">⚠️ <strong>Konfigurasi Global Diperlukan:</strong><br><span class="text-gray-400 mt-1 block">Silakan letakkan tautan Web App Apps Script Anda pada variabel <code>WEB_APP_URL</code>.</span></div>`;
          return;
       }
       
@@ -228,47 +245,68 @@
         .then(res => {
           if (res.status === "success") {
             databaseSantri = res.data;
-            buildDeckMaster(databaseSantri);
+            buildDeckMaster();
             tarikTelemetriHariIni();
           }
         }).catch(err => {
-          container.innerHTML = `<div class="col-span-full text-center py-20 text-rose-500 font-mono text-xs px-4 border border-dashed border-rose-500/30 rounded-lg bg-rose-500/5">🚨 <strong>CRITICAL CRASH:</strong><br><span class="text-zinc-400 mt-1 block">Gagal menarik data dari server Cloud Ledger.</span></div>`;
+          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs px-4 border border-dashed border-rose-500/30 rounded-2xl bg-rose-500/5">🚨 <strong>CRITICAL CONNECTION ERROR:</strong><br><span class="text-gray-400 mt-1 block">Gagal terhubung dengan server Google Sheets Cloud.</span></div>`;
         });
     }
 
-    function buildDeckMaster(data) {
+    // MEMBUAT RE-RENDER CARD DECK YANG ADAPTIF
+    function buildDeckMaster() {
       const container = document.getElementById("gridSantriDispo");
       container.innerHTML = "";
 
-      if(data.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-500 font-mono text-xs">Tidak ada data personel.</div>`;
+      // Memfilter santri yang sedang tidak dimasukkan ke dalam form pilihan
+      const listTersedia = databaseSantri.filter(s => !santriDipilihSaatIni || santriDipilihSaatIni.nik !== s.nik);
+
+      if(listTersedia.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-20 text-muted-custom font-mono text-xs">Seluruh personel masuk antrean atau data kosong.</div>`;
         return;
       }
 
-      data.forEach(s => {
+      listTersedia.forEach(s => {
         const div = document.createElement("div");
+        div.className = "box-santri card-bg border p-3 rounded-xl cursor-pointer shadow-sm transition transform active:scale-95 font-mono flex flex-col justify-between h-20";
         div.setAttribute("data-nama", s.nama.toLowerCase());
         
-        if (currentTheme === "dark") {
-          div.className = "box-santri card-fade bg-zinc-950 text-zinc-300 border border-zinc-800 p-2.5 rounded-lg text-center cursor-pointer hover:bg-zinc-800/80 shadow-md font-mono relative";
-        } else {
-          div.className = "box-santri card-fade bg-white text-slate-700 border border-slate-200 p-2.5 rounded-lg text-center cursor-pointer hover:bg-amber-50/70 shadow-sm font-mono relative";
-        }
-        
         div.innerHTML = `
-          <p class="text-[10px] font-bold tracking-tight line-clamp-1">${s.nama}</p>
-          <p class="text-[8px] text-zinc-500 mt-1">NIK: ${s.nik || '-'}</p>
+          <p class="text-xs font-bold tracking-tight line-clamp-1">${s.nama}</p>
+          <div class="flex justify-between items-center mt-2 border-t border-custom pt-1">
+            <span class="text-[9px] text-muted-custom">NIK: ${s.nik || '-'}</span>
+            <i class="fa-solid fa-right-to-bracket text-[10px] text-blue-500 opacity-60"></i>
+          </div>
         `;
 
+        // LOGIKA KLIK KARTU HILANG DAN PINDAH KE FORM
         div.addEventListener("click", function() {
-          document.getElementById("inputNama").value = s.nama;
-          document.getElementById("inputNIK").value = s.nik || "000000";
-          div.classList.add("ring-2", "ring-amber-500");
-          setTimeout(() => div.classList.remove("ring-2", "ring-amber-500"), 600);
+          div.classList.add("fade-out-card"); // Jalankan efek animasi CSS
+          
+          setTimeout(() => {
+            // Jika ada santri yang sebelumnya tersemat, kembalikan dulu ke deck
+            santriDipilihSaatIni = s; 
+            
+            document.getElementById("inputNama").value = s.nama;
+            document.getElementById("inputNIK").value = s.nik || "000000";
+            document.getElementById("btnResetTerpilih").classList.remove("hidden");
+            
+            // Re-render ulang deck kanan sehingga santri terpilih HILANG dari daftar
+            buildDeckMaster();
+          }, 250);
         });
 
         container.appendChild(div);
       });
+    }
+
+    // Fungsi Untuk Membatalkan Pilihan Santri (Mengembalikan kartu ke kanan)
+    function resetTerpilih() {
+      document.getElementById("inputNama").value = "";
+      document.getElementById("inputNIK").value = "";
+      document.getElementById("btnResetTerpilih").classList.add("hidden");
+      santriDipilihSaatIni = null;
+      buildDeckMaster();
     }
 
     function ajukanDispensasi(e) {
@@ -279,14 +317,14 @@
       const kategori = document.getElementById("selectKategori").value;
       
       const checkedBoxes = document.querySelectorAll(".kegiatan-checkbox:checked");
-      if(checkedBoxes.length === 0) { alert("Minimal pilih 1 kegiatan delegasi bebas!"); return; }
+      if(checkedBoxes.length === 0) { alert("Pilih minimal 1 kegiatan dispensasi!"); return; }
 
       let arrKegiatan = [];
       checkedBoxes.forEach(cb => arrKegiatan.push(cb.value));
       const buktiStr = arrKegiatan.join(", ");
 
       btn.disabled = true;
-      btn.innerText = "MENSTRANSMISIKAN DATA...";
+      btn.innerText = "SEDANG MENGIRIM DATA LEDGER...";
 
       let targetUrl = `${WEB_APP_URL}?aksi=simpan_dispensasi_khusus&nik=${encodeURIComponent(nik)}&nama=${encodeURIComponent(nama)}&kategori=${encodeURIComponent(kategori)}&bukti=${encodeURIComponent(buktiStr)}`;
 
@@ -294,23 +332,26 @@
         .then(res => res.json())
         .then(res => {
           if(res.status === "success") {
-            alert(`Dispensasi ${kategori} atas nama ${nama} Berhasil Diotorisasi!`);
+            alert(`Dispensasi ${kategori} atas nama ${nama} Sukses Disimpan!`);
             document.getElementById("formDispensasi").reset();
+            santriDipilihSaatIni = null; // hapus dari list form karena sudah sukses disimpan
+            document.getElementById("btnResetTerpilih").classList.add("hidden");
             aturLimitEksklusif();
+            buildDeckMaster(); // Refresh deck agar kartu muncul kembali untuk keperluan input masa depan
             tarikTelemetriHariIni();
           } else {
-            alert("Error: " + res.message);
+            alert("Gagal menyimpan data: " + res.message);
           }
         })
-        .catch(err => alert("Koneksi cloud node terputus."))
+        .catch(err => alert("Error: Sambungan dengan node cloud terputus."))
         .finally(() => {
           btn.disabled = false;
-          btn.innerText = "SIMPAN OTORISASI DISPENSASI";
+          btn.innerText = "SIMPAN & PUBLIKASIKAN DATA";
         });
     }
 
     function tarikTelemetriHariIni() {
-      if(WEB_APP_URL.includes("URL_WEB_APP_SCRIPT_ANDA")) return;
+      if(WEB_APP_URL.includes("https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec")) return;
       fetch(`${WEB_APP_URL}?aksi=ambil_telemetri_dispensasi`)
         .then(res => res.json())
         .then(res => {
@@ -321,11 +362,12 @@
         });
     }
 
+    // SEARCH FILTER BAR DECK KANAN
     document.getElementById("searchDeck").addEventListener("input", function() {
       let val = this.value.trim().toLowerCase();
       document.querySelectorAll(".box-santri").forEach(b => {
         let text = b.getAttribute("data-nama");
-        b.style.display = text.includes(val) ? "block" : "none";
+        b.style.display = text.includes(val) ? "flex" : "none";
       });
     });
   </script>
