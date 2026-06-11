@@ -139,11 +139,14 @@
                 return;
             }
 
+            // === BAGIAN YANG DIPERBAIKI (MENGGUNAKAN BACKTICK PADA ONCLICK) ===
             hasilSaring.forEach(u => {
                 const card = document.createElement('div');
                 card.id = `card-${u.nik}`;
                 card.className = 'card-ustadz p-4 rounded-xl border border-zinc-800/80 flex flex-col justify-center items-center text-center relative overflow-hidden';
-                card.setAttribute('onclick', `eksekusiAbsenUstadz('${u.nik}', '${u.nama}')`);
+                
+                // Menggunakan backtick ` agar tanda petik pada nama seperti Syafi' tidak merusak sintaks
+                card.setAttribute('onclick', `eksekusiAbsenUstadz(\`${u.nik}\`, \`${u.nama}\`)`);
                 
                 card.innerHTML = `
                     <div class="w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 pointer-events-none">
