@@ -17,8 +17,8 @@
       --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
       --accent: #319795;
       --accent-hover: #2c7a7b;
-      --badge-bg: #e6fffa;
-      --badge-text: #234e52;
+      --badge-bg: #feebc8;
+      --badge-text: #c05621;
     }
 
     [data-theme="dark"] {
@@ -30,8 +30,8 @@
       --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --accent: #4fd1c5;
       --accent-hover: #319795;
-      --badge-bg: rgba(79, 209, 197, 0.2);
-      --badge-text: #81e6d9;
+      --badge-bg: rgba(2dd, 107, 107, 0.2);
+      --badge-text: #feb2b2;
     }
 
     * {
@@ -91,7 +91,6 @@
       gap: 12px;
     }
 
-    /* BUTTONS STYLE */
     .btn-nav {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -201,7 +200,7 @@
     .santri-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-      border-color: var(--accent);
+      border-color: #e53e3e;
     }
 
     .santri-info .name {
@@ -225,29 +224,25 @@
     }
 
     .badge {
-      background: var(--badge-bg);
-      color: var(--badge-text);
+      background: #fff5f5;
+      color: #e53e3e;
       font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
+      font-weight: 700;
+      padding: 4px 12px;
       border-radius: 30px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      border: 1px solid rgba(229, 62, 62, 0.2);
     }
 
-    .badge.perempuan {
-      background: #fff5f5;
-      color: #9b2c2c;
-    }
-
-    [data-theme="dark"] .badge.perempuan {
-      background: rgba(254, 178, 178, 0.2);
+    [data-theme="dark"] .badge {
+      background: rgba(229, 62, 62, 0.2);
       color: #feb2b2;
     }
 
     .click-indicator {
       font-size: 12px;
-      color: var(--accent);
+      color: #e53e3e;
       opacity: 0;
       transform: translateX(10px);
     }
@@ -305,7 +300,7 @@
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
-        <p>Klik kartu pengurus untuk langsung mengonfirmasi kehadiran petugas malam ini.</p>
+        <p>Klik kartu petugas berstatus GAIB untuk mengonfirmasi kehadiran mereka malam ini.</p>
       </div>
       <div class="header-actions">
         <button class="btn-nav" onclick="kembaliKeDashboard()">
@@ -331,13 +326,13 @@
 
     <div class="section-title">
       <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
-      <span>Daftar Pengurus Wajib Patroli Hari Ini</span>
+      <span>Petugas Jaga Malam Berstatus GAIB</span>
     </div>
 
     <div class="oprak-grid" id="container-grid">
       <div class="loader-container">
         <div class="spinner"></div>
-        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghimpun Database Jadwal Oprak PPMUY...</p>
+        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghimpun Database Urutan Kolom K...</p>
       </div>
     </div>
   </div>
@@ -347,7 +342,6 @@
     let dataSantriLokal = [];
     let filterSekarang = "semua";
 
-    // Auto Sinkronisasi Terang/Gelap Mengikuti Kondisi Penyimpanan State Dashboard
     function inisialisasiTemaBawaan() {
       const temaDisimpan = localStorage.getItem('theme') || 'dark';
       document.body.setAttribute('data-theme', temaDisimpan);
@@ -370,7 +364,6 @@
     }
 
     function kembaliKeDashboard() {
-      // Mengarahkan kembali ke file utama index dashboard Anda
       window.location.href = "index.html";
     }
 
@@ -380,7 +373,6 @@
     });
 
     function muatDaftarOprak() {
-      // Dipanggil via parameter aksi murni yang dikenali file gs satelit
       fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
         .then(response => response.json())
         .then(res => {
@@ -394,7 +386,7 @@
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud. Silakan coba kembali.</div>`;
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal terhubung dengan radar cloud.</div>`;
         });
     }
 
@@ -405,22 +397,21 @@
       const dataDisaring = dataSantriLokal.filter(s => {
         if (filterSekarang === "semua") return true;
         var gen = (s.gender || "").toString().toUpperCase().trim();
-        // Normalisasi toleransi data lama sheet
         if (gen === "L" || gen === "PUTRA") gen = "LAKI-LAKI";
         if (gen === "P" || gen === "PUTRI") gen = "PEREMPUAN";
         return gen === filterSekarang;
       });
 
-      if (dataDisaring.length === 0) {
+      // Menyaring kartu agar hanya memunculkan yang status kerjanya "GAIB"
+      const dataGaib = dataDisaring.filter(s => s.status_kerja.toUpperCase() === "GAIB");
+
+      if (dataGaib.length === 0) {
         var labelDisplay = filterSekarang === 'semua' ? '' : filterSekarang;
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Tidak ada petugas ${labelDisplay} yang tersisa malam ini!</div>`;
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Alhamdulillah, malam ini tidak ada petugas ${labelDisplay} berstatus GAIB!</div>`;
         return;
       }
 
-      dataDisaring.forEach(santri => {
-        // Hanya memunculkan petugas yang status kerjanya belum absen
-        if (santri.status_kerja === "HADIR JAGA") return;
-
+      dataGaib.forEach(santri => {
         const card = document.createElement("div");
         card.className = "santri-card";
         
@@ -432,26 +423,21 @@
         if (genDisplay === "L" || genDisplay === "PUTRA") genDisplay = "LAKI-LAKI";
         if (genDisplay === "P" || genDisplay === "PUTRI") genDisplay = "PEREMPUAN";
 
-        const badgeClass = genDisplay === "PEREMPUAN" ? "badge perempuan" : "badge";
-
         card.innerHTML = `
           <div class="santri-info">
             <div class="name">${santri.nama}</div>
             <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
             <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
+            <div class="sub"><i class="fa-solid fa-rotate"></i> Putaran Ke: ${santri.putaran || '-'}</div>
             <div class="sub"><i class="fa-solid fa-venus-mars"></i> Kelompok: ${genDisplay}</div>
           </div>
           <div class="card-footer">
-            <span class="${badgeClass}">Wajib Oprak</span>
+            <span class="badge"><i class="fa-solid fa-ghost"></i> GAIB</span>
             <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
           </div>
         `;
         grid.appendChild(card);
       });
-      
-      if(gridHasNoCards() && dataSantriLokal.length > 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas untuk filter ini sudah terabsen!</div>`;
-      }
     }
 
     function saringGender(kategori, elemen) {
@@ -462,10 +448,12 @@
     }
 
     function eksekusiHadirKilat(nik, nama, elemen) {
+      // Animasi kartu menciut dan menghilang secara langsung di UI
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
       
       setTimeout(() => {
+        // Hilangkan data dari array lokal dan re-render grid agar sinkron
         dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
         elemen.remove();
         if(gridHasNoCards()) {
@@ -473,17 +461,18 @@
         }
       }, 300);
 
+      // Tembak server POST untuk merubah status GAIB -> HADIR
       fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
         method: 'POST'
       })
       .then(r => r.json())
       .then(respon => {
         if(respon.status !== "success") {
-          console.error("Gagal sinkronisasi cloud: " + respon.message);
+          console.error("Gagal update status cloud: " + respon.message);
         }
       })
       .catch(e => {
-        console.error("Server Error di background request", e);
+        console.error("Server Error link cloud background", e);
       });
     }
 
