@@ -26,7 +26,7 @@
             <div id="dropdown-hasil" class="absolute left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-xl max-h-48 overflow-y-auto hidden z-50 shadow-2xl"></div>
         </div>
 
-        <input type="hidden" id="input-nik-terpilih">
+        <input type="hidden" id="input-nik-terpilled">
         <div id="info-santri-terpilih" class="bg-slate-950 p-2.5 rounded-xl border border-dashed border-slate-800 hidden text-center">
             <p class="text-xs font-black text-emerald-400 tracking-wide uppercase"><i class="fa-solid fa-user-check mr-1"></i> TARGET SINKRONISASI</p>
             <p id="lbl-nama-terpilih" class="text-sm font-bold text-white mt-0.5"></p>
@@ -66,7 +66,8 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT ENGINE BIOMETRIK...";
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                // Menggunakan SsdMobilenetv1 untuk proses Registrasi agar koordinat wajah presisi absolut
+                await faceapi.nets.ssdMobilenetv1.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
@@ -87,8 +88,8 @@
                 setInterval(async () => {
                     if (!aiReady || video.paused || video.ended) return;
                     
-                    // MENAIKKAN SCORE THRESHOLD: Menghindari pendaftaran sampel beresolusi jelek
-                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.6 }))
+                    // Deteksi menggunakan opsi SsdMobilenetv1 (Lebih akurat dibanding TinyFaceDetector untuk urusan registrasi)
+                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
                                                  .withFaceLandmarks()
                                                  .withFaceDescriptor();
                     
@@ -97,7 +98,7 @@
                         frame.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-102";
                         label.innerText = "BIOMETRIK WAJAH TERKUNCI";
                         
-                        if (document.getElementById('input-nik-terpilih').value) {
+                        if (document.getElementById('input-nik-terpilled').value) {
                             btnSimpan.disabled = false;
                             btnSimpan.innerText = "DAFTARKAN WAJAH FIX";
                             btnSimpan.className = "w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-2xl text-xs uppercase text-center tracking-widest shadow-lg transition-all cursor-pointer";
@@ -114,7 +115,6 @@
             } catch (e) { label.innerText = "ENGINE AI ERROR"; }
         });
 
-        // Logika Live Dropdown Search
         const inputCari = document.getElementById('input-cari-nama');
         const dropdownHasil = document.getElementById('dropdown-hasil');
 
@@ -130,7 +130,7 @@
                 item.className = "px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-amber-500 hover:text-slate-950 border-b border-slate-800/50 cursor-pointer text-left";
                 item.innerHTML = `${santri.nama.toUpperCase()} <span class="text-[9px] block opacity-50">NIK: ${santri.nik} | Kelas: ${santri.kelas}</span>`;
                 item.addEventListener('click', () => {
-                    document.getElementById('input-nik-terpilih').value = santri.nik;
+                    document.getElementById('input-nik-terpilled').value = santri.nik;
                     document.getElementById('lbl-nama-terpilih').innerText = santri.nama.toUpperCase();
                     document.getElementById('lbl-nik-kelas-terpilih').innerText = `NIK: ${santri.nik} | KELAS: ${santri.kelas}`;
                     document.getElementById('info-santri-terpilih').classList.remove('hidden');
@@ -143,7 +143,7 @@
         });
 
         btnSimpan.addEventListener('click', async () => {
-            let nikFinal = document.getElementById('input-nik-terpilih').value;
+            let nikFinal = document.getElementById('input-nik-terpilled').value;
             if (!nikFinal || !descriptorWajahTerakhir) return;
 
             btnSimpan.disabled = true; 
@@ -152,7 +152,7 @@
             const params = new URLSearchParams();
             params.append('aksi', 'daftar_wajah_saja');
             params.append('nik', nikFinal);
-            params.append('vektor', JSON.stringify(descriptorWajahTerakhir)); 
+            params.append('vektor', JSON.stringify(descriptorWajahTerakhir));
 
             try {
                 let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params.toString() });
@@ -168,7 +168,7 @@
                     });
                     inputCari.value = ""; 
                     document.getElementById('info-santri-terpilih').classList.add('hidden');
-                    document.getElementById('input-nik-terpilih').value = "";
+                    document.getElementById('input-nik-terpilled').value = "";
                 } else { 
                     alert("Gagal menyimpan data: " + r.message); 
                 }
