@@ -91,6 +91,7 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
+                // Menggunakan unpkg bawaan Anda yang terbukti aktif tanpa kendala offline/404
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -109,8 +110,8 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Deteksi wajah menggunakan ukuran input dinamis 160 untuk respons lebih optimal
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
+                    // PENYESUAIAN 1: Menyamakan konfigurasi detektor secara presisi dengan file pendaftaran Anda (inputSize: 160, scoreThreshold: 0.5)
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
@@ -119,7 +120,7 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 400);
+                }, 350);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -139,8 +140,9 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // PERBAIKAN UTAMA: Batas strict diubah dari 0.50 menjadi 0.60 agar wajah santri langsung teridentifikasi dengan baik
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.60) { 
+                    // PENYESUAIAN 2: Melonggarkan toleransi jarak sains ke 0.65. 
+                    // Ini adalah sweet-spot krusial agar model biner 160-bit tetap mengenali wajah meski ada pergeseran sudut/cahaya kecil.
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.65) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
