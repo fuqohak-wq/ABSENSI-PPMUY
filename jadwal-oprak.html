@@ -39,7 +39,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+      transition: background 0.3s, color 0.3s, transform 0.2s, opacity 0.3s, box-shadow 0.3s;
     }
 
     body {
@@ -235,7 +235,7 @@
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
-        <p>Klik kartu santri jika dikonfirmasi hadir bertugas dalam siklus hari ini (18.00 - 17.59 WIB).</p>
+        <p>Klik kartu santri untuk langsung mengonfirmasi kehadiran petugas dalam siklus hari ini.</p>
       </div>
       <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
@@ -255,10 +255,8 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <script>
-    // URL API Google Apps Script (Pastikan URL ini sesuai dengan hasil Web App Deploy Anda!)
+    // URL API Google Apps Script
     const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
 
     // FUNGSI TOGGLE THEME (TERANG/GELAP)
@@ -288,7 +286,7 @@
           grid.innerHTML = "";
           
           if(res.status === "error" || !res.data || res.data.length === 0) {
-            grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
+            tampilkanEmptyState();
             return;
           }
 
@@ -296,9 +294,9 @@
             const card = document.createElement("div");
             card.className = "santri-card";
             
-            // Mengikat event click dengan aman tanpa gangguan karakter tanda kutip (') pada nama
+            // Langsung eksekusi hilangkan nama tanpa konfirmasi popup saat diklik
             card.addEventListener("click", function() {
-              konfirmasiKehadiran(santri.nik, santri.nama, card);
+              eksekusiHadirKilat(santri.nik, santri.nama, card);
             });
             
             card.innerHTML = `
@@ -321,65 +319,45 @@
         });
     }
 
-    // KONFIRMASI KEHADIRAN (UBAH STATUS JADI HADIR & POIN JADI 0)
-    function konfirmasiKehadiran(nik, nama, elemen) {
-      Swal.fire({
-        title: 'Konfirmasi Kehadiran',
-        text: `Apakah benar santri "${nama}" hadir melaksanakan tugas oprak-oprak hari ini?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#319795',
-        cancelButtonColor: '#718096',
-        confirmButtonText: 'Ya, Hadir Kerja!',
-        cancelButtonText: 'Batal',
-        background: document.body.getAttribute('data-theme') === 'dark' ? '#2d3748' : '#fff',
-        color: document.body.getAttribute('data-theme') === 'dark' ? '#fff' : '#2d3748'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          
-          // Kirim request POST perubahan data ke Cloud Engine
-          fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
-            method: 'POST'
-          })
-          .then(r => r.json())
-          .then(respon => {
-            if(respon.status === "success") {
-              // Efek animasi menyusut (scale 0) saat kartu sukses ditambah/diverifikasi
-              elemen.style.transform = "scale(0)";
-              elemen.style.opacity = "0";
-              
-              setTimeout(() => {
-                elemen.remove();
-                // Jika kartu di layar sudah habis, tampilkan empty state bersih
-                if(gridHasNoCards()) {
-                  document.getElementById("container-grid").innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
-                }
-              }, 300);
-
-              Swal.fire({
-                title: 'Berhasil!',
-                text: 'Status kerja diperbarui menjadi HADIR (Poin Pelanggaran: 0).',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false,
-                background: document.body.getAttribute('data-theme') === 'dark' ? '#2d3748' : '#fff',
-                color: document.body.getAttribute('data-theme') === 'dark' ? '#fff' : '#2d3748'
-              });
-            } else {
-              Swal.fire('Gagal', respon.message, 'error');
-            }
-          })
-          .catch(e => {
-            Swal.fire('Server Error', 'Gagal memperbarui status ke cloud database.', 'error');
-          });
+    // MODE KILAT: KARTU LANGSUNG HILANG DI LAYAR, KODE POST BERJALAN DI BACKGROUND
+    function eksekusiHadirKilat(nik, nama, elemen) {
+      // 1. Jalankan animasi menyusut & hilangkan elemen dari UI secara langsung
+      elemen.style.transform = "scale(0)";
+      elemen.style.opacity = "0";
+      
+      setTimeout(() => {
+        elemen.remove();
+        // Cek jika kartu di layar sudah habis total, tampilkan status bersih
+        if(gridHasNoCards()) {
+          tampilkanEmptyState();
         }
+      }, 300);
+
+      // 2. Kirim data ke Cloud Engine secara senyap (Background Request)
+      fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
+        method: 'POST'
+      })
+      .then(r => r.json())
+      .then(respon => {
+        if(respon.status !== "success") {
+          console.error("Gagal sinkronisasi cloud untuk santri: " + nama + ". Error: " + respon.message);
+        }
+      })
+      .catch(e => {
+        console.error("Server Error: Sinkronisasi latar belakang gagal untuk " + nama, e);
       });
     }
 
-    // Helper untuk mengecek ketersediaan kartu santri di grid
+    // Helper untuk mengecek sisa kartu di dalam grid
     function gridHasNoCards() {
       const grid = document.getElementById("container-grid");
       return grid.getElementsByClassName("santri-card").length === 0;
+    }
+
+    // Helper untuk merender pesan kosong/bersih
+    function tampilkanEmptyState() {
+      const grid = document.getElementById("container-grid");
+      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
     }
   </script>
 </body>
