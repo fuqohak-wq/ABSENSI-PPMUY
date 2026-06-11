@@ -66,7 +66,6 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT ENGINE BIOMETRIK...";
-                // WAJIB MEMUAT 3 MODEL UTAMA AGAR BISA MENGHASILKAN DESCRIPTOR 128-BIT
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -85,17 +84,15 @@
                 label.innerText = "PILIH NAMA SANTRI DI ATAS";
                 aiReady = true;
                 
-                // Perulangan pelacakan struktur wajah real-time
                 setInterval(async () => {
                     if (!aiReady || video.paused || video.ended) return;
                     
-                    // Deteksi wajah tunggal lengkap dengan pencatatan descriptor biometrik mendalam
-                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 }))
+                    // MENAIKKAN SCORE THRESHOLD: Menghindari pendaftaran sampel beresolusi jelek
+                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.6 }))
                                                  .withFaceLandmarks()
-                                                 .withFaceDescriptor(); // <-- Kunci Akurasi Utama
+                                                 .withFaceDescriptor();
                     
                     if (deteksi) {
-                        // Simpan struktur descriptor asli (bukan lagi koordinat piksel)
                         descriptorWajahTerakhir = Array.from(deteksi.descriptor);
                         frame.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-102";
                         label.innerText = "BIOMETRIK WAJAH TERKUNCI";
@@ -113,7 +110,7 @@
                         btnSimpan.innerText = "WAJAH BELUM TERDETEKSI";
                         btnSimpan.className = "w-full bg-slate-800 text-slate-500 font-black py-4 rounded-2xl text-xs uppercase text-center tracking-widest shadow-lg transition-all cursor-not-allowed";
                     }
-                }, 350);
+                }, 400);
             } catch (e) { label.innerText = "ENGINE AI ERROR"; }
         });
 
@@ -155,7 +152,7 @@
             const params = new URLSearchParams();
             params.append('aksi', 'daftar_wajah_saja');
             params.append('nik', nikFinal);
-            params.append('vektor', JSON.stringify(descriptorWajahTerakhir)); // Mengirimkan enkripsi 128-bit ke Google Sheets
+            params.append('vektor', JSON.stringify(descriptorWajahTerakhir)); 
 
             try {
                 let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: params.toString() });
