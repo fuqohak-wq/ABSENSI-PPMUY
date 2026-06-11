@@ -358,8 +358,9 @@
 
     // Fungsi Navigasi Menggunakan Top Window Parent (Menerobos iFrame Sandbox Google)
     function keDashboardUtama() {
-      window.top.location.href = urlScript + "?page=dashboard";
-    }
+  // Menghapus parameter query dan kembali ke halaman dasar Web App Anda
+  window.top.location.href = urlScript.split('?')[0];
+}
 
     function toggleTheme() {
       const body = document.body;
