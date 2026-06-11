@@ -63,7 +63,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 24px;
-      padding: 20px 24px;
+      padding: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -71,63 +71,64 @@
     }
 
     .title-area h1 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
     
     .title-area p {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-muted);
       margin-top: 4px;
     }
 
-    .action-header-buttons {
+    .header-actions {
       display: flex;
-      gap: 10px;
       align-items: center;
+      gap: 12px;
     }
 
-    .btn-nav-back {
-      background: transparent;
+    /* TOMBOL KEMBALI KE DASHBOARD UTAMA */
+    .btn-dashboard {
+      background: var(--card-bg);
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 10px 18px;
+      padding: 10px 20px;
       border-radius: 14px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 8px;
-      text-decoration: none;
       box-shadow: var(--shadow);
     }
 
-    .btn-nav-back:hover {
+    .btn-dashboard:hover {
       background: var(--accent);
       color: white;
       border-color: var(--accent);
+      transform: scale(1.02);
     }
 
     .theme-toggle-btn {
       background: var(--accent);
       border: none;
       color: white;
-      width: 42px;
-      height: 42px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 18px;
     }
 
     /* FUN STATS INTERAKTIF */
     .fun-stats-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
       margin-bottom: 25px;
     }
@@ -137,7 +138,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 20px;
-      padding: 16px 20px;
+      padding: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -145,23 +146,23 @@
     }
 
     .stat-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 22px;
       color: white;
     }
 
     .stat-info h3 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
     }
 
     .stat-info p {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-muted);
     }
 
@@ -171,7 +172,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
       border-radius: 20px;
-      padding: 14px 20px;
+      padding: 16px 20px;
       margin-bottom: 25px;
       display: flex;
       flex-wrap: wrap;
@@ -200,8 +201,8 @@
     .seg-btn {
       background: transparent;
       border: none;
-      padding: 6px 14px;
-      font-size: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: 9px;
@@ -217,47 +218,46 @@
       background: var(--card-bg);
       color: var(--text-main);
       border: 1px solid var(--border-color);
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       outline: none;
       cursor: pointer;
     }
 
-    /* GRID TAMPILAN UTAMA (KARTU DIKECILKAN) */
+    /* GRID TAMPILAN UTAMA (UKURAN DIKECILKAN) */
     .piket-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 12px;
     }
 
+    /* KARTU RINGKAS: HANYA NAMA */
     .piket-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
-      border-radius: 14px;
-      padding: 14px;
+      border-radius: 16px;
+      padding: 16px;
       cursor: pointer;
       position: relative;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      min-height: 85px;
+      min-height: 80px;
     }
 
     .piket-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       border-color: var(--accent);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
     }
 
     .santri-name {
       font-size: 14px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.4;
       word-break: break-word;
     }
 
@@ -270,8 +270,8 @@
 
     .spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border-left-color: var(--accent);
       animation: spin 1s linear infinite;
@@ -287,11 +287,11 @@
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-broom" style="color: var(--accent); margin-right: 6px;"></i> Radar Operasi Piket Kebersihan</h1>
-        <p>Klik nama santri untuk konfirmasi kehadiran. Santri yang tersisa otomatis berstatus Gaib.</p>
+        <p>Klik kartu santri untuk konfirmasi kehadiran piket. Santri yang tersisa di layar otomatis berstatus Gaib.</p>
       </div>
-      <div class="action-header-buttons">
-        <button onclick="kembaliKeDashboard()" class="btn-nav-back">
-          <i class="fa-solid fa-arrow-left"></i> Dashboard
+      <div class="header-actions">
+        <button class="btn-dashboard" onclick="keDashboardUtama()">
+          <i class="fa-solid fa-house"></i> Ke Dashboard
         </button>
         <button class="theme-toggle-btn" onclick="toggleTheme()">
           <i class="fa-solid fa-moon" id="theme-icon"></i>
@@ -350,14 +350,14 @@
   </div>
 
   <script>
-    // URL dinamis otomatis mengambil origin script Apps Script Anda
-    const urlScript = window.location.href.split('?')[0];
+    // URL Deployment Web App Asli Anda (Tetap Dipertahankan)
+    const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
     let dataPiketLokal = [];
     let filterGender = "semua";
     let filterKelas = "semua";
 
-    function kembaliKeDashboard() {
-      // Mengarahkan kembali ke dashboard utama Apps Script Anda
+    // Fungsi Navigasi Menggunakan Top Window Parent (Menerobos iFrame Sandbox Google)
+    function keDashboardUtama() {
       window.top.location.href = urlScript + "?page=dashboard";
     }
 
@@ -428,16 +428,19 @@
       const grid = document.getElementById("grid-piket");
       grid.innerHTML = "";
 
-      // Hanya menampilkan santri yang masih belum absen ("") agar bisa diklik hilang
+      // Logika Penyaringan: Hanya memunculkan yang status kehadirannya kosong ("")
       const disaring = dataPiketLokal.filter(s => {
-        if (s.kehadiran !== "") return false; 
-        const matchGen = (filterGender === "semua") || (s.gender.toUpperCase() === filterGender.toUpperCase());
+        if (s.kehadiran !== "") return false;
+
+        const genderSantri = (s.gender || "").toString().toUpperCase();
+        const matchGen = (filterGender === "semua") || (genderSantri === filterGender.toUpperCase());
         const matchKls = (filterKelas === "semua") || (s.kelas === filterKelas);
+        
         return matchGen && matchKls;
       });
 
       if(disaring.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--aman-color);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib! Semua sudah piket.</div>`;
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--aman-color);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib!</div>`;
         return;
       }
 
@@ -449,28 +452,27 @@
           eksekusiPiketKilat(s.nik, card);
         });
 
-        // Hanya merender komponen Nama Santri agar ukuran kartu ringkas & efisien
+        // Struktur Kartu Dipersempit: Hanya Merender Nama Saja
         card.innerHTML = `<div class="santri-name">${s.nama}</div>`;
         grid.appendChild(card);
       });
     }
 
     function eksekusiPiketKilat(nik, elemen) {
-      // Efek visual klik animasi mengecil dan memudar
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
 
       setTimeout(() => {
+        // Mekanisme Eliminasi Array Lokal Seperti Struktur Halaman Oprak Keamanan
         let idx = dataPiketLokal.findIndex(item => item.nik === nik);
         if(idx !== -1) {
           dataPiketLokal[idx].kehadiran = "HADIR";
         }
         elemen.remove();
         hitungUlangMeters();
-        renderGridPiket(); // Gambar ulang sisa santri yang gaib
-      }, 250);
+        renderGridPiket(); // Render ulang sisa santri gaib di layar
+      }, 300);
 
-      // Kirim data ke pelayan cloud Google Apps Script (piket.gs)
       fetch(`${urlScript}?aksi=konfirmasi_hadir_piket&nik=${nik}`, { method: 'POST' })
       .then(r => r.json())
       .then(res => {
