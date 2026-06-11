@@ -1,1 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Kedisiplinan Santri - PPMUY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
 
+  <nav class="bg-indigo-900 text-white shadow-md py-4 px-6 mb-8 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <i class="fa-solid fa-gavel text-2xl text-amber-400"></i>
+      <h1 class="text-xl font-bold tracking-wide">Portal Keamanan & Ta'ziran Santri</h1>
+    </div>
+    <span class="text-sm bg-indigo-800 px-3 py-1.5 rounded-md border border-indigo-700 font-medium">PPMUY Pusat</span>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+    
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-fit">
+      <div class="flex items-center gap-2 pb-4 mb-5 border-b border-slate-100">
+        <i class="fa-solid fa-square-plus text-indigo-600 text-lg"></i>
+        <h2 class="text-lg font-bold text-slate-900">Input Pelanggaran Baru</h2>
+      </div>
+
+      <form id="formPelanggaran" class="space-y-4">
+        <div class="relative">
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Cari Santri (Ketik Nama / NIK)</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-400 text-sm"></i>
+            <input type="text" id="inputSantri" placeholder="Masukkan nama santri..." autocomplete="off"
+              class="w-full pl-9 pr-4 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+          </div>
+          <div id="boxSugesti" class="absolute z-50 w-full bg-white border border-slate-200 rounded-lg shadow-xl mt-1 max-h-48 overflow-y-auto hidden"></div>
+          <input type="hidden" id="hiddenNIK">
+        </div>
+
+        <div id="infoTerpilih" class="hidden p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs space-y-1">
+          <p class="font-bold text-indigo-900" id="txtNamaTerpilih">-</p>
+          <p class="text-indigo-700" id="txtNikTerpilih">-</p>
+          <p class="text-indigo-700" id="txtKelasTerpilih">-</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tingkat Pelanggaran</label>
+          <select id="selectTingkat" onchange="autoIsiTemplateHukuman()"
+            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="Ringan">Pelanggaran Ringan</option>
+            <option value="Sedang">Pelanggaran Sedang</option>
+            <option value="Berat">Pelanggaran Berat</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Deskripsi Kejadian / Kronologi</label>
+          <textarea id="textareaDeskripsi" rows="3" placeholder="Contoh: Terlambat mengikuti jamaah shalat subuh berjamaah..."
+            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Usulan Takzir (Hukuman)</label>
+          <input type="text" id="inputTakzir" placeholder="Hukuman edukatif yang diusulkan..."
+            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+        </div>
+
+        <button type="submit" id="btnSubmit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-sm transition text-sm flex justify-center items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Kirim ke Pengasuh
+        </button>
+      </form>
+    </section>
+
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-5 border-b border-slate-100 gap-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-indigo-600 text-lg"></i>
+          <h2 class="text-lg font-bold text-slate-900">Monitoring & Eksekusi Sanksi</h2>
+        </div>
+        <button onclick="muatDataLogPelanggaran()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrows-rotate animate-spin-slow"></i> Refresh Data
+        </button>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-slate-100">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100 text-xs uppercase tracking-wider">
+              <th class="py-3 px-4">Santri</th>
+              <th class="py-3 px-4">Pelanggaran</th>
+              <th class="py-3 px-4">Usulan Takzir</th>
+              <th class="py-3 px-4 text-center">Acc Pengasuh</th>
+              <th class="py-3 px-4 text-center">Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tabelBodyPelanggaran" class="divide-y divide-slate-100 text-slate-700">
+            <tr>
+              <td colspan="5" class="text-center py-12 text-slate-400">Sedang memuat database takziran...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // MASUKKAN URL GOOGLE WEB APP ANDA YANG SUDAH DI-DEPLOY DI SINI
+    const WEB_APP_URL = "MASUKKAN_URL_WEB_APP_DEPLOYMENT_ANDA_DI_SINI";
+
+    let databaseSantri = [];
+
+    // JALUR AWAL: Load Database Master & Log Real-time saat Web Terbuka
+    document.addEventListener("DOMContentLoaded", function() {
+      muatDatabaseMasterSantri();
+      muatDataLogPelanggaran();
+      autoIsiTemplateHukuman();
+    });
+
+    // 1. AMBIL DATABASE MASTER SANTRI UNTUK FITUR AUTOCOMPLETE SEARCH
+    function muatDatabaseMasterSantri() {
+      fetch(`${WEB_APP_URL}?aksi=ambil_database`)
+        .then(res => res.json())
+        .then(response => {
+          if (response.status === "success") {
+            databaseSantri = response.data;
+          }
+        }).catch(err => console.error("Gagal memuat master santri:", err));
+    }
+
+    // INTERFACE LOGIC: Autocomplete Search Input Handler
+    const inputSantri = document.getElementById("inputSantri");
+    const boxSugesti = document.getElementById("boxSugesti");
+
+    inputSantri.addEventListener("input", function() {
+      let keyword = this.value.trim().toLowerCase();
+      boxSugesti.innerHTML = "";
+      if (keyword.length < 2) { boxSugesti.classList.add("hidden"); return; }
+
+      let filtered = databaseSantri.filter(s => 
+        s.nama.toLowerCase().includes(keyword) || s.nik.toLowerCase().includes(keyword)
+      );
+
+      if (filtered.length === 0) { boxSugesti.classList.add("hidden"); return; }
+
+      filtered.forEach(s => {
+        let item = document.createElement("div");
+        item.className = "px-4 py-2.5 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-50 last:border-none";
+        item.innerHTML = `<p class="font-semibold text-slate-800">${s.nama}</p><p class="text-xs text-slate-400">NIK: ${s.nik} | Kelas: ${s.kelas}</p>`;
+        item.addEventListener("click", function() {
+          document.getElementById("hiddenNIK").value = s.nik;
+          document.getElementById("txtNamaTerpilih").innerText = "Nama: " + s.nama;
+          document.getElementById("txtNikTerpilih").innerText = "NIK: " + s.nik;
+          document.getElementById("txtKelasTerpilih").innerText = "Kelas: " + s.kelas;
+          document.getElementById("infoTerpilih").classList.remove("hidden");
+          inputSantri.value = s.nama;
+          boxSugesti.classList.add("hidden");
+        });
+        boxSugesti.appendChild(item);
+      });
+      boxSugesti.classList.remove("hidden");
+    });
+
+    // 2. TEMPLATE STRATEGI OTOMATISASI USULAN TA'ZIR BERDASARKAN LEVEL
+    function autoIsiTemplateHukuman() {
+      const tingkat = document.getElementById("selectTingkat").value;
+      const inputTakzir = document.getElementById("inputTakzir");
+      if (tingkat === "Ringan") {
+        inputTakzir.value = "Ro'an menyapu kompleks halaman pondok selama 3 hari";
+      } else if (tingkat === "Sedang") {
+        inputTakzir.value = "Membaca / menderas 2 Juz Al-Qur'an berdiri di depan aula khalayak";
+      } else if (tingkat === "Berat") {
+        inputTakzir.value = "Takzir indisipliner tingkat tinggi & Pemanggilan langsung Wali Santri";
+      }
+    }
+
+    // 3. PENGIRIMAN DATA FORM BARU KE BACKEND VIA API POST
+    document.getElementById("formPelanggaran").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let nik = document.getElementById("hiddenNIK").value;
+      let tingkat = document.getElementById("selectTingkat").value;
+      let deskripsi = document.getElementById("textareaDeskripsi").value.trim();
+      let usulan = document.getElementById("inputTakzir").value.trim();
+      let btn = document.getElementById("btnSubmit");
+
+      if (!nik) { alert("Pilih santri terlebih dahulu dari daftar pencarian!"); return; }
+      if (!deskripsi) { alert("Deskripsi pelanggaran / kronologi tidak boleh kosong!"); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Memproses ke Pengasuh...`;
+
+      let urlTarget = `${WEB_APP_URL}?aksi=simpan_pelanggaran&nik=${encodeURIComponent(nik)}&tingkat_pelanggaran=${encodeURIComponent(tingkat)}&deskripsi_kejadian=${encodeURIComponent(deskripsi)}&usulan_takzir=${encodeURIComponent(usulan)}`;
+
+      fetch(urlTarget, { method: "POST" })
+        .then(res => res.json())
+        .then(res => {
+          alert(res.message);
+          if (res.status === "success") {
+            document.getElementById("formPelanggaran").reset();
+            document.getElementById("infoTerpilih").classList.add("hidden");
+            document.getElementById("hiddenNIK").value = "";
+            autoIsiTemplateHukuman();
+            muatDataLogPelanggaran();
+          }
+        })
+        .catch(err => alert("Terjadi gangguan jaringan server API."))
+        .finally(() => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim ke Pengasuh`;
+        });
+    });
+
+    // 4. MUAT TABEL LOG MONITORING REAL-TIME & BADGING INTERFACE
+    function muatDataLogPelanggaran() {
+      const tbody = document.getElementById("tabelBodyPelanggaran");
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-400"><i class="fa-solid fa-circle-notch animate-spin text-lg text-indigo-600 mb-2 block"></i> Membaca Log Takziran Terkini...</td></tr>`;
+
+      fetch(`${WEB_APP_URL}?aksi=ambil_pelanggaran`)
+        .then(res => res.json())
+        .then(response => {
+          if (response.status === "success") {
+            let data = response.data;
+            if(data.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-400">Alhamdulillah, tidak ada catatan pelanggaran santri saat ini.</td></tr>`;
+              return;
+            }
+            tbody.innerHTML = "";
+            
+            // Urutkan data berdasarkan ID terbaru di posisi paling atas
+            data.reverse().forEach(row => {
+              let tr = document.createElement("tr");
+              tr.className = "hover:bg-slate-50 transition border-b border-slate-100 last:border-none align-top";
+              
+              // Set Badge Kategori Warna Tingkat Pelanggaran
+              let badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-slate-100 text-slate-600">${row.Tingkat_Pelanggaran}</span>`;
+              if (row.Tingkat_Pelanggaran === "Sedang") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-amber-100 text-amber-700">Sedang</span>`;
+              if (row.Tingkat_Pelanggaran === "Berat") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-rose-100 text-rose-700">Berat</span>`;
+
+              // Set Badge Kategori Status Persetujuan Pengasuh
+              let badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fa-solid fa-spinner animate-spin-slow"></i> PENDING</span>`;
+              if(row.Acc_Pengasuh === "DISETUJUI") badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> DISETUJUI</span>`;
+              if(row.Acc_Pengasuh === "REJECTED") badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-circle-xmark"></i> DITOLAK</span>`;
+
+              // Logika Tombol Aksi Dinamis Pengurus
+              let kolomAksi = "";
+              if (row.Acc_Pengasuh === "PENDING") {
+                kolomAksi = `<span class="text-xs text-slate-400 italic">Menunggu validasi Pengasuh</span>`;
+              } else if (row.Acc_Pengasuh === "REJECTED") {
+                kolomAksi = `<span class="text-xs text-rose-500 font-medium">Ta'zir Diampuni</span>`;
+              } else if (row.Acc_Pengasuh === "DISETUJUI") {
+                if (row.Sudah_Belum === "SUDAH") {
+                  kolomAksi = `<span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded font-bold uppercase tracking-wider"><i class="fa-solid fa-check-double"></i> Selesai</span>`;
+                } else {
+                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${row.ID_Melanggar}')" class="w-full text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded shadow-sm transition"><i class="fa-solid fa-gavel"></i> Selesai Hukuman</button>`;
+                }
+              }
+
+              tr.innerHTML = `
+                <td class="py-4 px-4 font-semibold text-slate-900">${row.Nama_Santri}<br><span class="text-xs font-normal text-slate-400">NIK: ${row.NIK}</span></td>
+                <td class="py-4 px-4 text-xs max-w-xs text-slate-600">${row.Deskripsi_Kejadian}<br>${badgeTingkat}</td>
+                <td class="py-4 px-4 font-medium text-slate-700 italic text-xs">${row.Usulan_Takzir}</td>
+                <td class="py-4 px-4 text-center">${badgeAcc}</td>
+                <td class="py-4 px-4 text-center">${kolomAksi}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        }).catch(err => {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">Gagal sinkronisasi data dari Google Sheets.</td></tr>`;
+        });
+    }
+
+    // 5. AKSI EKSEKUSI TOMBOL SELESAI HUKUMAN DARI SISI PENGURUS
+    function eksekusiSelesaiHukuman(idTarget) {
+      if(!confirm("Apakah Anda yakin santri yang bersangkutan sudah menyelesaikan sanksi Ta'zir edukatif ini?")) return;
+      
+      fetch(`${WEB_APP_URL}?aksi=eksekusi_selesai_takzir&id_melanggar=${idTarget}`, { method: "POST" })
+        .then(res => res.json())
+        .then(res => {
+          alert(res.message);
+          muatDataLogPelanggaran();
+        }).catch(err => alert("Gagal memperbarui status hukuman di cloud."));
+    }
+  </script>
+</body>
+</html>
