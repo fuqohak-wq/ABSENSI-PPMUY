@@ -13,9 +13,9 @@
             cursor: pointer;
         }
         .card-ustadz:hover {
-            transform: scale(1.02);
+            transform: scale(1.03);
             border-color: #10b981;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
         }
         .filter-btn-active {
             background-color: #10b981 !important;
@@ -31,7 +31,7 @@
                 <h1 class="text-xl font-bold text-white flex items-center gap-2">
                     Portal Absensi Cepat Asatidzah
                 </h1>
-                <p class="text-xs text-zinc-400 mt-0.5">Klik pada kartu untuk mencatat kehadiran. Kartu akan otomatis hilang setelah diklik.</p>
+                <p class="text-xs text-zinc-400 mt-0.5">Klik pada kartu untuk konfirmasi HADIR. Kartu akan otomatis terhapus dan ter-update ke spreadsheet.</p>
             </div>
             
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -52,7 +52,7 @@
         
         <div id="statusArea" class="flex flex-col items-center justify-center py-20 text-center">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500 mb-4"></div>
-            <p class="text-zinc-400 text-sm">Menghubungkan ke master_santri...</p>
+            <p class="text-zinc-400 text-sm">Menyelaraskan data log harian asatidzah...</p>
         </div>
 
         <div id="gridUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 hidden">
@@ -62,20 +62,20 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
-        let masterUstadz = [];
+        let logHarianUstadz = [];
         let kajianAktif = "Magrib";
         let genderAktif = "L";
 
         window.addEventListener('DOMContentLoaded', () => {
-            fetchData();
+            fetchDataLog();
         });
 
-        function fetchData() {
+        function fetchDataLog() {
             fetch(`${WEB_APP_URL}?aksi=ambil_database_ustadz`)
                 .then(r => r.json())
                 .then(res => {
                     if(res.status === "success") {
-                        masterUstadz = res.data;
+                        logHarianUstadz = res.data;
                         document.getElementById('statusArea').classList.add('hidden');
                         document.getElementById('gridUstadz').classList.remove('hidden');
                         saringDanTampilkan();
@@ -84,7 +84,7 @@
                     }
                 })
                 .catch(e => {
-                    document.getElementById('statusArea').innerHTML = `<p class="text-red-400 text-sm">Gagal memuat data. Pastikan Web App diset ke Anyone & New Version.</p>`;
+                    document.getElementById('statusArea').innerHTML = `<p class="text-red-400 text-sm">Gagal sinkronisasi data log harian.</p>`;
                 });
         }
 
@@ -106,29 +106,31 @@
             const container = document.getElementById('gridUstadz');
             container.innerHTML = '';
 
-            // Saring berdasarkan Gender yang dipilih di tombol topbar
-            const hasilSaring = masterUstadz.filter(u => {
+            // Saring Ganda: Berdasarkan Kajian AKTIF DAN Gender AKTIF
+            const hasilSaring = logHarianUstadz.filter(u => {
+                let matchKajian = (u.kajian === kajianAktif);
+                
                 let g = u.gender ? u.gender.toUpperCase().trim() : '';
-                // toleransi data L / Laki-laki / P / Perempuan
-                if (genderAktif === 'L') return g === 'L' || g.includes('LAKI');
-                if (genderAktif === 'P') return g === 'P' || g.includes('PEREMPUAN');
-                return false;
+                let matchGender = false;
+                if (genderAktif === 'L') matchGender = (g === 'L' || g.includes('LAKI'));
+                if (genderAktif === 'P') matchGender = (g === 'P' || g.includes('PEREMPUAN'));
+                
+                return matchKajian && matchGender;
             });
 
             if(hasilSaring.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-10 text-sm">Tidak ada data Ustadz/Ustadzah dengan gender ini.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-10 text-sm">✨ Semua Ustadz/Ustadzah di kelompok ini sudah selesai diabsen untuk Kajian ${kajianAktif}.</div>`;
                 return;
             }
 
             hasilSaring.forEach(u => {
                 const card = document.createElement('div');
                 card.id = `card-${u.nik}`;
-                card.className = 'card-ustadz p-4 rounded-xl border border-zinc-800 flex flex-col justify-center items-center text-center relative overflow-hidden';
-                // Trigger absen langsung ketika seluruh area kartu diklik
-                card.setAttribute('onclick', `eksekusiAbsen('${u.nik}', '${u.nama}')`);
+                card.className = 'card-ustadz p-4 rounded-xl border border-zinc-800/80 flex flex-col justify-center items-center text-center relative overflow-hidden';
+                card.setAttribute('onclick', `eksekusiAbsenUstadz('${u.nik}', '${u.nama}')`);
                 
                 card.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 pointer-events-none">
+                    <div class="w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 pointer-events-none">
                         <span class="text-xs font-bold">${u.nama.substring(0,2).toUpperCase()}</span>
                     </div>
                     <h3 class="text-xs font-bold text-white tracking-tight line-clamp-2 w-full px-1 pointer-events-none">${u.nama}</h3>
@@ -138,19 +140,17 @@
             });
         }
 
-        function eksekusiAbsen(nik, nama) {
+        function eksekusiAbsenUstadz(nik, nama) {
             const targetCard = document.getElementById(`card-${nik}`);
             if(!targetCard) return;
 
-            // Berikan efek memudar (loading) sesaat sebelum hilang total
-            targetCard.style.opacity = "0.4";
+            targetCard.style.opacity = "0.3";
             targetCard.style.pointerEvents = "none";
 
             const payload = {
                 aksi: "simpan_absen_ustadz_manual",
                 nik: nik,
-                nama: nama,
-                kajian: kajianAktif // Mengirim "Magrib" atau "Subuh"
+                kajian: kajianAktif
             };
 
             fetch(WEB_APP_URL, {
@@ -160,10 +160,13 @@
             .then(r => r.json())
             .then(res => {
                 if(res.status === "success") {
-                    // KARTU LANGSUNG HILANG DARI LAYAR
+                    // KARTU LANGSUNG DIELIMINASI DARI LAYAR
                     targetCard.remove();
                     
-                    // Cek jika kartu habis setelah di-remove
+                    // Update array lokal agar sinkron saat ganti-ganti filter tab
+                    logHarianUstadz = logHarianUstadz.filter(u => !(u.nik === nik && u.kajian === kajianAktif));
+                    
+                    // Cek ketersediaan kartu sisa
                     const container = document.getElementById('gridUstadz');
                     if (container.children.length === 0) {
                         container.innerHTML = `<div class="col-span-full text-center text-emerald-400 py-10 text-sm font-medium">✨ Semua Personel Kajian ${kajianAktif} Selesai Diabsen!</div>`;
@@ -171,13 +174,13 @@
                 } else {
                     targetCard.style.opacity = "1";
                     targetCard.style.pointerEvents = "auto";
-                    alert("Gagal: " + res.message);
+                    alert("Gagal meng-update: " + res.message);
                 }
             })
             .catch(e => {
                 targetCard.style.opacity = "1";
                 targetCard.style.pointerEvents = "auto";
-                alert("Koneksi terputus. Gagal mengirim data.");
+                alert("Koneksi gagal terhubung ke Cloud Apps Script.");
             });
         }
     </script>
