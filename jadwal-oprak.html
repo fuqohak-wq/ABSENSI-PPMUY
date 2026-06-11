@@ -3,377 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HQ Special Patrol System - PPMUY</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <title>RADAR PATROLI KETERTIBAN - PENGURUS PPMUY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      --card-bg: rgba(255, 255, 255, 0.85);
+      --bg-cyber: #0a0f1d;
+      --card-cyber: #131c33;
+      --neon-green: #39ff14;
+      --neon-cyan: #00f3ff;
+      --neon-red: #ff3131;
+      --text-main: #e2e8f0;
+      --border-neon: rgba(0, 243, 255, 0.2);
+    }
+    .light-theme {
+      --bg-cyber: #f0f4f8;
+      --card-cyber: #ffffff;
+      --neon-green: #2b6cb0;
+      --neon-cyan: #319795;
+      --neon-red: #e53e3e;
       --text-main: #2d3748;
-      --text-muted: #718096;
-      --border-color: rgba(255, 255, 255, 0.5);
-      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-      --accent: #319795;
-      --accent-hover: #2c7a7b;
-      --badge-bg: #feebc8;
-      --badge-text: #c05621;
+      --border-neon: rgba(49, 151, 149, 0.2);
     }
-
-    [data-theme="dark"] {
-      --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-      --card-bg: rgba(45, 55, 72, 0.7);
-      --text-main: #f7fafc;
-      --text-muted: #cbd5e0;
-      --border-color: rgba(255, 255, 255, 0.1);
-      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --accent: #4fd1c5;
-      --accent-hover: #319795;
-      --badge-bg: rgba(2dd, 107, 107, 0.2);
-      --badge-text: #feb2b2;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background 0.3s, color 0.3s, transform 0.2s, opacity 0.3s, box-shadow 0.3s;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg-gradient);
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--bg-cyber);
       color: var(--text-main);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease;
     }
-
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      margin-top: 20px;
-    }
-
-    /* GLASS HEADER */
     header {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-      padding: 24px;
+      background: linear-gradient(180deg, rgba(19,28,51,0.8) 0%, rgba(10,15,29,0) 100%);
+      padding: 25px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-neon);
+      position: relative;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      color: #ffffff;
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+    .light-theme h1 {
+      color: var(--text-main);
+      text-shadow: none;
+    }
+    .sub-title {
+      font-size: 1rem;
+      color: var(--neon-cyan);
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+    }
+    .controls-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      gap: 15px;
     }
-
-    .title-area h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    
-    .title-area p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .header-actions {
+    .dashboard-panel {
+      background: var(--card-cyber);
+      border: 1px solid var(--border-neon);
+      border-radius: 8px;
+      padding: 12px 20px;
       display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
-
-    .btn-nav {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    .stat-box { display: flex; flex-direction: column; }
+    .stat-val { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); font-weight: bold; }
+    .stat-lbl { font-size: 0.8rem; text-transform: uppercase; opacity: 0.7; }
+    .filter-btn-group { display: flex; gap: 10px; }
+    .btn-cyber {
+      background: rgba(19,28,51,0.6);
+      border: 1px solid var(--neon-cyan);
       color: var(--text-main);
-      padding: 10px 18px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 600;
+      padding: 8px 16px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      transition: all 0.3s;
     }
-
-    .btn-nav:hover {
-      background: var(--accent);
-      color: white;
-      transform: translateY(-2px);
+    .btn-cyber:hover, .btn-cyber.active {
+      background: var(--neon-cyan);
+      color: #0a0f1d;
+      box-shadow: 0 0 10px var(--neon-cyan);
     }
-
-    .theme-toggle-btn {
-      background: var(--accent);
-      border: none;
-      color: white;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .theme-toggle-btn:hover {
-      background: var(--accent-hover);
-      transform: scale(1.05);
-    }
-
-    /* FILTER SEGMENTED CONTROL */
-    .filter-container {
-      background: var(--card-bg);
-      padding: 6px;
-      border-radius: 16px;
-      display: inline-flex;
-      gap: 4px;
-      margin-bottom: 25px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-    }
-
-    .filter-btn {
+    .theme-toggle {
       background: transparent;
-      border: none;
-      padding: 10px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: 12px;
+      border: 1px solid var(--text-main);
+      color: var(--text-main);
+      padding: 6px 12px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .filter-btn.active {
-      background: var(--accent);
-      color: white;
-    }
-
-    /* GRID LAYOUT */
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .oprak-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-
-    /* PETUGAS CARD */
-    .santri-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
       border-radius: 20px;
+      font-size: 0.8rem;
+    }
+    .grid-radar {
+      max-width: 1200px;
+      margin: 0 auto 50px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+    }
+    .card-cyber {
+      background: var(--card-cyber);
+      border: 1px solid var(--border-neon);
+      border-radius: 12px;
       padding: 20px;
-      cursor: pointer;
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    .santri-card:hover {
+    .card-cyber:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-      border-color: #e53e3e;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(0,243,255,0.3);
     }
-
-    .santri-info .name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      line-height: 1.3;
+    .card-cyber::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--neon-cyan);
     }
-
-    .santri-info .sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .card-footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .badge {
-      background: #fff5f5;
-      color: #e53e3e;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 30px;
+    .card-cyber.gender-P::before { background: #ff007f; }
+    .card-header-info { display: flex; justify-content: space-between; margin-bottom: 15px; }
+    .badge-kelas {
+      background: rgba(0,243,255,0.1);
+      color: var(--neon-cyan);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border: 1px solid rgba(229, 62, 62, 0.2);
+      border: 1px solid rgba(0,243,255,0.3);
     }
-
-    [data-theme="dark"] .badge {
-      background: rgba(229, 62, 62, 0.2);
-      color: #feb2b2;
+    .card-cyber.gender-P .badge-kelas {
+      background: rgba(255,0,127,0.1);
+      color: #ff007f;
+      border-color: rgba(255,0,127,0.3);
     }
-
-    .click-indicator {
-      font-size: 12px;
-      color: #e53e3e;
-      opacity: 0;
-      transform: translateX(10px);
+    .nik-tag { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; opacity: 0.6; }
+    .petugas-name { font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; line-height: 1.2; letter-spacing: 0.5px; }
+    .action-area { display: flex; justify-content: flex-end; }
+    .btn-hadir-kilat {
+      background: linear-gradient(90deg, #00f3ff 0%, #00a3ff 100%);
+      color: #0a0f1d;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,243,255,0.4);
+      transition: all 0.2s;
     }
-
-    .santri-card:hover .click-indicator {
-      opacity: 1;
-      transform: translateX(0);
+    .btn-hadir-kilat:hover {
+      filter: brightness(1.2);
+      box-shadow: 0 4px 25px rgba(0,243,255,0.6);
     }
-
-    /* LOADER ANIMATION */
-    .loader-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px;
-      grid-column: 1 / -1;
-    }
-
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border-left-color: var(--accent);
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
     .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-      font-size: 15px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      border: 1px dashed var(--text-muted);
       grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px;
+      border: 2px dashed var(--border-neon);
+      border-radius: 12px;
+      font-size: 1.2rem;
+      opacity: 0.7;
     }
-
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
+    @media(max-width: 600px) {
+      .controls-container { flex-direction: column; align-items: stretch; }
+      .dashboard-panel { justify-content: space-around; }
+      .filter-btn-group { justify-content: center; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <div class="title-area">
-        <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Petugas Oprak-Oprak PPMUY</h1>
-        <p>Klik kartu petugas berstatus GAIB untuk mengonfirmasi kehadiran mereka malam ini.</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn-nav" onclick="kembaliKeDashboard()">
-          <i class="fa-solid fa-arrow-left"></i> Dashboard
-        </button>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
-          <i class="fa-solid fa-moon" id="theme-icon"></i>
-        </button>
-      </div>
-    </header>
+  <header>
+    <h1>RADAR PATROLI KETERTIBAN</h1>
+    <div class="sub-title">Sistem Oprak Harian PPMUY Pusat</div>
+  </header>
 
-    <div class="filter-container">
-      <button class="filter-btn active" onclick="saringGender('semua', this)">
-        <i class="fa-solid fa-users"></i> Semua
-      </button>
-      <button class="filter-btn" onclick="saringGender('LAKI-LAKI', this)">
-        <i class="fa-solid fa-mars"></i> LAKI-LAKI
-      </button>
-      <button class="filter-btn" onclick="saringGender('PEREMPUAN', this)">
-        <i class="fa-solid fa-venus"></i> PEREMPUAN
-      </button>
+  <div class="controls-container">
+    <div class="dashboard-panel">
+      <div class="stat-box">
+        <span class="stat-val" id="total-radar">0</span>
+        <span class="stat-lbl">On Radar</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" id="tgl-realtime">--/--</span>
+        <span class="stat-lbl">Hari Ini</span>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()">MODE TEMA</button>
     </div>
 
-    <div class="section-title">
-      <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
-      <span>Petugas Jaga Malam Berstatus GAIB</span>
-    </div>
-
-    <div class="oprak-grid" id="container-grid">
-      <div class="loader-container">
-        <div class="spinner"></div>
-        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghimpun Database Urutan Kolom K...</p>
-      </div>
+    <div class="filter-btn-group">
+      <button class="btn-cyber active" id="btn-all" onclick="setFilter('semua')">SEMUA</button>
+      <button class="btn-cyber" id="btn-l" onclick="setFilter('L')">USTADZ/PUTRA</button>
+      <button class="btn-cyber" id="btn-p" onclick="setFilter('P')">USTADZAH/PUTRI</button>
     </div>
   </div>
 
+  <main class="grid-radar" id="container-grid">
+    <div class="empty-state">Mensinkronisasikan jaringan cloud satelit...</div>
+  </main>
+
   <script>
+    // URL SCRIPT DIBAWAH ADALAH DEPLOYMENT UTAMA (URL Web App code1.gs Anda)
     const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
     let dataSantriLokal = [];
     let filterSekarang = "semua";
 
-    function inisialisasiTemaBawaan() {
-      const temaDisimpan = localStorage.getItem('theme') || 'dark';
-      document.body.setAttribute('data-theme', temaDisimpan);
-      const icon = document.getElementById('theme-icon');
-      icon.className = temaDisimpan === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-    }
+    // Set Kalender Tampilan
+    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+    document.getElementById("tgl-realtime").innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short'});
 
     function toggleTheme() {
-      const body = document.body;
-      const icon = document.getElementById('theme-icon');
-      if(body.getAttribute('data-theme') === 'dark') {
-        body.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
-        icon.className = 'fa-solid fa-sun';
-      } else {
-        body.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-        icon.className = 'fa-solid fa-moon';
-      }
+      document.body.classList.toggle("light-theme");
     }
 
-    function kembaliKeDashboard() {
-      window.location.href = "dashboard.html";
+    function setFilter(gender) {
+      filterSekarang = gender;
+      document.querySelectorAll(".filter-btn-group .btn-cyber").forEach(b => b.classList.remove("active"));
+      if(gender === 'semua') document.getElementById("btn-all").classList.add("active");
+      if(gender === 'L') document.getElementById("btn-l").classList.add("active");
+      if(gender === 'P') document.getElementById("btn-p").classList.add("active");
+      renderGrid();
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      inisialisasiTemaBawaan();
-      muatDaftarOprak();
-    });
-
+    // MEMANGGIL API UTAMA AMAN TANPA UBAH CODE1.GS
     function muatDaftarOprak() {
-      fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
+      // Diubah menggunakan parameter "get_initial_data_oprak" agar lolos gerbang utama code1.gs
+      fetch(`${urlScript}?aksi=get_initial_data_oprak`)
         .then(response => response.json())
         .then(res => {
           if(res.status === "error" || !res.data || res.data.length === 0) {
@@ -386,82 +257,65 @@
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal terhubung dengan radar cloud.</div>`;
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#ff3131; color:#ff3131;">Gagal terhubung dengan radar cloud pondok.</div>`;
         });
     }
 
     function renderGrid() {
-      const grid = document.getElementById("container-grid");
-      grid.innerHTML = "";
+      const container = document.getElementById("container-grid");
+      container.innerHTML = "";
 
-      const dataDisaring = dataSantriLokal.filter(s => {
+      let dataFilter = dataSantriLokal.filter(s => {
         if (filterSekarang === "semua") return true;
-        var gen = (s.gender || "").toString().toUpperCase().trim();
-        if (gen === "L" || gen === "PUTRA") gen = "LAKI-LAKI";
-        if (gen === "P" || gen === "PUTRI") gen = "PEREMPUAN";
-        return gen === filterSekarang;
+        return s.gender === filterSekarang;
       });
 
-      // Menyaring kartu agar hanya memunculkan yang status kerjanya "GAIB"
-      const dataGaib = dataDisaring.filter(s => s.status_kerja.toUpperCase() === "GAIB");
+      document.getElementById("total-radar").innerText = dataFilter.length;
 
-      if (dataGaib.length === 0) {
-        var labelDisplay = filterSekarang === 'semua' ? '' : filterSekarang;
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Alhamdulillah, malam ini tidak ada petugas ${labelDisplay} berstatus GAIB!</div>`;
+      if(dataFilter.length === 0) {
+        container.innerHTML = `<div class="empty-state">Radar Senyap. Tidak ada jadwal petugas aktif saat ini di kategori terpilih.</div>`;
         return;
       }
 
-      dataGaib.forEach(santri => {
+      dataFilter.forEach(santri => {
         const card = document.createElement("div");
-        card.className = "santri-card";
-        
-        card.addEventListener("click", function() {
-          eksekusiHadirKilat(santri.nik, santri.nama, card);
-        });
-        
-        var genDisplay = (santri.gender || "").toString().toUpperCase().trim();
-        if (genDisplay === "L" || genDisplay === "PUTRA") genDisplay = "LAKI-LAKI";
-        if (genDisplay === "P" || genDisplay === "PUTRI") genDisplay = "PEREMPUAN";
-
+        card.className = `card-cyber gender-${santri.gender}`;
+        card.id = `card-${santri.nik}`;
         card.innerHTML = `
-          <div class="santri-info">
-            <div class="name">${santri.nama}</div>
-            <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
-            <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
-            <div class="sub"><i class="fa-solid fa-rotate"></i> Putaran Ke: ${santri.putaran || '-'}</div>
-            <div class="sub"><i class="fa-solid fa-venus-mars"></i> Kelompok: ${genDisplay}</div>
+          <div class="card-header-info">
+            <span class="badge-kelas">${santri.kelas}</span>
+            <span class="nik-tag">ID-${santri.nik.substring(0,5)}</span>
           </div>
-          <div class="card-footer">
-            <span class="badge"><i class="fa-solid fa-ghost"></i> GAIB</span>
-            <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
+          <div class="petugas-name">${santri.nama}</div>
+          <div class="action-area">
+            <button class="btn-hadir-kilat" onclick="eksekusiHadirKilat('${santri.nik}', '${santri.nama.replace(/'/g, "\\'")}', this.closest('.card-cyber'))">KONFIRMASI HADIR</button>
           </div>
         `;
-        grid.appendChild(card);
+        container.appendChild(card);
       });
     }
 
-    function saringGender(kategori, elemen) {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      elemen.classList.add('active');
-      filterSekarang = kategori;
-      renderGrid();
-    }
-
     function eksekusiHadirKilat(nik, nama, elemen) {
-      // Animasi kartu menciut dan menghilang secara langsung di UI
+      // Efek visual menghilang kilat
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
       
       setTimeout(() => {
-        // Hilangkan data dari array lokal dan re-render grid agar sinkron
         dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
         elemen.remove();
-        if(gridHasNoCards()) {
+        
+        // Cek sisa kartu di grid
+        const container = document.getElementById("container-grid");
+        if (!container.querySelector('.card-cyber')) {
           renderGrid();
+        } else {
+          // Hanya kurangi counter dashboard tanpa re-render full
+          let currentVal = parseInt(document.getElementById("total-radar").innerText);
+          document.getElementById("total-radar").innerText = currentVal > 0 ? currentVal - 1 : 0;
         }
       }, 300);
 
-      // Tembak server POST untuk merubah status GAIB -> HADIR
+      // KIRIM PRESENSI VIA POST MENGGUNAKAN AKSI YANG AKAN DITERUSKAN OLEH CODE1
       fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
         method: 'POST'
       })
@@ -472,14 +326,12 @@
         }
       })
       .catch(e => {
-        console.error("Server Error link cloud background", e);
+        console.error("Gagal menggapai server pusat", e);
       });
     }
 
-    function gridHasNoCards() {
-      const grid = document.getElementById("container-grid");
-      return grid.getElementsByClassName("santri-card").length === 0;
-    }
+    // Jalankan sistem radar saat halaman dibuka
+    window.onload = muatDaftarOprak;
   </script>
 </body>
 </html>
