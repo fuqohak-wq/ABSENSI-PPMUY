@@ -70,7 +70,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .title-area h1 {
@@ -83,6 +83,12 @@
       font-size: 14px;
       color: var(--text-muted);
       margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .theme-toggle-btn {
@@ -103,6 +109,37 @@
     .theme-toggle-btn:hover {
       background: var(--accent-hover);
       transform: scale(1.05);
+    }
+
+    /* FILTER SEGMENTED CONTROL */
+    .filter-container {
+      background: var(--card-bg);
+      padding: 6px;
+      border-radius: 16px;
+      display: inline-flex;
+      gap: 4px;
+      margin-bottom: 25px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: none;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: white;
     }
 
     /* GRID LAYOUT */
@@ -155,6 +192,7 @@
     .santri-info .sub {
       font-size: 12px;
       color: var(--text-muted);
+      margin-bottom: 2px;
     }
 
     .card-footer {
@@ -173,6 +211,16 @@
       border-radius: 30px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .badge.putri {
+      background: #fff5f5;
+      color: #9b2c2c;
+    }
+
+    [data-theme="dark"] .badge.putri {
+      background: rgba(254, 178, 178, 0.2);
+      color: #feb2b2;
     }
 
     .click-indicator {
@@ -237,10 +285,24 @@
         <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
         <p>Klik kartu santri untuk langsung mengonfirmasi kehadiran petugas dalam siklus hari ini.</p>
       </div>
-      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
-      </button>
+      <div class="header-actions">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+      </div>
     </header>
+
+    <div class="filter-container">
+      <button class="filter-btn active" onclick="saringGender('semua', this)">
+        <i class="fa-solid fa-users"></i> Semua
+      </button>
+      <button class="filter-btn" onclick="saringGender('putra', this)">
+        <i class="fa-solid fa-mars"></i> Putra
+      </button>
+      <button class="filter-btn" onclick="saringGender('putri', this)">
+        <i class="fa-solid fa-venus"></i> Putri
+      </button>
+    </div>
 
     <div class="section-title">
       <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
@@ -256,10 +318,10 @@
   </div>
 
   <script>
-    // URL API Google Apps Script
     const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
+    let dataSantriLokal = [];
+    let filterSekarang = "semua";
 
-    // FUNGSI TOGGLE THEME (TERANG/GELAP)
     function toggleTheme() {
       const body = document.body;
       const icon = document.getElementById('theme-icon');
@@ -272,46 +334,21 @@
       }
     }
 
-    // AMBIL DATA KETIKA HALAMAN SELESAI DIMUAT
     document.addEventListener("DOMContentLoaded", function() {
       muatDaftarOprak();
     });
 
-    // MENGAMBIL DATA DATABASE JADWAL_OPRAK YANG STATUSNYA MASIH KOSONG
     function muatDaftarOprak() {
       fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
         .then(response => response.json())
         .then(res => {
-          const grid = document.getElementById("container-grid");
-          grid.innerHTML = "";
-          
           if(res.status === "error" || !res.data || res.data.length === 0) {
-            tampilkanEmptyState();
+            dataSantriLokal = [];
+            renderGrid();
             return;
           }
-
-          res.data.forEach(santri => {
-            const card = document.createElement("div");
-            card.className = "santri-card";
-            
-            // Langsung eksekusi hilangkan nama tanpa konfirmasi popup saat diklik
-            card.addEventListener("click", function() {
-              eksekusiHadirKilat(santri.nik, santri.nama, card);
-            });
-            
-            card.innerHTML = `
-              <div class="santri-info">
-                <div class="name">${santri.nama}</div>
-                <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
-                <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
-              </div>
-              <div class="card-footer">
-                <span class="badge">Wajib Oprak</span>
-                <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
-              </div>
-            `;
-            grid.appendChild(card);
-          });
+          dataSantriLokal = res.data;
+          renderGrid();
         })
         .catch(err => {
           console.error(err);
@@ -319,45 +356,86 @@
         });
     }
 
-    // MODE KILAT: KARTU LANGSUNG HILANG DI LAYAR, KODE POST BERJALAN DI BACKGROUND
+    function renderGrid() {
+      const grid = document.getElementById("container-grid");
+      grid.innerHTML = "";
+
+      // Jalankan penyaringan berdasarkan state filter kontrol gender
+      const dataDisaring = dataSantriLokal.filter(s => {
+        if (filterSekarang === "semua") return true;
+        return (s.gender || "").toString().toLowerCase() === filterSekarang;
+      });
+
+      if (dataDisaring.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Tidak ada petugas ${filterSekarang !== 'semua' ? filterSekarang : ''} yang tersisa atau perlu dikonfirmasi!</div>`;
+        return;
+      }
+
+      dataDisaring.forEach(santri => {
+        const card = document.createElement("div");
+        card.className = "santri-card";
+        
+        card.addEventListener("click", function() {
+          eksekusiHadirKilat(santri.nik, santri.nama, card);
+        });
+        
+        const labelGender = (santri.gender || "").toString().toUpperCase() === "PUTRI" ? "Putri" : "Putra";
+        const badgeClass = labelGender === "Putri" ? "badge putri" : "badge";
+
+        card.innerHTML = `
+          <div class="santri-info">
+            <div class="name">${santri.nama}</div>
+            <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
+            <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
+            <div class="sub"><i class="fa-solid fa-venus-mars"></i> Sektor: ${labelGender}</div>
+          </div>
+          <div class="card-footer">
+            <span class="${badgeClass}">Wajib Oprak</span>
+            <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function saringGender(kategori, elemen) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      elemen.classList.add('active');
+      filterSekarang = kategori;
+      renderGrid();
+    }
+
     function eksekusiHadirKilat(nik, nama, elemen) {
-      // 1. Jalankan animasi menyusut & hilangkan elemen dari UI secara langsung
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
       
       setTimeout(() => {
+        // Hapus data dari memori lokal array agar sinkron dengan UI filter
+        dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
         elemen.remove();
-        // Cek jika kartu di layar sudah habis total, tampilkan status bersih
+        
         if(gridHasNoCards()) {
-          tampilkanEmptyState();
+          renderGrid();
         }
       }, 300);
 
-      // 2. Kirim data ke Cloud Engine secara senyap (Background Request)
       fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
         method: 'POST'
       })
       .then(r => r.json())
       .then(respon => {
         if(respon.status !== "success") {
-          console.error("Gagal sinkronisasi cloud untuk santri: " + nama + ". Error: " + respon.message);
+          console.error("Gagal sinkronisasi cloud: " + respon.message);
         }
       })
       .catch(e => {
-        console.error("Server Error: Sinkronisasi latar belakang gagal untuk " + nama, e);
+        console.error("Server Error di background request", e);
       });
     }
 
-    // Helper untuk mengecek sisa kartu di dalam grid
     function gridHasNoCards() {
       const grid = document.getElementById("container-grid");
       return grid.getElementsByClassName("santri-card").length === 0;
-    }
-
-    // Helper untuk merender pesan kosong/bersih
-    function tampilkanEmptyState() {
-      const grid = document.getElementById("container-grid");
-      grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
     }
   </script>
 </body>
