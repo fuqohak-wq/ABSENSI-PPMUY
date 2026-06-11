@@ -1,1 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HQ Clean Patrol System - PPMUY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f6f8fb 0%, #e5ebee 100%);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --border-color: rgba(255, 255, 255, 0.6);
+      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+      --accent: #2b6cb0;
+      --accent-hover: #2c5282;
+      --gaib-color: #e53e3e;
+      --aman-color: #38a169;
+    }
 
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #1a202c 0%, #232733 100%);
+      --card-bg: rgba(45, 55, 72, 0.65);
+      --text-main: #f7fafc;
+      --text-muted: #cbd5e0;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      --accent: #4299e1;
+      --accent-hover: #63b3ed;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.3s, color 0.3s, transform 0.2s, opacity 0.3s;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 10px;
+    }
+
+    header {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .title-area h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .title-area p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    /* FUN STATS INTERAKTIF */
+    .fun-stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: white;
+    }
+
+    .stat-info h3 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .stat-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* FILTER BAR */
+    .controls-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .segmented-control {
+      background: rgba(0,0,0,0.05);
+      padding: 4px;
+      border-radius: 12px;
+      display: flex;
+      gap: 4px;
+    }
+    [data-theme="dark"] .segmented-control {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .seg-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    select.filter-dropdown {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* GRID TAMPILAN UTAMA */
+    .piket-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .piket-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .piket-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .santri-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .meta-line {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-top: 12px;
+    }
+
+    .status-badge.gaib {
+      background: rgba(229, 62, 62, 0.15);
+      color: #e53e3e;
+    }
+    
+    .status-badge.aman {
+      background: rgba(56, 161, 105, 0.15);
+      color: #38a169;
+    }
+
+    .loader-container, .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border-left-color: var(--accent);
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div class="container">
+    <header>
+      <div class="title-area">
+        <h1><i class="fa-solid fa-broom" style="color: var(--accent); margin-right: 6px;"></i> Radar Operasi Piket Kebersihan</h1>
+        <p>Klik kartu santri untuk konfirmasi kehadiran piket. Santri yang tersisa di layar otomatis berstatus Gaib.</p>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()">
+        <i class="fa-solid fa-moon" id="theme-icon"></i>
+      </button>
+    </header>
+
+    <div class="fun-stats-container">
+      <div class="stat-box">
+        <div class="stat-icon" style="background: var(--gaib-color);"><i class="fa-solid fa-ghost"></i></div>
+        <div class="stat-info">
+          <h3 id="count-gaib">0</h3>
+          <p>Santri Masih Gaib</p>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon" style="background: var(--aman-color);"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+          <h3 id="count-aman">0</h3>
+          <p>Sudah Pegang Sapu</p>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon" style="background: var(--accent);"><i class="fa-solid fa-chart-pie"></i></div>
+        <div class="stat-info">
+          <h3 id="clean-percent">0%</h3>
+          <p>Cleanliness Level</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="filter-group">
+        <span style="font-size: 13px; font-weight:600;"><i class="fa-solid fa-venus-mars"></i> Sektor:</span>
+        <div class="segmented-control">
+          <button class="seg-btn active" onclick="setGender('semua', this)">Semua</button>
+          <button class="seg-btn" onclick="setGender('putra', this)">Putra</button>
+          <button class="seg-btn" onclick="setGender('putri', this)">Putri</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span style="font-size: 13px; font-weight:600;"><i class="fa-solid fa-filter"></i> Filter Kelas:</span>
+        <select class="filter-dropdown" id="dropdown-kelas" onchange="setKelas(this.value)">
+          <option value="semua">-- Tampilkan Semua Kelas --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="piket-grid" id="grid-piket">
+      <div class="loader-container">
+        <div class="spinner"></div>
+        <p>Membaca pembagian klaster piket PPMUY...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+    let dataPiketLokal = [];
+    let filterGender = "semua";
+    let filterKelas = "semua";
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      if(body.getAttribute('data-theme') === 'dark') {
+        body.setAttribute('data-theme', 'light');
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        icon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      muatDaftarPiket();
+    });
+
+    function muatDaftarPiket() {
+      fetch(`${urlScript}?aksi=ambil_petugas_piket`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "success") {
+            dataPiketLokal = res.data || [];
+            isiDropdownKelas(res.semua_kelas || []);
+            hitungUlangMeters();
+            renderGridPiket();
+          }
+        })
+        .catch(err => {
+          document.getElementById("grid-piket").innerHTML = `<div class="empty-state">Gagal terhubung dengan database piket kebersihan cloud.</div>`;
+        });
+    }
+
+    function isiDropdownKelas(arrKelas) {
+      const dd = document.getElementById("dropdown-kelas");
+      dd.innerHTML = `<option value="semua">-- Tampilkan Semua Kelas --</option>`;
+      arrKelas.forEach(k => {
+        dd.innerHTML += `<option value="${k}">${k}</option>`;
+      });
+    }
+
+    function hitungUlangMeters() {
+      const gaib = dataPiketLokal.filter(s => s.kehadiran === "").length;
+      const aman = dataPiketLokal.filter(s => s.kehadiran === "HADIR").length;
+      const total = dataPiketLokal.length;
+      const persen = total > 0 ? Math.round((aman / total) * 100) : 0;
+
+      document.getElementById("count-gaib").innerText = gaib;
+      document.getElementById("count-aman").innerText = aman;
+      document.getElementById("clean-percent").innerText = persen + "%";
+    }
+
+    function setGender(val, btn) {
+      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterGender = val;
+      renderGridPiket();
+    }
+
+    function setKelas(val) {
+      filterKelas = val;
+      renderGridPiket();
+    }
+
+    function renderGridPiket() {
+      const grid = document.getElementById("grid-piket");
+      grid.innerHTML = "";
+
+      const disaring = dataPiketLokal.filter(s => {
+        const matchGen = (filterGender === "semua") || (s.gender === filterGender);
+        const matchKls = (filterKelas === "semua") || (s.kelas === filterKelas);
+        return matchGen && matchKls;
+      });
+
+      if(disaring.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--accent);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib!</div>`;
+        return;
+      }
+
+      disaring.forEach(s => {
+        const card = document.createElement("div");
+        card.className = "piket-card";
+        
+        // Mode Instan Klik: Langsung coret/hilangkan jika berstatus gaib
+        if(s.kehadiran === "") {
+          card.addEventListener("click", function() {
+            eksekusiPiketKilat(s.nik, card);
+          });
+        }
+
+        const badgeText = s.kehadiran === "HADIR" ? "Aman Piket" : "Gaib (Belum Piket)";
+        const badgeClass = s.kehadiran === "HADIR" ? "status-badge aman" : "status-badge gaib";
+        const iconGender = s.gender === "putri" ? "fa-venus" : "fa-mars";
+
+        card.innerHTML = `
+          <div>
+            <div class="santri-name">${s.nama}</div>
+            <div class="meta-line"><i class="fa-solid fa-fingerprint"></i> NIK: ${s.nik}</div>
+            <div class="meta-line"><i class="fa-solid fa-graduation-cap"></i> Kelas: ${s.kelas}</div>
+            <div class="meta-line"><i class="fa-solid ${iconGender}"></i> Sektor: ${s.gender.toUpperCase()}</div>
+          </div>
+          <div>
+            <span class="${badgeClass}">${badgeText}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function eksekusiPiketKilat(nik, elemen) {
+      elemen.style.transform = "scale(0)";
+      elemen.style.opacity = "0";
+
+      setTimeout(() => {
+        // Cari objek di ram lokal dan ubah statusnya secara reaktif
+        let idx = dataPiketLokal.findIndex(item => item.nik === nik);
+        if(idx !== -1) {
+          dataPiketLokal[idx].kehadiran = "HADIR";
+        }
+        elemen.remove();
+        hitungUlangMeters();
+        renderGridPiket();
+      }, 300);
+
+      fetch(`${urlScript}?aksi=konfirmasi_hadir_piket&nik=${nik}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if(res.status !== "success") console.error("Gagal sinkronisasi cloud untuk NIK: " + nik);
+      })
+      .catch(e => console.error("Server Error background push", e));
+    }
+  </script>
+</body>
+</html>
