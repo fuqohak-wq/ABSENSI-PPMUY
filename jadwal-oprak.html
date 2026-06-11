@@ -228,7 +228,7 @@
     <header>
       <div class="title-area">
         <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
-        <p>Klik nama santri jika dikonfirmasi hadir patroli malam ini.</p>
+        <p>Klik kartu santri jika dikonfirmasi hadir bertugas dalam siklus hari ini (18.00 - 17.59 WIB).</p>
       </div>
       <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
@@ -237,13 +237,13 @@
 
     <div class="section-title">
       <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
-      <span>Daftar Santri Bertugas Malam Ini</span>
+      <span>Daftar Santri Wajib Oprak Hari Ini</span>
     </div>
 
     <div class="oprak-grid" id="container-grid">
       <div class="loader-container">
         <div class="spinner"></div>
-        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghubungkan ke Cloud Server PPMUY...</p>
+        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghimpun Database Jadwal Oprak PPMUY...</p>
       </div>
     </div>
   </div>
@@ -251,6 +251,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <script>
+    // URL API Google Apps Script (Pastikan URL ini sesuai dengan hasil Web App Deploy Anda!)
+    const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
+
     // FUNGSI TOGGLE THEME (TERANG/GELAP)
     function toggleTheme() {
       const body = document.body;
@@ -264,23 +267,21 @@
       }
     }
 
-    // AMBIL DATA DARI SERVING APPS SCRIPT
+    // AMBIL DATA KETIKA HALAMAN SELESAI DIMUAT
     document.addEventListener("DOMContentLoaded", function() {
       muatDaftarOprak();
     });
 
+    // MENGAMBIL DATA DATABASE JADWAL_OPRAK YANG STATUSNYA MASIH KOSONG
     function muatDaftarOprak() {
-      // PERBAIKAN: Ditambahkan ?aksi=ambil_petugas_oprak agar menjembatani routing ke oprak.gs
-      const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
-
-      fetch(urlScript)
+      fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
         .then(response => response.json())
         .then(res => {
           const grid = document.getElementById("container-grid");
           grid.innerHTML = "";
           
           if(res.status === "error" || !res.data || res.data.length === 0) {
-            grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh gelombang putaran malam ini bersih atau sudah dikonfirmasi hadir!</div>`;
+            grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
             return;
           }
 
@@ -296,7 +297,7 @@
                 <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
               </div>
               <div class="card-footer">
-                <span class="badge">Putaran ${santri.putaran}</span>
+                <span class="badge">Wajib Oprak</span>
                 <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
               </div>
             `;
@@ -305,51 +306,48 @@
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari cloud. Pastikan URL Web App Deploy sudah sesuai.</div>`;
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud. Pastikan Apps Script sudah di-deploy dengan benar.</div>`;
         });
     }
 
-    // PROSES EKSEKUSI KLIK OLEH KEPALA PONDOK
+    // KONFIRMASI KEHADIRAN (UBAH STATUS JADI HADIR & POIN JADI 0)
     function konfirmasiKehadiran(nik, nama, elemen) {
       Swal.fire({
         title: 'Konfirmasi Kehadiran',
-        text: `Apakah benar santri bernama "${nama}" hadir dalam tugas oprak-oprak ronda malam ini?`,
+        text: `Apakah benar santri "${nama}" hadir melaksanakan tugas oprak-oprak hari ini?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#319795',
         cancelButtonColor: '#718096',
-        confirmButtonText: 'Ya, Hadir!',
+        confirmButtonText: 'Ya, Hadir Kerja!',
         cancelButtonText: 'Batal',
         background: document.body.getAttribute('data-theme') === 'dark' ? '#2d3748' : '#fff',
         color: document.body.getAttribute('data-theme') === 'dark' ? '#fff' : '#2d3748'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Kirim data ke API Post Server
-          const urlPost = "https://script.google.com/macros/s/AKfycbz_K_N3x6gQ1WwSbyHclZ3WwL58rM08Z4A0W3vE3b58O0mYvRsc_l5A11eYf98u0p8/exec";
           
-          let formData = new URLSearchParams();
-          formData.append("aksi", "simpan_dispensasi_khusus"); // dialihkan via Post
-          // Untuk kenyamanan gateway bypass, gunakan format x-www-form-urlencoded standar:
-          
-          fetch(`${urlPost}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
+          // Kirim request POST perubahan data ke Cloud Engine
+          fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
             method: 'POST'
           })
           .then(r => r.json())
           .then(respon => {
             if(respon.status === "success") {
-              // Efek animasi hancur menghilang yang menyenangkan
+              // Efek animasi menyusut (scale 0) saat kartu sukses diverifikasi
               elemen.style.transform = "scale(0)";
               elemen.style.opacity = "0";
+              
               setTimeout(() => {
                 elemen.remove();
+                // Jika kartu di layar sudah habis, tampilkan empty state bersih
                 if(document.getElementById("container-grid").children.length === 0) {
-                  document.getElementById("container-grid").innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh gelombang putaran malam ini bersih atau sudah dikonfirmasi hadir!</div>`;
+                  document.getElementById("container-grid").innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
                 }
               }, 300);
 
               Swal.fire({
                 title: 'Berhasil!',
-                text: respon.message,
+                text: 'Status kerja diperbarui menjadi HADIR (Poin Pelanggaran: 0).',
                 icon: 'success',
                 timer: 1500,
                 showConfirmButton: false,
@@ -361,7 +359,7 @@
             }
           })
           .catch(e => {
-            Swal.fire('Server Error', 'Gagal memproses data ke database cloud.', 'error');
+            Swal.fire('Server Error', 'Gagal memperbarui status ke cloud database.', 'error');
           });
         }
       });
