@@ -46,10 +46,7 @@
       color: #ffffff;
       text-shadow: 0 0 10px var(--neon-cyan);
     }
-    .light-theme h1 {
-      color: var(--text-main);
-      text-shadow: none;
-    }
+    .light-theme h1 { color: var(--text-main); text-shadow: none; }
     .sub-title {
       font-size: 1rem;
       color: var(--neon-cyan);
@@ -191,7 +188,7 @@
 
   <header>
     <h1>RADAR PATROLI KETERTIBAN</h1>
-    <div class="sub-title">Sistem Oprak Harian PPMUY Pusat</div>
+    <div class="sub-title">Sistem Oprak Massal Kolom K PPMUY</div>
   </header>
 
   <div class="controls-container">
@@ -209,23 +206,21 @@
 
     <div class="filter-btn-group">
       <button class="btn-cyber active" id="btn-all" onclick="setFilter('semua')">SEMUA</button>
-      <button class="btn-cyber" id="btn-l" onclick="setFilter('L')">USTADZ/PUTRA</button>
-      <button class="btn-cyber" id="btn-p" onclick="setFilter('P')">USTADZAH/PUTRI</button>
+      <button class="btn-cyber" id="btn-l" onclick="setFilter('L')">PUTRA</button>
+      <button class="btn-cyber" id="btn-p" onclick="setFilter('PUTRI')">PUTRI</button>
     </div>
   </div>
 
   <main class="grid-radar" id="container-grid">
-    <div class="empty-state">Mensinkronisasikan jaringan cloud satelit...</div>
+    <div class="empty-state">Menghubungkan jaringan cloud satelit...</div>
   </main>
 
   <script>
-    // URL SCRIPT DIBAWAH ADALAH DEPLOYMENT UTAMA (URL Web App code1.gs Anda)
+    // URL Deployment Web App Utama dari code1.gs Anda
     const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
     let dataSantriLokal = [];
     let filterSekarang = "semua";
 
-    // Set Kalender Tampilan
-    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
     document.getElementById("tgl-realtime").innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short'});
 
     function toggleTheme() {
@@ -237,13 +232,12 @@
       document.querySelectorAll(".filter-btn-group .btn-cyber").forEach(b => b.classList.remove("active"));
       if(gender === 'semua') document.getElementById("btn-all").classList.add("active");
       if(gender === 'L') document.getElementById("btn-l").classList.add("active");
-      if(gender === 'P') document.getElementById("btn-p").classList.add("active");
+      if(gender === 'PUTRI') document.getElementById("btn-p").classList.add("active");
       renderGrid();
     }
 
-    // MEMANGGIL API UTAMA AMAN TANPA UBAH CODE1.GS
     function muatDaftarOprak() {
-      // Diubah menggunakan parameter "get_initial_data_oprak" agar lolos gerbang utama code1.gs
+      // Menembak aksi "get_initial_data_oprak" agar lolos gerbang utama code1.gs
       fetch(`${urlScript}?aksi=get_initial_data_oprak`)
         .then(response => response.json())
         .then(res => {
@@ -273,7 +267,7 @@
       document.getElementById("total-radar").innerText = dataFilter.length;
 
       if(dataFilter.length === 0) {
-        container.innerHTML = `<div class="empty-state">Radar Senyap. Tidak ada jadwal petugas aktif saat ini di kategori terpilih.</div>`;
+        container.innerHTML = `<div class="empty-state">Radar Senyap. Semua petugas di kategori ini sudah absen atau data Kolom K kosong.</div>`;
         return;
       }
 
@@ -283,7 +277,7 @@
         card.id = `card-${santri.nik}`;
         card.innerHTML = `
           <div class="card-header-info">
-            <span class="badge-kelas">${santri.kelas}</span>
+            <span class="badge-kelas">${santri.kelas} (Putaran ${santri.putaran})</span>
             <span class="nik-tag">ID-${santri.nik.substring(0,5)}</span>
           </div>
           <div class="petugas-name">${santri.nama}</div>
@@ -296,7 +290,6 @@
     }
 
     function eksekusiHadirKilat(nik, nama, elemen) {
-      // Efek visual menghilang kilat
       elemen.style.transform = "scale(0)";
       elemen.style.opacity = "0";
       
@@ -304,18 +297,16 @@
         dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
         elemen.remove();
         
-        // Cek sisa kartu di grid
         const container = document.getElementById("container-grid");
         if (!container.querySelector('.card-cyber')) {
           renderGrid();
         } else {
-          // Hanya kurangi counter dashboard tanpa re-render full
           let currentVal = parseInt(document.getElementById("total-radar").innerText);
           document.getElementById("total-radar").innerText = currentVal > 0 ? currentVal - 1 : 0;
         }
       }, 300);
 
-      // KIRIM PRESENSI VIA POST MENGGUNAKAN AKSI YANG AKAN DITERUSKAN OLEH CODE1
+      // Mengirimkan data via POST resmi menuju gerbang utama
       fetch(`${urlScript}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
         method: 'POST'
       })
@@ -330,7 +321,6 @@
       });
     }
 
-    // Jalankan sistem radar saat halaman dibuka
     window.onload = muatDaftarOprak;
   </script>
 </body>
