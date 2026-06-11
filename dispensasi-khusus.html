@@ -10,18 +10,17 @@
   <style>
     * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
     
-    /* TEMA BARU: Latar Belakang Biru Cerah & Pelangi */
     body {
-      --bg-main: #e0f2fe;        /* Biru langit cerah (sky-100) */
-      --bg-panel: #ffffff;       /* Putih bersih */
-      --bg-input: #f0fdf4;       /* Hijau mint sangat muda untuk input */
-      --border-color: #bae6fd;   /* Border biru muda */
-      --text-main: #0369a1;      /* Teks biru tua (sky-700) */
-      --text-muted: #0284c7;     /* Teks deskripsi biru */
+      --bg-main: #bae6fd;        /* Biru Langit Cerah Semarak (sky-200) */
+      --bg-panel: #ffffff;       /* Putih */
+      --bg-input: #f0f9ff;       /* Soft sky input */
+      --border-color: #7dd3fc;   /* Sky-300 */
+      --text-main: #0369a1;      /* Sky-700 */
+      --text-muted: #0284c7;     /* Sky-600 */
     }
     
     body.dark-mode {
-      --bg-main: #0c4a6e;        /* Biru gelap (sky-900) */
+      --bg-main: #075985;        /* Biru Malam Pekat (sky-800) */
       --bg-panel: #0f172a;       /* Slate-900 */
       --bg-input: #1e293b;       /* Slate-800 */
       --border-color: #0284c7;   /* Sky-600 */
@@ -35,36 +34,35 @@
     .text-muted-custom { color: var(--text-muted); }
     .border-custom { border-color: var(--border-color); }
 
-    /* Efek Animasi Kartu Hilang */
     .fade-out-card {
       opacity: 0;
-      transform: scale(0.8) rotate(-5deg);
+      transform: scale(0.8) translateY(-10px);
       transition: all 0.25s ease-out;
     }
 
-    /* KARTU PELANGI MINIMALIS (Warna acak lembut untuk estetika cerah) */
-    .rainbow-1 { background-color: #fef2f2; border-left: 5px solid #ef4444; color: #991b1b; } /* Merah */
-    .rainbow-2 { background-color: #fff7ed; border-left: 5px solid #f97316; color: #9a3412; } /* Oranye */
-    .rainbow-3 { background-color: #fefce8; border-left: 5px solid #eab308; color: #854d0e; } /* Kuning */
-    .rainbow-4 { background-color: #f0fdf4; border-left: 5px solid #22c55e; color: #166534; } /* Hijau */
-    .rainbow-5 { background-color: #eff6ff; border-left: 5px solid #3b82f6; color: #1e40af; } /* Biru */
-    .rainbow-6 { background-color: #faf5ff; border-left: 5px solid #a855f7; color: #6b21a8; } /* Ungu */
+    /* KARTU PELANGI CERAH MINIMALIS */
+    .rainbow-1 { background-color: #fff5f5; border-left: 5px solid #f87171; color: #991b1b; }
+    .rainbow-2 { background-color: #fff9db; border-left: 5px solid #fbbf24; color: #92400e; }
+    .rainbow-3 { background-color: #f0fdf4; border-left: 5px solid #4ade80; color: #166534; }
+    .rainbow-4 { background-color: #ecfeff; border-left: 5px solid #22d3ee; color: #075985; }
+    .rainbow-5 { background-color: #eef2ff; border-left: 5px solid #818cf8; color: #3730a3; }
+    .rainbow-6 { background-color: #fdf4ff; border-left: 5px solid #e879f9; color: #86198f; }
   </style>
 </head>
 <body class="app-bg min-h-screen font-sans antialiased pb-12">
 
   <nav class="panel-bg border-b shadow-md py-4 px-6 mb-8 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <div class="bg-sky-500 text-white p-2.5 rounded-xl shadow-md">
-        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+      <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md">
+        <i class="fa-solid fa-graduation-cap text-xl"></i>
       </div>
       <div>
-        <h1 class="text-md font-extrabold tracking-wide uppercase">Gateway Otorisasi Dispensasi</h1>
-        <p class="text-[10px] text-muted-custom font-mono font-bold">MONITORING INTERN - PPMUY</p>
+        <h1 class="text-md font-black tracking-wide uppercase">Sistem Kontrol Dispensasi Harian</h1>
+        <p class="text-[10px] text-muted-custom font-mono font-bold">DIGITAL VERIFICATION NODE - PPMUY</p>
       </div>
     </div>
     
-    <button onclick="toggleTheme()" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold font-mono px-4 py-2 rounded-xl flex items-center gap-2 shadow">
+    <button onclick="toggleTheme()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold font-mono px-4 py-2 rounded-xl flex items-center gap-2 shadow">
       <i id="themeIcon" class="fa-solid fa-moon"></i> <span id="themeText">MODE GELAP</span>
     </button>
   </nav>
@@ -72,83 +70,86 @@
   <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
     
     <section class="lg:col-span-5 space-y-6">
-      <div class="panel-bg border rounded-2xl p-6 shadow-lg space-y-4">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider border-b border-custom pb-3 font-mono flex items-center gap-2">
-          <i class="fa-solid fa-file-invoice text-sky-500"></i> Otorisasi Input
+      <div class="panel-bg border rounded-2xl p-6 shadow-xl space-y-4">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider border-b border-custom pb-3 flex items-center gap-2">
+          <i class="fa-solid fa-square-pen text-sky-600"></i> Form Validasi Dispensasi
         </h2>
         
         <form id="formDispensasi" onsubmit="ajukanDispensasi(event)">
           <div class="space-y-4">
             <div>
-              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-muted-custom font-mono">Personel Terpilih</label>
+              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-muted-custom font-mono">Nama Santri Terpilih</label>
               <div class="relative">
-                <input type="text" id="inputNama" readonly required placeholder="Klik nama di panel kanan..." 
-                  class="input-bg w-full px-4 py-3 text-sm rounded-xl border outline-none focus:border-sky-500 font-bold shadow-sm placeholder-sky-400/60">
-                <button type="button" onclick="resetTerpilih()" id="btnResetTerpilih" class="hidden absolute right-3 top-3.5 text-xs text-rose-500 hover:underline font-mono font-bold">
-                  <i class="fa-solid fa-circle-xmark"></i> Batal
+                <input type="text" id="inputNama" readonly required placeholder="Klik nama santri di panel kanan..." 
+                  class="input-bg w-full px-4 py-3 text-sm rounded-xl border outline-none focus:border-sky-600 font-bold shadow-sm placeholder-sky-400/50">
+                <button type="button" onclick="resetTerpilih()" id="btnResetTerpilih" class="hidden absolute right-3 top-3.5 text-xs text-rose-600 hover:underline font-bold">
+                  <i class="fa-solid fa-rotate-left"></i> Batal
                 </button>
               </div>
-              <input type="hidden" id="inputNIK" required>
+              <input type="hidden" id="inputNIK">
             </div>
 
             <div>
-              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-muted-custom font-mono">Kategori Opsi</label>
-              <select id="selectKategori" class="input-bg w-full px-4 py-3 text-sm rounded-xl border outline-none focus:border-sky-500 font-bold shadow-sm">
-                <option value="Khidmah">🛡️ Khidmah (Pengabdian Khusus)</option>
-                <option value="Melekan">☕ Melekan (Sistem Jaga Malam)</option>
+              <label class="block text-[11px] font-bold uppercase tracking-wider mb-1 text-muted-custom font-mono">Kategori Izin</label>
+              <select id="selectKategori" onchange="cekKebutuhanUpload()" class="input-bg w-full px-4 py-3 text-sm rounded-xl border outline-none focus:border-sky-600 font-bold shadow-sm">
+                <option value="Khidmah">🛡️ Kategori Khidmah (Pengabdian Instansi)</option>
+                <option value="Melekan">☕ Kategori Melekan (Wajib Upload Bukti)</option>
               </select>
             </div>
 
-            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold font-mono text-xs tracking-wider rounded-xl shadow-md transform hover:-translate-y-0.5 active:translate-y-0 transition">
-              <i class="fa-solid fa-check-double mr-1"></i> VALIDASI DISPENSASI
+            <div id="rowUploadBukti" class="hidden space-y-1.5 p-3 rounded-xl bg-amber-500/10 border border-amber-400/30">
+              <label class="block text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase font-mono"><i class="fa-solid fa-camera"></i> Ambil Foto Hasil Belajar Semalam (Wajib Tulisan Tangan)</label>
+              <input type="file" id="fileBukti" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer">
+              <p class="text-[9px] text-amber-600 dark:text-amber-400/80 font-medium">⚠️ Sistem terintegrasi kecerdasan tiruan (OCR Scanner). Foto acak/palsu otomatis tertolak!</p>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold font-mono text-xs tracking-wider rounded-xl shadow-md transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> PROSES OTORISASI DISPENSASI
             </button>
           </div>
         </form>
       </div>
 
-      <div class="panel-bg border rounded-2xl p-6 shadow-lg space-y-4 font-mono">
-        <h2 class="text-xs font-bold text-muted-custom uppercase tracking-widest border-b border-custom pb-2 flex items-center gap-2">
-          <i class="fa-solid fa-chart-line text-emerald-500"></i> Rekap Aktual Hari Ini
+      <div class="panel-bg border rounded-2xl p-6 shadow-xl space-y-4 font-mono">
+        <h2 class="text-xs font-black text-muted-custom uppercase tracking-widest border-b border-custom pb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-list-check text-emerald-600"></i> Rekap Detail Hari Ini</span>
+          <button onclick="perbaruiLogDanTelemetri()" class="text-sky-600 hover:underline text-[10px]"><i class="fa-solid fa-arrows-rotate"></i> Sync</button>
         </h2>
         
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-emerald-50 dark:bg-slate-800 p-3 rounded-xl border border-emerald-200">
-            <span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block">KHIDMAH</span>
-            <span id="txtKhidmah" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0</span>
-          </div>
-          <div class="bg-amber-50 dark:bg-slate-800 p-3 rounded-xl border border-amber-200">
-            <span class="text-[9px] text-amber-600 dark:text-amber-400 font-bold block">MELEKAN</span>
-            <span id="txtMelekan" class="text-2xl font-black text-amber-600 dark:text-amber-400">0</span>
+        <div class="space-y-2">
+          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20"><i class="fa-solid fa-shield-halved"></i> KHIDMAH (<span id="countKhidmah">0</span>)</span>
+          <div id="boxDetailKhidmah" class="font-sans input-bg p-2.5 rounded-xl border max-h-28 overflow-y-auto text-xs grid grid-cols-2 gap-1.5">
+            <span class="text-gray-400 text-[11px] col-span-2 text-center py-2">Belum ada data khidmah hari ini.</span>
           </div>
         </div>
 
-        <div class="pt-2">
-          <span class="text-[10px] font-bold text-muted-custom uppercase block mb-2"><i class="fa-solid fa-users-viewfinder"></i> Daftar Personel Ter-Dispensasi:</span>
-          <div id="listSantriHariIni" class="input-bg p-3 rounded-xl border max-h-40 overflow-y-auto space-y-2 text-xs font-sans shadow-inner">
-            <p class="text-center text-muted-custom font-mono text-[11px] py-4">Memuat data log harian...</p>
+        <div class="space-y-2 pt-1">
+          <span class="text-[10px] font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20"><i class="fa-solid fa-mug-hot"></i> MELEKAN (<span id="countMelekan">0</span>)</span>
+          <div id="boxDetailMelekan" class="font-sans input-bg p-2.5 rounded-xl border max-h-32 overflow-y-auto text-xs space-y-1.5">
+            <span class="text-gray-400 text-[11px] text-center block py-2">Belum ada data melekan hari ini.</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="lg:col-span-7 panel-bg border rounded-2xl p-6 shadow-lg flex flex-col h-[650px]">
+    <section class="lg:col-span-7 panel-bg border rounded-2xl p-6 shadow-xl flex flex-col h-[670px]">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-custom pb-4 mb-4 gap-3">
         <div>
-          <h2 class="text-sm font-black uppercase tracking-wider">Database Node Santri</h2>
-          <p class="text-[10px] text-muted-custom font-mono">Klik kartu nama santri untuk mengajukan dispensasi</p>
+          <h2 class="text-sm font-black uppercase tracking-wider">Database Personel Santri</h2>
+          <p class="text-[10px] text-muted-custom font-mono">Pilih nama santri di bawah ini untuk input dispensasi</p>
         </div>
         
         <div class="relative w-full sm:w-60">
           <input type="text" id="searchDeck" placeholder="Ketik nama untuk menyaring..." autocomplete="off"
-            class="input-bg w-full pl-4 pr-10 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-sky-500 shadow-sm font-medium">
-          <i class="fa-solid fa-filter absolute right-3.5 top-3.5 text-xs text-muted-custom"></i>
+            class="input-bg w-full pl-4 pr-10 py-2.5 text-xs rounded-xl border focus:outline-none focus:border-sky-600 font-bold shadow-sm">
+          <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3.5 text-xs text-muted-custom"></i>
         </div>
       </div>
 
       <div class="flex-1 overflow-y-auto pr-1">
-        <div id="gridSantriDispo" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div id="gridSantriDispo" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           <div class="col-span-full text-center py-24 text-muted-custom font-mono text-xs">
-            <i class="fa-solid fa-circle-notch animate-spin text-xl text-sky-500 mb-2 block"></i> Menghubungkan Terminal ke Master Node...
+            <i class="fa-solid fa-circle-notch animate-spin text-xl text-sky-600 mb-2 block"></i> Membaca Data Node Cloud...
           </div>
         </div>
       </div>
@@ -156,7 +157,6 @@
   </main>
 
   <script>
-    // SILAHKAN MASUKKAN URL DEPLOYMENT APPS SCRIPT ANDA DI SINI
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec"; 
 
     let databaseSantri = [];
@@ -167,12 +167,10 @@
       tarikDatabaseMaster();
     });
 
-    // CONTROLLER TEMA CERAH & GELAP
     function toggleTheme() {
       const body = document.body;
       const themeIcon = document.getElementById("themeIcon");
       const themeText = document.getElementById("themeText");
-      
       if (isDarkMode) {
         body.classList.remove("dark-mode");
         themeIcon.className = "fa-solid fa-moon";
@@ -186,13 +184,24 @@
       }
     }
 
+    function cekKebutuhanUpload() {
+      const kategori = document.getElementById("selectKategori").value;
+      const rowUpload = document.getElementById("rowUploadBukti");
+      if (kategori === "Melekan") {
+        rowUpload.classList.remove("hidden");
+        document.getElementById("fileBukti").required = true;
+      } else {
+        rowUpload.classList.add("hidden");
+        document.getElementById("fileBukti").required = false;
+      }
+    }
+
     function tarikDatabaseMaster() {
       const container = document.getElementById("gridSantriDispo");
       if(WEB_APP_URL.includes("URL_WEB_APP_SCRIPT_ANDA")) {
-         container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-600 font-mono text-xs px-4 border border-dashed border-rose-300 rounded-xl bg-white">⚠️ <strong>Konfigurasi Diperlukan:</strong> Taruh URL Web App Apps Script pada variabel <code>WEB_APP_URL</code>.</div>`;
+         container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-600 font-mono text-xs px-4 border border-dashed border-rose-300 rounded-xl bg-white">⚠️ URL Web App belum dikonfigurasi di dalam tag script HTML.</div>`;
          return;
       }
-      
       fetch(`${WEB_APP_URL}?aksi=ambil_database`)
         .then(res => res.json())
         .then(res => {
@@ -201,12 +210,12 @@
             buildDeckMaster();
             perbaruiLogDanTelemetri();
           }
-        }).catch(err => {
-          container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-500 font-mono text-xs">🚨 Gagal menyambungkan ke Google Sheets Cloud.</div>`;
+        }).catch(() => {
+          container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-500 font-mono text-xs">🚨 Gagal sinkronisasi data cloud spreadsheet.</div>`;
         });
     }
 
-    // RENDER DECK UTAMA - HANYA MENAMPILKAN NAMA SAJA DENGAN WARNA PELANGI
+    // MEMBUAT GRID KARTU NAMA SAJA DENGAN DESIGN PELANGI CERAH
     function buildDeckMaster() {
       const container = document.getElementById("gridSantriDispo");
       container.innerHTML = "";
@@ -214,32 +223,28 @@
       const listTersedia = databaseSantri.filter(s => !santriDipilihSaatIni || santriDipilihSaatIni.nik !== s.nik);
 
       if(listTersedia.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-16 text-muted-custom font-mono text-xs">Semua santri telah dipilah / data kosong.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-muted-custom font-mono text-xs">Semua data tersemat.</div>`;
         return;
       }
 
       listTersedia.forEach((s, index) => {
         const div = document.createElement("div");
-        
-        // Pola Pelangi Lembut (1 sampai 6)
         const rainbowClass = `rainbow-${(index % 6) + 1}`;
         
-        div.className = `box-santri ${rainbowClass} p-3 rounded-xl cursor-pointer shadow-sm font-bold text-center flex items-center justify-center h-14 text-xs tracking-wide transform active:scale-95 transition duration-150 border`;
+        div.className = `box-santri ${rainbowClass} p-3 rounded-xl cursor-pointer shadow-sm font-extrabold text-center flex items-center justify-center h-12 text-xs tracking-wide transform active:scale-95 transition duration-150 border`;
         div.setAttribute("data-nama", s.nama.toLowerCase());
         div.innerText = s.nama;
 
-        // LOGIKA KLIK KARTU LANGSUNG HILANG
+        // EFEK KLIK KARTU LANGSUNG HILANG
         div.addEventListener("click", function() {
           div.classList.add("fade-out-card");
-          
           setTimeout(() => {
             santriDipilihSaatIni = s; 
             document.getElementById("inputNama").value = s.nama;
             document.getElementById("inputNIK").value = s.nik || "000000";
             document.getElementById("btnResetTerpilih").classList.remove("hidden");
-            
-            buildDeckMaster(); // Re-render instan agar kartu menghilang
-          }, 220);
+            buildDeckMaster(); 
+          }, 200);
         });
 
         container.appendChild(div);
@@ -254,82 +259,112 @@
       buildDeckMaster();
     }
 
+    // FORM ACTION TERINTEGRASI BASE64 CONVERTER & OCR VALIDATOR
     function ajukanDispensasi(e) {
       e.preventDefault();
       const btn = document.getElementById("btnSubmit");
       const nik = document.getElementById("inputNIK").value;
       const nama = document.getElementById("inputNama").value;
       const kategori = document.getElementById("selectKategori").value;
+      const fileInput = document.getElementById("fileBukti");
 
       btn.disabled = true;
-      btn.innerText = "MEMPROSES OTORISASI CLOUD...";
+      btn.innerText = "MENGECEK KEASLIAN BUKTI (OCR SCANNING)...";
 
-      // Karena menu checkbox dihapus, parameter bukti dikirim string statis/kosong yang aman bagi script.gs Anda
-      let targetUrl = `${WEB_APP_URL}?aksi=simpan_dispensasi_khusus&nik=${encodeURIComponent(nik)}&nama=${encodeURIComponent(nama)}&kategori=${encodeURIComponent(kategori)}&bukti=${encodeURIComponent("Dispensasi Terbit via Radar")}`;
-
-      fetch(targetUrl, { method: "POST" })
-        .then(res => res.json())
-        .then(res => {
-          if(res.status === "success") {
-            alert(`Sukses! Otorisasi ${kategori} untuk ${nama} berhasil disimpan.`);
-            document.getElementById("formDispensasi").reset();
-            santriDipilihSaatIni = null;
-            document.getElementById("btnResetTerpilih").classList.add("hidden");
-            buildDeckMaster();
-            perbaruiLogDanTelemetri();
-          } else {
-            alert("Terjadi Kendala: " + res.message);
-          }
-        })
-        .catch(err => alert("Koneksi server cloud terganggu."))
-        .finally(() => {
-          btn.disabled = false;
-          btn.innerText = "VALIDASI DISPENSASI";
-        });
+      if (kategori === "Melekan" && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(evt) {
+          kirimKeBackend(nik, nama, kategori, evt.target.result, file.name);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        kirimKeBackend(nik, nama, kategori, "", "");
+      }
     }
 
-    // FUNGSI UNTUK MELAKUKAN UPDATE COUNTER DAN FEED NAMA SANTRI SEKALIGUS
+    function kirimKeBackend(nik, nama, kategori, fileData, fileName) {
+      const btn = document.getElementById("btnSubmit");
+      
+      const payload = {
+        aksi: "simpan_dispensasi_khusus",
+        nik: nik,
+        nama: nama,
+        kategori: kategori,
+        fileData: fileData,
+        fileName: fileName
+      };
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.status === "success") {
+          alert(`Alhamdulillah terimakasih sudah belajar malam ini. Data berhasil disimpan!`);
+          document.getElementById("formDispensasi").reset();
+          santriDipilihSaatIni = null;
+          document.getElementById("btnResetTerpilih").classList.add("hidden");
+          document.getElementById("rowUploadBukti").classList.add("hidden");
+          buildDeckMaster();
+          perbaruiLogDanTelemetri();
+        } else if (res.status === "ocr_rejected") {
+          alert(`Ditolak! Silakan upload bukti asli hasil belajar jangan main2 karena akan dicek pengasuh..`);
+        } else {
+          alert("Error: " + res.message);
+        }
+      })
+      .catch(() => alert("Koneksi cloud node terputus."))
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerText = "PROSES OTORISASI DISPENSASI";
+      });
+    }
+
+    // TARIK REKAP DAFTAR NAMA DETAIL SECARA REAL-TIME
     function perbaruiLogDanTelemetri() {
       if(WEB_APP_URL.includes("URL_WEB_APP_SCRIPT_ANDA")) return;
       
-      const logContainer = document.getElementById("listSantriHariIni");
-      
-      // Ambil angka telemetri harian
+      const boxKhidmah = document.getElementById("boxDetailKhidmah");
+      const boxMelekan = document.getElementById("boxDetailMelekan");
+
       fetch(`${WEB_APP_URL}?aksi=ambil_telemetri_dispensasi`)
         .then(res => res.json())
         .then(res => {
           if(res.status === "success") {
-            document.getElementById("txtKhidmah").innerText = res.khidmah;
-            document.getElementById("txtMelekan").innerText = res.melekan;
-          }
-        });
+            // Update Angka Indikator
+            document.getElementById("countKhidmah").innerText = res.khidmah;
+            document.getElementById("countMelekan").innerText = res.melekan;
 
-      // Tarik log histori untuk menampilkan siapa saja santri yang sudah divalidasi hari ini
-      // Kita meminjam endpoint dari sistem log/aktivitas (jika tidak ada, kita fallback mengambil data manifest)
-      logContainer.innerHTML = `<div class="text-center py-2 text-sky-500 font-mono text-[10px]"><i class="fa-solid fa-spinner animate-spin"></i> Sinkronisasi Log Harian...</div>`;
-      
-      // Mengambil histori harian dari ledger spreadsheet dispensasi_khusus
-      fetch(`${WEB_APP_URL}?aksi=ambil_database`) 
-        .then(res => res.json())
-        .then(res => {
-          // Fallback cerdas: Karena script harian mengembalikan total angka, 
-          // kita simulasikan daftar log aktif hari ini agar langsung tampil di UI
-          if(res.status === "success" && santriDipilihSaatIni == null) {
-             // Simulasi live feed harian sederhana di UI
-             logContainer.innerHTML = `
-               <div class="flex items-center justify-between bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 text-emerald-700 font-medium">
-                 <span>🟢 Node Server Active</span>
-                 <span class="text-[9px] font-mono">Sync OK</span>
-               </div>
-               <p class="text-[11px] text-center text-muted-custom pt-2 font-mono">Input data otomatis terintegrasi ke sistem harian.</p>
-             `;
+            // Update List Detail Nama Khidmah
+            if(res.listKhidmah.length > 0) {
+              boxKhidmah.innerHTML = res.listKhidmah.map(s => `
+                <div class="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold p-1 px-2 rounded-lg border border-emerald-500/20 text-center truncate">${s.nama}</div>
+              `).join("");
+            } else {
+              boxKhidmah.innerHTML = `<span class="text-gray-400 text-[11px] col-span-2 text-center py-2">Belum ada data khidmah hari ini.</span>`;
+            }
+
+            // Update List Detail Nama Melekan + Tombol Bukti Link Drive
+            if(res.listMelekan.length > 0) {
+              boxMelekan.innerHTML = res.listMelekan.map(s => `
+                <div class="flex items-center justify-between bg-amber-500/10 p-1.5 px-2.5 rounded-xl border border-amber-500/20 text-amber-800 dark:text-amber-400">
+                  <span class="font-bold truncate max-w-[150px]">${s.nama}</span>
+                  <a href="${s.bukti}" target="_blank" class="bg-amber-600 text-white text-[9px] px-2 py-1 rounded-md font-bold hover:bg-amber-700 transition flex items-center gap-1">
+                    <i class="fa-solid fa-eye"></i> Bukti
+                  </a>
+                </div>
+              `).join("");
+            } else {
+              boxMelekan.innerHTML = `<span class="text-gray-400 text-[11px] text-center block py-2">Belum ada data melekan hari ini.</span>`;
+            }
           }
-        }).catch(() => {
-          logContainer.innerHTML = `<p class="text-center text-rose-500 text-[10px]">Gagal memuat daftar log.</p>`;
         });
     }
 
-    // FILTER SEARCH
+    // FILTER FILTER SEARCH
     document.getElementById("searchDeck").addEventListener("input", function() {
       let val = this.value.trim().toLowerCase();
       document.querySelectorAll(".box-santri").forEach(b => {
