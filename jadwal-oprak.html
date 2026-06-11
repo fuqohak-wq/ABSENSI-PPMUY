@@ -1,1 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HQ Special Patrol System - PPMUY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --border-color: rgba(255, 255, 255, 0.5);
+      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+      --accent: #319795;
+      --accent-hover: #2c7a7b;
+      --badge-bg: #e6fffa;
+      --badge-text: #234e52;
+    }
 
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+      --card-bg: rgba(45, 55, 72, 0.7);
+      --text-main: #f7fafc;
+      --text-muted: #cbd5e0;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --accent: #4fd1c5;
+      --accent-hover: #319795;
+      --badge-bg: rgba(79, 209, 197, 0.2);
+      --badge-text: #81e6d9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 20px;
+    }
+
+    /* GLASS HEADER */
+    header {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .title-area h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .title-area p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+
+    /* GRID LAYOUT */
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .oprak-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    /* PETUGAS CARD */
+    .santri-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .santri-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      border-color: var(--accent);
+    }
+
+    .santri-info .name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .santri-info .sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .click-indicator {
+      font-size: 12px;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateX(10px);
+    }
+
+    .santri-card:hover .click-indicator {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* LOADER ANIMATION */
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border-left-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 15px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px dashed var(--text-muted);
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <div class="container">
+    <header>
+      <div class="title-area">
+        <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
+        <p>Klik nama santri jika dikonfirmasi hadir patroli malam ini.</p>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
+        <i class="fa-solid fa-moon" id="theme-icon"></i>
+      </button>
+    </header>
+
+    <div class="section-title">
+      <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
+      <span>Daftar Santri Bertugas Malam Ini</span>
+    </div>
+
+    <div class="oprak-grid" id="container-grid">
+      <div class="loader-container">
+        <div class="spinner"></div>
+        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghubungkan ke Cloud Server PPMUY...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script>
+    // FUNGSI TOGGLE THEME (TERANG/GELAP)
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      if(body.getAttribute('data-theme') === 'dark') {
+        body.setAttribute('data-theme', 'light');
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        icon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    // AMBIL DATA DARI SERVING APPS SCRIPT
+    document.addEventListener("DOMContentLoaded", function() {
+      muatDaftarOprak();
+    });
+
+    function muatDaftarOprak() {
+      const urlScript = "https://script.google.com/macros/s/AKfycbz_K_N3x6gQ1WwSbyHclZ3WwL58rM08Z4A0W3vE3b58O0mYvRsc_l5A11eYf98u0p8/exec?aksi=ambil_petugas_oprak"; 
+      // Catatan: Ganti URL di atas dengan tautan URL Web App Apps Script Anda yang valid!
+
+      fetch(urlScript)
+        .then(response => response.json())
+        .then(res => {
+          const grid = document.getElementById("container-grid");
+          grid.innerHTML = "";
+          
+          if(res.status === "error" || !res.data || res.data.length === 0) {
+            grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh gelombang putaran malam ini bersih atau sudah dikonfirmasi hadir!</div>`;
+            return;
+          }
+
+          res.data.forEach(santri => {
+            const card = document.createElement("div");
+            card.className = "santri-card";
+            card.setAttribute("onclick", `konfirmasiKehadiran('${santri.nik}', '${santri.nama}', this)`);
+            
+            card.innerHTML = `
+              <div class="santri-info">
+                <div class="name">${santri.nama}</div>
+                <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
+                <div class="sub"><i class="fa-solid fa-school"></i> Kelas: ${santri.kelas}</div>
+              </div>
+              <div class="card-footer">
+                <span class="badge">Putaran ${santri.putaran}</span>
+                <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari cloud. Pastikan URL Web App Deploy sudah sesuai.</div>`;
+        });
+    }
+
+    // PROSES EKSEKUSI KLIK OLEH KEPALA PONDOK
+    function konfirmasiKehadiran(nik, nama, elemen) {
+      Swal.fire({
+        title: 'Konfirmasi Kehadiran',
+        text: `Apakah benar santri bernama "${nama}" hadir dalam tugas oprak-oprak ronda malam ini?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#319795',
+        cancelButtonColor: '#718096',
+        confirmButtonText: 'Ya, Hadir!',
+        cancelButtonText: 'Batal',
+        background: document.body.getAttribute('data-theme') === 'dark' ? '#2d3748' : '#fff',
+        color: document.body.getAttribute('data-theme') === 'dark' ? '#fff' : '#2d3748'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Kirim data ke API Post Server
+          const urlPost = "https://script.google.com/macros/s/AKfycbz_K_N3x6gQ1WwSbyHclZ3WwL58rM08Z4A0W3vE3b58O0mYvRsc_l5A11eYf98u0p8/exec";
+          
+          let formData = new URLSearchParams();
+          formData.append("aksi", "simpan_dispensasi_khusus"); // dialihkan via Post
+          // Untuk kenyamanan gateway bypass, gunakan format x-www-form-urlencoded standar:
+          
+          fetch(`${urlPost}?aksi=konfirmasi_hadir_oprak&nik=${nik}&nama=${encodeURIComponent(nama)}`, {
+            method: 'POST'
+          })
+          .then(r => r.json())
+          .then(respon => {
+            if(respon.status === "success") {
+              // Efek animasi hancur menghilang yang menyenangkan
+              elemen.style.transform = "scale(0)";
+              elemen.style.opacity = "0";
+              setTimeout(() => {
+                elemen.remove();
+                if(document.getElementById("container-grid").children.length === 0) {
+                  document.getElementById("container-grid").innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh gelombang putaran malam ini bersih atau sudah dikonfirmasi hadir!</div>`;
+                }
+              }, 300);
+
+              Swal.fire({
+                title: 'Berhasil!',
+                text: respon.message,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: document.body.getAttribute('data-theme') === 'dark' ? '#2d3748' : '#fff',
+                color: document.body.getAttribute('data-theme') === 'dark' ? '#fff' : '#2d3748'
+              });
+            } else {
+              Swal.fire('Gagal', respon.message, 'error');
+            }
+          })
+          .catch(e => {
+            Swal.fire('Server Error', 'Gagal memproses data ke database cloud.', 'error');
+          });
+        }
+      });
+    }
+  </script>
+  
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+  </style>
+</body>
+</html>
