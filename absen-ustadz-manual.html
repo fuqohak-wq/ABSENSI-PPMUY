@@ -1,307 +1,217 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HQ Ustadz Attendance Radar - PPMUY</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .card-fade {
-      transition: all 0.5s ease;
-      opacity: 1;
-      transform: scale(1);
-    }
-    .card-hidden {
-      opacity: 0;
-      transform: scale(0.8);
-      pointer-events: none;
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 0 !important;
-      height: 0 !important;
-      border: none !important;
-    }
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
-    .animate-spin-custom {
-      animation: spin 1s linear infinite;
-    }
-  </style>
-</head>
-<body id="mainBody" class="bg-zinc-950 font-sans text-zinc-200 min-h-screen transition-colors duration-300">
-
-  <nav id="navbar" class="bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300">
-    <div class="flex items-center gap-3">
-      <div id="logoBox" class="bg-emerald-600/10 border border-emerald-500/30 p-2.5 rounded-lg text-emerald-400 shadow-inner">
-        <i class="fa-solid fa-user-check text-xl animate-pulse"></i>
-      </div>
-      <div>
-        <h1 id="navTitle" class="text-lg font-extrabold tracking-wider text-zinc-100 uppercase">LOGISTIK PRESENSI ASATIDZAH</h1>
-        <p id="navSub" class="text-xs text-zinc-500 font-mono tracking-widest">SINKRONISASI LOG_USTADZ REAL-TIME</p>
-      </div>
-    </div>
-    
-    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-      <button onclick="toggleTheme()" id="btnVisor" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm">
-        <i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR
-      </button>
-      <a href="javascript:history.back();" id="btnBack" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm">
-        <i class="fa-solid fa-arrow-left-long"></i> Dashboard
-      </a>
-    </div>
-  </nav>
-
-  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8 pb-12">
-    
-    <section class="lg:col-span-1 space-y-6">
-      <div id="panelConfig" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg transition-colors duration-300">
-        <label id="lblKegiatan" class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 font-mono">Pilih Agenda Kegiatan</label>
-        <div class="relative">
-          <select id="selectKegiatan" class="input-field w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 transition">
-            <option value="Kajian Kitab Sore">📚 Kajian Kitab Sore</option>
-            <option value="Madrasah Diniyah">🕌 Madrasah Diniyah</option>
-            <option value="Tahfidzul Qur'an">📖 Tahfidzul Qur'an</option>
-            <option value="Rapat Koordinasi">💼 Rapat Koordinasi</option>
-            <option value="Piket Khidmah">🛡️ Piket Khidmah</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="panelMetrics" class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4 font-mono transition-colors duration-300">
-        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Otorisasi & Live Telemetri</p>
-        <div class="flex justify-between items-center bg-zinc-950 p-4 rounded-lg border border-zinc-800/80">
-          <div>
-            <span class="text-xs text-zinc-500 block">SQUAD TOTAL</span>
-            <span id="txtHadir" class="text-2xl font-bold text-emerald-400">0</span>
-            <span id="txtTotal" class="text-sm text-zinc-500">/ 0 Active</span>
-          </div>
-          <div class="text-3xl text-zinc-800"><i class="fa-solid fa-users-viewfinder"></i></div>
-        </div>
-
-        <div>
-          <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Feed Check-in Terbaru</p>
-          <div id="logFeed" class="space-y-2 max-h-48 overflow-y-auto text-[11px] text-zinc-400 divide-y divide-zinc-800/30">
-            <p class="text-center py-4 text-zinc-600 italic">Belum ada aktivitas transmisi...</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="panelMainDeck" class="lg:col-span-3 bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-2xl transition-colors duration-300">
-      <div id="deckHeader" class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-6">
-        <div>
-          <h2 id="deckTitle" class="text-sm font-bold uppercase tracking-wider text-zinc-100">Deck Grid Asatidzah</h2>
-          <p id="deckSub" class="text-[10px] text-zinc-500 font-mono">Klik kartu nama Anda untuk melakukan otorisasi absensi langsung</p>
-        </div>
-        <div class="relative w-48 sm:w-64">
-          <input type="text" id="searchDeck" placeholder="Saring Nama..." autocomplete="off"
-            class="input-field w-full pl-3 pr-8 py-1.5 bg-zinc-950 text-xs text-zinc-100 placeholder-zinc-600 rounded-md border border-zinc-800 focus:outline-none focus:border-emerald-500 transition">
-          <i class="fa-solid fa-filter absolute right-2.5 top-2.5 text-[10px] text-zinc-600"></i>
-        </div>
-      </div>
-
-      <div id="gridKartuUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        <div class="col-span-full text-center py-24 text-zinc-600 font-mono text-xs">
-          <i class="fa-solid fa-circle-notch animate-spin-custom text-xl text-emerald-500 mb-2 block"></i> Membaca data personel ustadz dari master_santri...
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    // Secara otomatis mengambil domain dasar web app tempat script ini berjalan
-    const WEB_APP_URL = window.location.href.split('?')[0]; 
-
-    let listUstadz = [];
-    let countHadir = 0;
-    let currentTheme = "dark";
-
-    document.addEventListener("DOMContentLoaded", function() {
-      tarikDatabaseUstadz();
-    });
-
-    function toggleTheme() {
-      const body = document.getElementById("mainBody");
-      const navbar = document.getElementById("navbar");
-      const logoBox = document.getElementById("logoBox");
-      const btnVisor = document.getElementById("btnVisor");
-      const btnBack = document.getElementById("btnBack");
-      const panelConfig = document.getElementById("panelConfig");
-      const panelMetrics = document.getElementById("panelMetrics");
-      const panelMainDeck = document.getElementById("panelMainDeck");
-      
-      const navTitle = document.getElementById("navTitle");
-      const deckTitle = document.getElementById("deckTitle");
-      const deckHeader = document.getElementById("deckHeader");
-      const lblKegiatan = document.getElementById("lblKegiatan");
-      const inputFields = document.querySelectorAll(".input-field");
-      const cards = document.querySelectorAll(".ustadz-card");
-
-      if (currentTheme === "dark") {
-        currentTheme = "light";
-        body.className = "bg-slate-100 font-sans text-slate-800 min-h-screen transition-colors duration-300";
-        navbar.className = "bg-white border-b border-slate-200 text-slate-800 shadow-md py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
-        panelConfig.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md transition-colors duration-300";
-        panelMetrics.className = "bg-white border border-slate-200 rounded-xl p-5 shadow-md space-y-4 font-mono transition-colors duration-300";
-        panelMainDeck.className = "bg-white border border-slate-200 rounded-xl p-6 shadow-xl transition-colors duration-300";
-        
-        navTitle.className = "text-lg font-extrabold tracking-wider text-slate-900 uppercase";
-        deckTitle.className = "text-sm font-bold uppercase tracking-wider text-slate-900";
-        deckHeader.className = "flex justify-between items-center border-b border-slate-200 pb-4 mb-6";
-        lblKegiatan.className = "block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 font-mono";
-        
-        logoBox.className = "bg-emerald-100 border border-emerald-300 p-2.5 rounded-lg text-emerald-600 shadow-inner";
-        btnVisor.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnBack.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnVisor.innerHTML = `<i class="fa-solid fa-moon text-indigo-600"></i> TOGGLE VISOR`;
-
-        inputFields.forEach(el => {
-          el.className = "input-field w-full px-3 py-2.5 bg-slate-50 text-slate-900 placeholder-slate-400 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-500 transition";
-        });
-        document.getElementById("searchDeck").className = "input-field w-full pl-3 pr-8 py-1.5 bg-slate-50 text-xs text-slate-900 placeholder-slate-400 rounded-md border border-slate-300 focus:outline-none focus:border-emerald-500 transition";
-        
-        cards.forEach(c => {
-          if(!c.classList.contains('card-hidden')) c.className = "ustadz-card card-fade bg-slate-50 hover:bg-emerald-50 text-slate-800 border border-slate-200 p-3 rounded-lg text-center cursor-pointer shadow-sm font-mono transition duration-200 relative group overflow-hidden";
-        });
-      } else {
-        currentTheme = "dark";
-        body.className = "bg-zinc-950 font-sans text-zinc-200 min-h-screen transition-colors duration-300";
-        navbar.className = "bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
-        panelConfig.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg transition-colors duration-300";
-        panelMetrics.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4 font-mono transition-colors duration-300";
-        panelMainDeck.className = "bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-2xl transition-colors duration-300";
-        
-        navTitle.className = "text-lg font-extrabold tracking-wider text-zinc-100 uppercase";
-        deckTitle.className = "text-sm font-bold uppercase tracking-wider text-zinc-100";
-        deckHeader.className = "flex justify-between items-center border-b border-zinc-800 pb-4 mb-6";
-        lblKegiatan.className = "block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2 font-mono";
-        
-        logoBox.className = "bg-emerald-600/10 border border-emerald-500/30 p-2.5 rounded-lg text-emerald-400 shadow-inner";
-        btnVisor.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnBack.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnVisor.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR`;
-
-        inputFields.forEach(el => {
-          el.className = "input-field w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 transition";
-        });
-        document.getElementById("searchDeck").className = "input-field w-full pl-3 pr-8 py-1.5 bg-zinc-950 text-xs text-zinc-100 placeholder-zinc-600 rounded-md border border-zinc-800 focus:outline-none focus:border-emerald-500 transition";
-        
-        cards.forEach(c => {
-          if(!c.classList.contains('card-hidden')) c.className = "ustadz-card card-fade bg-zinc-950 hover:bg-zinc-800/80 text-zinc-300 border border-zinc-800 p-3 rounded-lg text-center cursor-pointer shadow-md font-mono transition duration-200 relative group overflow-hidden";
-        });
-      }
-    }
-
-    function tarikDatabaseUstadz() {
-      const container = document.getElementById("gridKartuUstadz");
-      
-      fetch(`${WEB_APP_URL}?aksi=ambil_database_ustadz`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.status === "success") {
-            listUstadz = res.data;
-            document.getElementById("txtTotal").innerText = `/ ${listUstadz.length} Active`;
-            buildDeckKartu(listUstadz);
-          } else {
-            container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">ERROR SYSTEM: ${res.message}</div>`;
-          }
-        }).catch(err => {
-          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Gagal berkomunikasi dengan cloud node server.</div>`;
-        });
-    }
-
-    function buildDeckKartu(data) {
-      const container = document.getElementById("gridKartuUstadz");
-      container.innerHTML = "";
-
-      if(data.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-600 font-mono text-xs">Data personel Ustadz tidak ditemukan di tab master_santri.</div>`;
-        return;
-      }
-
-      data.forEach(u => {
-        const card = document.createElement("div");
-        
-        card.className = currentTheme === "dark"
-          ? "ustadz-card card-fade bg-zinc-950 hover:bg-zinc-800/80 text-zinc-300 border border-zinc-800 p-3 rounded-lg text-center cursor-pointer shadow-md font-mono transition duration-200 relative group overflow-hidden"
-          : "ustadz-card card-fade bg-slate-50 hover:bg-emerald-50 text-slate-800 border border-slate-200 p-3 rounded-lg text-center cursor-pointer shadow-sm font-mono transition duration-200 relative group overflow-hidden";
-        
-        card.setAttribute("data-nama", u.nama.toLowerCase());
-        card.innerHTML = `
-          <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500 group-hover:h-full transition-all"></div>
-          <i class="fa-solid fa-user-tie text-xs block mb-1 text-zinc-500 group-hover:text-emerald-400 transition"></i>
-          <p class="text-xs font-bold tracking-tight line-clamp-2">${u.nama}</p>
-        `;
-
-        card.addEventListener("click", function() {
-          eksekusiAbsenUstadz(u.nama, card);
-        });
-
-        container.appendChild(card);
-      });
-    }
-
-    function eksekusiAbsenUstadz(namaUstadz, elementKartu) {
-      const agenda = document.getElementById("selectKegiatan").value;
-      
-      elementKartu.style.pointerEvents = "none";
-      elementKartu.classList.add("animate-pulse");
-
-      let targetUrl = `${WEB_APP_URL}?aksi=simpan_absen_ustadz&nama_ustadz=${encodeURIComponent(namaUstadz)}&nama_kegiatan=${encodeURIComponent(agenda)}`;
-
-      fetch(targetUrl, { method: "POST" })
-        .then(res => res.json())
-        .then(res => {
-          if(res.status === "success") {
-            elementKartu.classList.remove("animate-pulse");
-            elementKartu.classList.add("card-hidden");
-            
-            countHadir++;
-            document.getElementById("txtHadir").innerText = countHadir;
-
-            suntikLiveFeed(namaUstadz, agenda);
-          } else {
-            alert("Gagal melakukan enkripsi absensi: " + res.message);
-            elementKartu.style.pointerEvents = "auto";
-          }
-        }).catch(err => {
-          alert("Koneksi gagal ditransmisikan ke Google Cloud Node Server.");
-          elementKartu.style.pointerEvents = "auto";
-        });
-    }
-
-    function suntikLiveFeed(nama, kegiatan) {
-      const feedBox = document.getElementById("logFeed");
-      if(countHadir === 1) feedBox.innerHTML = ""; 
-
-      const item = document.createElement("div");
-      item.className = "py-2 border-b border-zinc-800/30 flex items-center gap-2";
-      
-      const waktu = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-      item.innerHTML = `
-        <i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i>
-        <div>
-          <span class="font-bold block text-zinc-100">${nama}</span>
-          <span class="text-[9px] text-zinc-500">${waktu} -> ${kegiatan}</span>
-        </div>
-      `;
-      feedBox.insertBefore(item, feedBox.firstChild);
-    }
-
-    document.getElementById("searchDeck").addEventListener("input", function() {
-      let val = this.value.trim().toLowerCase();
-      const cards = document.querySelectorAll(".ustadz-card");
-      cards.forEach(c => {
-        let text = c.getAttribute("data-nama");
-        if(text.includes(val)) {
-          c.style.display = "block";
-        } else {
-          c.style.display = "none";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presensi Manual Ustadz - PPMUY</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #09090b; /* bg-zinc-950 alternatif */
+            color: #f4f4f5;
         }
-      });
-    });
-  </script>
+        .card-ustadz {
+            background-color: #18181b; /* bg-zinc-900 alternatif */
+            transition: all 0.2s ease-in-out;
+        }
+        .card-ustadz:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+        }
+        /* Custom scrollbar untuk estetika dashboard */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <header class="border-b border-zinc-800 bg-zinc-900 sticky top-0 z-50 px-4 py-4 shadow-md" style="background-color: #18181b; border-color: #27272a;">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-400">
+                    <svg class="w-6 height-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Presensi Personel Asatidzah
+                        <span class="px-2 py-0.5 text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">Manual Portal</span>
+                    </h1>
+                    <p class="text-xs text-zinc-400 mt-0.5">PPM. Al-Anwar Mangunsari | HQ Management System</p>
+                </div>
+            </div>
+            
+            <div class="relative w-full sm:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="inputCari" onkeyup="filterUstadz()" placeholder="Cari nama ustadz..." 
+                       class="w-full pl-9 pr-4 py-2 bg-zinc-950 text-sm text-zinc-200 border border-zinc-800 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-zinc-500 transition-all" style="background-color: #09090b; border-color: #27272a;">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <div id="statusArea" class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500 mb-4"></div>
+            <p class="text-zinc-400 font-medium text-sm tracking-wide">Membaca data personel asatidzah dari cloud server...</p>
+        </div>
+
+        <div id="gridUstadz" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 hidden">
+            </div>
+    </main>
+
+    <script>
+        // MENGUNCI URL WEB APP TERBARU ANDA SECARA LANGSUNG
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+
+        let databaseUstadz = [];
+
+        // 1. Ambil Data Saat Halaman Pertama Kali Dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            muatDataAsatidzah();
+        });
+
+        function muatDataAsatidzah() {
+            const urlTarget = `${WEB_APP_URL}?aksi=ambil_database_ustadz`;
+            
+            fetch(urlTarget)
+                .then(response => response.json())
+                .then(res => {
+                    const statusArea = document.getElementById('statusArea');
+                    const gridUstadz = document.getElementById('gridUstadz');
+
+                    if (res.status === 'success' && res.data && res.data.length > 0) {
+                        databaseUstadz = res.data;
+                        statusArea.classList.add('hidden');
+                        gridUstadz.classList.remove('hidden');
+                        renderCards(databaseUstadz);
+                    } else {
+                        statusArea.innerHTML = `
+                            <div class="p-3 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl max-w-md">
+                                <p class="font-semibold text-sm">Data Tidak Ditemukan</p>
+                                <p class="text-xs text-zinc-400 mt-1">Pastikan di data master_santri Anda terdapat nama dengan unsur 'Ustadz' atau kolom kelas tertulis 'Asatidzah'.</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('statusArea').innerHTML = `
+                        <div class="p-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl max-w-md">
+                            <p class="font-bold text-sm">Gagal Terhubung ke Server</p>
+                            <p class="text-xs text-zinc-400 mt-1">Gagal mengambil data. Pastikan Web App sudah dideploy ulang sebagai 'Anyone' dan 'New Version'.</p>
+                            <button onclick="muatDataAsatidzah()" class="mt-3 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white rounded-lg transition-all">Coba Lagi</button>
+                        </div>
+                    `;
+                });
+        }
+
+        // 2. Render List Kartu ke HTML
+        function renderCards(dataList) {
+            const container = document.getElementById('gridUstadz');
+            container.innerHTML = '';
+
+            dataList.forEach(ustadz => {
+                const card = document.createElement('div');
+                card.className = 'card-ustadz rounded-2xl p-5 border border-zinc-800/60 flex flex-col justify-between relative overflow-hidden';
+                card.setAttribute('data-nama', ustadz.nama.toLowerCase());
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded-md bg-zinc-800 text-zinc-300 uppercase tracking-wider">
+                                ${ustadz.kelas || 'ASATIDZAH'}
+                            </span>
+                            <div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+                        </div>
+
+                        <h3 class="text-base font-bold text-white tracking-tight line-clamp-1 mb-1">${ustadz.nama}</h3>
+                        <p class="text-xs text-zinc-500 font-mono tracking-wide mb-6">ID: ${ustadz.nik}</p>
+                    </div>
+
+                    <div class="flex gap-2 mt-auto pt-2 border-t border-zinc-800/40">
+                        <button onclick="prosesAbsenLokal('${ustadz.nik}', '${ustadz.nama}', 'HADIR')" 
+                                class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-sm transition-all focus:outline-none active:scale-95">
+                            HADIR
+                        </button>
+                        <button onclick="prosesAbsenLokal('${ustadz.nik}', '${ustadz.nama}', 'IZIN')" 
+                                class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium text-xs rounded-xl transition-all focus:outline-none active:scale-95">
+                            IZIN
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 3. Logika Pencarian Realtime
+        function filterUstadz() {
+            const kueri = document.getElementById('inputCari').value.toLowerCase();
+            const kartuSemua = document.querySelectorAll('#gridUstadz > div');
+            
+            kartuSemua.forEach(kartu => {
+                const namaUstadz = kartu.getAttribute('data-nama');
+                if (namaUstadz.includes(kueri)) {
+                    kartu.classList.remove('hidden');
+                } else {
+                    kartu.classList.add('hidden');
+                }
+            });
+        }
+
+        // 4. Kirim Data Absen ke Server via POST
+        function prosesAbsenLokal(nik, nama, status) {
+            // Beri feedback loading instan pada tombol agar user tahu data diproses
+            const tombol = event.target;
+            const teksAsli = tombol.innerText;
+            tombol.disabled = true;
+            tombol.innerText = '...';
+
+            const payload = {
+                aksi: "simpan_absen_ustadz_manual",
+                nik: nik,
+                nama: nama,
+                status: status
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(res => {
+                tombol.disabled = false;
+                tombol.innerText = teksAsli;
+
+                if (res.status === "success") {
+                    alert(`Alhamdulillah, Presensi ${status} untuk ${nama} berhasil dicatat!`);
+                } else {
+                    alert(`Gagal: ${res.message}`);
+                }
+            })
+            .catch(err => {
+                tombol.disabled = false;
+                tombol.innerText = teksAsli;
+                console.error(err);
+                alert("Koneksi gagal/terputus. Silakan coba klik tombol sekali lagi.");
+            });
+        }
+    </script>
 </body>
 </html>
