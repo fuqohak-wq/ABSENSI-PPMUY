@@ -112,19 +112,19 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // OPTIMASI: inputSize dinaikkan ke 416 & scoreThreshold ke 0.50 demi pemindaian sudut miring & peci yang akurat
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.50 }))
+                    // REVISI: scoreThreshold diturunkan ke 0.45 agar AI lebih responsif menangkap pola wajah di ruangan minim cahaya
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.45 }))
                                                      .withFaceLandmarks()
                                                      .withFaceDescriptor();
                     
-                    if (hasilKamera && hasilKamera.landmarks && hasilKamera.landmarks.positions.length === 68) {
+                    if (hasilKamera) {
                         isProcessing = true;
                         kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                         label.innerText = "MENCOCOKKAN BIOMETRIK...";
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 300); // Interval dipercepat sedikit ke 300ms untuk respon mengunci target yang instan
+                }, 350); 
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -148,8 +148,9 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // PENGETATAN AKURASI: Diperketat ke 0.55 agar antar wajah kembar/mirip tidak saling tertukar aksesnya
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.55) { 
+                    // REVISI TITIK SWEET SPOT: Dilonggarkan ke 0.62. 
+                    // Toleran terhadap peci/kerudung & beda pencahayaan, tapi tetap mencegah wajah orang lain tertukar.
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.62) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
@@ -175,7 +176,7 @@
                         isProcessing = false;
                         label.innerText = "HADAPKAN WAJAH KE KAMERA";
                         kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                    }, 2500);
+                    }, 2000);
                     return;
                 }
 
@@ -201,7 +202,7 @@
                     isProcessing = false; 
                     label.innerText = "HADAPKAN WAJAH KE KAMERA";
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                }, 2000);
+                }, 1500);
 
             } else {
                 isProcessing = false; 
