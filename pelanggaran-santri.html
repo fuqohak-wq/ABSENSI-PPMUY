@@ -3,100 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Kedisiplinan Santri - PPMUY</title>
+  <title>HQ Security & Discipline Portal - PPMUY</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+      50% { border-color: rgba(239, 68, 68, 1); }
+    }
+    .tactical-alert {
+      animation: pulse-border 2s infinite;
+    }
+  </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800">
+<body class="bg-zinc-950 font-sans text-zinc-200 min-h-screen selection:bg-rose-500 selection:text-white">
 
-  <nav class="bg-indigo-900 text-white shadow-md py-4 px-6 mb-8 flex justify-between items-center">
+  <nav class="bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
     <div class="flex items-center gap-3">
-      <i class="fa-solid fa-gavel text-2xl text-amber-400"></i>
-      <h1 class="text-xl font-bold tracking-wide">Portal Keamanan & Ta'ziran Santri</h1>
+      <div class="bg-rose-600/10 border border-rose-500/30 p-2.5 rounded-lg text-rose-500 shadow-inner">
+        <i class="fa-solid fa-shield-halved text-xl animate-pulse"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-extrabold tracking-wider text-zinc-100 uppercase">DEVISI KEAMANAN PUSAT</h1>
+        <p class="text-xs text-zinc-500 font-mono tracking-widest">PORTAL TAKZIR & KEDISIPLINAN SANTRI</p>
+      </div>
     </div>
-    <span class="text-sm bg-indigo-800 px-3 py-1.5 rounded-md border border-indigo-700 font-medium">PPMUY Pusat</span>
+    
+    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+      <a href="javascript:history.back();" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm">
+        <i class="fa-solid fa-arrow-left-long text-zinc-400"></i> Dashboard Utama
+      </a>
+      <span class="text-xs font-mono bg-rose-950 text-rose-400 px-3 py-2 rounded-md border border-rose-900/50 font-bold uppercase tracking-wider">
+        HQ-SQUAD CORE
+      </span>
+    </div>
   </nav>
 
   <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
     
-    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 h-fit">
-      <div class="flex items-center gap-2 pb-4 mb-5 border-b border-slate-100">
-        <i class="fa-solid fa-square-plus text-indigo-600 text-lg"></i>
-        <h2 class="text-lg font-bold text-slate-900">Input Pelanggaran Baru</h2>
+    <section class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 h-fit">
+      <div class="flex items-center gap-2.5 pb-4 mb-5 border-b border-zinc-800">
+        <i class="fa-solid fa-bolt text-rose-500 text-base"></i>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-100">BAP / Laporan Pelanggaran</h2>
       </div>
 
       <form id="formPelanggaran" class="space-y-4">
         <div class="relative">
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Cari Santri (Ketik Nama / NIK)</label>
+          <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 font-mono">Radar Pencarian Santri</label>
           <div class="relative">
-            <i class="fa-solid fa-user absolute left-3 top-3.5 text-slate-400 text-sm"></i>
-            <input type="text" id="inputSantri" placeholder="Masukkan nama santri..." autocomplete="off"
-              class="w-full pl-9 pr-4 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+            <i class="fa-solid fa-terminal absolute left-3 top-3.5 text-zinc-500 text-xs font-mono"></i>
+            <input type="text" id="inputSantri" placeholder="Ketik Nama / NIK Target..." autocomplete="off"
+              class="w-full pl-9 pr-4 py-2.5 bg-zinc-950 text-zinc-100 placeholder-zinc-600 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition duration-200">
           </div>
-          <div id="boxSugesti" class="absolute z-50 w-full bg-white border border-slate-200 rounded-lg shadow-xl mt-1 max-h-48 overflow-y-auto hidden"></div>
+          <div id="boxSugesti" class="absolute z-50 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl mt-1 max-h-56 overflow-y-auto hidden divide-y divide-zinc-800/50"></div>
           <input type="hidden" id="hiddenNIK">
-        </div>
+        </form>
 
-        <div id="infoTerpilih" class="hidden p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-xs space-y-1">
-          <p class="font-bold text-indigo-900" id="txtNamaTerpilih">-</p>
-          <p class="text-indigo-700" id="txtNikTerpilih">-</p>
-          <p class="text-indigo-700" id="txtKelasTerpilih">-</p>
+        <div id="infoTerpilih" class="hidden p-4 bg-zinc-950 border border-zinc-800 rounded-lg text-xs space-y-1.5 font-mono relative overflow-hidden">
+          <div class="absolute right-2 top-2 text-zinc-800 text-3xl"><i class="fa-solid fa-id-badge"></i></div>
+          <p class="font-bold text-rose-400 text-sm" id="txtNamaTerpilih">-</p>
+          <p class="text-zinc-400" id="txtNikTerpilih">-</p>
+          <p class="text-zinc-500" id="txtKelasTerpilih">-</p>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tingkat Pelanggaran</label>
+          <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 font-mono">Level Eskalasi</label>
           <select id="selectTingkat" onchange="autoIsiTemplateHukuman()"
-            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500">
-            <option value="Ringan">Pelanggaran Ringan</option>
-            <option value="Sedang">Pelanggaran Sedang</option>
-            <option value="Berat">Pelanggaran Berat</option>
+            class="w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-rose-500 transition duration-200">
+            <option value="Ringan">⚠️ Pelanggaran Ringan</option>
+            <option value="Sedang">🔥 Pelanggaran Sedang</option>
+            <option value="Berat">🚨 Pelanggaran Berat</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Deskripsi Kejadian / Kronologi</label>
-          <textarea id="textareaDeskripsi" rows="3" placeholder="Contoh: Terlambat mengikuti jamaah shalat subuh berjamaah..."
-            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm"></textarea>
+          <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 font-mono">Kronologi & Deskripsi Kejadian</label>
+          <textarea id="textareaDeskripsi" rows="3" placeholder="Tulis rincian TKP dan waktu kejadian..."
+            class="w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 placeholder-zinc-700 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-rose-500 transition duration-200"></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Usulan Takzir (Hukuman)</label>
-          <input type="text" id="inputTakzir" placeholder="Hukuman edukatif yang diusulkan..."
-            class="w-full px-3 py-2.5 bg-slate-5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+          <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 font-mono">Rekomendasi Tindakan Sanksi (Edukasi)</label>
+          <input type="text" id="inputTakzir" placeholder="Jenis hukuman disiplin..."
+            class="w-full px-3 py-2.5 bg-zinc-950 text-zinc-100 placeholder-zinc-700 text-sm rounded-lg border border-zinc-800 focus:outline-none focus:border-rose-500 transition duration-200">
         </div>
 
         <button type="submit" id="btnSubmit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-sm transition text-sm flex justify-center items-center gap-2">
-          <i class="fa-solid fa-paper-plane"></i> Kirim ke Pengasuh
+          class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2">
+          <i class="fa-solid fa-satellite-dish text-xs"></i> Transmit Data ke Pengasuh
         </button>
       </form>
     </section>
 
-    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-5 border-b border-slate-100 gap-3">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-clock-rotate-left text-indigo-600 text-lg"></i>
-          <h2 class="text-lg font-bold text-slate-900">Monitoring & Eksekusi Sanksi</h2>
+    <section class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 lg:col-span-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-5 border-b border-zinc-800 gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="bg-zinc-950 p-2 rounded-lg border border-zinc-800 text-zinc-400">
+            <i class="fa-solid fa-desktop text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-100">Live Status & Monitor Eksekusi</h2>
+            <p class="text-[10px] text-zinc-500 font-mono">Data sinkron otomatis langsung ke Google Sheets</p>
+          </div>
         </div>
-        <button onclick="muatDataLogPelanggaran()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrows-rotate animate-spin-slow"></i> Refresh Data
+        <button onclick="muatDataLogPelanggaran()" class="text-xs bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition">
+          <i class="fa-solid fa-sync text-[10px]"></i> REFRESH HUD
         </button>
       </div>
 
-      <div class="overflow-x-auto rounded-lg border border-slate-100">
+      <div class="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950">
         <table class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100 text-xs uppercase tracking-wider">
-              <th class="py-3 px-4">Santri</th>
-              <th class="py-3 px-4">Pelanggaran</th>
-              <th class="py-3 px-4">Usulan Takzir</th>
-              <th class="py-3 px-4 text-center">Acc Pengasuh</th>
-              <th class="py-3 px-4 text-center">Tindakan</th>
+            <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-800 text-[10px] uppercase font-mono tracking-widest">
+              <th class="py-3.5 px-4">Santri</th>
+              <th class="py-3.5 px-4">Detail Pelanggaran</th>
+              <th class="py-3.5 px-4">Tuntutan Takzir</th>
+              <th class="py-3.5 px-4 text-center">Status HQ</th>
+              <th class="py-3.5 px-4 text-center">Aksi / Kontrol</th>
             </tr>
           </thead>
-          <tbody id="tabelBodyPelanggaran" class="divide-y divide-slate-100 text-slate-700">
+          <tbody id="tabelBodyPelanggaran" class="divide-y divide-zinc-900/60 text-zinc-300">
             <tr>
-              <td colspan="5" class="text-center py-12 text-slate-400">Sedang memuat database takziran...</td>
+              <td colspan="5" class="text-center py-16 text-zinc-600 font-mono text-xs">
+                <i class="fa-solid fa-circle-notch animate-spin text-lg text-rose-500 mb-2 block"></i> Booting terminal data takziran...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -105,19 +135,18 @@
   </main>
 
   <script>
-    // MASUKKAN URL GOOGLE WEB APP ANDA YANG SUDAH DI-DEPLOY DI SINI
-    const WEB_APP_URL = "MASUKKAN_URL_WEB_APP_DEPLOYMENT_ANDA_DI_SINI";
+    // URL CLOUD WEB APP GOOGLE APPS SCRIPT (SINKRON DATA)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
 
     let databaseSantri = [];
 
-    // JALUR AWAL: Load Database Master & Log Real-time saat Web Terbuka
     document.addEventListener("DOMContentLoaded", function() {
       muatDatabaseMasterSantri();
       muatDataLogPelanggaran();
       autoIsiTemplateHukuman();
     });
 
-    // 1. AMBIL DATABASE MASTER SANTRI UNTUK FITUR AUTOCOMPLETE SEARCH
+    // 1. QUERY CLOUD: MASTER DATABASE
     function muatDatabaseMasterSantri() {
       fetch(`${WEB_APP_URL}?aksi=ambil_database`)
         .then(res => res.json())
@@ -125,10 +154,10 @@
           if (response.status === "success") {
             databaseSantri = response.data;
           }
-        }).catch(err => console.error("Gagal memuat master santri:", err));
+        }).catch(err => console.error("Terminal crash loading master santri:", err));
     }
 
-    // INTERFACE LOGIC: Autocomplete Search Input Handler
+    // SEARCH SUGGESTION LOGIC
     const inputSantri = document.getElementById("inputSantri");
     const boxSugesti = document.getElementById("boxSugesti");
 
@@ -145,13 +174,13 @@
 
       filtered.forEach(s => {
         let item = document.createElement("div");
-        item.className = "px-4 py-2.5 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-50 last:border-none";
-        item.innerHTML = `<p class="font-semibold text-slate-800">${s.nama}</p><p class="text-xs text-slate-400">NIK: ${s.nik} | Kelas: ${s.kelas}</p>`;
+        item.className = "px-4 py-3 hover:bg-zinc-800/70 cursor-pointer text-xs border-b border-zinc-800/30 transition duration-150";
+        item.innerHTML = `<p class="font-bold text-zinc-200">${s.nama}</p><p class="text-[10px] text-zinc-500 font-mono mt-0.5">NIK: ${s.nik} | KLZ: ${s.kelas}</p>`;
         item.addEventListener("click", function() {
           document.getElementById("hiddenNIK").value = s.nik;
-          document.getElementById("txtNamaTerpilih").innerText = "Nama: " + s.nama;
-          document.getElementById("txtNikTerpilih").innerText = "NIK: " + s.nik;
-          document.getElementById("txtKelasTerpilih").innerText = "Kelas: " + s.kelas;
+          document.getElementById("txtNamaTerpilih").innerText = "TAG: " + s.nama;
+          document.getElementById("txtNikTerpilih").innerText = "ID : " + s.nik;
+          document.getElementById("txtKelasTerpilih").innerText = "RM : " + s.kelas;
           document.getElementById("infoTerpilih").classList.remove("hidden");
           inputSantri.value = s.nama;
           boxSugesti.classList.add("hidden");
@@ -161,20 +190,20 @@
       boxSugesti.classList.remove("hidden");
     });
 
-    // 2. TEMPLATE STRATEGI OTOMATISASI USULAN TA'ZIR BERDASARKAN LEVEL
+    // 2. DISCIPLINARY AUTOMATION SCHEME
     function autoIsiTemplateHukuman() {
       const tingkat = document.getElementById("selectTingkat").value;
       const inputTakzir = document.getElementById("inputTakzir");
       if (tingkat === "Ringan") {
-        inputTakzir.value = "Ro'an menyapu kompleks halaman pondok selama 3 hari";
+        inputTakzir.value = "Bakti sosial pembersihan halaman komplek pondok selama 3 hari";
       } else if (tingkat === "Sedang") {
-        inputTakzir.value = "Membaca / menderas 2 Juz Al-Qur'an berdiri di depan aula khalayak";
+        inputTakzir.value = "Setoran hafalan 2 Juz Al-Qur'an berdiri di hadapan dewan pengurus";
       } else if (tingkat === "Berat") {
-        inputTakzir.value = "Takzir indisipliner tingkat tinggi & Pemanggilan langsung Wali Santri";
+        inputTakzir.value = "Skorsing indisipliner tingkat tinggi & Pemanggilan Orang Tua/Wali";
       }
     }
 
-    // 3. PENGIRIMAN DATA FORM BARU KE BACKEND VIA API POST
+    // 3. API TRANSMISSION METHOD (POST FORM DATA)
     document.getElementById("formPelanggaran").addEventListener("submit", function(e) {
       e.preventDefault();
       let nik = document.getElementById("hiddenNIK").value;
@@ -183,11 +212,11 @@
       let usulan = document.getElementById("inputTakzir").value.trim();
       let btn = document.getElementById("btnSubmit");
 
-      if (!nik) { alert("Pilih santri terlebih dahulu dari daftar pencarian!"); return; }
-      if (!deskripsi) { alert("Deskripsi pelanggaran / kronologi tidak boleh kosong!"); return; }
+      if (!nik) { alert("Peringatan: Kunci koordinat identitas santri terlebih dahulu!"); return; }
+      if (!deskripsi) { alert("Peringatan: Berkas kronologi kejadian tidak boleh kosong!"); return; }
 
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Memproses ke Pengasuh...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-xs"></i> TRANSMITTING DATA...`;
 
       let urlTarget = `${WEB_APP_URL}?aksi=simpan_pelanggaran&nik=${encodeURIComponent(nik)}&tingkat_pelanggaran=${encodeURIComponent(tingkat)}&deskripsi_kejadian=${encodeURIComponent(deskripsi)}&usulan_takzir=${encodeURIComponent(usulan)}`;
 
@@ -203,17 +232,17 @@
             muatDataLogPelanggaran();
           }
         })
-        .catch(err => alert("Terjadi gangguan jaringan server API."))
+        .catch(err => alert("Koneksi gagal: Masalah pada transmisi cloud terminal API."))
         .finally(() => {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim ke Pengasuh`;
+          btn.innerHTML = `<i class="fa-solid fa-satellite-dish text-xs"></i> Transmit Data ke Pengasuh`;
         });
     });
 
-    // 4. MUAT TABEL LOG MONITORING REAL-TIME & BADGING INTERFACE
+    // 4. MAIN TELEMETRY LOOP: DATA HUB SINKRON KE GOOGLE SHEETS
     function muatDataLogPelanggaran() {
       const tbody = document.getElementById("tabelBodyPelanggaran");
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-400"><i class="fa-solid fa-circle-notch animate-spin text-lg text-indigo-600 mb-2 block"></i> Membaca Log Takziran Terkini...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-zinc-600 font-mono text-xs"><i class="fa-solid fa-circle-notch animate-spin text-sm text-rose-500 mb-2 block"></i> Syncing Cloud Data Server...</td></tr>`;
 
       fetch(`${WEB_APP_URL}?aksi=ambil_pelanggaran`)
         .then(res => res.json())
@@ -221,65 +250,82 @@
           if (response.status === "success") {
             let data = response.data;
             if(data.length === 0) {
-              tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-slate-400">Alhamdulillah, tidak ada catatan pelanggaran santri saat ini.</td></tr>`;
+              tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-zinc-500 font-mono text-xs">STATUS CLEAR: Semua santri berdisiplin penuh saat ini.</td></tr>`;
               return;
             }
             tbody.innerHTML = "";
             
-            // Urutkan data berdasarkan ID terbaru di posisi paling atas
+            // Urutan reverse agar entri terbaru otomatis naik di bagian paling atas HUD
             data.reverse().forEach(row => {
               let tr = document.createElement("tr");
-              tr.className = "hover:bg-slate-50 transition border-b border-slate-100 last:border-none align-top";
               
-              // Set Badge Kategori Warna Tingkat Pelanggaran
-              let badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-slate-100 text-slate-600">${row.Tingkat_Pelanggaran}</span>`;
-              if (row.Tingkat_Pelanggaran === "Sedang") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-amber-100 text-amber-700">Sedang</span>`;
-              if (row.Tingkat_Pelanggaran === "Berat") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase mt-1 inline-block bg-rose-100 text-rose-700">Berat</span>`;
+              // Logika visual: Berikan aksen 'tactical-alert' merah menyala jika takzir disetujui tapi belum dieksekusi
+              let barisStatusStyle = "border-b border-zinc-900 bg-zinc-950/20 hover:bg-zinc-900/40 transition align-top font-mono";
+              if (row.Acc_Pengasuh === "DISETUJUI" && row.Sudah_Belum !== "SUDAH") {
+                barisStatusStyle = "border-l-2 border-l-red-500 bg-rose-950/10 border-b border-zinc-900 hover:bg-rose-950/20 transition align-top font-mono tactical-alert";
+              }
+              tr.className = barisStatusStyle;
+              
+              // BADGING TINGKAT PELANGGARAN
+              let badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">${row.Tingkat_Pelanggaran}</span>`;
+              if (row.Tingkat_Pelanggaran === "Sedang") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-amber-950/50 border border-amber-900 text-amber-400 font-mono">SEDANG</span>`;
+              if (row.Tingkat_Pelanggaran === "Berat") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-rose-950 border border-rose-900 text-rose-400 font-mono animate-pulse">CRITICAL</span>`;
 
-              // Set Badge Kategori Status Persetujuan Pengasuh
-              let badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fa-solid fa-spinner animate-spin-slow"></i> PENDING</span>`;
-              if(row.Acc_Pengasuh === "DISETUJUI") badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> DISETUJUI</span>`;
-              if(row.Acc_Pengasuh === "REJECTED") badgeAcc = `<span class="px-2 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-circle-xmark"></i> DITOLAK</span>`;
+              // BADGING STATUS VALIDASI ACC PENGASUH
+              let badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-zinc-900 text-zinc-500 border border-zinc-800 tracking-wide inline-block"><i class="fa-solid fa-clock-rotate-left text-[9px]"></i> PENDING</span>`;
+              if(row.Acc_Pengasuh === "DISETUJUI") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-900 tracking-wide inline-block"><i class="fa-solid fa-square-check"></i> GRANTED</span>`;
+              if(row.Acc_Pengasuh === "REJECTED") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-zinc-900 text-rose-500/60 border border-zinc-800 line-through tracking-wide inline-block"><i class="fa-solid fa-ban text-[9px]"></i> VOID</span>`;
 
-              // Logika Tombol Aksi Dinamis Pengurus
+              // LOGIKA TOMBOL AKSI DISIPLIN DEVISI KEAMANAN
               let kolomAksi = "";
               if (row.Acc_Pengasuh === "PENDING") {
-                kolomAksi = `<span class="text-xs text-slate-400 italic">Menunggu validasi Pengasuh</span>`;
+                kolomAksi = `<span class="text-[11px] text-zinc-500 italic block mt-1.5">Waiting HQ Decision</span>`;
               } else if (row.Acc_Pengasuh === "REJECTED") {
-                kolomAksi = `<span class="text-xs text-rose-500 font-medium">Ta'zir Diampuni</span>`;
+                kolomAksi = `<span class="text-[11px] text-zinc-600 font-medium tracking-wide block mt-1.5 uppercase">Kasus Ditutup</span>`;
               } else if (row.Acc_Pengasuh === "DISETUJUI") {
                 if (row.Sudah_Belum === "SUDAH") {
-                  kolomAksi = `<span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded font-bold uppercase tracking-wider"><i class="fa-solid fa-check-double"></i> Selesai</span>`;
+                  kolomAksi = `<span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900 px-2 py-1 rounded font-bold uppercase tracking-widest block text-center"><i class="fa-solid fa-shield-check"></i> RESOLVED</span>`;
                 } else {
-                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${row.ID_Melanggar}')" class="w-full text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded shadow-sm transition"><i class="fa-solid fa-gavel"></i> Selesai Hukuman</button>`;
+                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${row.ID_Melanggar}')" class="w-full text-[10px] bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-2.5 rounded shadow-md transition uppercase tracking-wider"><i class="fa-solid fa-gavel"></i> CLOSE CASE</button>`;
                 }
               }
 
               tr.innerHTML = `
-                <td class="py-4 px-4 font-semibold text-slate-900">${row.Nama_Santri}<br><span class="text-xs font-normal text-slate-400">NIK: ${row.NIK}</span></td>
-                <td class="py-4 px-4 text-xs max-w-xs text-slate-600">${row.Deskripsi_Kejadian}<br>${badgeTingkat}</td>
-                <td class="py-4 px-4 font-medium text-slate-700 italic text-xs">${row.Usulan_Takzir}</td>
-                <td class="py-4 px-4 text-center">${badgeAcc}</td>
-                <td class="py-4 px-4 text-center">${kolomAksi}</td>
+                <td class="py-4 px-4 border-b border-zinc-900">
+                  <span class="font-bold text-zinc-100 block text-xs tracking-wide">${row.Nama_Santri}</span>
+                  <span class="text-[10px] text-zinc-500 mt-0.5 block">ID: ${row.NIK}</span>
+                </td>
+                <td class="py-4 px-4 border-b border-zinc-900 text-xs text-zinc-400 max-w-xs leading-relaxed">
+                  ${row.Deskripsi_Kejadian}<br>${badgeTingkat}
+                </td>
+                <td class="py-4 px-4 border-b border-zinc-900 font-mono text-zinc-300 italic text-xs max-w-xs">
+                  ${row.Usulan_Takzir}
+                </td>
+                <td class="py-4 px-4 border-b border-zinc-900 text-center">
+                  ${badgeAcc}
+                </td>
+                <td class="py-4 px-4 border-b border-zinc-900 text-center vertical-middle">
+                  ${kolomAksi}
+                </td>
               `;
               tbody.appendChild(tr);
             });
           }
         }).catch(err => {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-rose-500">Gagal sinkronisasi data dari Google Sheets.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-rose-500 font-mono text-xs">SYSTEM CORRUPT: Gagal intersept loop data dari Google Cloud.</td></tr>`;
         });
     }
 
-    // 5. AKSI EKSEKUSI TOMBOL SELESAI HUKUMAN DARI SISI PENGURUS
+    // 5. SECURE TRANSACTION: TUTUP KASUS TAKZIR (SET KE 'SUDAH')
     function eksekusiSelesaiHukuman(idTarget) {
-      if(!confirm("Apakah Anda yakin santri yang bersangkutan sudah menyelesaikan sanksi Ta'zir edukatif ini?")) return;
+      if(!confirm("OTORISASI KEAMANAN: Konfirmasi bahwa target santri ini benar-benar telah menyelesaikan sanksinya?")) return;
       
       fetch(`${WEB_APP_URL}?aksi=eksekusi_selesai_takzir&id_melanggar=${idTarget}`, { method: "POST" })
         .then(res => res.json())
         .then(res => {
           alert(res.message);
           muatDataLogPelanggaran();
-        }).catch(err => alert("Gagal memperbarui status hukuman di cloud."));
+        }).catch(err => alert("Otorisasi gagal: Cloud server menolak enkripsi perubahan status."));
     }
   </script>
 </body>
