@@ -66,7 +66,7 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT ENGINE BIOMETRIK...";
-                // Menggunakan SsdMobilenetv1 untuk proses Registrasi agar koordinat wajah presisi absolut
+                // SsdMobilenetv1 dimuat penuh untuk ekstraksi akurasi tinggi saat registrasi data awal
                 await faceapi.nets.ssdMobilenetv1.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -80,7 +80,10 @@
                     dbStatus.className = "text-[10px] text-emerald-400 font-bold";
                 }
 
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } }, 
+                    audio: false 
+                });
                 video.srcObject = stream;
                 label.innerText = "PILIH NAMA SANTRI DI ATAS";
                 aiReady = true;
@@ -88,12 +91,13 @@
                 setInterval(async () => {
                     if (!aiReady || video.paused || video.ended) return;
                     
-                    // Deteksi menggunakan opsi SsdMobilenetv1 (Lebih akurat dibanding TinyFaceDetector untuk urusan registrasi)
-                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+                    // Naikkan minConfidence ke 0.70 agar terhindar dari background noise/benda mati terdeteksi wajah
+                    const deteksi = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.70 }))
                                                  .withFaceLandmarks()
                                                  .withFaceDescriptor();
                     
-                    if (deteksi) {
+                    // Validasi struktural: Pastikan ada koordinat landmarks 68 titik penuh
+                    if (deteksi && deteksi.landmarks && deteksi.landmarks.positions.length === 68) {
                         descriptorWajahTerakhir = Array.from(deteksi.descriptor);
                         frame.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-102";
                         label.innerText = "BIOMETRIK WAJAH TERKUNCI";
