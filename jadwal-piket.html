@@ -278,6 +278,7 @@
       margin: 0 auto 12px;
     }
 
+    @define-placeholder spin { 100% { transform: rotate(360deg); } }
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
@@ -356,11 +357,10 @@
     let filterGender = "semua";
     let filterKelas = "semua";
 
-    // Fungsi Navigasi Menggunakan Top Window Parent (Menerobos iFrame Sandbox Google)
+    // Fungsi Navigasi Menggunakan Riwayat Browser (Bebas Error Cloud)
     function keDashboardUtama() {
-  // Menghapus parameter query dan kembali ke halaman dasar Web App Anda
-  window.top.location.href = urlScript.split('?')[0];
-}
+      window.history.back();
+    }
 
     function toggleTheme() {
       const body = document.body;
