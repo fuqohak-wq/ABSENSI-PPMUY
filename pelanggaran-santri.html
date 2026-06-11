@@ -16,11 +16,11 @@
     }
   </style>
 </head>
-<body class="bg-zinc-950 font-sans text-zinc-200 min-h-screen selection:bg-rose-500 selection:text-white">
+<body id="mainBody" class="bg-zinc-950 font-sans text-zinc-200 min-h-screen selection:bg-rose-500 selection:text-white transition-colors duration-300">
 
-  <nav class="bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+  <nav id="navbar" class="bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300">
     <div class="flex items-center gap-3">
-      <div class="bg-rose-600/10 border border-rose-500/30 p-2.5 rounded-lg text-rose-500 shadow-inner">
+      <div id="logoBox" class="bg-rose-600/10 border border-rose-500/30 p-2.5 rounded-lg text-rose-500 shadow-inner">
         <i class="fa-solid fa-shield-halved text-xl animate-pulse"></i>
       </div>
       <div>
@@ -30,10 +30,14 @@
     </div>
     
     <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+      <button onclick="toggleTheme()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition duration-200">
+        <i class="fa-solid fa-eye text-cyan-400"></i> TOGGLE VISOR
+      </button>
+      
       <a href="javascript:history.back();" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm">
         <i class="fa-solid fa-arrow-left-long text-zinc-400"></i> Dashboard Utama
       </a>
-      <span class="text-xs font-mono bg-rose-950 text-rose-400 px-3 py-2 rounded-md border border-rose-900/50 font-bold uppercase tracking-wider">
+      <span id="badgeHq" class="text-xs font-mono bg-rose-950 text-rose-400 px-3 py-2 rounded-md border border-rose-900/50 font-bold uppercase tracking-wider">
         HQ-SQUAD CORE
       </span>
     </div>
@@ -41,9 +45,9 @@
 
   <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
     
-    <section class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 h-fit">
+    <section id="panelInput" class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 h-fit transition-colors duration-300">
       <div class="flex items-center gap-2.5 pb-4 mb-5 border-b border-zinc-800">
-        <i class="fa-solid fa-bolt text-rose-500 text-base"></i>
+        <i id="iconForm" class="fa-solid fa-bolt text-rose-500 text-base"></i>
         <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-100">BAP / Laporan Pelanggaran</h2>
       </div>
 
@@ -57,7 +61,7 @@
           </div>
           <div id="boxSugesti" class="absolute z-50 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl mt-1 max-h-56 overflow-y-auto hidden divide-y divide-zinc-800/50"></div>
           <input type="hidden" id="hiddenNIK">
-        </form>
+        </div>
 
         <div id="infoTerpilih" class="hidden p-4 bg-zinc-950 border border-zinc-800 rounded-lg text-xs space-y-1.5 font-mono relative overflow-hidden">
           <div class="absolute right-2 top-2 text-zinc-800 text-3xl"><i class="fa-solid fa-id-badge"></i></div>
@@ -95,7 +99,7 @@
       </form>
     </section>
 
-    <section class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 lg:col-span-2">
+    <section id="panelMonitor" class="bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 lg:col-span-2 transition-colors duration-300">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 mb-5 border-b border-zinc-800 gap-4">
         <div class="flex items-center gap-2.5">
           <div class="bg-zinc-950 p-2 rounded-lg border border-zinc-800 text-zinc-400">
@@ -135,16 +139,58 @@
   </main>
 
   <script>
-    // URL CLOUD WEB APP GOOGLE APPS SCRIPT (SINKRON DATA)
+    // MASUKKAN URL WEB APP SCRIPT ANDA DI SINI
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
 
     let databaseSantri = [];
+    let currentTheme = "dark"; // Default: dark ops
 
     document.addEventListener("DOMContentLoaded", function() {
       muatDatabaseMasterSantri();
       muatDataLogPelanggaran();
       autoIsiTemplateHukuman();
     });
+
+    // ==========================================
+    // LOGIKA SWITCH THEME (DUAL VISOR MODE)
+    // ==========================================
+    function toggleTheme() {
+      const body = document.getElementById("mainBody");
+      const navbar = document.getElementById("navbar");
+      const panelInput = document.getElementById("panelInput");
+      const panelMonitor = document.getElementById("panelMonitor");
+      const logoBox = document.getElementById("logoBox");
+      const badgeHq = document.getElementById("badgeHq");
+      const iconForm = document.getElementById("iconForm");
+      const btnSubmit = document.getElementById("btnSubmit");
+
+      if (currentTheme === "dark") {
+        // Alihkan ke TACTICAL BLUE (Mode Siang Pesantren)
+        currentTheme = "blue";
+        body.className = "bg-slate-900 font-sans text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-white transition-colors duration-300";
+        navbar.className = "bg-slate-800 border-b border-slate-700 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
+        panelInput.className = "bg-slate-800/90 rounded-xl shadow-2xl border border-slate-700 p-6 h-fit transition-colors duration-300";
+        panelMonitor.className = "bg-slate-800/90 rounded-xl shadow-2xl border border-slate-700 p-6 lg:col-span-2 transition-colors duration-300";
+        
+        logoBox.className = "bg-cyan-600/10 border border-cyan-500/30 p-2.5 rounded-lg text-cyan-400 shadow-inner";
+        badgeHq.className = "text-xs font-mono bg-cyan-950 text-cyan-400 px-3 py-2 rounded-md border border-cyan-900/50 font-bold uppercase tracking-wider";
+        iconForm.className = "fa-solid fa-bolt text-cyan-400 text-base";
+        btnSubmit.className = "w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-cyan-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2";
+      } else {
+        // Alihkan kembali ke DARK OPERATIONS (Mode Malam)
+        currentTheme = "dark";
+        body.className = "bg-zinc-950 font-sans text-zinc-200 min-h-screen selection:bg-rose-500 selection:text-white transition-colors duration-300";
+        navbar.className = "bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
+        panelInput.className = "bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 h-fit transition-colors duration-300";
+        panelMonitor.className = "bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 lg:col-span-2 transition-colors duration-300";
+        
+        logoBox.className = "bg-rose-600/10 border border-rose-500/30 p-2.5 rounded-lg text-rose-500 shadow-inner";
+        badgeHq.className = "text-xs font-mono bg-rose-950 text-rose-400 px-3 py-2 rounded-md border border-rose-900/50 font-bold uppercase tracking-wider";
+        iconForm.className = "fa-solid fa-bolt text-rose-500 text-base";
+        btnSubmit.className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2";
+      }
+      muatDataLogPelanggaran(); // Render ulang tabel agar mengikuti warna tema aktif
+    }
 
     // 1. QUERY CLOUD: MASTER DATABASE
     function muatDatabaseMasterSantri() {
@@ -174,8 +220,11 @@
 
       filtered.forEach(s => {
         let item = document.createElement("div");
-        item.className = "px-4 py-3 hover:bg-zinc-800/70 cursor-pointer text-xs border-b border-zinc-800/30 transition duration-150";
-        item.innerHTML = `<p class="font-bold text-zinc-200">${s.nama}</p><p class="text-[10px] text-zinc-500 font-mono mt-0.5">NIK: ${s.nik} | KLZ: ${s.kelas}</p>`;
+        item.className = currentTheme === "dark" 
+          ? "px-4 py-3 hover:bg-zinc-800/70 cursor-pointer text-xs border-b border-zinc-800/30 transition duration-150 text-zinc-200"
+          : "px-4 py-3 hover:bg-slate-700/70 cursor-pointer text-xs border-b border-slate-700/30 transition duration-150 text-slate-100";
+        
+        item.innerHTML = `<p class="font-bold">${s.nama}</p><p class="text-[10px] text-zinc-400 font-mono mt-0.5">NIK: ${s.nik} | KLZ: ${s.kelas}</p>`;
         item.addEventListener("click", function() {
           document.getElementById("hiddenNIK").value = s.nik;
           document.getElementById("txtNamaTerpilih").innerText = "TAG: " + s.nama;
@@ -235,14 +284,17 @@
         .catch(err => alert("Koneksi gagal: Masalah pada transmisi cloud terminal API."))
         .finally(() => {
           btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-satellite-dish text-xs"></i> Transmit Data ke Pengasuh`;
+          btn.innerHTML = currentTheme === "dark" 
+            ? `<i class="fa-solid fa-satellite-dish text-xs"></i> Transmit Data ke Pengasuh`
+            : `<i class="fa-solid fa-satellite-dish text-xs"></i> Kirim Berkas ke Pengasuh`;
         });
     });
 
     // 4. MAIN TELEMETRY LOOP: DATA HUB SINKRON KE GOOGLE SHEETS
     function muatDataLogPelanggaran() {
       const tbody = document.getElementById("tabelBodyPelanggaran");
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-zinc-600 font-mono text-xs"><i class="fa-solid fa-circle-notch animate-spin text-sm text-rose-500 mb-2 block"></i> Syncing Cloud Data Server...</td></tr>`;
+      const spinnerColor = currentTheme === "dark" ? "text-rose-500" : "text-cyan-400";
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-zinc-500 font-mono text-xs"><i class="fa-solid fa-circle-notch animate-spin text-sm ${spinnerColor} mb-2 block"></i> Syncing Cloud Data Server...</td></tr>`;
 
       fetch(`${WEB_APP_URL}?aksi=ambil_pelanggaran`)
         .then(res => res.json())
@@ -255,14 +307,18 @@
             }
             tbody.innerHTML = "";
             
-            // Urutan reverse agar entri terbaru otomatis naik di bagian paling atas HUD
             data.reverse().forEach(row => {
               let tr = document.createElement("tr");
               
-              // Logika visual: Berikan aksen 'tactical-alert' merah menyala jika takzir disetujui tapi belum dieksekusi
-              let barisStatusStyle = "border-b border-zinc-900 bg-zinc-950/20 hover:bg-zinc-900/40 transition align-top font-mono";
+              // Set basis style per baris tabel berdasarkan tema aktif
+              let barisStatusStyle = currentTheme === "dark"
+                ? "border-b border-zinc-900 bg-zinc-950/20 hover:bg-zinc-900/40 transition align-top font-mono"
+                : "border-b border-slate-700 bg-slate-900/20 hover:bg-slate-700/40 transition align-top font-mono";
+              
               if (row.Acc_Pengasuh === "DISETUJUI" && row.Sudah_Belum !== "SUDAH") {
-                barisStatusStyle = "border-l-2 border-l-red-500 bg-rose-950/10 border-b border-zinc-900 hover:bg-rose-950/20 transition align-top font-mono tactical-alert";
+                barisStatusStyle = currentTheme === "dark"
+                  ? "border-l-2 border-l-red-500 bg-rose-950/10 border-b border-zinc-900 hover:bg-rose-950/20 transition align-top font-mono tactical-alert"
+                  : "border-l-2 border-l-cyan-500 bg-cyan-950/20 border-b border-slate-700 hover:bg-cyan-950/30 transition align-top font-mono tactical-alert";
               }
               tr.className = barisStatusStyle;
               
@@ -276,7 +332,7 @@
               if(row.Acc_Pengasuh === "DISETUJUI") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-900 tracking-wide inline-block"><i class="fa-solid fa-square-check"></i> GRANTED</span>`;
               if(row.Acc_Pengasuh === "REJECTED") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-zinc-900 text-rose-500/60 border border-zinc-800 line-through tracking-wide inline-block"><i class="fa-solid fa-ban text-[9px]"></i> VOID</span>`;
 
-              // LOGIKA TOMBOL AKSI DISIPLIN DEVISI KEAMANAN
+              // LOGIKA TOMBOL AKSI DISIPLIN
               let kolomAksi = "";
               if (row.Acc_Pengasuh === "PENDING") {
                 kolomAksi = `<span class="text-[11px] text-zinc-500 italic block mt-1.5">Waiting HQ Decision</span>`;
@@ -286,25 +342,26 @@
                 if (row.Sudah_Belum === "SUDAH") {
                   kolomAksi = `<span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900 px-2 py-1 rounded font-bold uppercase tracking-widest block text-center"><i class="fa-solid fa-shield-check"></i> RESOLVED</span>`;
                 } else {
-                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${row.ID_Melanggar}')" class="w-full text-[10px] bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-2.5 rounded shadow-md transition uppercase tracking-wider"><i class="fa-solid fa-gavel"></i> CLOSE CASE</button>`;
+                  let btnColor = currentTheme === "dark" ? "bg-rose-600 hover:bg-rose-700" : "bg-cyan-600 hover:bg-cyan-700";
+                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${row.ID_Melanggar}')" class="w-full text-[10px] ${btnColor} text-white font-bold py-2 px-2.5 rounded shadow-md transition uppercase tracking-wider"><i class="fa-solid fa-gavel"></i> CLOSE CASE</button>`;
                 }
               }
 
               tr.innerHTML = `
-                <td class="py-4 px-4 border-b border-zinc-900">
+                <td class="py-4 px-4">
                   <span class="font-bold text-zinc-100 block text-xs tracking-wide">${row.Nama_Santri}</span>
                   <span class="text-[10px] text-zinc-500 mt-0.5 block">ID: ${row.NIK}</span>
                 </td>
-                <td class="py-4 px-4 border-b border-zinc-900 text-xs text-zinc-400 max-w-xs leading-relaxed">
+                <td class="py-4 px-4 text-xs text-zinc-400 max-w-xs leading-relaxed">
                   ${row.Deskripsi_Kejadian}<br>${badgeTingkat}
                 </td>
-                <td class="py-4 px-4 border-b border-zinc-900 font-mono text-zinc-300 italic text-xs max-w-xs">
+                <td class="py-4 px-4 font-mono text-zinc-300 italic text-xs max-w-xs">
                   ${row.Usulan_Takzir}
                 </td>
-                <td class="py-4 px-4 border-b border-zinc-900 text-center">
+                <td class="py-4 px-4 text-center">
                   ${badgeAcc}
                 </td>
-                <td class="py-4 px-4 border-b border-zinc-900 text-center vertical-middle">
+                <td class="py-4 px-4 text-center vertical-middle">
                   ${kolomAksi}
                 </td>
               `;
