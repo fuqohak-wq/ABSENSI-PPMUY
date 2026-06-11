@@ -91,7 +91,6 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
-                // Menggunakan unpkg bawaan Anda yang terbukti aktif tanpa kendala offline/404
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -110,8 +109,8 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // PENYESUAIAN 1: Menyamakan konfigurasi detektor secara presisi dengan file pendaftaran Anda (inputSize: 160, scoreThreshold: 0.5)
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
+                    // PENGUNCIAN RESOLUSI DETEKSI: Tetap sinkron di 160px
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
@@ -120,7 +119,7 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 350);
+                }, 400);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -131,22 +130,31 @@
             for (let santri of databaseSantri) {
                 try {
                     let dataVektorRaw = santri.vektor;
-                    if(!dataVektorRaw) continue;
+                    if (!dataVektorRaw) continue;
                     
-                    let dataVektorArr = JSON.parse(dataVektorRaw);
+                    // VALIDASI ANTI-STRING: Jika data double encoded, lakukan parsing ulang
+                    if (typeof dataVektorRaw === 'string') {
+                        // Bersihkan jika ada bungkus string berlebih dari kueri sheets
+                        if(dataVektorRaw.startsWith('"') && dataVektorRaw.endsWith('"')) {
+                            dataVektorRaw = JSON.parse(dataVektorRaw);
+                        }
+                    }
+                    
+                    let dataVektorArr = (typeof dataVektorRaw === 'string') ? JSON.parse(dataVektorRaw) : dataVektorRaw;
                     let arrayVektorDb = Array.isArray(dataVektorArr) ? dataVektorArr : Object.values(dataVektorArr);
                     
-                    if(arrayVektorDb.length !== 128) continue; 
+                    if (arrayVektorDb.length !== 128) continue; 
 
-                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
+                    // Konversi mutlak ke Float32Array agar face-api bisa membaca struktur matriksnya
+                    const vectorFloat32 = new Float32Array(arrayVektorDb);
+                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, vectorFloat32);
 
-                    // PENYESUAIAN 2: Melonggarkan toleransi jarak sains ke 0.65. 
-                    // Ini adalah sweet-spot krusial agar model biner 160-bit tetap mengenali wajah meski ada pergeseran sudut/cahaya kecil.
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.65) { 
+                    // THRESHOLD AMAN (0.60): Batas akurat detektor biner 160-bit di luar ruangan/pondok
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.60) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
-                } catch(e){}
+                } catch(e) { console.log("Gagal memproses salah satu baris vektor santri", e); }
             }
 
             if (santriDitemukan) {
