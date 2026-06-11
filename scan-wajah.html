@@ -29,8 +29,8 @@
             <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
             <option value="Sorogan">Sorogan Kitab</option>
             <option value="Belajar">Jam Belajar</option>
-            <option value="Belajar">Jumatan</option>
-            <option value="Belajar">Ziarah Kubur</option>
+            <option value="Jumatan">Jumatan</option>
+            <option value="Ziarah Kubur">Ziarah Kubur</option>
         </select>
     </div>
 
@@ -109,8 +109,8 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // PENGUNCIAN RESOLUSI DETEKSI: Tetap sinkron di 160px
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
+                    // PENYESUAIAN KIOSK: inputSize dinaikkan ke 320 agar pemindaian jarak jauh super responsif
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
@@ -119,7 +119,7 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 400);
+                }, 350);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -130,31 +130,26 @@
             for (let santri of databaseSantri) {
                 try {
                     let dataVektorRaw = santri.vektor;
-                    if (!dataVektorRaw) continue;
+                    if(!dataVektorRaw) continue;
                     
-                    // VALIDASI ANTI-STRING: Jika data double encoded, lakukan parsing ulang
-                    if (typeof dataVektorRaw === 'string') {
-                        // Bersihkan jika ada bungkus string berlebih dari kueri sheets
-                        if(dataVektorRaw.startsWith('"') && dataVektorRaw.endsWith('"')) {
-                            dataVektorRaw = JSON.parse(dataVektorRaw);
-                        }
+                    // Bersihkan gangguan format string otomatis Google Sheets
+                    if (dataVektorRaw.startsWith("'")) {
+                        dataVektorRaw = dataVektorRaw.substring(1);
                     }
                     
-                    let dataVektorArr = (typeof dataVektorRaw === 'string') ? JSON.parse(dataVektorRaw) : dataVektorRaw;
+                    let dataVektorArr = JSON.parse(dataVektorRaw);
                     let arrayVektorDb = Array.isArray(dataVektorArr) ? dataVektorArr : Object.values(dataVektorArr);
                     
-                    if (arrayVektorDb.length !== 128) continue; 
+                    if(arrayVektorDb.length !== 128) continue; 
 
-                    // Konversi mutlak ke Float32Array agar face-api bisa membaca struktur matriksnya
-                    const vectorFloat32 = new Float32Array(arrayVektorDb);
-                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, vectorFloat32);
+                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // THRESHOLD AMAN (0.60): Batas akurat detektor biner 160-bit di luar ruangan/pondok
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.60) { 
+                    // LONGGAR & AMAN: Threshold disesuaikan ke posisi 0.68 untuk toleransi aksesoris peci/kerudung santri
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.68) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
-                } catch(e) { console.log("Gagal memproses salah satu baris vektor santri", e); }
+                } catch(e){}
             }
 
             if (santriDitemukan) {
