@@ -194,6 +194,7 @@
       align-items: center;
       justify-content: center;
       padding: 60px;
+      grid-column: 1 / -1;
     }
 
     .spinner {
@@ -219,6 +220,12 @@
       border-radius: 20px;
       border: 1px dashed var(--text-muted);
       grid-column: 1 / -1;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
     }
   </style>
 </head>
@@ -288,7 +295,11 @@
           res.data.forEach(santri => {
             const card = document.createElement("div");
             card.className = "santri-card";
-            card.setAttribute("onclick", `konfirmasiKehadiran('${santri.nik}', '${santri.nama}', this)`);
+            
+            // Mengikat event click dengan aman tanpa gangguan karakter tanda kutip (') pada nama
+            card.addEventListener("click", function() {
+              konfirmasiKehadiran(santri.nik, santri.nama, card);
+            });
             
             card.innerHTML = `
               <div class="santri-info">
@@ -333,14 +344,14 @@
           .then(r => r.json())
           .then(respon => {
             if(respon.status === "success") {
-              // Efek animasi menyusut (scale 0) saat kartu sukses diverifikasi
+              // Efek animasi menyusut (scale 0) saat kartu sukses ditambah/diverifikasi
               elemen.style.transform = "scale(0)";
               elemen.style.opacity = "0";
               
               setTimeout(() => {
                 elemen.remove();
                 // Jika kartu di layar sudah habis, tampilkan empty state bersih
-                if(document.getElementById("container-grid").children.length === 0) {
+                if(gridHasNoCards()) {
                   document.getElementById("container-grid").innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Seluruh petugas hari ini sudah dikonfirmasi hadir (Siklus Bersih)!</div>`;
                 }
               }, 300);
@@ -364,14 +375,12 @@
         }
       });
     }
-  </script>
-  
-  <style>
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
+
+    // Helper untuk mengecek ketersediaan kartu santri di grid
+    function gridHasNoCards() {
+      const grid = document.getElementById("container-grid");
+      return grid.getElementsByClassName("santri-card").length === 0;
     }
-  </style>
+  </script>
 </body>
 </html>
