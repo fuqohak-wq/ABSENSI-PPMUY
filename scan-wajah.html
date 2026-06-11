@@ -91,8 +91,8 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
-                // Menggunakan SsdMobilenetv1 untuk ekstraksi biometrik presisi tinggi demi menghindari 'Wajah Tidak Dikenal'
-                await faceapi.nets.ssdMobilenetv1.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                // Kembali menggunakan TinyFaceDetector versi ringan agar lancar di segala jenis device
+                await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
@@ -110,8 +110,8 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Eksekusi pemindaian dengan model SsdMobilenetv1 berkemampuan deteksi low-light lebih baik
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.55 })).withFaceLandmarks().withFaceDescriptor();
+                    // Gunakan TinyFaceDetector dengan inputSize 160 agar sangat cepat prosesnya
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
@@ -120,7 +120,7 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 500);
+                }, 400);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -140,8 +140,8 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // Penyesuaian ambang batas toleransi dari 0.50 dinaikkan menjadi 0.58 agar lebih responsif di area kiosk
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.58) { 
+                    // OPTIMASI UTAMA: Batas kelonggaran diubah menjadi 0.62 agar wajah langsung cepat dikenali
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.62) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
