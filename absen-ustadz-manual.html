@@ -77,7 +77,7 @@
         <div>
           <p class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Feed Check-in Terbaru</p>
           <div id="logFeed" class="space-y-2 max-h-48 overflow-y-auto text-[11px] text-zinc-400 divide-y divide-zinc-800/30">
-            <p class="text-center py-4 text-zinc-600 italic">Belum ada aktivitas transimisi...</p>
+            <p class="text-center py-4 text-zinc-600 italic">Belum ada aktivitas transmisi...</p>
           </div>
         </div>
       </div>
@@ -188,30 +188,23 @@
       }
     }
 
-    // 2. QUERY MASTER NAME FROM CLOUD SPREADSHEET
+    // 2. QUERY MASTER NAME FROM CLOUD SPREADSHEET (SINKRON KE USTADZ.GS)
     function tarikDatabaseUstadz() {
       const container = document.getElementById("gridKartuUstadz");
-      fetch(`${WEB_APP_URL}?aksi=ambil_database`)
+      
+      // Mengarahkan langsung ke fungsi filter ustadz.gs yang baru
+      fetch(`${WEB_APP_URL}?aksi=ambil_database_ustadz`)
         .then(res => res.json())
         .then(res => {
           if (res.status === "success") {
-            // Filter data yang baris namanya berisi gelar ustadz atau sesuaikan kebutuhan filter Anda
-            listUstadz = res.data.filter(personel => 
-              personel.nama.toLowerCase().includes("ustadz") || 
-              personel.nama.toLowerCase().includes("ustz") || 
-              personel.nama.toLowerCase().includes("ust") || 
-              personel.kelas.toLowerCase().includes("asatidzah") ||
-              personel.kelas.toLowerCase().includes("ustadz")
-            );
-
-            // Jika filter di atas kosong karena penulisan di sheet berbeda, gunakan fallback semua data
-            if(listUstadz.length === 0) listUstadz = res.data;
-
+            listUstadz = res.data;
             document.getElementById("txtTotal").innerText = `/ ${listUstadz.length} Active`;
             buildDeckKartu(listUstadz);
+          } else {
+            container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">ERROR SYSTEM: ${res.message}</div>`;
           }
         }).catch(err => {
-          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Terminal gagal intersept database ustadz.</div>`;
+          container.innerHTML = `<div class="col-span-full text-center py-16 text-rose-500 font-mono text-xs">CRITICAL CRASH: Terminal gagal intersept node ustadz.gs</div>`;
         });
     }
 
@@ -221,7 +214,7 @@
       container.innerHTML = "";
 
       if(data.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-600 font-mono text-xs">Data personel tidak ditemukan.</div>`;
+        container.innerHTML = `<div class="col-span-full text-center py-16 text-zinc-600 font-mono text-xs">Data personel Ustadz tidak ditemukan di tab master_santri.</div>`;
         return;
       }
 
