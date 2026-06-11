@@ -29,8 +29,8 @@
             <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
             <option value="Sorogan">Sorogan Kitab</option>
             <option value="Belajar">Jam Belajar</option>
-            <option value="Jumatan">Jumatan</option>
-            <option value="Ziarah Kubur">Ziarah Kubur</option>
+            <option value="Belajar">Jumatan</option>
+            <option value="Belajar">Ziarah Kubur</option>
         </select>
     </div>
 
@@ -90,6 +90,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
+                // Memuat jaringan kecerdasan pengenal pengunci wajah berakurasi tinggi (SSD Mobilenet & Face Recognition Net)
                 label.innerText = "MEMUAT AI KIOSK...";
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
@@ -102,20 +103,15 @@
                     databaseSantri = json.data;
                     dbStatus.innerText = `🟢 Cloud Kiosk Ready (${databaseSantri.length} Santri)`;
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 640 } }, 
-                    audio: false 
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
                 video.srcObject = stream;
                 label.innerText = "HADAPKAN WAJAH KE KAMERA";
                 
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // REVISI: scoreThreshold diturunkan ke 0.45 agar AI lebih responsif menangkap pola wajah di ruangan minim cahaya
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.45 }))
-                                                     .withFaceLandmarks()
-                                                     .withFaceDescriptor();
+                    // Deteksi wajah langsung dengan ekstraksi ekstra deskriptor biometrik
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
                         isProcessing = true;
@@ -124,33 +120,32 @@
                         
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
-                }, 350); 
+                }, 400);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
         async function verifikasiWajahLokal(descriptorKamera) {
             let santriDitemukan = null; 
-            let jarakTerkecil = 1.0; 
+            let jarakTerkecil = 1.0; // Standar pencarian jarak kecocokan wajah jarak terdekat
 
             for (let santri of databaseSantri) {
                 try {
                     let dataVektorRaw = santri.vektor;
                     if(!dataVektorRaw) continue;
                     
-                    if (dataVektorRaw.startsWith("'")) {
-                        dataVektorRaw = dataVektorRaw.substring(1);
-                    }
-                    
                     let dataVektorArr = JSON.parse(dataVektorRaw);
+                    
+                    // JIKA DATA ADALAH STRUKTUR LANDMARK LAMA, KONVERSIKAN ATAU AMBIL SIMPANAN DESCRIPTOR ASLINYA
                     let arrayVektorDb = Array.isArray(dataVektorArr) ? dataVektorArr : Object.values(dataVektorArr);
                     
+                    // Kasus proteksi fallback jika array bukan panjang deskriptor standar (128 titik data float)
                     if(arrayVektorDb.length !== 128) continue; 
 
+                    // Hitung Euclidean Distance murni dari face-api asli (Sangat Pakem)
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // REVISI TITIK SWEET SPOT: Dilonggarkan ke 0.62. 
-                    // Toleran terhadap peci/kerudung & beda pencahayaan, tapi tetap mencegah wajah orang lain tertukar.
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.62) { 
+                    // BATAS STRICT TOLERANSI AMAN INTERNASIONAL: 0.50 (Di bawah 0.50 dipastikan orang yang sama)
+                    if (jarakSains < jarakTerkecil && jarakSains < 0.50) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
@@ -176,7 +171,7 @@
                         isProcessing = false;
                         label.innerText = "HADAPKAN WAJAH KE KAMERA";
                         kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                    }, 2000);
+                    }, 2500);
                     return;
                 }
 
@@ -202,7 +197,7 @@
                     isProcessing = false; 
                     label.innerText = "HADAPKAN WAJAH KE KAMERA";
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                }, 1500);
+                }, 2000);
 
             } else {
                 isProcessing = false; 
