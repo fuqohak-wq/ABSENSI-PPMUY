@@ -91,10 +91,12 @@
             if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
-                // Kembali menggunakan TinyFaceDetector versi ringan agar lancar di segala jenis device
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
-                await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
-                await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
+                
+                // PERBAIKAN UTAMA: Dialihkan ke CDN JSDelivr resmi face-api.js milik cdanderson yang lengkap dan anti-404
+                const MODEL_URL = 'https://cdn.jsdelivr.net/gh/cdanderson/face-api.js@master/weights/';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                 
                 const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
                 const json = await res.json();
@@ -110,7 +112,6 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Gunakan TinyFaceDetector dengan inputSize 160 agar sangat cepat prosesnya
                     const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.4 })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
@@ -121,7 +122,10 @@
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     }
                 }, 400);
-            } catch (e) { label.innerText = "AI OFFLINE"; }
+            } catch (e) { 
+                label.innerText = "AI OFFLINE"; 
+                console.error("Gagal memuat model AI:", e);
+            }
         });
 
         async function verifikasiWajahLokal(descriptorKamera) {
@@ -140,7 +144,7 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // OPTIMASI UTAMA: Batas kelonggaran diubah menjadi 0.62 agar wajah langsung cepat dikenali
+                    // Tetap menjaga batas toleransi ideal 0.62 untuk model TinyFaceDetector
                     if (jarakSains < jarakTerkecil && jarakSains < 0.62) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
