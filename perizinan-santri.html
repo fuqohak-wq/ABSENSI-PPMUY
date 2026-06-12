@@ -222,50 +222,44 @@
         });
 
         async function muatMasterSantri() {
-    try {
-        // Menggunakan URLSearchParams agar parameter 'aksi' terbungkus dengan aman
-        const param = new URLSearchParams({ aksi: "ambil_database" });
-        
-        let res = await fetch(`${API_URL}?${param.toString()}`, { 
-            method: "GET",
-            mode: "cors"
-        });
-        
-        let r = await res.json();
-        if(r.status === "success") {
-            masterSantriCache = r.data || [];
-            console.log("Master santri berhasil disinkronkan:", masterSantriCache.length);
-        } else {
-            console.error("Respon cloud gagal:", r.message);
+            try {
+                const param = new URLSearchParams({ aksi: "ambil_database" });
+                let res = await fetch(`${API_URL}?${param.toString()}`, { 
+                    method: "GET",
+                    mode: "cors"
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    masterSantriCache = r.data || [];
+                    console.log("Master santri berhasil disinkronkan:", masterSantriCache.length);
+                } else {
+                    console.error("Respon cloud gagal:", r.message);
+                }
+            } catch(e) { 
+                console.error("Gagal sinkronisasi master cache santri", e); 
+            }
         }
-    } catch(e) { 
-        console.error("Gagal sinkronisasi master cache santri", e); 
-    }
-}
 
-async function muatDataPerizinan() {
-    const tbody = document.getElementById('tbl-izin-body');
-    try {
-        // Menggunakan URLSearchParams agar parameter 'aksi' terbungkus dengan aman
-        const param = new URLSearchParams({ aksi: "ambil_perizinan" });
-        
-        let res = await fetch(`${API_URL}?${param.toString()}`, { 
-            method: "GET",
-            mode: "cors"
-        });
-        
-        let r = await res.json();
-        if(r.status === "success") {
-            databaseIzinGlobal = r.data || [];
-            kalkulasiStatistikDanRender();
-        } else {
-            if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Error Cloud: ${r.message}</td></tr>`;
+        async function muatDataPerizinan() {
+            const tbody = document.getElementById('tbl-izin-body');
+            try {
+                const param = new URLSearchParams({ aksi: "ambil_perizinan" });
+                let res = await fetch(`${API_URL}?${param.toString()}`, { 
+                    method: "GET",
+                    mode: "cors"
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    databaseIzinGlobal = r.data || [];
+                    kalkulasiStatistikDanRender();
+                } else {
+                    if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Error Cloud: ${r.message}</td></tr>`;
+                }
+            } catch(e) {
+                console.error("Gagal load perizinan:", e);
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
+            }
         }
-    } catch(e) {
-        console.error("Gagal load perizinan:", e);
-        if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
-    }
-}
 
         function kalkulasiStatistikDanRender() {
             let pending = 0, diluar = 0, terlambat = 0;
@@ -346,14 +340,14 @@ async function muatDataPerizinan() {
                 if(statusStr === "PENDING") {
                     aksiButton = `
                         <div class="flex justify-end gap-1.5">
-                            <button onclick="eksekusiAccPortal('${idIzin}', 'SETUJU')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400 cursor-pointer">ACC</button>
-                            <button onclick="eksekusiAccPortal('${idIzin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
+                            <button class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400 cursor-pointer">ACC</button>
+                            <button class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
                         </div>
                     `;
                 } else if((statusStr === "DISETUJUI" || statusStr === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
                     aksiButton = `
                         <div class="flex justify-end gap-1.5 items-center">
-                            <button onclick="tutupIzinManual('${idIzin}')" class="px-2 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 font-black text-[9px] uppercase hover:bg-slate-600 cursor-pointer"><i class="fa-solid fa-right-to-bracket mr-1"></i>OVERRIDE IN</button>
+                            <button class="px-2 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 font-black text-[9px] uppercase hover:bg-slate-600 cursor-pointer"><i class="fa-solid fa-right-to-bracket mr-1"></i>OVERRIDE IN</button>
                         </div>
                     `;
                 } else {
@@ -463,7 +457,10 @@ async function muatDataPerizinan() {
         }
 
         async function prosesUsulkanIzin() {
-            if(!santriTerpilihNIK) { alert("Pilih nama atau Scan QR santri terlebih dahulu!"); return; }
+            if(!santriTerpilihNIK) { 
+                alert("Pilih nama atau Scan QR santri terlebih dahulu!"); 
+                return; 
+            }
             
             const jenisIzin = document.getElementById('select-jenis-izin').value;
             const tglMulai = document.getElementById('input-tgl-mulai').value;
@@ -474,13 +471,12 @@ async function muatDataPerizinan() {
             
             let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
 
-            // Animasi tombol loading saat klik submit
+            // Efek Loading Kiosk Keamanan
             const btnSubmit = document.querySelector("button[onclick='prosesUsulkanIzin()']");
             const teksAsli = btnSubmit.innerHTML;
             btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i> MEMPROSES...`;
             btnSubmit.disabled = true;
 
-            // Mempersiapkan payload data JSON
             const payload = {
                 nik: santriTerpilihNIK,
                 nama: namaSantri,
@@ -495,37 +491,34 @@ async function muatDataPerizinan() {
             try {
                 let res = await fetch(API_URL, {
                     method: "POST",
-                    mode: "cors",
                     body: JSON.stringify(payload)
                 });
 
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    alert(`🎉 BERHASIL! Data disimpan dengan ${r.id_izin}.\nNotifikasi sistem telah diteruskan ke Telegram.`);
+                    alert(`🎉 BERHASIL!\nData tersimpan dengan ${r.id_izin}.\nSistem telah meneruskan notifikasi ke Telegram.`);
                     
-                    // Reset Form Input
+                    // Reset Input Form Kiosk
                     document.getElementById('input-alasan').value = "";
                     document.getElementById('input-nik-nama').value = "";
                     document.getElementById('preview-santri').classList.add('hidden');
                     santriTerpilihNIK = null;
                     
-                    // Refresh Tabel Log secara real-time
+                    // Refresh Log Real-Time otomatis
                     muatDataPerizinan();
                 } else {
-                    alert("Gagal Cloud: " + r.message);
+                    alert("Gagal Server Cloud: " + r.message);
                 }
             } catch (e) {
                 console.error("Crash POST system:", e);
-                alert("Gagal menghubungkan ke Server Cloud Google Script. Periksa koneksi internet Anda.");
+                alert("Koneksi Error: Gagal mengirim data ke Google Sheets.");
             } finally {
-                // Kembalikan tombol ke keadaan semula
                 btnSubmit.innerHTML = teksAsli;
                 btnSubmit.disabled = false;
             }
         }
 
-        // --- FUNGSI TAMBAHAN UTILITY AGAR TIDAK ERROR ---
         function formatTanggalLokal(stringTgl) {
             if(!stringTgl) return "-";
             try {
