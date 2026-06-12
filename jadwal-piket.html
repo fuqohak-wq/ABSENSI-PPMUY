@@ -3,483 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HQ Clean Patrol System - PPMUY</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Digital Piket Node - PPMUY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #f6f8fb 0%, #e5ebee 100%);
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --text-main: #2d3748;
-      --text-muted: #718096;
-      --border-color: rgba(255, 255, 255, 0.6);
-      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
-      --accent: #2b6cb0;
-      --accent-hover: #2c5282;
-      --gaib-color: #e53e3e;
-      --aman-color: #38a169;
-    }
-
-    [data-theme="dark"] {
-      --bg-gradient: linear-gradient(135deg, #1a202c 0%, #232733 100%);
-      --card-bg: rgba(45, 55, 72, 0.65);
-      --text-main: #f7fafc;
-      --text-muted: #cbd5e0;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-      --accent: #4299e1;
-      --accent-hover: #63b3ed;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background 0.3s, color 0.3s, transform 0.2s, opacity 0.3s;
-    }
-
+    * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
     body {
-      background: var(--bg-gradient);
-      color: var(--text-main);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      --bg-main: #f0fdf4; --bg-panel: #ffffff; --bg-input: #ecfdf5;
+      --border-color: #a7f3d0; --text-main: #065f46; --text-muted: #047857;
     }
+    body.dark-mode {
+      --bg-main: #064e3b; --bg-panel: #0b1512; --bg-input: #0f2922;
+      --border-color: #047857; --text-main: #e6fdf5; --text-muted: #34d399;
+    }
+    .app-bg { background-color: var(--bg-main); color: var(--text-main); }
+    .panel-bg { background-color: var(--bg-panel); border-color: var(--border-color); }
+    .input-bg { background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-main); }
+    .text-muted-custom { color: var(--text-muted); }
+    .border-custom { border-color: var(--border-color); }
 
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      margin-top: 10px;
-    }
-
-    header {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-      padding: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .title-area h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    
-    .title-area p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* TOMBOL KEMBALI KE DASHBOARD UTAMA */
-    .btn-dashboard {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 10px 20px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow);
-    }
-
-    .btn-dashboard:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-      transform: scale(1.02);
-    }
-
-    .theme-toggle-btn {
-      background: var(--accent);
-      border: none;
-      color: white;
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    /* FUN STATS INTERAKTIF */
-    .fun-stats-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 25px;
-    }
-
-    .stat-box {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 20px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      position: relative;
-    }
-
-    .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      color: white;
-    }
-
-    .stat-info h3 {
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .stat-info p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* FILTER BAR */
-    .controls-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 20px;
-      padding: 16px 20px;
-      margin-bottom: 25px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .segmented-control {
-      background: rgba(0,0,0,0.05);
-      padding: 4px;
-      border-radius: 12px;
-      display: flex;
-      gap: 4px;
-    }
-    [data-theme="dark"] .segmented-control {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .seg-btn {
-      background: transparent;
-      border: none;
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: 9px;
-      cursor: pointer;
-    }
-
-    .seg-btn.active {
-      background: var(--accent);
-      color: white;
-    }
-
-    select.filter-dropdown {
-      background: var(--card-bg);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-    }
-
-    /* GRID TAMPILAN UTAMA (UKURAN DIKECILKAN) */
-    .piket-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-    }
-
-    /* KARTU RINGKAS: HANYA NAMA */
-    .piket-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 16px;
-      padding: 16px;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 80px;
-    }
-
-    .piket-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-    }
-
-    .santri-name {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .loader-container, .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 50px;
-      color: var(--text-muted);
-    }
-
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border-left-color: var(--accent);
-      animation: spin 1s linear infinite;
-      margin: 0 auto 12px;
-    }
-
-    @define-placeholder spin { 100% { transform: rotate(360deg); } }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .rainbow-card-1 { background-color: #f0fdf4; border: 1.5px solid #4ade80; color: #166534; }
+    .rainbow-card-2 { background-color: #ecfeff; border: 1.5px solid #22d3ee; color: #075985; }
+    .rainbow-card-3 { background-color: #fff9db; border: 1.5px solid #fbbf24; color: #92400e; }
+    .rainbow-card-4 { background-color: #fdf4ff; border: 1.5px solid #e879f9; color: #86198f; }
+    .rainbow-card-5 { background-color: #eef2ff; border: 1.5px solid #818cf8; color: #3730a3; }
   </style>
 </head>
-<body data-theme="dark">
+<body class="app-bg min-h-screen font-sans antialiased pb-12">
 
-  <div class="container">
-    <header>
-      <div class="title-area">
-        <h1><i class="fa-solid fa-broom" style="color: var(--accent); margin-right: 6px;"></i> Radar Operasi Piket Kebersihan</h1>
-        <p>Klik kartu santri untuk konfirmasi kehadiran piket. Santri yang tersisa di layar otomatis berstatus Gaib.</p>
+  <!-- TOP HEADER NAVBAR -->
+  <nav class="panel-bg border-b shadow-sm py-4 px-6 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="bg-emerald-600 text-white p-2.5 rounded-xl shadow-md">
+        <i class="fa-solid fa-broom text-xl animate-pulse"></i>
       </div>
-      <div class="header-actions">
-        <button class="btn-dashboard" onclick="keDashboardUtama()">
-          <i class="fa-solid fa-house"></i> Ke Dashboard
+      <div>
+        <h1 class="text-md font-black tracking-wide uppercase">Digital Piket Node</h1>
+        <p class="text-[10px] text-muted-custom font-mono font-bold">MONITORING KEBERSIHAN LINGKUNGAN - PPMUY</p>
+      </div>
+    </div>
+    
+    <!-- TIMING & NAVIGATION -->
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <div class="text-center sm:text-right px-3 py-1 bg-emerald-500/10 rounded-xl border border-custom font-mono">
+        <div id="liveClock" class="text-sm font-black">00:00:00</div>
+        <div id="liveDay" class="text-[10px] font-bold text-muted-custom">HARI INI</div>
+      </div>
+
+      <a href="https://manajemen.ppmuy.com/dashboard.html" class="bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-black font-mono px-3.5 py-2.5 rounded-xl flex items-center gap-2 shadow transition">
+        <i class="fa-solid fa-circle-arrow-left"></i> KEMBALI
+      </a>
+      
+      <button onclick="toggleTheme()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold font-mono px-3.5 py-2.5 rounded-xl flex items-center gap-2 shadow">
+        <i id="themeIcon" class="fa-solid fa-moon"></i> <span id="themeText">MODE GELAP</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN MAIN DASHBOARD -->
+  <main class="max-w-6xl mx-auto px-4 space-y-6">
+    
+    <!-- MOTIVATIONAL QUOTE CONTAINER -->
+    <section class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-2xl shadow-md flex items-center gap-4">
+      <div class="text-2xl hidden sm:block opacity-80"><i class="fa-solid fa-quote-left"></i></div>
+      <div>
+        <p id="motivationalQuote" class="text-xs sm:text-sm font-bold tracking-wide">"Kebersihan sebagian dari Iman. Menjaga kebersihan pondok adalah bukti khidmah terbaik kita."</p>
+        <span class="text-[9px] font-mono text-emerald-200 uppercase block mt-1">— Maklumat Kebersihan PPMUY</span>
+      </div>
+    </section>
+
+    <!-- CONTROL PANEL ABSENSI -->
+    <section class="panel-bg border rounded-2xl p-4 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+      <!-- GENDER FILTERS -->
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+        <button id="filterAll" onclick="setGenderFilter('SEMUA')" class="bg-emerald-600 text-white text-xs font-black font-mono px-4 py-2 rounded-xl shadow">
+          🌍 SEMUA (<span id="countAll">0</span>)
         </button>
-        <button class="theme-toggle-btn" onclick="toggleTheme()">
-          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        <button id="filterPutra" onclick="setGenderFilter('LAKI-LAKI')" class="input-bg border text-xs font-black font-mono px-4 py-2 rounded-xl">
+          👦 PUTRA (<span id="countPutra">0</span>)
+        </button>
+        <button id="filterPutri" onclick="setGenderFilter('PEREMPUAN')" class="input-bg border text-xs font-black font-mono px-4 py-2 rounded-xl">
+          👧 PUTRI (<span id="countPutri">0</span>)
         </button>
       </div>
-    </header>
 
-    <div class="fun-stats-container">
-      <div class="stat-box">
-        <div class="stat-icon" style="background: var(--gaib-color);"><i class="fa-solid fa-ghost"></i></div>
-        <div class="stat-info">
-          <h3 id="count-gaib">0</h3>
-          <p>Santri Masih Gaib</p>
-        </div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-icon" style="background: var(--aman-color);"><i class="fa-solid fa-circle-check"></i></div>
-        <div class="stat-info">
-          <h3 id="count-aman">0</h3>
-          <p>Sudah Pegang Sapu</p>
-        </div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-icon" style="background: var(--accent);"><i class="fa-solid fa-chart-pie"></i></div>
-        <div class="stat-info">
-          <h3 id="clean-percent">0%</h3>
-          <p>Cleanliness Level</p>
-        </div>
-      </div>
-    </div>
+      <!-- MASTER LOCK ACTION -->
+      <button onclick="kunciAbsensiGaibMassal()" id="btnKunci" class="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white text-xs font-black font-mono px-5 py-2.5 rounded-xl shadow flex items-center justify-center gap-2">
+        <i class="fa-solid fa-lock"></i> KUNCI ABSENSI HARI INI
+      </button>
+    </section>
 
-    <div class="controls-panel">
-      <div class="filter-group">
-        <span style="font-size: 13px; font-weight:600;"><i class="fa-solid fa-venus-mars"></i> Sektor:</span>
-        <div class="segmented-control">
-          <button class="seg-btn active" onclick="setGender('semua', this)">Semua</button>
-          <button class="seg-btn" onclick="setGender('LAKI-LAKI', this)">Laki-Laki</button>
-          <button class="seg-btn" onclick="setGender('PEREMPUAN', this)">Perempuan</button>
-        </div>
+    <!-- CONTAINER KARTU JADWAL PIKET -->
+    <section class="panel-bg border rounded-2xl p-6 shadow-xl min-h-[350px]">
+      <div class="flex justify-between items-center border-b border-custom pb-3 mb-4">
+        <h2 class="text-xs font-black uppercase tracking-wider font-mono flex items-center gap-2 text-muted-custom">
+          <i class="fa-solid fa-clipboard-list"></i> Daftar Konfirmasi Petugas Piket
+        </h2>
+        <span class="text-[10px] bg-emerald-500/10 px-2 py-1 rounded-md font-bold text-emerald-700 dark:text-emerald-300">Tips: Klik nama jika hadir menyapu</span>
       </div>
 
-      <div class="filter-group">
-        <span style="font-size: 13px; font-weight:600;"><i class="fa-solid fa-filter"></i> Filter Kelas:</span>
-        <select class="filter-dropdown" id="dropdown-kelas" onchange="setKelas(this.value)">
-          <option value="semua">-- Tampilkan Semua Kelas --</option>
-        </select>
+      <!-- CARDS GRID -->
+      <div id="gridPiket" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+        <div class="col-span-full text-center py-24 text-muted-custom font-mono text-xs">Menghubungkan Node Database...</div>
       </div>
-    </div>
+    </section>
 
-    <div class="piket-grid" id="grid-piket">
-      <div class="loader-container">
-        <div class="spinner"></div>
-        <p>Membaca pembagian klaster piket PPMUY...</p>
-      </div>
-    </div>
-  </div>
+  </main>
 
   <script>
-    // URL Deployment Web App Asli Anda (Tetap Dipertahankan)
-    const urlScript = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
-    let dataPiketLokal = [];
-    let filterGender = "semua";
-    let filterKelas = "semua";
+    // URL WEB APP SCRIPT ANDA YANG BARU:
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA-yj9bmUrP4rf9SU-QO-Cx_b1VmSQk06F7c7Z_RQsKI3uE4XGUmG_NIFdiaSjUUm2Qw/exec";
 
-    // Fungsi Navigasi Menggunakan Riwayat Browser (Bebas Error Cloud)
-    function keDashboardUtama() {
-      window.history.back();
+    let masterJadwalPiket = [];
+    let genderAktif = "SEMUA";
+    let isDarkMode = false;
+
+    // Kumpulan Quotes Penyemangat Kebersihan
+    const quotesKebersihan = [
+      "\"Kebersihan sebagian dari Iman. Menjaga kebersihan pondok adalah bukti khidmah terbaik kita.\"",
+      "\"Pondok yang bersih melahirkan pikiran yang jernih untuk menghafal dan mutholaah.\"",
+      "\"Sapu tanganmu hari ini membersihkan jalan keberkahan ilmumu di masa depan.\"",
+      "\"Malaikat menyukai tempat yang bersih dan wangi. Mari raih berkah lewat piket teratur.\"",
+      "\"Disiplin piket adalah cermin karakter santri sejati. Semangat khidmah!\""
+    ];
+
+    document.addEventListener("DOMContentLoaded", function() {
+      jalankanJamRealtime();
+      tarikJadwalHariIni();
+      // Ganti quote acak setiap 15 detik
+      setInterval(() => {
+        const acak = quotesKebersihan[Math.floor(Math.random() * quotesKebersihan.length)];
+        document.getElementById("motivationalQuote").innerText = acak;
+      }, 15000);
+    });
+
+    function jalankanJamRealtime() {
+      setInterval(() => {
+        const skrg = new Date();
+        document.getElementById("liveClock").innerText = skrg.toLocaleTimeString("id-ID");
+        const opsi = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+        document.getElementById("liveDay").innerText = skrg.toLocaleDateString("id-ID", opsi).toUpperCase();
+      }, 1000);
     }
 
     function toggleTheme() {
       const body = document.body;
-      const icon = document.getElementById('theme-icon');
-      if(body.getAttribute('data-theme') === 'dark') {
-        body.setAttribute('data-theme', 'light');
-        icon.className = 'fa-solid fa-sun';
+      if (isDarkMode) {
+        body.classList.remove("dark-mode");
+        document.getElementById("themeIcon").className = "fa-solid fa-moon";
+        document.getElementById("themeText").innerText = "MODE GELAP";
+        isDarkMode = false;
       } else {
-        body.setAttribute('data-theme', 'dark');
-        icon.className = 'fa-solid fa-moon';
+        body.classList.add("dark-mode");
+        document.getElementById("themeIcon").className = "fa-solid fa-sun text-amber-400";
+        document.getElementById("themeText").innerText = "MODE TERANG";
+        isDarkMode = true;
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      muatDaftarPiket();
-    });
-
-    function muatDaftarPiket() {
-      fetch(`${urlScript}?aksi=ambil_petugas_piket`)
+    function tarikJadwalHariIni() {
+      fetch(`${WEB_APP_URL}?aksi=ambil_jadwal_hari_ini`)
         .then(res => res.json())
         .then(res => {
           if (res.status === "success") {
-            dataPiketLokal = res.data || [];
-            isiDropdownKelas(res.semua_kelas || []);
-            hitungUlangMeters();
-            renderGridPiket();
+            masterJadwalPiket = res.data;
+            hitungStatistikManajemen();
+            renderKartuPiket();
+          } else {
+            document.getElementById("gridPiket").innerHTML = `<div class="col-span-full text-center py-24 text-rose-500 font-mono text-xs">Gagal memuat: ${res.message}</div>`;
           }
-        })
-        .catch(err => {
-          document.getElementById("grid-piket").innerHTML = `<div class="empty-state">Gagal terhubung dengan database piket kebersihan cloud.</div>`;
+        }).catch(() => {
+          document.getElementById("gridPiket").innerHTML = `<div class="col-span-full text-center py-24 text-rose-500 font-mono text-xs">Gagal tersambung ke server Google.</div>`;
         });
     }
 
-    function isiDropdownKelas(arrKelas) {
-      const dd = document.getElementById("dropdown-kelas");
-      dd.innerHTML = `<option value="semua">-- Tampilkan Semua Kelas --</option>`;
-      arrKelas.forEach(k => {
-        dd.innerHTML += `<option value="${k}">${k}</option>`;
-      });
+    function hitungStatistikManajemen() {
+      document.getElementById("countAll").innerText = masterJadwalPiket.length;
+      document.getElementById("countPutra").innerText = masterJadwalPiket.filter(s => s.gender === "LAKI-LAKI").length;
+      document.getElementById("countPutri").innerText = masterJadwalPiket.filter(s => s.gender === "PEREMPUAN").length;
     }
 
-    function hitungUlangMeters() {
-      const gaib = dataPiketLokal.filter(s => s.kehadiran === "").length;
-      const aman = dataPiketLokal.filter(s => s.kehadiran === "HADIR").length;
-      const total = dataPiketLokal.length;
-      const persen = total > 0 ? Math.round((aman / total) * 100) : 0;
+    function setGenderFilter(gender) {
+      genderAktif = gender;
+      // Perbarui style tombol filter
+      const btnAll = document.getElementById("filterAll");
+      const btnPutra = document.getElementById("filterPutra");
+      const btnPutri = document.getElementById("filterPutri");
 
-      document.getElementById("count-gaib").innerText = gaib;
-      document.getElementById("count-aman").innerText = aman;
-      document.getElementById("clean-percent").innerText = persen + "%";
+      btnAll.className = gender === "SEMUA" ? "bg-emerald-600 text-white text-xs font-black font-mono px-4 py-2 rounded-xl shadow" : "input-bg border text-xs font-black font-mono px-4 py-2 rounded-xl";
+      btnPutra.className = gender === "LAKI-LAKI" ? "bg-emerald-600 text-white text-xs font-black font-mono px-4 py-2 rounded-xl shadow" : "input-bg border text-xs font-black font-mono px-4 py-2 rounded-xl";
+      btnPutri.className = gender === "PEREMPUAN" ? "bg-emerald-600 text-white text-xs font-black font-mono px-4 py-2 rounded-xl shadow" : "input-bg border text-xs font-black font-mono px-4 py-2 rounded-xl";
+
+      renderKartuPiket();
     }
 
-    function setGender(val, btn) {
-      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      filterGender = val;
-      renderGridPiket();
-    }
+    function renderKartuPiket() {
+      const container = document.getElementById("gridPiket");
+      container.innerHTML = "";
 
-    function setKelas(val) {
-      filterKelas = val;
-      renderGridPiket();
-    }
+      const dataFiltered = masterJadwalPiket.filter(s => genderAktif === "SEMUA" || s.gender === genderAktif);
 
-    function renderGridPiket() {
-      const grid = document.getElementById("grid-piket");
-      grid.innerHTML = "";
-
-      // Logika Penyaringan: Hanya memunculkan yang status kehadirannya kosong ("")
-      const disaring = dataPiketLokal.filter(s => {
-        if (s.kehadiran !== "") return false;
-
-        const genderSantri = (s.gender || "").toString().toUpperCase();
-        const matchGen = (filterGender === "semua") || (genderSantri === filterGender.toUpperCase());
-        const matchKls = (filterKelas === "semua") || (s.kelas === filterKelas);
-        
-        return matchGen && matchKls;
-      });
-
-      if(disaring.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-face-smile-beam" style="font-size:30px; color:var(--aman-color);"></i><br><br>Sektor/Kelas ini bersih dari santri gaib!</div>`;
+      if (dataFiltered.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-24 text-gray-400 font-mono text-xs">Kosong / Absensi Selesai Divalidasi.</div>`;
         return;
       }
 
-      disaring.forEach(s => {
+      dataFiltered.forEach((s, idx) => {
         const card = document.createElement("div");
-        card.className = "piket-card";
+        // Desain mini kartu warna-warni bersih
+        card.className = `rainbow-card-${(idx % 5) + 1} p-2 px-3 rounded-xl shadow-sm flex items-center justify-between gap-1 h-12 cursor-pointer hover:scale-105 transform transition relative group`;
         
-        card.addEventListener("click", function() {
-          eksekusiPiketKilat(s.nik, card);
-        });
+        // Isian teks nama & sub-teks kelas
+        card.innerHTML = `
+          <div class="flex-1 min-w-0" onclick="prosesAbsenSatuan('${s.nik}', 'HADIR')">
+            <div class="text-[11px] font-black tracking-tight truncate uppercase">${s.nama}</div>
+            <div class="text-[9px] font-mono opacity-70 truncate">${s.kelas} | ${s.gender === "LAKI-LAKI" ? "PUTRA" : "PUTRI"}</div>
+          </div>
+          <!-- Opsi Sakit / Izin -->
+          <button onclick="prosesAbsenSatuan('${s.nik}', 'SAKIT/IZIN')" title="Sakit atau Izin Khusus" class="ml-1 bg-white/60 hover:bg-white text-[10px] p-1 px-1.5 rounded-md border font-sans shadow-sm text-amber-700 font-bold z-10">
+            🏥
+          </button>
+        `;
 
-        // Struktur Kartu Dipersempit: Hanya Merender Nama Saja
-        card.innerHTML = `<div class="santri-name">${s.nama}</div>`;
-        grid.appendChild(card);
+        container.appendChild(card);
       });
     }
 
-    function eksekusiPiketKilat(nik, elemen) {
-      elemen.style.transform = "scale(0)";
-      elemen.style.opacity = "0";
+    function prosesAbsenSatuan(nik, status) {
+      const santri = masterJadwalPiket.find(s => s.nik === nik);
+      if (!santri) return;
 
-      setTimeout(() => {
-        // Mekanisme Eliminasi Array Lokal Seperti Struktur Halaman Oprak Keamanan
-        let idx = dataPiketLokal.findIndex(item => item.nik === nik);
-        if(idx !== -1) {
-          dataPiketLokal[idx].kehadiran = "HADIR";
-        }
-        elemen.remove();
-        hitungUlangMeters();
-        renderGridPiket(); // Render ulang sisa santri gaib di layar
-      }, 300);
+      const konfirmasi = confirm(`Konfirmasi: Apakah ${santri.nama} dinyatakan ${status}?`);
+      if (!konfirmasi) return;
 
-      fetch(`${urlScript}?aksi=konfirmasi_hadir_piket&nik=${nik}`, { method: 'POST' })
-      .then(r => r.json())
-      .then(res => {
-        if(res.status !== "success") console.error("Gagal sinkronisasi cloud untuk NIK: " + nik);
+      const payload = {
+        aksi: "simpan_absen_satuan",
+        nik: santri.nik,
+        nama: santri.nama,
+        gender: santri.gender,
+        kelas: santri.kelas,
+        hari: santri.hari,
+        status: status
+      };
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
       })
-      .catch(e => console.error("Server Error background push", e));
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === "success") {
+          // Buang dari list lokal agar kartu langsung hilang dari antarmuka
+          masterJadwalPiket = masterJadwalPiket.filter(s => s.nik !== nik);
+          hitungStatistikManajemen();
+          renderKartuPiket();
+        } else {
+          alert("Gagal menyimpan absensi: " + res.message);
+        }
+      }).catch(() => alert("Koneksi gagal terhubung."));
+    }
+
+    function kunciAbsensiGaibMassal() {
+      if (masterJadwalPiket.length === 0) {
+        alert("Semua santri yang terjadwal hari ini sudah terkonfirmasi hadir/izin!");
+        return;
+      }
+
+      const yakin = confirm(`Peringatan! Menekan tombol ini akan mengunci absensi piket hari ini. \n\nSebanyak ${masterJadwalPiket.length} santri yang tersisa di layar akan otomatis dicatat "GAIB" dan mendapat TAKZIRAN 5 POIN. Lanjutkan?`);
+      if (!yakin) return;
+
+      const btn = document.getElementById("btnKunci");
+      btn.disabled = true;
+      btn.innerText = "MENGUNCI & MENGIRIM DATA TAKZIRAN...";
+
+      const payload = {
+        aksi: "kunci_absensi_gaib",
+        dataGaib: masterJadwalPiket
+      };
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === "success") {
+          alert(res.message);
+          masterJadwalPiket = [];
+          hitungStatistikManajemen();
+          renderKartuPiket();
+        } else {
+          alert("Gagal mengunci absen: " + res.message);
+        }
+      })
+      .catch(() => alert("Koneksi gagal terhubung."))
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerText = "KUNCI ABSENSI HARI INI";
+      });
     }
   </script>
 </body>
