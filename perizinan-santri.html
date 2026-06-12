@@ -1,197 +1,329 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>Perizinan Santri PPMUY</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Poppins,sans-serif;
-}
-
-body{
-background:linear-gradient(135deg,#4f46e5,#7c3aed);
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
-}
-
-.card{
-width:100%;
-max-width:650px;
-background:white;
-padding:35px;
-border-radius:30px;
-box-shadow:0 20px 40px rgba(0,0,0,.25);
-}
-
-h1{
-text-align:center;
-color:#4338ca;
-margin-bottom:10px;
-}
-
-.subtitle{
-text-align:center;
-color:#777;
-margin-bottom:30px;
-}
-
-label{
-font-weight:600;
-display:block;
-margin-top:18px;
-margin-bottom:8px;
-}
-
-select,input,textarea{
-width:100%;
-padding:14px;
-border-radius:15px;
-border:1px solid #ddd;
-font-size:15px;
-outline:none;
-}
-
-textarea{
-height:100px;
-resize:none;
-}
-
-button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:18px;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
-margin-top:20px;
-transition:.3s;
-}
-
-.simpan{
-background:#10b981;
-color:white;
-}
-
-.simpan:hover{
-background:#059669;
-}
-
-.dashboard{
-background:#4f46e5;
-color:white;
-}
-
-.dashboard:hover{
-background:#3730a3;
-}
-
-#status{
-margin-top:20px;
-text-align:center;
-font-weight:600;
-color:#16a34a;
-}
-
-.badges{
-display:flex;
-gap:10px;
-justify-content:center;
-margin-bottom:25px;
-}
-
-.badge{
-padding:8px 15px;
-border-radius:30px;
-font-size:13px;
-font-weight:600;
-color:white;
-}
-
-.sakit{
-background:#ef4444;
-}
-
-.keluar{
-background:#f59e0b;
-}
-
-.pulang{
-background:#10b981;
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Perizinan Santri | PPMUY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #10b981;
+      border-radius: 10px;
+    }
+    /* Mode Terang Keren Default */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e6f4ea 100%);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --text-main: #0f172a;
+      --border-color: rgba(16, 185, 129, 0.2);
+    }
+    /* Dark Mode Override */
+    .dark-mode {
+      --bg-gradient: linear-gradient(135deg, #022c22 0%, #061f1a 100%);
+      --card-bg: rgba(15, 23, 42, 0.6);
+      --text-main: #f8fafc;
+      --border-color: rgba(16, 185, 129, 0.4);
+    }
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+    }
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-screen p-4 md:p-8 custom-scrollbar">
 
-<div class="card">
+  <header class="max-w-7xl mx-auto flex justify-between items-center mb-8 glass-card rounded-2xl p-4 shadow-xs">
+    <div class="flex items-center gap-3">
+      <div class="bg-emerald-500 text-white w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-md shadow-emerald-500/20">
+        <i class="fa-solid fa-id-card-clip"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">E-PERIZINAN PPMUY</h1>
+        <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Pusat Administrasi & Kontrol Mobilitas Santri</p>
+      </div>
+    </div>
+    <button id="btnTheme" class="cursor-pointer w-10 h-10 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:text-emerald-400 flex items-center justify-center transition-all">
+      <i class="fa-solid fa-moon text-lg" id="iconTheme"></i>
+    </button>
+  </header>
 
-<h1>📋 PERIZINAN SANTRI PPMUY</h1>
+  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <section class="lg:col-span-1 flex flex-col gap-6">
+      <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-6 border-b border-emerald-500/10 pb-3">
+          <i class="fa-solid fa-pen-to-square text-emerald-500 text-lg"></i>
+          <h2 class="font-bold text-lg">Form Pengajuan Izin</h2>
+        </div>
+        
+        <form id="formIzin" class="flex flex-col gap-4">
+          <div class="relative">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Cari Nama Santri</label>
+            <div class="relative">
+              <input type="text" id="searchNama" placeholder="Ketik nama santri..." autocomplete="off" required
+                class="w-full bg-white/50 dark:bg-black/20 border border-emerald-500/20 focus:border-emerald-500 rounded-xl px-4 py-3 pl-10 text-sm focus:outline-hidden transition-all">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+            </div>
+            <div id="radarDropdown" class="hidden absolute left-0 right-0 top-[105%] bg-white dark:bg-slate-900 border border-emerald-500/30 rounded-xl max-h-56 overflow-y-auto z-50 shadow-xl custom-scrollbar"></div>
+          </div>
 
-<div class="subtitle">
-Input izin dengan cepat dan mudah
-</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">NIK Terkunci</label>
+              <input type="text" id="nik" readonly required class="w-full bg-slate-500/10 border border-transparent rounded-xl px-4 py-2.5 text-sm outline-hidden font-mono text-center">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Kelas Santri</label>
+              <input type="text" id="kelas" readonly required class="w-full bg-slate-500/10 border border-transparent rounded-xl px-4 py-2.5 text-sm outline-hidden text-center">
+            </div>
+          </div>
 
-<div class="badges">
-<div class="badge sakit">🤒 Sakit</div>
-<div class="badge keluar">🚶 Keluar</div>
-<div class="badge pulang">🏠 Pulang</div>
-</div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Jenis Perizinan</label>
+            <select id="jenisIzin" required class="w-full bg-white/50 dark:bg-black/20 border border-emerald-500/20 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm focus:outline-hidden cursor-pointer transition-all">
+              <option value="Sakit" class="dark:bg-slate-900">Sakit (Langsung ACC)</option>
+              <option value="Keluar" class="dark:bg-slate-900">Keluar Lingkungan (Langsung ACC)</option>
+              <option value="Pulang" class="dark:bg-slate-900">Pulang Rumah (Butuh Telegram ACC)</option>
+            </select>
+          </div>
 
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Janji Kembali Ke Pondok</label>
+            <input type="text" id="janjiKembali" placeholder="Contoh: Besok Sore, 15 Juni jam 17:00, dsb." required
+              class="w-full bg-white/50 dark:bg-black/20 border border-emerald-500/20 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm focus:outline-hidden transition-all">
+          </div>
 
-<label>Nama Santri</label>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Alasan Detail</label>
+            <textarea id="alasan" rows="3" placeholder="Sebutkan keperluan secara detail..." required
+              class="w-full bg-white/50 dark:bg-black/20 border border-emerald-500/20 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm focus:outline-hidden resize-none transition-all"></textarea>
+          </div>
 
-<select id="santri">
-<option>Pilih Santri</option>
-</select>
+          <button type="submit" id="btnSubmit" class="cursor-pointer mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-emerald-500/10 flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Proses & Pancarkan Izin</span>
+          </button>
+        </form>
+      </div>
+    </section>
 
+    <section class="lg:col-span-2 flex flex-col gap-4">
+      <div class="glass-card rounded-2xl p-6 shadow-sm flex flex-col h-full max-h-[640px]">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-emerald-500/10 pb-4 mb-4">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-emerald-500 text-lg"></i>
+            <h2 class="font-bold text-lg">Log Perizinan Santri Terkini</h2>
+          </div>
+          <button id="btnRefresh" class="cursor-pointer px-4 py-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-rotate"></i> Sinkronisasi
+          </button>
+        </div>
 
-<label>Jenis Izin</label>
+        <div class="overflow-x-auto flex-1 custom-scrollbar">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-emerald-500/10 text-emerald-600 dark:text-emerald-400 uppercase text-xs tracking-wider font-semibold">
+                <th class="py-3 px-4">Santri</th>
+                <th class="py-3 px-4">Jenis Izin</th>
+                <th class="py-3 px-4">Waktu Kembali</th>
+                <th class="py-3 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabelIzinBody">
+              <tr>
+                <td colspan="4" class="py-8 text-center text-slate-400">Menghubungkan ke pusat server database...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
-<select id="jenis">
-<option>Sakit</option>
-<option>Keluar</option>
-<option>Pulang</option>
-</select>
+  <script>
+    // URL Web App Google Apps Script Anda (GANTI SETELAH DEPLOY)
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_YOUR_ID/exec";
 
+    let databaseMaster = [];
 
-<label>Alasan</label>
+    // Controller Dual Mode Terang / Gelap
+    const btnTheme = document.getElementById('btnTheme');
+    const iconTheme = document.getElementById('iconTheme');
+    
+    btnTheme.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      if(document.body.classList.contains('dark-mode')) {
+        iconTheme.className = "fa-solid fa-sun text-lg";
+      } else {
+        iconTheme.className = "fa-solid fa-moon text-lg";
+      }
+    });
 
-<textarea id="alasan"></textarea>
+    // Jalankan Sinkronisasi Pertama Saat Aplikasi Dibuka
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDatabaseMaster();
+      loadLogPerizinan();
+    });
 
+    document.getElementById('btnRefresh').addEventListener('click', loadLogPerizinan);
 
-<label>Janji Kembali</label>
+    // Ambil Data NIK/Nama/Kelas untuk Radar Autocomplete
+    async function loadDatabaseMaster() {
+      try {
+        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_database`);
+        const hasil = await resp.json();
+        if (hasil.status === "success") {
+          databaseMaster = hasil.data;
+        }
+      } catch (err) { console.error("Gagal memuat radar database master: ", err); }
+    }
 
-<input type="datetime-local" id="kembali">
+    // Engine Fitur Radar Autocomplete Search
+    const searchInput = document.getElementById('searchNama');
+    const dropdown = document.getElementById('radarDropdown');
 
+    searchInput.addEventListener('input', () => {
+      const keyword = searchInput.value.toLowerCase().trim();
+      dropdown.innerHTML = "";
+      if (!keyword) { dropdown.classList.add('hidden'); return; }
 
-<button class="simpan">
-✅ Simpan Izin
-</button>
+      const filtered = databaseMaster.filter(s => s.nama.toLowerCase().includes(keyword) || s.nik.includes(keyword));
+      
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">Santri tidak terdaftar</div>`;
+      } else {
+        filtered.forEach(santri => {
+          const item = document.createElement('div');
+          item.className = "p-3 hover:bg-emerald-500/10 cursor-pointer border-b border-slate-500/5 text-sm flex justify-between items-center transition-all";
+          item.innerHTML = `
+            <div>
+              <div class="font-semibold">${santri.nama}</div>
+              <div class="text-xs text-slate-400 font-mono">${santri.nik}</div>
+            </div>
+            <span class="text-xs bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-md font-bold">${santri.kelas}</span>
+          `;
+          item.addEventListener('click', () => {
+            searchInput.value = santri.nama;
+            document.getElementById('nik').value = santri.nik;
+            document.getElementById('kelas').value = santri.kelas;
+            dropdown.classList.add('hidden');
+          });
+          dropdown.appendChild(item);
+        });
+      }
+      dropdown.classList.remove('hidden');
+    });
 
+    // Tutup Dropdown Jika Klik di Luar Area Radar Search
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
+    });
 
-<button class="dashboard"
-onclick="location.href='https://manajemen.ppmuy.com/dashboard.html'">
-🏠 Kembali ke Dashboard
-</button>
+    // Ambil Data Log Izin untuk Ditampilkan di Tabel Dashboard
+    async function loadLogPerizinan() {
+      const tbody = document.getElementById('tabelIzinBody');
+      tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin"></i> Menyelaraskan data...</td></tr>`;
+      
+      try {
+        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_perizinan`);
+        const hasil = await resp.json();
+        
+        if(hasil.status === "success" && hasil.data.length > 0) {
+          tbody.innerHTML = "";
+          // Tampilkan dari yang paling baru diajukan (Reverse order)
+          hasil.data.reverse().forEach(row => {
+            let badgeClass = "";
+            if (row.status === "ACC") badgeClass = "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400";
+            else if (row.status === "DITOLAK") badgeClass = "bg-rose-500/20 text-rose-600 dark:text-rose-400";
+            else badgeClass = "bg-amber-500/20 text-amber-600 dark:text-amber-400 animate-pulse";
 
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-emerald-500/5 hover:bg-emerald-500/5 transition-all";
+            tr.innerHTML = `
+              <td class="py-3.5 px-4">
+                <div class="font-semibold">${row.nama}</div>
+                <div class="text-xs text-slate-400 font-mono">${row.nik} | ${row.kelas}</div>
+              </td>
+              <td class="py-3.5 px-4">
+                <span class="font-medium text-xs border border-emerald-500/30 px-2 py-0.5 rounded-md bg-white/40 dark:bg-black/10">${row.jenis_izin}</span>
+                <div class="text-xs text-slate-400 mt-0.5 max-w-[180px] truncate" title="${row.alasan}">${row.alasan}</div>
+              </td>
+              <td class="py-3.5 px-4 text-xs font-medium">
+                <div>${row.janji_kembali}</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">Izin: ${row.tgl_mulai}</div>
+              </td>
+              <td class="py-3.5 px-4 text-center">
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeClass}">${row.status}</span>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400">Belum ada riwayat data perizinan.</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-rose-400">Gagal terhubung ke database cloud.</td></tr>`;
+      }
+    }
 
-<div id="status"></div>
+    // Eksekusi Submit Form Pengajuan Izin Baru
+    const form = document.getElementById('formIzin');
+    const btnSubmit = document.getElementById('btnSubmit');
 
-</div>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Memancarkan Data...`;
 
+      const payload = {
+        aksi: "simpan_perizinan",
+        nik: document.getElementById('nik').value,
+        nama: document.getElementById('searchNama').value,
+        kelas: document.getElementById('kelas').value,
+        jenis_izin: document.getElementById('jenisIzin').value,
+        janji_kembali: document.getElementById('janjiKembali').value,
+        alasan: document.getElementById('alasan').value
+      };
+
+      try {
+        const resp = await fetch(WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors", // Proteksi CORS bypass standar web app gs
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        // Karena no-cors, anggap sukses dan langsung reset interface
+        alert(`Perizinan ${payload.jenis_izin} Berhasil Diproses!`);
+        form.reset();
+        loadLogPerizinan();
+      } catch(err) {
+        alert("Terjadi gangguan transmisi data, silakan cek log sistem.");
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Proses & Pancarkan Izin</span>`;
+      }
+    });
+  </script>
 </body>
 </html>
