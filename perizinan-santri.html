@@ -468,113 +468,111 @@ async function muatDataPerizinan() {
             const jenisIzin = document.getElementById('select-jenis-izin').value;
             const tglMulai = document.getElementById('input-tgl-mulai').value;
             const janjiKembali = document.getElementById('input-janji-kembali').value;
-            const alasan = document.getElementById('input-alasan').value;
+            const alasan = document.getElementById('input-alasan').value || "-";
             const namaSantri = document.getElementById('prev-nama').innerText;
             const kelasSantri = document.getElementById('prev-kelas').innerText;
             
             let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
 
+            // Animasi tombol loading saat klik submit
+            const btnSubmit = document.querySelector("button[onclick='prosesUsulkanIzin()']");
+            const teksAsli = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i> MEMPROSES...`;
+            btnSubmit.disabled = true;
+
+            // Mempersiapkan payload data JSON
+            const payload = {
+                nik: santriTerpilihNIK,
+                nama: namaSantri,
+                kelas: kelasSantri,
+                jenisIzin: jenisIzin,
+                tglMulai: tglMulai,
+                janjiKembali: janjiKembali,
+                alasan: alasan,
+                statusAwal: statusAwal
+            };
+
             try {
                 let res = await fetch(API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        aksi: "simpan_usulan_izin",
-                        nik: santriTerpilihNIK,
-                        nama: namaSantri,
-                        kelas: kelasSantri,
-                        jenis: jenisIzin,
-                        mulai: tglMulai.replace('T', ' '),
-                        janji: janjiKembali.replace('T', ' '),
-                        alasan: alasan,
-                        status: statusAwal
-                    })
+                    mode: "cors",
+                    body: JSON.stringify(payload)
                 });
+
                 let r = await res.json();
-                if(r.status === "success") {
-                    alert("Alhamdulillah, log perizinan sukses disubmit ke Cloud!");
-                    resetFormIzin();
+
+                if (r.status === "success") {
+                    alert(`🎉 BERHASIL! Data disimpan dengan ${r.id_izin}.\nNotifikasi sistem telah diteruskan ke Telegram.`);
+                    
+                    // Reset Form Input
+                    document.getElementById('input-alasan').value = "";
+                    document.getElementById('input-nik-nama').value = "";
+                    document.getElementById('preview-santri').classList.add('hidden');
+                    santriTerpilihNIK = null;
+                    
+                    // Refresh Tabel Log secara real-time
                     muatDataPerizinan();
+                } else {
+                    alert("Gagal Cloud: " + r.message);
                 }
-            } catch(e) { alert("Koneksi cloud bermasalah untuk input perizinan."); }
+            } catch (e) {
+                console.error("Crash POST system:", e);
+                alert("Gagal menghubungkan ke Server Cloud Google Script. Periksa koneksi internet Anda.");
+            } finally {
+                // Kembalikan tombol ke keadaan semula
+                btnSubmit.innerHTML = teksAsli;
+                btnSubmit.disabled = false;
+            }
         }
 
-        async function eksekusiAccPortal(idIzin, tindakan) {
-            let statusBaru = (tindakan === "SETUJU") ? "DISETUJUI" : "REJECTED";
+        // --- FUNGSI TAMBAHAN UTILITY AGAR TIDAK ERROR ---
+        function formatTanggalLokal(stringTgl) {
+            if(!stringTgl) return "-";
             try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ aksi: "update_status_izin", id: idIzin, status: statusBaru })
-                });
-                let r = await res.json();
-                if(r.status === "success") {
-                    alert("Status perizinan telah diupdate ke: " + statusBaru);
-                    muatDataPerizinan();
-                }
-            } catch(e) { alert("Gagal update validasi."); }
+                let d = new Date(stringTgl);
+                if(isNaN(d.getTime())) return stringTgl;
+                return d.toLocaleString('id-ID', { hour12: false }).replace(/\//g, '-');
+            } catch(e) { return stringTgl; }
         }
 
-        async function tutupIzinManual(idIzin) {
-            if(!confirm("Gunakan tombol darurat ini jika mesin Kiosk wajah error. Lanjutkan proses santri Check-In manual?")) return;
-            try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ aksi: "tutup_izin_manual", id: idIzin })
-                });
-                let r = await res.json();
-                if(r.status === "success") {
-                    muatDataPerizinan();
-                }
-            } catch(e) { alert("Gagal memproses check-in."); }
+        function toggleTema() {
+            const body = document.body;
+            if(body.classList.contains('theme-dark')) {
+                setTemaAplikasi('theme-light');
+            } else {
+                setTemaAplikasi('theme-dark');
+            }
+        }
+
+        function setTemaAplikasi(tema) {
+            const body = document.body;
+            const btn = document.getElementById('btn-tema');
+            if(tema === 'theme-light') {
+                body.classList.remove('theme-dark');
+                body.classList.add('theme-light');
+                if(btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-light');
+            } else {
+                body.classList.remove('theme-light');
+                body.classList.add('theme-dark');
+                if(btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-dark');
+            }
         }
 
         function gantiTabFilter(tab) {
             filterTabSekarang = tab;
-            const tAktif = document.getElementById('tab-aktif-izin');
-            const tRiwayat = document.getElementById('tab-riwayat-izin');
-            if(tab === "AKTIF") {
-                tAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm";
-                tRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
+            const btnAktif = document.getElementById('tab-aktif-izin');
+            const btnRiwayat = document.getElementById('tab-riwayat-izin');
+            
+            if(tab === 'AKTIF') {
+                btnAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm";
+                btnRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
             } else {
-                tAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
-                tRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 uppercase cursor-pointer shadow-sm";
+                btnAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
+                btnRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm";
             }
             renderTabelIzin();
-        }
-
-        function resetFormIzin() {
-            santriTerpilihNIK = null;
-            document.getElementById('input-nik-nama').value = "";
-            document.getElementById('input-alasan').value = "";
-            document.getElementById('preview-santri').classList.add('hidden');
-        }
-
-        function formatTanggalLokal(strDate) {
-            if(!strDate) return "-";
-            let d = new Date(strDate);
-            if(isNaN(d.getTime())) return strDate;
-            return d.toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) + " WIB";
-        }
-
-        function toggleTema() {
-            const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
-            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
-            setTemaAplikasi(newTheme);
-        }
-
-        function setTemaAplikasi(tema) {
-            const btnTema = document.getElementById('btn-tema');
-            const isLight = (tema === 'theme-light');
-            if (isLight) {
-                document.body.classList.remove('theme-dark');
-                document.body.classList.add('theme-light');
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-white"></i>`;
-                localStorage.setItem('dashboard_theme', 'theme-light');
-            } else {
-                document.body.classList.remove('theme-light');
-                document.body.classList.add('theme-dark');
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-                localStorage.setItem('dashboard_theme', 'theme-dark');
-            }
         }
     </script>
 </body>
