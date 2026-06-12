@@ -222,28 +222,50 @@
         });
 
         async function muatMasterSantri() {
-            try {
-                let res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
-                let r = await res.json();
-                if(r.status === "success") {
-                    masterSantriCache = r.data || [];
-                }
-            } catch(e) { console.error("Gagal sinkronisasi master cache santri", e); }
+    try {
+        // Menggunakan URLSearchParams agar parameter 'aksi' terbungkus dengan aman
+        const param = new URLSearchParams({ aksi: "ambil_database" });
+        
+        let res = await fetch(`${API_URL}?${param.toString()}`, { 
+            method: "GET",
+            mode: "cors"
+        });
+        
+        let r = await res.json();
+        if(r.status === "success") {
+            masterSantriCache = r.data || [];
+            console.log("Master santri berhasil disinkronkan:", masterSantriCache.length);
+        } else {
+            console.error("Respon cloud gagal:", r.message);
         }
+    } catch(e) { 
+        console.error("Gagal sinkronisasi master cache santri", e); 
+    }
+}
 
-        async function muatDataPerizinan() {
-            const tbody = document.getElementById('tbl-izin-body');
-            try {
-                let res = await fetch(`${API_URL}?aksi=ambil_perizinan`, { method: "GET" });
-                let r = await res.json();
-                if(r.status === "success") {
-                    databaseIzinGlobal = r.data || [];
-                    kalkulasiStatistikDanRender();
-                }
-            } catch(e) {
-                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
-            }
+async function muatDataPerizinan() {
+    const tbody = document.getElementById('tbl-izin-body');
+    try {
+        // Menggunakan URLSearchParams agar parameter 'aksi' terbungkus dengan aman
+        const param = new URLSearchParams({ aksi: "ambil_perizinan" });
+        
+        let res = await fetch(`${API_URL}?${param.toString()}`, { 
+            method: "GET",
+            mode: "cors"
+        });
+        
+        let r = await res.json();
+        if(r.status === "success") {
+            databaseIzinGlobal = r.data || [];
+            kalkulasiStatistikDanRender();
+        } else {
+            if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Error Cloud: ${r.message}</td></tr>`;
         }
+    } catch(e) {
+        console.error("Gagal load perizinan:", e);
+        if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
+    }
+}
 
         function kalkulasiStatistikDanRender() {
             let pending = 0, diluar = 0, terlambat = 0;
