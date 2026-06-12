@@ -8,11 +8,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @keyframes pulse-border {
-      0%, 100 { border-color: rgba(239, 68, 68, 0.4); }
-      50% { border-color: rgba(239, 68, 68, 1); }
+      0%, 100% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+      50% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
     }
     .tactical-alert {
       animation: pulse-border 2s infinite;
+      border-left: 4px solid #ef4444 !important;
+    }
+    .tactical-alert-light {
+      animation: pulse-border 2s infinite;
+      border-left: 4px solid #f59e0b !important;
     }
   </style>
 </head>
@@ -24,13 +29,13 @@
         <i class="fa-solid fa-shield-halved text-xl animate-pulse"></i>
       </div>
       <div>
-        <h1 id="navTitle" class="text-lg font-extrabold tracking-wider text-zinc-100 uppercase">DEVISI KEAMANAN PUSAT</h1>
+        <h1 id="navTitle" class="text-lg font-extrabold tracking-wider text-zinc-100 uppercase">DIVISI KEAMANAN PUSAT</h1>
         <p id="navSub" class="text-xs text-zinc-500 font-mono tracking-widest">PORTAL TAKZIR & KEDISIPLINAN SANTRI</p>
       </div>
     </div>
     
     <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-      <button onclick="toggleTheme()" id="btnVisor" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm">
+      <button onclick="toggleTheme()" id="btnVisor" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition duration-200 shadow-sm cursor-pointer">
         <i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR
       </button>
       
@@ -93,7 +98,7 @@
         </div>
 
         <button type="submit" id="btnSubmit"
-          class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2">
+          class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer">
           <i class="fa-solid fa-satellite-dish text-xs"></i> Transmit Data ke Pengasuh
         </button>
       </form>
@@ -110,7 +115,7 @@
             <p id="subMonitor" class="text-[10px] text-zinc-500 font-mono">Data sinkron otomatis langsung ke Google Sheets</p>
           </div>
         </div>
-        <button onclick="muatDataLogPelanggaran()" id="btnRefresh" class="text-xs bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition">
+        <button onclick="muatDataLogPelanggaran()" id="btnRefresh" class="text-xs bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition cursor-pointer">
           <i class="fa-solid fa-sync text-[10px]"></i> REFRESH HUD
         </button>
       </div>
@@ -139,10 +144,10 @@
   </main>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwcToEH2rkAvGPsMyZXhukxGPS6DR_L_GVxXvIzrIZnQZV8dqKRwC0FA-RyqBoUVc-C/exec";
 
     let databaseSantri = [];
-    let currentTheme = "dark"; // Default: Mode Malam (Dark Ops)
+    let currentTheme = "dark"; 
 
     document.addEventListener("DOMContentLoaded", function() {
       muatDatabaseMasterSantri();
@@ -150,9 +155,7 @@
       autoIsiTemplateHukuman();
     });
 
-    // ==========================================
-    // PARADIGMA DUAL-THEME ENGINE (GELAP vs TERANG)
-    // ==========================================
+    // ENGINE THEME VISOR SWITCHER
     function toggleTheme() {
       const body = document.getElementById("mainBody");
       const navbar = document.getElementById("navbar");
@@ -180,7 +183,6 @@
 
       if (currentTheme === "dark") {
         currentTheme = "light";
-        // MASUK KE MODE TERANG (MENGUTIP VIBE PERIZINAN GAMBAR 1)
         body.className = "bg-slate-100 font-sans text-slate-800 min-h-screen selection:bg-amber-500 selection:text-white transition-colors duration-300";
         navbar.className = "bg-white border-b border-slate-200 text-slate-800 shadow-md py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
         panelInput.className = "bg-white rounded-xl shadow-xl border border-slate-200 p-6 h-fit transition-colors duration-300";
@@ -201,11 +203,10 @@
         badgeHq.className = "text-xs font-mono bg-slate-900 text-white px-3 py-2 rounded-md font-bold uppercase tracking-wider";
         iconForm.className = "fa-solid fa-bolt text-amber-500 text-base";
         
-        // Perubahan Tombol Utama -> Mengikuti Warna Kuning Cerah Gambar 1
-        btnSubmit.className = "w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2";
-        btnVisor.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnSubmit.className = "w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer";
+        btnVisor.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm cursor-pointer";
         btnBack.className = "text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnRefresh.className = "text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition";
+        btnRefresh.className = "text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition cursor-pointer";
         btnVisor.innerHTML = `<i class="fa-solid fa-moon text-indigo-600"></i> TOGGLE VISOR`;
 
         inputFields.forEach(el => {
@@ -216,7 +217,6 @@
         labelTxt.forEach(el => el.className = "label-txt block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 font-mono");
       } else {
         currentTheme = "dark";
-        // KEMBALI KE MODE DIKTAKTOR / TACTICAL DARK OPS
         body.className = "bg-zinc-950 font-sans text-zinc-200 min-h-screen selection:bg-rose-500 selection:text-white transition-colors duration-300";
         navbar.className = "bg-zinc-900 border-b border-zinc-800 text-white shadow-xl py-4 px-6 mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 transition-colors duration-300";
         panelInput.className = "bg-zinc-900 rounded-xl shadow-2xl border border-zinc-800 p-6 h-fit transition-colors duration-300";
@@ -237,10 +237,10 @@
         badgeHq.className = "text-xs font-mono bg-rose-950 text-rose-400 px-3 py-2 rounded-md border border-rose-900/50 font-bold uppercase tracking-wider";
         iconForm.className = "fa-solid fa-bolt text-rose-500 text-base";
         
-        btnSubmit.className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2";
-        btnVisor.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
+        btnSubmit.className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-rose-900/20 transition duration-200 text-xs uppercase tracking-widest flex justify-center items-center gap-2 cursor-pointer";
+        btnVisor.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 font-mono px-3 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm cursor-pointer";
         btnBack.className = "text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition shadow-sm";
-        btnRefresh.className = "text-xs bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition";
+        btnRefresh.className = "text-xs bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono px-3 py-2 rounded-lg flex items-center gap-2 transition cursor-pointer";
         btnVisor.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> TOGGLE VISOR`;
 
         inputFields.forEach(el => {
@@ -253,7 +253,7 @@
       muatDataLogPelanggaran();
     }
 
-    // 1. MASTER DATA ACQUISITION
+    // LOAD DATABASE MASTER (RADAR AUTOCOMPLETE)
     function muatDatabaseMasterSantri() {
       fetch(`${WEB_APP_URL}?aksi=ambil_database`)
         .then(res => res.json())
@@ -262,7 +262,7 @@
         }).catch(err => console.error("Terminal crash loading master santri:", err));
     }
 
-    // RADAR AUTOCOMPLETE
+    // AUTOCOMPLETE RADAR FILTER LOGIC
     const inputSantri = document.getElementById("inputSantri");
     const boxSugesti = document.getElementById("boxSugesti");
 
@@ -283,7 +283,7 @@
           ? "px-4 py-3 hover:bg-zinc-800/70 cursor-pointer text-xs border-b border-zinc-800/30 text-zinc-200"
           : "px-4 py-3 hover:bg-slate-100 cursor-pointer text-xs border-b border-slate-200 text-slate-800";
         
-        item.innerHTML = `<strong>${s.nama}</strong><p class="text-[10px] text-zinc-400 font-mono">ID: ${s.nik} | RM: ${s.kelas}</p>`;
+        item.innerHTML = `<strong>${s.nama}</strong><p class="text-[10px] text-zinc-400 font-mono">NIK: ${s.nik} | Kelas: ${s.kelas}</p>`;
         item.addEventListener("click", function() {
           document.getElementById("hiddenNIK").value = s.nik;
           document.getElementById("txtNamaTerpilih").innerText = "TAG: " + s.nama;
@@ -306,7 +306,7 @@
       else if (tingkat === "Berat") inputTakzir.value = "Skorsing indisipliner tingkat tinggi & Pemanggilan Orang Tua/Wali";
     }
 
-    // 3. SUBMIT FORM
+    // TRANSMIT DATA PELANGGARAN BARU (POST)
     document.getElementById("formPelanggaran").addEventListener("submit", function(e) {
       e.preventDefault();
       let nik = document.getElementById("hiddenNIK").value;
@@ -342,7 +342,7 @@
         });
     });
 
-    // 4. TELEMETRY DISPLAY (PENYEBAB UNDEFINED DIPERBAIKIKAN DI SINI)
+    // TELEMETRY LIVE MONITOR DISPLAY
     function muatDataLogPelanggaran() {
       const tbody = document.getElementById("tabelBodyPelanggaran");
       tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-zinc-500 font-mono text-xs"><i class="fa-solid fa-circle-notch animate-spin text-sm text-rose-500 mb-2 block"></i> Syncing Cloud Data Server...</td></tr>`;
@@ -361,81 +361,95 @@
             data.reverse().forEach(row => {
               let tr = document.createElement("tr");
               
-              // Normalisasi Key Object (Mengatasi perbedaan Huruf Besar / Kecil dari Sheets)
-              let namaSantri = row.Nama_Santri || row.nama_santri || "-";
-              let idNik = row.NIK || row.nik || "-";
-              let deskripsiKejadian = row.Deskripsi_Kejadian || row.deskripsi_kejadian || "Tidak ada rincian";
-              let tingkatPelanggaran = row.Tingkat_Pelanggaran || row.tingkat_pelanggaran || "Ringan";
-              let usulanTakzir = row.Usulan_Takzir || row.usulan_takzir || "-";
-              let accPengasuh = row.Acc_Pengasuh || row.acc_pengasuh || "PENDING";
-              let sudahBelum = row.Sudah_Belum || row.sudah_belum || "BELUM";
-              let idMelanggar = row.ID_Melanggar || row.id_melanggar || "";
+              let namaSantri = row.nama_santri || "-"; 
+              let idNik = row.nik || "-";
+              let deskripsiKejadian = row.deskripsi || "Tidak ada rincian";
+              let tingkatPelanggaran = row.tingkat || "Ringan";
+              let usulanTakzir = row.takzir || "-";
+              let accPengasuh = (row.acc || "PENDING").toUpperCase();
+              let sudahBelum = (row.status || "BELUM").toUpperCase();
+              let idMelanggar = row.id_melanggar || "";
 
+              // Tentukan Desain Warna Baris
               let barisStatusStyle = currentTheme === "dark"
                 ? "border-b border-zinc-900 bg-zinc-950/20 hover:bg-zinc-900/40 text-zinc-300 transition align-top"
                 : "border-b border-slate-200 bg-white hover:bg-slate-50 text-slate-800 transition align-top";
               
-              if (accPengasuh === "DISETUJUI" && sudahBelum !== "SUDAH") {
+              // Mode Kedip Darurat Jika Status "ACC" Tapi Belum Dieksekusi Selesai
+              if (accPengasuh === "ACC" && sudahBelum !== "SUDAH") {
                 barisStatusStyle = currentTheme === "dark"
-                  ? "border-l-2 border-l-red-500 bg-rose-950/10 border-b border-zinc-900 hover:bg-rose-950/20 text-zinc-300 transition align-top tactical-alert"
-                  : "border-l-2 border-l-amber-500 bg-amber-50/50 border-b border-slate-200 hover:bg-amber-50 text-slate-800 transition align-top tactical-alert";
+                  ? "bg-rose-950/10 border-b border-zinc-900 hover:bg-rose-950/20 text-zinc-300 transition align-top tactical-alert"
+                  : "bg-amber-50/50 border-b border-slate-200 hover:bg-amber-50 text-slate-800 transition align-top tactical-alert-light";
               }
+
               tr.className = barisStatusStyle + " font-mono text-xs";
               
-              let badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-zinc-800 text-zinc-400 border border-zinc-700">${tingkatPelanggaran}</span>`;
-              if (tingkatPelanggaran === "Sedang") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-amber-950/50 border border-amber-900 text-amber-400">SEDANG</span>`;
-              if (tingkatPelanggaran === "Berat") badgeTingkat = `<span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase mt-1.5 inline-block bg-rose-950 border border-rose-900 text-rose-400 animate-pulse">CRITICAL</span>`;
+              // Badge Status Real-Time
+              let badgeStatus = "";
+              if (accPengasuh === "ACC") {
+                badgeStatus = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACC</span>`;
+              } else if (accPengasuh === "PENDING") {
+                badgeStatus = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDING</span>`;
+              } else {
+                badgeStatus = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">DITOLAK</span>`;
+              }
 
-              let badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-zinc-800 text-zinc-500 border border-zinc-700"><i class="fa-solid fa-clock-rotate-left"></i> PENDING</span>`;
-              if(accPengasuh === "DISETUJUI") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-900"><i class="fa-solid fa-square-check"></i> GRANTED</span>`;
-              if(accPengasuh === "REJECTED") badgeAcc = `<span class="px-2.5 py-1 rounded text-[10px] font-bold bg-zinc-800 text-rose-500 line-through border border-zinc-700"><i class="fa-solid fa-ban"></i> VOID</span>`;
-
-              let kolomAksi = "";
-              if (accPengasuh === "PENDING") kolomAksi = `<span class="text-[11px] text-zinc-500 italic block mt-1.5">Waiting HQ Decision</span>`;
-              else if (accPengasuh === "REJECTED") kolomAksi = `<span class="text-[11px] text-zinc-500 block mt-1.5 uppercase font-bold">Kasus Ditutup</span>`;
-              else if (accPengasuh === "DISETUJUI") {
-                if (sudahBelum === "SUDAH") {
-                  kolomAksi = `<span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-900 px-2 py-1 rounded font-bold uppercase tracking-widest block text-center"><i class="fa-solid fa-shield-check"></i> RESOLVED</span>`;
-                } else {
-                  let btnColor = currentTheme === "dark" ? "bg-rose-600 hover:bg-rose-700" : "bg-amber-500 hover:bg-amber-600";
-                  kolomAksi = `<button onclick="eksekusiSelesaiHukuman('${idMelanggar}')" class="w-full text-[10px] ${btnColor} text-white font-bold py-2 px-2.5 rounded shadow-md transition uppercase tracking-wider"><i class="fa-solid fa-gavel"></i> CLOSE CASE</button>`;
-                }
+              // Tombol Kontrol Aksi Eksekusi
+              let tombolAksi = "-";
+              if (sudahBelum === "SUDAH") {
+                tombolAksi = `<span class="text-emerald-500 font-bold text-[10px]"><i class="fa-solid fa-circle-check"></i> TA'ZIR SELESAI</span>`;
+              } else if (accPengasuh === "ACC") {
+                tombolAksi = `
+                  <button onclick="eksekusiSelesaiTakzir('${idMelanggar}', this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded text-[10px] transition shadow cursor-pointer">
+                    <i class="fa-solid fa-gavel"></i> Selesaikan
+                  </button>
+                `;
+              } else {
+                tombolAksi = `<span class="text-zinc-500 text-[10px] italic">Menunggu Pengasuh</span>`;
               }
 
               tr.innerHTML = `
-                <td class="py-4 px-4">
-                  <span class="font-bold ${currentTheme === 'dark' ? 'text-zinc-100' : 'text-slate-900'} block text-xs tracking-wide">${namaSantri}</span>
-                  <span class="text-[10px] text-zinc-500 mt-0.5 block">ID: ${idNik}</span>
+                <td class="py-3 px-4 font-bold">
+                  <div>${namaSantri}</div>
+                  <div class="text-[10px] text-zinc-500 font-normal">NIK: ${idNik}</div>
                 </td>
-                <td class="py-4 px-4 text-xs ${currentTheme === 'dark' ? 'text-zinc-400' : 'text-slate-600'} max-w-xs leading-relaxed">
-                  ${deskripsiKejadian}<br>${badgeTingkat}
+                <td class="py-3 px-4 max-w-xs whitespace-normal">
+                  <span class="font-bold text-rose-400 text-[10px] block uppercase">[${tingkatPelanggaran}]</span>
+                  <div class="text-zinc-400 mt-0.5">${deskripsiKejadian}</div>
                 </td>
-                <td class="py-4 px-4 text-zinc-400 italic text-xs max-w-xs">
-                  ${usulanTakzir}
-                </td>
-                <td class="py-4 px-4 text-center">
-                  ${badgeAcc}
-                </td>
-                <td class="py-4 px-4 text-center vertical-middle">
-                  ${kolomAksi}
-                </td>
+                <td class="py-3 px-4 max-w-xs whitespace-normal text-zinc-400">${usulanTakzir}</td>
+                <td class="py-3 px-4 text-center">${badgeStatus}</td>
+                <td class="py-3 px-4 text-center">${tombolAksi}</td>
               `;
               tbody.appendChild(tr);
             });
           }
         }).catch(err => {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-rose-500 font-mono text-xs">SYSTEM CORRUPT: Server menolak loop data.</td></tr>`;
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-rose-500 font-mono text-xs">Gagal memuat data log server.</td></tr>`;
         });
     }
 
-    function eksekusiSelesaiHukuman(idTarget) {
-      if(!confirm("OTORISASI: Konfirmasi target santri telah menyelesaikan sanksi?")) return;
-      fetch(`${WEB_APP_URL}?aksi=eksekusi_selesai_takzir&id_melanggar=${idTarget}`, { method: "POST" })
+    // FUNGSI EKSEKUSI SELESAI TAKZIR (POST KE SERVER)
+    function eksekusiSelesaiTakzir(idMelanggar, btn) {
+      if (!confirm("Apakah Anda yakin takziran disiplin untuk santri ini sudah selesai dilaksanakan?")) return;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
+
+      let urlTarget = `${WEB_APP_URL}?aksi=eksekusi_selesai_takzir&id_melanggar=${encodeURIComponent(idMelanggar)}`;
+
+      fetch(urlTarget, { method: "POST" })
         .then(res => res.json())
         .then(res => {
           alert(res.message);
           muatDataLogPelanggaran();
-        }).catch(err => alert("Otorisasi gagal."));
+        })
+        .catch(err => {
+          alert("Gagal memproses eksekusi ke server cloud.");
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-gavel"></i> Selesaikan`;
+        });
     }
   </script>
 </body>
