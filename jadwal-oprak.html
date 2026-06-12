@@ -4,379 +4,234 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HQ Special Patrol System - PPMUY</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --text-main: #2d3748;
-      --text-muted: #718096;
-      --border-color: rgba(255, 255, 255, 0.5);
-      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-      --accent: #319795;
-      --accent-hover: #2c7a7b;
-      --badge-bg: #e6fffa;
-      --badge-text: #234e52;
+      --accent-color: #3b82f6;
+      --rose-danger: #f43f5e;
     }
 
-    [data-theme="dark"] {
-      --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-      --card-bg: rgba(45, 55, 72, 0.7);
-      --text-main: #f7fafc;
-      --text-muted: #cbd5e0;
-      --border-color: rgba(255, 255, 255, 0.1);
-      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --accent: #4fd1c5;
-      --accent-hover: #319795;
-      --badge-bg: rgba(79, 209, 197, 0.2);
-      --badge-text: #81e6d9;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    body, header, div, section, button, h1, h3, p {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background 0.3s, color 0.3s, transform 0.2s, opacity 0.3s, box-shadow 0.3s;
+    }
+
+    /* MODE GELAP: Deep Cyber Sapphire */
+    .theme-dark {
+      --bg-main: #020617;
+      --bg-header: rgba(15, 23, 42, 0.75);
+      --bg-card: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+      --blob-color: rgba(59, 130, 246, 0.06);
+    }
+
+    /* MODE TERANG: Luxury Soft Sky Blue (Sesuai Request Latar Belakang Biru) */
+    .theme-light {
+      --bg-main: #f0f7ff;
+      --bg-header: rgba(255, 255, 255, 0.8);
+      --bg-card: #ffffff;
+      --text-main: #1e3a8a;
+      --text-muted: #60a5fa;
+      --border-color: #dbeafe;
+      --blob-color: rgba(96, 165, 250, 0.15);
     }
 
     body {
-      background: var(--bg-gradient);
+      background-color: var(--bg-main);
       color: var(--text-main);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 100px; /* Jarak untuk floating button */
+      overflow-x: hidden;
     }
 
-    .container {
-      width: 100%;
-      max-width: 1100px;
-      margin-top: 20px;
-    }
-
-    header {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 24px;
-      padding: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .title-area h1 {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    
-    .title-area p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .theme-toggle-btn {
-      background: var(--accent);
-      border: none;
-      color: white;
-      width: 48px;
-      height: 48px;
+    .blob {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--blob-color) 0%, rgba(59, 130, 246, 0) 70%);
       border-radius: 50%;
-      cursor: pointer;
+      z-index: -1;
+      filter: blur(80px);
+    }
+
+    .header-glass {
+      background-color: var(--bg-header);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Kartu Ultra Kecil & Compact (Hanya Nama) */
+    .card-oprak {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 14px 10px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .theme-toggle-btn:hover {
-      background: var(--accent-hover);
-      transform: scale(1.05);
-    }
-
-    .filter-container {
-      background: var(--card-bg);
-      padding: 6px;
-      border-radius: 16px;
-      display: inline-flex;
-      gap: 4px;
-      margin-bottom: 25px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-    }
-
-    .filter-btn {
-      background: transparent;
-      border: none;
-      padding: 10px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-radius: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .filter-btn.active {
-      background: var(--accent);
-      color: white;
-    }
-
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .oprak-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-
-    .santri-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      border-radius: 20px;
-      padding: 20px;
+      text-align: center;
       cursor: pointer;
       position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      min-height: 55px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
-    .santri-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-      border-color: var(--accent);
+    .card-oprak:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: var(--accent-color);
+      box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.4);
     }
 
-    .santri-info .name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-
-    .santri-info .sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 2px;
-    }
-
-    .card-footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .badge {
-      background: var(--badge-bg);
-      color: var(--badge-text);
+    .card-oprak h3 {
       font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 30px;
+      font-weight: 800;
+      line-height: 1.3;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.02em;
     }
 
-    .badge.putri {
-      background: #fff5f5;
-      color: #9b2c2c;
+    .vanish {
+      opacity: 0 !important;
+      transform: scale(0.6) !important;
+      filter: blur(8px);
+      pointer-events: none;
     }
 
-    [data-theme="dark"] .badge.putri {
-      background: rgba(254, 178, 178, 0.2);
-      color: #feb2b2;
+    .clock-font {
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .click-indicator {
-      font-size: 12px;
-      color: var(--accent);
-      opacity: 0;
-      transform: translateX(10px);
+    .btn-filter-active {
+      background-color: var(--accent-color) !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
-    .santri-card:hover .click-indicator {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .loader-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px;
-      grid-column: 1 / -1;
-    }
-
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border-left-color: var(--accent);
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-muted);
-      font-size: 15px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      border: 1px dashed var(--text-muted);
-      grid-column: 1 / -1;
-    }
-
-    /* TOMBOL KUNCI ELEGAN */
-    .btn-kunci-container {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99;
-    }
-
-    .btn-kunci {
-      background: #e53e3e;
-      color: white;
-      border: none;
-      padding: 14px 32px;
-      border-radius: 50px;
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(229, 62, 62, 0.4);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn-kunci:hover {
-      background: #c53030;
-      transform: scale(1.03);
-      box-shadow: 0 12px 30px rgba(229, 62, 62, 0.5);
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(0.9); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(0.9); opacity: 0.6; }
-    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
   </style>
 </head>
-<body data-theme="dark">
+<body class="theme-dark min-h-screen pb-32">
 
-  <div class="container">
-    <header>
-      <div class="title-area">
-        <h1><i class="fa-solid fa-shield-halved" style="color: var(--accent); margin-right: 8px;"></i> Radar Oprak-Oprak Keamanan</h1>
-        <p>Klik kartu santri untuk konfirmasi <span style="color:#4fd1c5; font-weight:bold;">HADIR (Poin 0)</span>. Sisanya dikunci <span style="color:#fc8181; font-weight:bold;">ALPA (Poin 5)</span>.</p>
-      </div>
-      <div class="header-actions">
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Ubah Tema">
-          <i class="fa-solid fa-moon" id="theme-icon"></i>
-        </button>
-      </div>
-    </header>
+  <div class="blob" style="top: -150px; left: -150px;"></div>
+  <div class="blob" style="bottom: -150px; right: -150px;"></div>
 
-    <div class="filter-container">
-      <button class="filter-btn active" onclick="saringGender('semua', this)">
-        <i class="fa-solid fa-users"></i> Semua
-      </button>
-      <button class="filter-btn" onclick="saringGender('laki-laki', this)">
-        <i class="fa-solid fa-mars"></i> Putra
-      </button>
-      <button class="filter-btn" onclick="saringGender('perempuan', this)">
-        <i class="fa-solid fa-venus"></i> Putri
-      </button>
-    </div>
-
-    <div class="section-title">
-      <i class="fa-solid fa-circle-dot" style="color: #fc8181; font-size: 12px; animation: pulse 1.5s infinite;"></i>
-      <span>Daftar Santri Wajib Oprak Hari Ini</span>
-    </div>
-
-    <div class="oprak-grid" id="container-grid">
-      <div class="loader-container">
-        <div class="spinner"></div>
-        <p style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">Menghimpun Database Jadwal Oprak PPMUY...</p>
-      </div>
-    </div>
+  <div class="w-full bg-blue-500/10 border-b border-blue-500/10 py-1.5 px-4 text-center">
+    <p id="kata-bijak" class="text-[10px] font-semibold tracking-wider text-blue-400 uppercase animate-pulse">
+      "Mata yang terjaga demi keamanan saudaranya, haram tersentuh api neraka."
+    </p>
   </div>
 
-  <div class="btn-kunci-container id="panel-kunci" style="display:none;">
-    <button class="btn-kunci" onclick="kunciSesiAlpaMassal()">
-      <i class="fa-solid fa-lock"></i> Kunci Radar & Alpa Massal (Poin 5)
-    </button>
-  </div>
+  <header class="header-glass sticky top-0 z-50 px-6 py-3">
+    <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+        
+      <div class="flex items-center gap-4 w-full lg:w-auto">
+        <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm">
+          <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
+        <div class="h-8 w-px bg-slate-700/30"></div>
+        <div>
+          <h1 class="text-base font-black tracking-tight flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-blue-500 text-sm"></i> RADAR SECURITY <span class="text-blue-500">OPRAK</span>
+          </h1>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span id="live-date" class="text-[9px] font-bold uppercase tracking-widest text-slate-500">12 JUNI 2026</span>
+            <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+            <span id="live-clock" class="text-[9px] font-bold clock-font text-blue-500">12:44:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="info-putaran-screen" class="text-center px-4 py-1.5 bg-blue-500/5 rounded-xl border border-blue-500/10 text-[11px] font-bold text-slate-400">
+        Menghubungkan ke satelit jadwal...
+      </div>
+
+      <div class="flex items-center gap-2 bg-slate-900/40 p-1 rounded-xl border border-slate-700/30 shadow-inner">
+        <button id="btnSemua" onclick="setGender('semua')" class="px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Semua</button>
+        <button id="btnL" onclick="setGender('laki-laki')" class="px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Putra</button>
+        <button id="btnP" onclick="setGender('perempuan')" class="px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Putri</button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="toggleTema()" class="w-9 h-9 rounded-xl bg-slate-800/40 border border-slate-700/50 text-amber-400 flex items-center justify-center cursor-pointer shadow-sm"><i class="fa-solid fa-sun text-xs"></i></button>
+        <div class="h-6 w-px bg-slate-700/30"></div>
+        <div class="text-right">
+          <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Patrol System</p>
+          <p class="text-[10px] font-extrabold text-blue-500 uppercase">v2.0 Dynamic</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1600px] mx-auto px-6 mt-8">
+    
+    <div id="statusArea" class="flex flex-col items-center justify-center py-28 text-center">
+      <div class="w-12 h-12 border-4 border-slate-800 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+      <p class="text-xs font-bold tracking-widest text-slate-500 uppercase animate-pulse">Menyelaraskan Siklus Patroli Keamanan...</p>
+    </div>
+
+    <div id="gridOprak" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3 hidden">
+    </div>
+
+    <div id="panelAksi" class="fixed bottom-8 left-1/2 -translate-x-1/2 hidden z-50">
+      <button onclick="kunciSesiAlpaMassal()" class="px-8 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-500/30 active:scale-95 transition-all flex items-center gap-2.5 cursor-pointer">
+        <i class="fa-solid fa-lock text-sm"></i> Kunci Radar & Alpa Massal (Poin 5)
+      </button>
+    </div>
+  </main>
 
   <script>
-    // URL disesuaikan dengan Web App Script Anda
-    const urlScript = "https://script.google.com/macros/s/AKfycby0wyCx83Kf8XFpxaLiRy96noe0jaTlWBLg-M2XnfG0YqeZytE0vaR9QPzFWP7mpk_rlQ/exec"; 
+    const urlScript = "https://script.google.com/macros/s/AKfycby0wyCx83Kf8XFpxaLiRy96noe0jaTlWBLg-M2XnfG0YqeZytE0vaR9QPzFWP7mpk_rlQ/exec";
+    
     let dataSantriLokal = [];
     let sisaDisaringlP = [];
     let filterSekarang = "semua";
+    let infoPutaranAktif = 1;
+    let infoPutaranMaksimal = 1;
 
-    function toggleTheme() {
-      const body = document.body;
-      const icon = document.getElementById('theme-icon');
-      if(body.getAttribute('data-theme') === 'dark') {
-        body.setAttribute('data-theme', 'light');
-        icon.className = 'fa-solid fa-sun';
-      } else {
-        body.setAttribute('data-theme', 'dark');
-        icon.className = 'fa-solid fa-moon';
-      }
-    }
+    // Kumpulan kata bijak penyemangat ronda/oprak keamanan
+    const quotesOprak = [
+      "Keamanan pesantren ada di ketukan langkah patrolimu malam ini.",
+      "Mata yang berjaga demi kenyamanan saudaranya menuntut ridho Allah Swt.",
+      "Disiplin adalah fondasi utama tegaknya keamanan bumi PPMUY.",
+      "Satu putaran patrolimu, seribu ketenangan bagi santri yang menuntut ilmu.",
+      "Pengabdianmu di lini keamanan tidak akan pernah sia-sia di mata-Nya."
+    ];
 
-    document.addEventListener("DOMContentLoaded", function() {
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('oprak_theme') || 'theme-dark';
+      setTemaAplikasi(savedTheme);
+      mulaiJam();
+      acakKataBijak();
       muatDaftarOprak();
     });
 
-    // VARIABEL GLOBAL BARU (Tambahkan di bagian atas script HTML Anda)
-    let infoPutaranAktif = 1;
-    let infoPutaranMaksimal = 1;
+    function mulaiJam() {
+      setInterval(() => {
+        const n = new Date();
+        document.getElementById('live-clock').innerText = n.toLocaleTimeString('id-ID');
+      }, 1000);
+      const opt = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('live-date').innerText = new Date().toLocaleDateString('id-ID', opt).toUpperCase();
+    }
+
+    function acakKataBijak() {
+      const acak = quotesOprak[Math.floor(Math.random() * quotesOprak.length)];
+      document.getElementById('kata-bijak').innerText = `"${acak}"`;
+    }
+
+    function setTemaAplikasi(tema) {
+      document.body.className = tema + " min-h-screen pb-32";
+      localStorage.setItem('oprak_theme', tema);
+    }
+
+    function toggleTema() {
+      const current = document.body.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark';
+      setTemaAplikasi(current);
+    }
 
     function muatDaftarOprak() {
       fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
@@ -388,184 +243,90 @@
             return;
           }
           dataSantriLokal = res.data;
-          
-          // Tangkap info putaran dari cloud untuk dipasang di Sub-Header
           infoPutaranAktif = res.putaran_aktif || 1;
           infoPutaranMaksimal = res.putaran_maksimal || 1;
           
-          document.querySelector(".title-area p").innerHTML = `Menampilkan <span style="color:#4fd1c5; font-weight:bold;">PUTARAN ${infoPutaranAktif}</span> (Siklus Maksimal: ${infoPutaranMaksimal}). Klik kartu untuk Hadir, atau klik Kunci di bawah untuk geser putaran.`;
+          document.getElementById('info-putaran-screen').innerHTML = `
+            RADAR AKTIF: <span class="text-blue-500 font-extrabold">PUTARAN ${infoPutaranAktif}</span> 
+            <span class="opacity-30 mx-1">|</span> Siklus Maks: ${infoPutaranMaksimal}
+          `;
           
+          document.getElementById('statusArea').classList.add('hidden');
+          document.getElementById('gridOprak').classList.remove('hidden');
+          document.getElementById('panelAksi').classList.remove('hidden');
           renderGrid();
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud.</div>`;
+          document.getElementById("statusArea").innerHTML = `<p class="text-sm font-bold text-rose-500">Gagal terhubung dengan server cloud.</p>`;
         });
     }
 
-    function kunciSesiAlpaMassal() {
-      // Walau di layar sudah bersih (0 kartu), admin tetap harus klik tombol ini untuk memajukan siklus putaran ke angka berikutnya!
-      if (!confirm(`Apakah Anda yakin ingin MENGUNCI Sesi Putaran ${infoPutaranAktif} ini? Jika ada sisa santri di layar, mereka otomatis didenda Poin 5. Sistem akan bergeser ke Putaran berikutnya.`)) {
-        return;
-      }
-
-      const panelKunci = document.querySelector(".btn-kunci-container");
-      panelKunci.style.pointerEvents = "none";
-      panelKunci.style.opacity = "0.5";
-
-      fetch(urlScript, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({
-          aksi: "kunci_alpa_oprak_massal",
-          putaran_aktif: infoPutaranAktif,
-          putaran_maksimal: infoPutaranMaksimal,
-          data_alpa: sisaDisaringlP // Otomatis memproses denda jika masih ada sisa di layar
-        })
-      })
-      .then(r => r.json())
-      .then(res => {
-        if (res.status === "success") {
-          alert(res.message);
-          location.reload(); // Reload halaman agar layar otomatis menampilkan daftar santri untuk putaran baru!
-        }
-        panelKunci.style.pointerEvents = "auto";
-        panelKunci.style.opacity = "1";
-      })
-      .catch(e => {
-        alert("Gangguan jaringan cloud.");
-        panelKunci.style.pointerEvents = "auto";
-        panelKunci.style.opacity = "1";
-      });
+    function setGender(g) { 
+      filterSekarang = g; 
+      renderGrid(); 
     }
 
     function renderGrid() {
-      const grid = document.getElementById("container-grid");
-      const panelKunci = document.querySelector(".btn-kunci-container");
-      grid.innerHTML = "";
+      document.getElementById('btnSemua').className = `px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${filterSekarang === 'semua' ? 'btn-filter-active' : 'text-slate-400'}`;
+      document.getElementById('btnL').className = `px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${filterSekarang === 'laki-laki' ? 'btn-filter-active' : 'text-slate-400'}`;
+      document.getElementById('btnP').className = `px-4 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${filterSekarang === 'perempuan' ? 'btn-filter-active' : 'text-slate-400'}`;
 
-      // Menyaring database murni berdasarkan string 'LAKI-LAKI' atau 'PEREMPUAN'
+      const container = document.getElementById('gridOprak');
+      container.innerHTML = '';
+
       sisaDisaringlP = dataSantriLokal.filter(s => {
         if (filterSekarang === "semua") return true;
         return (s.gender || "").toString().toLowerCase().trim() === filterSekarang;
       });
 
       if (sisaDisaringlP.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--accent); margin-bottom: 10px;"></i><br>Tidak ada petugas wajib oprak yang tersisa untuk kelompok ini!</div>`;
-        panelKunci.style.display = "none";
+        container.innerHTML = `
+          <div class="col-span-full text-center py-16 text-xs font-bold uppercase tracking-widest opacity-40">
+            <i class="fa-solid fa-circle-check text-2xl text-blue-500 mb-2 block"></i> Kelompok ini sudah bersih / dikunci
+          </div>
+        `;
         return;
       }
 
-      // Tampilkan tombol kunci jika data dilayar tersedia
-      panelKunci.style.display = "block";
-
       sisaDisaringlP.forEach(santri => {
-        const card = document.createElement("div");
-        card.className = "santri-card";
+        const card = document.createElement('div');
+        card.id = `card-${santri.nik}`;
+        card.className = 'card-oprak';
+        card.setAttribute('onclick', `eksekusiHadirKilat(\`${santri.nik}\`, \`${santri.nama.replace(/"/g, '&quot;')}\`, \`${santri.gender}\`, \`${santri.status}\`, \`${santri.jadwal}\`)`);
         
-        card.addEventListener("click", function() {
-          eksekusiHadirKilat(santri, card);
-        });
-        
-        const labelGender = (santri.gender || "").toString().toUpperCase() === "PEREMPUAN" ? "Putri" : "Putra";
-        const badgeClass = labelGender === "Putri" ? "badge putri" : "badge";
-
-        card.innerHTML = `
-          <div class="santri-info">
-            <div class="name">${santri.nama}</div>
-            <div class="sub"><i class="fa-solid fa-address-card"></i> NIK: ${santri.nik}</div>
-            <div class="sub"><i class="fa-solid fa-shield"></i> Status: ${santri.status || '-'}</div>
-            <div class="sub"><i class="fa-solid fa-venus-mars"></i> Sektor: ${labelGender}</div>
-          </div>
-          <div class="card-footer">
-            <span class="${badgeClass}">Wajib Oprak</span>
-            <span class="click-indicator"><i class="fa-solid fa-circle-arrow-right"></i></span>
-          </div>
-        `;
-        grid.appendChild(card);
+        card.innerHTML = `<h3>${santri.nama}</h3>`;
+        container.appendChild(card);
       });
     }
 
-    function saringGender(kategori, elemen) {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      elemen.classList.add('active');
-      filterSekarang = kategori;
-      renderGrid();
-    }
-
-    function eksekusiHadirKilat(santri, elemen) {
-      elemen.style.transform = "scale(0)";
-      elemen.style.opacity = "0";
+    function eksekusiHadirKilat(nik, nama, gender, status, jadwal) {
+      const card = document.getElementById(`card-${nik}`);
+      if(card) card.classList.add('vanish');
       
-      setTimeout(() => {
-        dataSantriLokal = dataSantriLokal.filter(s => s.nik !== santri.nik);
-        elemen.remove();
-        
-        if(gridHasNoCards()) {
-          renderGrid();
-        }
-      }, 300);
+      dataSantriLokal = dataSantriLokal.filter(s => s.nik !== nik);
+      setTimeout(() => { if(card) card.remove(); renderGrid(); }, 300);
 
-      // Data dikirim menggunakan POST Payload agar aman dan mendukung struktur Log_Oprak utuh
       fetch(urlScript, {
         method: 'POST',
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({
           aksi: "konfirmasi_hadir_oprak",
-          nik: santri.nik,
-          nama: santri.nama,
-          gender: santri.gender,
-          status: santri.status,
-          jadwal: santri.jadwal
+          nik: nik,
+          nama: nama,
+          gender: gender,
+          status: status,
+          jadwal: jadwal
         })
-      })
-      .then(r => r.json())
-      .then(respon => {
-        if(respon.status !== "success") {
-          alert("Gagal menyimpan ke cloud: " + respon.message);
-        }
-      })
-      .catch(e => console.error("Server Error", e));
-    }
-
-    // VARIABEL GLOBAL BARU (Tambahkan di bagian atas script HTML Anda)
-    let infoPutaranAktif = 1;
-    let infoPutaranMaksimal = 1;
-
-    function muatDaftarOprak() {
-      fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
-        .then(response => response.json())
-        .then(res => {
-          if(res.status === "error" || !res.data) {
-            dataSantriLokal = [];
-            renderGrid();
-            return;
-          }
-          dataSantriLokal = res.data;
-          
-          // Tangkap info putaran dari cloud untuk dipasang di Sub-Header
-          infoPutaranAktif = res.putaran_aktif || 1;
-          infoPutaranMaksimal = res.putaran_maksimal || 1;
-          
-          document.querySelector(".title-area p").innerHTML = `Menampilkan <span style="color:#4fd1c5; font-weight:bold;">PUTARAN ${infoPutaranAktif}</span> (Siklus Maksimal: ${infoPutaranMaksimal}). Klik kartu untuk Hadir, atau klik Kunci di bawah untuk geser putaran.`;
-          
-          renderGrid();
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud.</div>`;
-        });
+      }).catch(e => console.error("Error background sync:", e));
     }
 
     function kunciSesiAlpaMassal() {
-      // Walau di layar sudah bersih (0 kartu), admin tetap harus klik tombol ini untuk memajukan siklus putaran ke angka berikutnya!
-      if (!confirm(`Apakah Anda yakin ingin MENGUNCI Sesi Putaran ${infoPutaranAktif} ini? Jika ada sisa santri di layar, mereka otomatis didenda Poin 5. Sistem akan bergeser ke Putaran berikutnya.`)) {
-        return;
-      }
+      if (!confirm(`Kunci Sesi Putaran ${infoPutaranAktif}? ${sisaDisaringlP.length} santri aktif di layar akan dicatat ALPA (Denda Poin 5). Sesi besok otomatis maju.`)) return;
 
-      const panelKunci = document.querySelector(".btn-kunci-container");
-      panelKunci.style.pointerEvents = "none";
-      panelKunci.style.opacity = "0.5";
+      const panel = document.getElementById('panelAksi');
+      panel.style.opacity = "0.5";
+      panel.style.pointerEvents = "none";
 
       fetch(urlScript, {
         method: "POST",
@@ -574,28 +335,21 @@
           aksi: "kunci_alpa_oprak_massal",
           putaran_aktif: infoPutaranAktif,
           putaran_maksimal: infoPutaranMaksimal,
-          data_alpa: sisaDisaringlP // Otomatis memproses denda jika masih ada sisa di layar
+          data_alpa: sisaDisaringlP
         })
       })
       .then(r => r.json())
       .then(res => {
         if (res.status === "success") {
           alert(res.message);
-          location.reload(); // Reload halaman agar layar otomatis menampilkan daftar santri untuk putaran baru!
+          location.reload();
         }
-        panelKunci.style.pointerEvents = "auto";
-        panelKunci.style.opacity = "1";
       })
       .catch(e => {
-        alert("Gangguan jaringan cloud.");
-        panelKunci.style.pointerEvents = "auto";
-        panelKunci.style.opacity = "1";
+        alert("Gangguan koneksi.");
+        panel.style.opacity = "1";
+        panel.style.pointerEvents = "auto";
       });
-    }
-
-    function gridHasNoCards() {
-      const grid = document.getElementById("container-grid");
-      return grid.getElementsByClassName("santri-card").length === 0;
     }
   </script>
 </body>
