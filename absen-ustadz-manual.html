@@ -3,79 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presensi Cepat Asatidzah - PPMUY</title>
+    <title>Presensi Cepat Asatidzah - E-Pesantren Core</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --emerald-primary: #10b981;
+            --rose-accent: #f43f5e;
+        }
+
         body, header, div, section, button, h1, h3, p {
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
         .theme-dark {
-            --bg-main: #0f172a; --bg-header: #020617; --bg-box: #020617;
-            --text-main: #f1f5f9; --text-muted: #94a3b8; --border-color: #1e293b;
+            --bg-main: #020617;
+            --bg-header: rgba(15, 23, 42, 0.8);
+            --bg-card: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
         }
+
         .theme-light {
-            --bg-main: #f8fafc; --bg-header: #ffffff; --bg-box: #ffffff;
-            --text-main: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0;
+            --bg-main: #f8fafc;
+            --bg-header: rgba(255, 255, 255, 0.8);
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
         }
-        body { background-color: var(--bg-main); color: var(--text-main); }
-        .header-theme { background-color: var(--bg-header); border-color: var(--border-color); }
-        .box-filter { background-color: var(--bg-box); border-color: var(--border-color); }
-        .card-ustadz { background-color: var(--bg-box); border-color: var(--border-color); transition: all 0.25s ease; }
-        .theme-dark .card-ustadz:hover { border-color: #10b981; box-shadow: 0 8px 20px rgba(16,185,129,0.15); transform: translateY(-2px); }
-        .theme-light .card-ustadz:hover { border-color: #10b981; box-shadow: 0 8px 20px rgba(16,185,129,0.08); transform: translateY(-2px); }
-        .card-vanish { opacity: 0 !important; transform: scale(0.8) translateY(10px) !important; pointer-events: none; }
-        .btn-active-emerald { background-color: #10b981 !important; color: #ffffff !important; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Hiasan Background Mahal */
+        .blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(60px);
+        }
+
+        .header-glass {
+            background-color: var(--bg-header);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Kartu Kecil & Compact */
+        .card-ustadz {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 12px 8px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            min-height: 100px;
+        }
+
+        .card-ustadz:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--emerald-primary);
+            box-shadow: 0 12px 20px -10px rgba(16, 185, 129, 0.3);
+        }
+
+        .card-ustadz h3 {
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.2));
+            color: var(--emerald-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .card-ustadz:hover .avatar-circle {
+            background: var(--emerald-primary);
+            color: white;
+        }
+
+        /* Animasi Vanish */
+        .vanish {
+            opacity: 0 !important;
+            transform: scale(0.5) !important;
+            filter: blur(10px);
+            pointer-events: none;
+        }
+
+        .clock-font {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -1px;
+        }
+
+        .btn-filter-active {
+            background-color: var(--emerald-primary) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--emerald-primary); border-radius: 10px; }
     </style>
 </head>
-<body class="theme-dark font-sans antialiased min-h-screen">
+<body class="theme-dark min-h-screen pb-10">
 
-    <header class="header-theme border-b sticky top-0 z-50 px-6 py-4 shadow-sm backdrop-blur-md bg-opacity-95">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4 w-full md:w-auto">
-                <button onclick="kembaliKeDashboard()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer transition-all">
+    <div class="blob" style="top: -100px; left: -100px;"></div>
+    <div class="blob" style="bottom: -100px; right: -100px;"></div>
+
+    <header class="header-glass sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-[1600px] mx-auto flex flex-col lg:flex-row justify-between items-center gap-6">
+            
+            <div class="flex items-center gap-5 w-full lg:w-auto">
+                <a href="dashboard.html" class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
                     <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button id="btn-tema" onclick="toggleTema()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer transition-all">
-                    <i class="fa-solid fa-sun"></i>
-                </button>
+                </a>
+                <div class="h-10 w-px bg-slate-700/30"></div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">Portal Presensi Asatidzah</h1>
-                    <p class="text-xs mt-0.5" style="color: var(--text-muted)">Klik kartu jika ustadz <span class="text-emerald-500 font-bold">Hadir (Poin 0)</span>. Sisanya klik tombol Selesai Absen di bawah <span class="text-red-400 font-bold">(Poin 3)</span>.</p>
+                    <h1 class="text-lg font-extrabold tracking-tight">ASATIDZAH <span class="text-emerald-500">GATEWAY</span></h1>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="live-date" class="text-[10px] font-bold uppercase tracking-widest text-slate-500">12 JUNI 2026</span>
+                        <span class="w-1 h-1 rounded-full bg-slate-600"></span>
+                        <span id="live-clock" class="text-[10px] font-bold clock-font text-emerald-500 tracking-tighter">12:44:00</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                <div class="box-filter p-1 rounded-xl border flex gap-1 shadow-inner">
-                    <button id="btnMagrib" onclick="setKajian('Magrib')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">MAGRIB</button>
-                    <button id="btnSubuh" onclick="setKajian('Subuh')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">SUBUH</button>
+
+            <div class="flex items-center gap-3 bg-slate-900/40 p-1.5 rounded-2xl border border-slate-700/30 shadow-inner">
+                <div class="flex gap-1 border-r border-slate-700/50 pr-2 mr-1">
+                    <button id="btnMagrib" onclick="setKajian('Magrib')" class="px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Magrib</button>
+                    <button id="btnSubuh" onclick="setKajian('Subuh')" class="px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Subuh</button>
                 </div>
-                <div class="box-filter p-1 rounded-xl border flex gap-1 shadow-inner">
-                    <button id="btnL" onclick="setGender('L')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">LAKI-LAKI</button>
-                    <button id="btnP" onclick="setGender('P')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">PEREMPUAN</button>
+                <div class="flex gap-1">
+                    <button id="btnL" onclick="setGender('L')" class="px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Laki-Laki</button>
+                    <button id="btnP" onclick="setGender('P')" class="px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-400 cursor-pointer transition-all">Perempuan</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTema()" class="w-10 h-10 rounded-xl bg-slate-800/40 border border-slate-700/50 text-amber-400 flex items-center justify-center cursor-pointer shadow-sm"><i class="fa-solid fa-sun"></i></button>
+                <div class="h-6 w-px bg-slate-700/30"></div>
+                <div class="text-right">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Portal Version</p>
+                    <p class="text-[11px] font-extrabold text-emerald-500 uppercase">V8.5 Integrated</p>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-8">
-        <div id="statusArea" class="flex flex-col items-center justify-center py-24 text-center">
-            <div class="animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-emerald-500 mb-4"></div>
-            <p class="text-sm font-medium" style="color: var(--text-muted)">Sinkronisasi master data ustadz PPMUY...</p>
+    <main class="max-w-[1600px] mx-auto px-8 mt-10">
+        
+        <div id="statusArea" class="flex flex-col items-center justify-center py-32 text-center">
+            <div class="w-14 h-14 border-4 border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-6"></div>
+            <p class="text-sm font-bold tracking-widest text-slate-500 uppercase">Synchronizing Asatidzah Core...</p>
         </div>
 
-        <div id="gridUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 hidden">
+        <div id="gridUstadz" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4 hidden">
             </div>
 
-        <div id="panelAksi" class="mt-12 flex justify-center hidden">
-            <button onclick="prosesUstadzAlpaMassal()" class="px-8 py-3.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-2">
-                <i class="fa-solid fa-gavel"></i> Selesai Absen (Kunci Poin 3 Bagi Yang Gaib)
+        <div id="panelAksi" class="fixed bottom-10 left-1/2 -translate-x-1/2 hidden z-50">
+            <button onclick="prosesUstadzAlpaMassal()" class="px-8 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-rose-500/40 active:scale-95 transition-all flex items-center gap-3 cursor-pointer">
+                <i class="fa-solid fa-lock text-sm"></i> Selesaikan Sesi & Kunci Pelanggaran
             </button>
         </div>
     </main>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbycq_pur0toFMte0dsiPPXZPhpsKVRwH2CxOnZc3wgvtS20mcb7Lbp2ttLOSr_szZTT/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbycq_pur0toFMte0dsiPPXZPhpsKVRwH2CxOnZc3wgvtS20mcb7Lbp2ttLOSr_szZTT/exec";
         
         let masterUstadz = [];
         let sisaUstadzDilayar = [];
@@ -85,183 +206,128 @@
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(savedTheme);
-            fetchDataMaster();
+            mulaiJam();
+            fetchDataUstadz();
         });
 
-        function toggleTema() {
-            const newTheme = document.body.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark';
-            setTemaAplikasi(newTheme);
+        function mulaiJam() {
+            setInterval(() => {
+                const n = new Date();
+                document.getElementById('live-clock').innerText = n.toLocaleTimeString('id-ID');
+            }, 1000);
+            const opt = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('live-date').innerText = new Date().toLocaleDateString('id-ID', opt).toUpperCase();
         }
 
         function setTemaAplikasi(tema) {
-            const btn = document.getElementById('btn-tema');
-            if (tema === 'theme-light') {
-                document.body.className = "theme-light font-sans antialiased min-h-screen";
-                if(btn) btn.innerHTML = `<i class="fa-solid fa-moon text-slate-700"></i>`;
-                localStorage.setItem('dashboard_theme', 'theme-light');
-            } else {
-                document.body.className = "theme-dark font-sans antialiased min-h-screen";
-                if(btn) btn.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i>`;
-                localStorage.setItem('dashboard_theme', 'theme-dark');
-            }
+            document.body.className = tema + " min-h-screen pb-10";
+            localStorage.setItem('dashboard_theme', tema);
         }
 
-        function kembaliKeDashboard() { window.location.href = "https://manajemen.ppmuy.com"; }
+        function toggleTema() {
+            const current = document.body.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark';
+            setTemaAplikasi(current);
+        }
 
-        function fetchDataMaster() {
-            const params = new URLSearchParams({ aksi: "ambil_database_ustadz" });
-            fetch(`${WEB_APP_URL}?${params.toString()}`, { method: "GET", mode: "cors" })
-            .then(r => r.json())
-            .then(res => {
-                if(res.status === "success") {
-                    masterUstadz = res.data;
+        async function fetchDataUstadz() {
+            try {
+                const param = new URLSearchParams({ aksi: "ambil_database_ustadz" });
+                let res = await fetch(`${API_URL}?${param.toString()}`, { method: "GET", mode: "cors" });
+                let r = await res.json();
+                
+                if(r.status === "success") {
+                    masterUstadz = r.data;
                     document.getElementById('statusArea').classList.add('hidden');
                     document.getElementById('gridUstadz').classList.remove('hidden');
                     document.getElementById('panelAksi').classList.remove('hidden');
-                    saringDanTampilkan();
-                } else {
-                    document.getElementById('statusArea').innerHTML = `<p class="text-red-400 font-bold">${res.message}</p>`;
+                    renderGrid();
                 }
-            })
-            .catch(e => {
-                document.getElementById('statusArea').innerHTML = `<p class="text-red-400 font-bold">Koneksi Cloud Putus.</p>`;
+            } catch(e) {
+                console.error("Master Sinkron Gagal", e);
+            }
+        }
+
+        function setKajian(k) { kajianAktif = k; renderGrid(); }
+        function setGender(g) { genderAktif = g; renderGrid(); }
+
+        function renderGrid() {
+            document.getElementById('btnMagrib').className = `px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${kajianAktif === 'Magrib' ? 'btn-filter-active' : 'text-slate-400'}`;
+            document.getElementById('btnSubuh').className = `px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${kajianAktif === 'Subuh' ? 'btn-filter-active' : 'text-slate-400'}`;
+            document.getElementById('btnL').className = `px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${genderAktif === 'L' ? 'btn-filter-active' : 'text-slate-400'}`;
+            document.getElementById('btnP').className = `px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all ${genderAktif === 'P' ? 'btn-filter-active' : 'text-slate-400'}`;
+
+            const container = document.getElementById('gridUstadz');
+            container.innerHTML = '';
+
+            sisaUstadzDilayar = masterUstadz.filter(u => {
+                let target = genderAktif === 'L' ? 'LAKI-LAKI' : 'PEREMPUAN';
+                return u.gender && u.gender.toUpperCase().trim() === target;
+            });
+
+            sisaUstadzDilayar.forEach(u => {
+                const card = document.createElement('div');
+                card.id = `card-${u.nik}`;
+                card.className = 'card-ustadz';
+                card.setAttribute('onclick', `absenHadir(\`${u.nik}\`, \`${u.nama}\`)`);
+                
+                const ins = u.nama.split(' ').map(x => x[0]).join('').substring(0,2).toUpperCase();
+
+                card.innerHTML = `
+                    <div class="avatar-circle">${ins}</div>
+                    <h3>${u.nama}</h3>
+                `;
+                container.appendChild(card);
             });
         }
 
-        function setKajian(k) { kajianAktif = k; saringDanTampilkan(); }
-        function setGender(g) { genderAktif = g; saringDanTampilkan(); }
-
-        function saringDanTampilkan() {
-    // 1. Perbarui efek visual tombol filter yang sedang aktif
-    document.getElementById('btnMagrib').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Magrib' ? 'btn-active-emerald' : 'text-slate-400'}`;
-    document.getElementById('btnSubuh').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Subuh' ? 'btn-active-emerald' : 'text-slate-400'}`;
-    
-    document.getElementById('btnL').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'L' ? 'btn-active-emerald' : 'text-slate-400'}`;
-    document.getElementById('btnP').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'P' ? 'btn-active-emerald' : 'text-slate-400'}`;
-
-    const container = document.getElementById('gridUstadz');
-    container.innerHTML = '';
-
-    // 2. Saring data MURNI hanya berdasarkan GENDER (LAKI-LAKI / PEREMPUAN) dari sheet Database Induk
-    sisaUstadzDilayar = masterUstadz.filter(u => {
-        let genTarget = genderAktif === 'L' ? 'LAKI-LAKI' : 'PEREMPUAN';
-        return u.gender && u.gender.toUpperCase().trim() === genTarget;
-    });
-
-    // 3. Jika data kosong di database
-    if(sisaUstadzDilayar.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-12 text-sm opacity-60">Tidak ada data Asatidzah dengan gender ini di dalam sheet Database.</div>`;
-        document.getElementById('panelAksi').classList.add('hidden');
-        return;
-    }
-    
-    document.getElementById('panelAksi').classList.remove('hidden');
-
-    // 4. Render seluruh nama ustadz menjadi kartu tanpa batas waktu/hari
-    sisaUstadzDilayar.forEach(u => {
-        const card = document.createElement('div');
-        card.id = `card-${u.nik}`;
-        card.className = 'card-ustadz p-5 rounded-2xl border flex flex-col justify-center items-center text-center relative overflow-hidden select-none active:scale-95 shadow-sm group cursor-pointer';
-        
-        // Memicu fungsi hadir saat kartu diklik
-        card.setAttribute('onclick', `eksekusiHadir(\`${u.nik}\`, \`${u.nama.replace(/"/g, '&quot;')}\`)`);
-        
-        const ins = u.nama ? u.nama.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : 'US';
-
-        card.innerHTML = `
-            <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center mb-3 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                <span class="text-sm font-black">${ins}</span>
-            </div>
-            <h3 class="text-sm font-bold tracking-tight line-clamp-2">${u.nama}</h3>
-            <p class="text-[10px] font-mono opacity-50 mt-1">ID: ${u.nik}</p>
-            <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-        // AKSI 1: KLIK HADIR (POIN 0)
-        function eksekusiHadir(nik, nama) {
+        async function absenHadir(nik, nama) {
             const card = document.getElementById(`card-${nik}`);
-            if(!card) return;
             card.style.pointerEvents = "none";
-
-            const payload = {
-                aksi: "simpan_absen_ustadz_manual",
-                nik: nik,
-                nama: nama,
-                kegiatan: kajianAktif
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                if(res.status === "success") {
-                    card.classList.add('card-vanish');
+            
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        aksi: "simpan_absen_ustadz_manual",
+                        nik: nik,
+                        nama: nama,
+                        kegiatan: kajianAktif
+                    })
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    card.classList.add('vanish');
                     setTimeout(() => {
                         card.remove();
-                        // Buang ustadz ini dari list sisaUstadzDilayar karena dia sudah sukses hadir
-                        sisaUstadzDilayar = sisaUstadzDilayar.filter(u => u.nik !== nik);
-                    }, 300);
-                } else {
-                    card.style.pointerEvents = "auto";
-                    alert("Gagal: " + res.message);
+                        sisaUstadzDilayar = sisaUstadzDilayar.filter(x => x.nik !== nik);
+                    }, 400);
                 }
-            })
-            .catch(e => { card.style.pointerEvents = "auto"; alert("Jaringan bermasalah."); });
+            } catch(e) { card.style.pointerEvents = "auto"; }
         }
 
-        // AKSI 2: KLIK TOMBOL SELESAI ABSEN (SISANYA DIANGGAP ALPA & POIN 3)
-        function prosesUstadzAlpaMassal() {
-            if(sisaUstadzDilayar.length === 0) {
-                alert("Semua ustadz di kelompok ini sudah diabsen hadir.");
-                return;
-            }
+        async function prosesUstadzAlpaMassal() {
+            if(sisaUstadzDilayar.length === 0) return alert("Semua asatidzah di layar sudah hadir.");
+            if(!confirm(`Kunci Sesi? ${sisaUstadzDilayar.length} Asatidzah akan dicatat TIDAK HADIR (Poin 3).`)) return;
 
-            if(!confirm(`Apakah Anda yakin mengunci absensi? ${sisaUstadzDilayar.length} Ustadz yang tersisa di layar akan otomatis dicatat TIDAK HADIR dengan Poin Pelanggaran = 3!`)) {
-                return;
-            }
+            const btn = document.getElementById('panelAksi');
+            btn.style.opacity = "0.5";
+            btn.style.pointerEvents = "none";
 
-            const btnAksi = document.getElementById('panelAksi');
-            btnAksi.style.pointerEvents = "none";
-            btnAksi.style.opacity = "0.5";
-
-            const payload = {
-                aksi: "simpan_tidak_hadir_massal",
-                kegiatan: kajianAktif,
-                data_alpa: sisaUstadzDilayar
-            };
-
-            fetch(WEB_APP_URL, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                if(res.status === "success") {
-                    alert(`Sukses! ${sisaUstadzDilayar.length} Ustadz berhasil dikunci dengan status Tidak Hadir (Poin 3).`);
-                    // Kosongkan layar karena sesi filter ini sudah selesai total
-                    sisaUstadzDilayar = [];
-                    document.getElementById('gridUstadz').innerHTML = '';
-                    saringDanTampilkan();
-                } else {
-                    alert("Gagal memproses alpa: " + res.message);
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        aksi: "simpan_tidak_hadir_massal",
+                        kegiatan: kajianAktif,
+                        data_alpa: sisaUstadzDilayar
+                    })
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    alert("Sesi berhasil dikunci. Poin pelanggaran otomatis tercatat.");
+                    location.reload();
                 }
-                btnAksi.style.pointerEvents = "auto";
-                btnAksi.style.opacity = "1";
-            })
-            .catch(e => { 
-                btnAksi.style.pointerEvents = "auto"; 
-                btnAksi.style.opacity = "1"; 
-                alert("Koneksi gagal saat memproses data alpa massal."); 
-            });
+            } catch(e) { btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; }
         }
     </script>
 </body>
