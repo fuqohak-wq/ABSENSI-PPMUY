@@ -51,12 +51,12 @@
     <header class="border-b dynamic-border-row dynamic-card no-print sticky top-0 z-50 backdrop-blur-md bg-opacity-80">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-between justify-center shadow-lg shadow-blue-500/20 text-white">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
                     <i class="fa-solid fa-id-card-clip text-sm m-auto"></i>
                 </div>
                 <div>
                     <h1 class="text-sm font-black uppercase tracking-wider">GATEWAY PERIZINAN</h1>
-                    <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase">KIOSK KEAMANAN PUSAT v8.2</p>
+                    <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase">KIOSK KEAMANAN PUSAT v8.3</p>
                 </div>
             </div>
             
@@ -192,7 +192,7 @@
 
     <script>
         // ====================================================================
-        // CONFIGURATION URL WEB APP GOOGLE APPS SCRIPT
+        // SILAHKAN PASTE URL WEB APP BARU ANDA DI SINI
         // ====================================================================
         const API_URL = "https://script.google.com/macros/s/AKfycbzsFOWETDSPw7aquOtBNsgkQGjQBcIJaJW6rSNl915MHIns5HFDwCpBwOfPwlk613Asvw/exec";
         
@@ -209,12 +209,10 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Set default waktu mulai (sekarang)
             let skrg = new Date();
             skrg.setMinutes(skrg.getMinutes() - skrg.getTimezoneOffset());
             document.getElementById('input-tgl-mulai').value = skrg.toISOString().slice(0,16);
             
-            // Set default waktu kembali (besok)
             let besok = new Date();
             besok.setDate(besok.getDate() + 1);
             besok.setMinutes(besok.getMinutes() - besok.getTimezoneOffset());
@@ -224,37 +222,36 @@
             muatMasterSantri();
         });
 
+        // PENYELAMAT CORS GET: Tanpa paksaan properti "mode" rumit, menyerupai file pelanggaran Anda
         async function muatMasterSantri() {
             try {
-                const param = new URLSearchParams({ aksi: "ambil_database" });
-                let res = await fetch(`${API_URL}?${param.toString()}`);
+                let urlTarget = `${API_URL}?aksi=ambil_database`;
+                let res = await fetch(urlTarget);
                 let r = await res.json();
                 if(r.status === "success") {
                     masterSantriCache = r.data || [];
                     console.log("Master santri disinkronkan:", masterSantriCache.length);
-                } else {
-                    console.error("Respon master santri gagal:", r.message);
                 }
             } catch(e) { 
-                console.error("Gagal sinkronisasi master cache santri", e); 
+                console.error("Gagal load master santri:", e); 
             }
         }
 
         async function muatDataPerizinan() {
             const tbody = document.getElementById('tbl-izin-body');
             try {
-                const param = new URLSearchParams({ aksi: "ambil_perizinan" });
-                let res = await fetch(`${API_URL}?${param.toString()}`);
+                let urlTarget = `${API_URL}?aksi=ambil_perizinan`;
+                let res = await fetch(urlTarget);
                 let r = await res.json();
                 if(r.status === "success") {
                     databaseIzinGlobal = r.data || [];
                     kalkulasiStatistikDanRender();
                 } else {
-                    if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Error Cloud: ${r.message}</td></tr>`;
+                    if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Error: ${r.message}</td></tr>`;
                 }
             } catch(e) {
                 console.error("Gagal load perizinan:", e);
-                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Gagal memuat data dari cloud server sheet.</td></tr>`;
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Gagal sinkronisasi data log perizinan dari cloud.</td></tr>`;
             }
         }
 
@@ -297,7 +294,7 @@
             });
 
             if(dataFilter.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 uppercase text-[10px] font-bold">Tidak ada catatan perizinan di baris filter ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 uppercase text-[10px] font-bold">Tidak ada catatan perizinan di filter ini.</td></tr>`;
                 return;
             }
 
@@ -452,9 +449,7 @@
             }
         }
 
-        // ====================================================================
-        // FUNGSI SUBMIT DENGAN STRATEGI PARAMETER URL (ADAPTASI FILE PELANGGARAN)
-        // ====================================================================
+        // PENYELAMAT CORS POST: Mengikuti pola pemanggilan file pelanggaran Anda 100%
         async function prosesUsulkanIzin() {
             if(!santriTerpilihNIK) { 
                 alert("Pilih nama atau Scan QR santri terlebih dahulu!"); 
@@ -470,13 +465,12 @@
             
             let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
 
-            // Efek Loading Tombol Submit
             const btnSubmit = document.querySelector("button[onclick='prosesUsulkanIzin()']");
             const teksAsli = btnSubmit.innerHTML;
             btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i> MEMPROSES...`;
             btnSubmit.disabled = true;
 
-            // STRATEGI SAKTI: Tempel parameter ke URL seperti pada sistem Pelanggaran Anda
+            // Membangun Query Params seperti sistem Pelanggaran Anda yang berhasil
             const urlTarget = `${API_URL}?aksi=simpan_perizinan` +
                               `&nik=${encodeURIComponent(santriTerpilihNIK)}` +
                               `&nama=${encodeURIComponent(namaSantri)}` +
@@ -488,20 +482,17 @@
                               `&statusAwal=${encodeURIComponent(statusAwal)}`;
 
             try {
-                // Eksekusi POST murni tanpa melempar raw body untuk mematikan proteksi CORS OPTIONS
                 let res = await fetch(urlTarget, { method: "POST" });
                 let r = await res.json();
 
                 if (r.status === "success") {
                     alert(`🎉 BERHASIL!\nData tersimpan dengan ID: ${r.id_izin}.\nSistem telah meneruskan notifikasi ke Telegram.`);
                     
-                    // Reset Input Form Kiosk
                     document.getElementById('input-alasan').value = "";
                     document.getElementById('input-nik-nama').value = "";
                     document.getElementById('preview-santri').classList.add('hidden');
                     santriTerpilihNIK = null;
                     
-                    // Refresh Log Table otomatis
                     muatDataPerizinan();
                 } else {
                     alert("Gagal Server Cloud: " + r.message);
