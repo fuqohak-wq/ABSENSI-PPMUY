@@ -374,22 +374,69 @@
       muatDaftarOprak();
     });
 
+    // VARIABEL GLOBAL BARU (Tambahkan di bagian atas script HTML Anda)
+    let infoPutaranAktif = 1;
+    let infoPutaranMaksimal = 1;
+
     function muatDaftarOprak() {
       fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
         .then(response => response.json())
         .then(res => {
-          if(res.status === "error" || !res.data || res.data.length === 0) {
+          if(res.status === "error" || !res.data) {
             dataSantriLokal = [];
             renderGrid();
             return;
           }
           dataSantriLokal = res.data;
+          
+          // Tangkap info putaran dari cloud untuk dipasang di Sub-Header
+          infoPutaranAktif = res.putaran_aktif || 1;
+          infoPutaranMaksimal = res.putaran_maksimal || 1;
+          
+          document.querySelector(".title-area p").innerHTML = `Menampilkan <span style="color:#4fd1c5; font-weight:bold;">PUTARAN ${infoPutaranAktif}</span> (Siklus Maksimal: ${infoPutaranMaksimal}). Klik kartu untuk Hadir, atau klik Kunci di bawah untuk geser putaran.`;
+          
           renderGrid();
         })
         .catch(err => {
           console.error(err);
-          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud. Pastikan Apps Script sudah di-deploy dengan benar.</div>`;
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud.</div>`;
         });
+    }
+
+    function kunciSesiAlpaMassal() {
+      // Walau di layar sudah bersih (0 kartu), admin tetap harus klik tombol ini untuk memajukan siklus putaran ke angka berikutnya!
+      if (!confirm(`Apakah Anda yakin ingin MENGUNCI Sesi Putaran ${infoPutaranAktif} ini? Jika ada sisa santri di layar, mereka otomatis didenda Poin 5. Sistem akan bergeser ke Putaran berikutnya.`)) {
+        return;
+      }
+
+      const panelKunci = document.querySelector(".btn-kunci-container");
+      panelKunci.style.pointerEvents = "none";
+      panelKunci.style.opacity = "0.5";
+
+      fetch(urlScript, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          aksi: "kunci_alpa_oprak_massal",
+          putaran_aktif: infoPutaranAktif,
+          putaran_maksimal: infoPutaranMaksimal,
+          data_alpa: sisaDisaringlP // Otomatis memproses denda jika masih ada sisa di layar
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === "success") {
+          alert(res.message);
+          location.reload(); // Reload halaman agar layar otomatis menampilkan daftar santri untuk putaran baru!
+        }
+        panelKunci.style.pointerEvents = "auto";
+        panelKunci.style.opacity = "1";
+      })
+      .catch(e => {
+        alert("Gangguan jaringan cloud.");
+        panelKunci.style.pointerEvents = "auto";
+        panelKunci.style.opacity = "1";
+      });
     }
 
     function renderGrid() {
@@ -481,10 +528,38 @@
       .catch(e => console.error("Server Error", e));
     }
 
+    // VARIABEL GLOBAL BARU (Tambahkan di bagian atas script HTML Anda)
+    let infoPutaranAktif = 1;
+    let infoPutaranMaksimal = 1;
+
+    function muatDaftarOprak() {
+      fetch(`${urlScript}?aksi=ambil_petugas_oprak`)
+        .then(response => response.json())
+        .then(res => {
+          if(res.status === "error" || !res.data) {
+            dataSantriLokal = [];
+            renderGrid();
+            return;
+          }
+          dataSantriLokal = res.data;
+          
+          // Tangkap info putaran dari cloud untuk dipasang di Sub-Header
+          infoPutaranAktif = res.putaran_aktif || 1;
+          infoPutaranMaksimal = res.putaran_maksimal || 1;
+          
+          document.querySelector(".title-area p").innerHTML = `Menampilkan <span style="color:#4fd1c5; font-weight:bold;">PUTARAN ${infoPutaranAktif}</span> (Siklus Maksimal: ${infoPutaranMaksimal}). Klik kartu untuk Hadir, atau klik Kunci di bawah untuk geser putaran.`;
+          
+          renderGrid();
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("container-grid").innerHTML = `<div class="empty-state" style="border-color:#fc8181; color:#fc8181;">Gagal memuat data dari database cloud.</div>`;
+        });
+    }
+
     function kunciSesiAlpaMassal() {
-      if (sisaDisaringlP.length === 0) return;
-      
-      if (!confirm(`Kunci Sesi? ${sisaDisaringlP.length} Santri yang aktif di layar saat ini akan otomatis dijatuhi denda TIDAK HADIR dengan Takziran Poin 5!`)) {
+      // Walau di layar sudah bersih (0 kartu), admin tetap harus klik tombol ini untuk memajukan siklus putaran ke angka berikutnya!
+      if (!confirm(`Apakah Anda yakin ingin MENGUNCI Sesi Putaran ${infoPutaranAktif} ini? Jika ada sisa santri di layar, mereka otomatis didenda Poin 5. Sistem akan bergeser ke Putaran berikutnya.`)) {
         return;
       }
 
@@ -497,17 +572,16 @@
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({
           aksi: "kunci_alpa_oprak_massal",
-          data_alpa: sisaDisaringlP
+          putaran_aktif: infoPutaranAktif,
+          putaran_maksimal: infoPutaranMaksimal,
+          data_alpa: sisaDisaringlP // Otomatis memproses denda jika masih ada sisa di layar
         })
       })
       .then(r => r.json())
       .then(res => {
         if (res.status === "success") {
-          alert(`Sukses! Sesi dikunci. ${sisaDisaringlP.length} Santri resmi terkena Takziran Poin 5.`);
-          // Bersihkan data lokal yang baru saja dihukum massal
-          const listNikHukum = sisaDisaringlP.map(x => x.nik);
-          dataSantriLokal = dataSantriLokal.filter(s => !listNikHukum.includes(s.nik));
-          renderGrid();
+          alert(res.message);
+          location.reload(); // Reload halaman agar layar otomatis menampilkan daftar santri untuk putaran baru!
         }
         panelKunci.style.pointerEvents = "auto";
         panelKunci.style.opacity = "1";
