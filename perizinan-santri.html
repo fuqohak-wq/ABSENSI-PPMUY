@@ -1,15 +1,70 @@
-const URL_GAS = "https://script.google.com/macros/s/AKfycbwLwePMzZNO_YaFlYxfaJVHP7GROP9-R__A8-jRdXjvgSwHVmDR7a8lMWZuvCgYc56_/exec";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Perizinan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
 
-async function ambilData() {
-  try {
-    // Kita gunakan mode 'cors' karena sekarang backend kita sudah mengizinkannya
-    let response = await fetch(`${URL_GAS}?aksi=ambil_data`, {
-      method: "GET",
-      mode: "cors" 
-    });
-    let result = await response.json();
-    console.log("Data dari Sheet:", result.data);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">Sistem Perizinan Santri</h1>
+        
+        <button onclick="ambilData()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Muat Data dari Sheet
+        </button>
+
+        <div id="status" class="mt-4 text-sm"></div>
+
+        <table class="w-full mt-6 border-collapse border border-gray-200">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="border p-2">Data</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-body">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Ganti dengan URL deployment Google Apps Script Anda
+        const URL_GAS = "https://script.google.com/macros/s/AKfycbwLwePMzZNO_YaFlYxfaJVHP7GROP9-R__A8-jRdXjvgSwHVmDR7a8lMWZuvCgYc56_/exec";
+
+        async function ambilData() {
+            const statusDiv = document.getElementById('status');
+            const tbody = document.getElementById('tabel-body');
+            
+            statusDiv.innerHTML = "Sedang mengambil data...";
+            
+            try {
+                // Fetch ke GAS dengan mode 'cors'
+                let response = await fetch(`${URL_GAS}?aksi=ambil_data`, {
+                    method: "GET",
+                    mode: "cors"
+                });
+
+                let result = await response.json();
+
+                if (result.status === "success") {
+                    statusDiv.innerHTML = "Berhasil mengambil data!";
+                    tbody.innerHTML = ""; // Bersihkan tabel
+                    
+                    // Render data ke tabel
+                    result.data.forEach(row => {
+                        let tr = document.createElement('tr');
+                        tr.innerHTML = `<td class="border p-2">${JSON.stringify(row)}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    statusDiv.innerHTML = "Error: " + result.message;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                statusDiv.innerHTML = "Gagal mengambil data. Pastikan CORS di GAS sudah disetting.";
+            }
+        }
+    </script>
+</body>
+</html>
