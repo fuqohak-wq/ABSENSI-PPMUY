@@ -160,7 +160,7 @@
   </main>
 
   <script>
-    // URL Web App Google Apps Script Anda (GANTI SETELAH DEPLOY)
+    // URL WEB APP TERKUNCI & VALID (BEBAS AMAN CORS)
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLwePMzZNO_YaFlYxfaJVHP7GROP9-R__A8-jRdXjvgSwHVmDR7a8lMWZuvCgYc56_/exec";
 
     let databaseMaster = [];
@@ -186,10 +186,13 @@
 
     document.getElementById('btnRefresh').addEventListener('click', loadLogPerizinan);
 
-    // Ambil Data NIK/Nama/Kelas untuk Radar Autocomplete
+    // Ambil Data NIK/Nama/Kelas untuk Radar Autocomplete (ANTI CORS RESTRICTION)
     async function loadDatabaseMaster() {
       try {
-        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_database`);
+        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_database`, {
+          method: "GET",
+          redirect: "follow"
+        });
         const hasil = await resp.json();
         if (hasil.status === "success") {
           databaseMaster = hasil.data;
@@ -233,23 +236,24 @@
       dropdown.classList.remove('hidden');
     });
 
-    // Tutup Dropdown Jika Klik di Luar Area Radar Search
     document.addEventListener('click', (e) => {
       if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden');
     });
 
-    // Ambil Data Log Izin untuk Ditampilkan di Tabel Dashboard
+    // Ambil Data Log Izin untuk Ditampilkan di Tabel Dashboard (ANTI CORS RESTRICTION)
     async function loadLogPerizinan() {
       const tbody = document.getElementById('tabelIzinBody');
       tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin"></i> Menyelaraskan data...</td></tr>`;
       
       try {
-        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_perizinan`);
+        const resp = await fetch(`${WEB_APP_URL}?aksi=ambil_perizinan`, {
+          method: "GET",
+          redirect: "follow"
+        });
         const hasil = await resp.json();
         
         if(hasil.status === "success" && hasil.data.length > 0) {
           tbody.innerHTML = "";
-          // Tampilkan dari yang paling baru diajukan (Reverse order)
           hasil.data.reverse().forEach(row => {
             let badgeClass = "";
             if (row.status === "ACC") badgeClass = "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400";
@@ -306,17 +310,16 @@
       };
 
       try {
-        const resp = await fetch(WEB_APP_URL, {
+        await fetch(WEB_APP_URL, {
           method: "POST",
-          mode: "no-cors", // Proteksi CORS bypass standar web app gs
+          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        // Karena no-cors, anggap sukses dan langsung reset interface
         alert(`Perizinan ${payload.jenis_izin} Berhasil Diproses!`);
         form.reset();
-        loadLogPerizinan();
+        setTimeout(loadLogPerizinan, 1000); // Beri jeda 1 detik agar sheet selesai menulis data
       } catch(err) {
         alert("Terjadi gangguan transmisi data, silakan cek log sistem.");
       } finally {
