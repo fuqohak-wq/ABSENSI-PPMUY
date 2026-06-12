@@ -193,7 +193,7 @@
 
     <script>
         // MASUKKAN URL WEB APPS KODE ANDA DISINI (URL EXEC DEPLOY TERBARU)
-        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzsFOWETDSPw7aquOtBNsgkQGjQBcIJaJW6rSNl915MHIns5HFDwCpBwOfPwlk613Asvw/exec";
         
         let masterSantriCache = [];
         let databaseIzinGlobal = [];
@@ -338,7 +338,7 @@
                     aksiButton = `<span class="text-slate-500 text-[10px] italic">Logged by Kiosk</span>`;
                 }
 
-                let infoDendaTeks = dendaAmt > 0 ? `<span class="text-rose-500 font-extrabold block text-[10px] mt-0.5"><i class="fa-solid fa-hand-holding-dollar mr-0.5"></i> Denda Tagihan: Rp ${dendaAmt.toLocaleString('id-ID')}</span>` : '';
+                let infoDendaTeks = dendaAmt > 0 ? `<span class="text-rose-500 font-extrabold block text-[10px] mt-0.5"><i class="fa-solid fa-hand-holding-dollar mr-0.5"></i> Kena Takzir: Rp ${dendaAmt.toLocaleString('id-ID')}</span>` : '';
 
                 row.innerHTML = `
                     <td class="py-3 uppercase font-black tracking-wide">
@@ -388,7 +388,7 @@
         }
 
         function kunciPilihanSantri(nik, nama, kelas) {
-            santriTerpilihNIK = nik;
+            santriTerpilihNIK = String(nik).trim();
             document.getElementById('input-nik-nama').value = nik;
             document.getElementById('dropdown-hasil-cari').classList.add('hidden');
             document.getElementById('prev-nama').innerText = nama;
@@ -420,12 +420,12 @@
                 { facingMode: "environment" }, 
                 { fps: 10, qrbox: 250 },
                 (decodedText) => {
-                    let sKetemu = masterSantriCache.find(s => s.nik.toString().trim() === decodedText.toString().trim());
+                    let sKetemu = masterSantriCache.find(s => String(s.nik).trim() === String(decodedText).trim());
                     if(sKetemu) {
                         kunciPilihanSantri(sKetemu.nik, sKetemu.nama, sKetemu.kelas);
                         alert("SANTRI TERDETEKSI: " + sKetemu.nama);
                     } else {
-                        alert("QR Code terbaca: " + decodedText + " (Tidak ditemukan di Master)");
+                        alert("QR Code terbaca NIK: " + decodedText + " (Belum terdaftar di Database)");
                     }
                 },
                 (errorMessage) => {}
@@ -469,7 +469,7 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
-                    alert("Alhamdulillah, proses izin selesai!");
+                    alert("Alhamdulillah, log perizinan sukses disubmit ke Cloud!");
                     resetFormIzin();
                     muatDataPerizinan();
                 }
@@ -485,7 +485,7 @@
                 });
                 let r = await res.json();
                 if(r.status === "success") {
-                    alert("Status perizinan diperbarui dari Portal: " + statusBaru);
+                    alert("Status perizinan telah diupdate ke: " + statusBaru);
                     muatDataPerizinan();
                 }
             } catch(e) { alert("Gagal update validasi."); }
@@ -548,12 +548,11 @@
                 if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-white"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-light');
             } else {
-                document.body.classList.remove('theme-light'); 
+                document.body.classList.remove('theme-light');
                 document.body.classList.add('theme-dark');
                 if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-dark');
             }
-            if(databaseIzinGlobal.length > 0) renderTabelIzin();
         }
     </script>
 </body>
