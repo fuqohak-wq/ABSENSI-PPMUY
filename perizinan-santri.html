@@ -192,7 +192,6 @@
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
 
     <script>
-        // MASUKKAN URL WEB APPS KODE ANDA DISINI (URL EXEC DEPLOY TERBARU)
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         let masterSantriCache = [];
@@ -250,12 +249,14 @@
             let waktuSekarang = new Date();
 
             databaseIzinGlobal.forEach(item => {
-                let status = String(item.Status_Persetujuan || "").toUpperCase();
-                let tglKembali = item.Waktu_Kembali;
-                let janjiKembali = new Date(item.Janji_Kembali);
+                // PENYELARASAN: Mendukung pencocokan format huruf kecil / besar dari data sheet
+                let status = String(item.status_izin || item.status || item.Status_Persetujuan || "").toUpperCase().trim();
+                let tglKembali = item.waktu_kembali || item.Waktu_Kembali;
+                let janjiData = item.janji || item.janji_kembali || item.Janji_Kembali;
+                let janjiKembali = janjiData ? new Date(janjiData) : new Date();
 
                 if(status === "PENDING") pending++;
-                if((status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
+                if((status === "DISETUJUI" || status === "ACC" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
                     diluar++;
                     if(waktuSekarang > janjiKembali) terlambat++;
                 }
@@ -273,13 +274,13 @@
             tbody.innerHTML = '';
 
             let dataFilter = databaseIzinGlobal.filter(item => {
-                let tglKembali = item.Waktu_Kembali;
-                let status = String(item.Status_Persetujuan || "").toUpperCase();
+                let tglKembali = item.waktu_kembali || item.Waktu_Kembali;
+                let status = String(item.status_izin || item.status || item.Status_Persetujuan || "").toUpperCase().trim();
                 
                 if(filterTabSekarang === "AKTIF") {
-                    return (status === "PENDING" || status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "");
+                    return (status === "PENDING" || status === "DISETUJUI" || status === "ACC" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "");
                 } else {
-                    return (status === "REJECTED" || status === "SELESAI" || (tglKembali && String(tglKembali).trim() !== ""));
+                    return (status === "REJECTED" || status === "TOLAK" || status === "SELESAI" || (tglKembali && String(tglKembali).trim() !== ""));
                 }
             });
 
@@ -294,11 +295,11 @@
                 let row = document.createElement('tr');
                 row.className = "border-b dynamic-border-row hover:bg-blue-500/5 transition-all text-xs";
                 
-                let janjiData = item.Janji_Kembali;
+                let janjiData = item.janji || item.janji_kembali || item.Janji_Kembali;
                 let tglJanji = new Date(janjiData);
-                let tglKembali = item.Waktu_Kembali;
-                let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
-                let dendaAmt = parseInt(item.Denda_Kumulatif) || 0;
+                let tglKembali = item.waktu_kembali || item.Waktu_Kembali;
+                let statusStr = String(item.status_izin || item.status || item.Status_Persetujuan || "").toUpperCase().trim();
+                let dendaAmt = parseInt(item.denda_kumulatif || item.Denda_Kumulatif) || 0;
                 
                 let isTerlambat = (new Date() > tglJanji && (!tglKembali || String(tglKembali).trim() === ""));
                 
@@ -313,12 +314,12 @@
                     badge = `<span class="bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">DI LUAR PONDOK</span>`;
                 }
 
-                let idIzin = item.ID_Izin;
-                let namaSantri = item.Nama_Santri;
-                let nikSantri = item.NIK;
-                let kelasSantri = item.Kelas;
-                let jenisIzin = item.Jenis_Izin;
-                let alasanIzin = item.Alasan;
+                let idIzin = item.id_izin || item.ID_Izin;
+                let namaSantri = item.nama || item.nama_santri || item.Nama_Santri;
+                let nikSantri = item.nik || item.NIK;
+                let kelasSantri = item.kelas || item.Kelas;
+                let jenisIzin = item.jenis || item.jenis_izin || item.Jenis_Izin;
+                let alasanIzin = item.keperluan || item.alasan || item.Alasan;
 
                 let aksiButton = "";
                 if(statusStr === "PENDING") {
@@ -328,7 +329,7 @@
                             <button onclick="eksekusiAccPortal('${idIzin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
                         </div>
                     `;
-                } else if((statusStr === "DISETUJUI" || statusStr === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
+                } else if((statusStr === "DISETUJUI" || statusStr === "ACC" || statusStr === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
                     aksiButton = `
                         <div class="flex justify-end gap-1.5 items-center">
                             <button onclick="tutupIzinManual('${idIzin}')" class="px-2 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 font-black text-[9px] uppercase hover:bg-slate-600 cursor-pointer"><i class="fa-solid fa-right-to-bracket mr-1"></i>OVERRIDE IN</button>
@@ -553,7 +554,6 @@
                 if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-dark');
             }
-            if(databaseIzinGlobal.length > 0) renderTabelIzin();
         }
     </script>
 </body>
