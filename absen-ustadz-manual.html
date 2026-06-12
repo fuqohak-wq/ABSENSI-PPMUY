@@ -3,109 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presensi Cepat Asatidzah - E-Pesantren Core</title>
+    <title>Presensi Cepat Asatidzah - PPMUY</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        /* Base Global Transition untuk menyamakan feel perizinan-santri.html */
         body, header, div, section, button, h1, h3, p {
-            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        /* TEMA GELAP (DEFAULT INTEGRATED) */
         .theme-dark {
-            --bg-main: #0f172a;
-            --bg-header: #020617;
-            --bg-box: #020617;
-            --bg-inner: #0f172a;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
+            --bg-main: #0f172a; --bg-header: #020617; --bg-box: #020617;
+            --text-main: #f1f5f9; --text-muted: #94a3b8; --border-color: #1e293b;
         }
-        
-        /* TEMA CERAH (INTEGRATED) */
         .theme-light {
-            --bg-main: #f8fafc;
-            --bg-header: #ffffff;
-            --bg-box: #ffffff;
-            --bg-inner: #f1f5f9;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --bg-main: #f8fafc; --bg-header: #ffffff; --bg-box: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0;
         }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-        }
-
-        .header-theme {
-            background-color: var(--bg-header);
-            border-color: var(--border-color);
-        }
-
-        .box-filter {
-            background-color: var(--bg-box);
-            border-color: var(--border-color);
-        }
-
-        /* Desain Premium Kartu Ustadz */
-        .card-ustadz {
-            background-color: var(--bg-box);
-            border-color: var(--border-color);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .theme-dark .card-ustadz:hover {
-            border-color: #10b981;
-            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.1);
-            transform: translateY(-4px);
-        }
-
-        .theme-light .card-ustadz:hover {
-            border-color: #10b981;
-            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.05);
-            transform: translateY(-4px);
-        }
-
-        /* Animasi Kartu Hilang Saat Diklik */
-        .card-vanish {
-            opacity: 0 !important;
-            transform: scale(0.7) translateY(20px) !important;
-            filter: blur(4px);
-            pointer-events: none;
-        }
-
-        /* Style Active Tab Filter */
-        .btn-active-emerald {
-            background-color: #10b981 !important;
-            color: #ffffff !important;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-        }
+        body { background-color: var(--bg-main); color: var(--text-main); }
+        .header-theme { background-color: var(--bg-header); border-color: var(--border-color); }
+        .box-filter { background-color: var(--bg-box); border-color: var(--border-color); }
+        .card-ustadz { background-color: var(--bg-box); border-color: var(--border-color); transition: all 0.25s ease; }
+        .theme-dark .card-ustadz:hover { border-color: #10b981; box-shadow: 0 8px 20px rgba(16,185,129,0.15); transform: translateY(-2px); }
+        .theme-light .card-ustadz:hover { border-color: #10b981; box-shadow: 0 8px 20px rgba(16,185,129,0.08); transform: translateY(-2px); }
+        .card-vanish { opacity: 0 !important; transform: scale(0.8) translateY(10px) !important; pointer-events: none; }
+        .btn-active-emerald { background-color: #10b981 !important; color: #ffffff !important; }
     </style>
 </head>
-<body class="theme-dark font-sans antialiased min-h-screen selection:bg-emerald-500/30">
+<body class="theme-dark font-sans antialiased min-h-screen">
 
     <header class="header-theme border-b sticky top-0 z-50 px-6 py-4 shadow-sm backdrop-blur-md bg-opacity-95">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            
             <div class="flex items-center gap-4 w-full md:w-auto">
-                <button onclick="kembaliKeDashboard()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer active:scale-95 group transition-all" title="Kembali ke Dashboard Utama">
-                    <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                <button onclick="kembaliKeDashboard()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer transition-all">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
-
-                <button id="btn-tema" onclick="toggleTema()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer active:scale-95 transition-all" title="Ganti Tema">
+                <button id="btn-tema" onclick="toggleTema()" class="p-2.5 bg-slate-800/40 hover:bg-slate-700/60 text-slate-300 rounded-xl border border-slate-700/50 cursor-pointer transition-all">
                     <i class="fa-solid fa-sun"></i>
                 </button>
-                
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
-                        <i class="fa-solid fa-user-check text-emerald-500"></i> Presensi Cepat Asatidzah
-                    </h1>
-                    <p class="text-xs text-muted mt-0.5" style="color: var(--text-muted)">
-                        Klik kartu ustadz jika <span class="text-emerald-500 font-semibold">HADIR</span>. Personel yang tersisa di layar otomatis terhitung Alpa/Gaib.
-                    </p>
+                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">Portal Presensi Asatidzah</h1>
+                    <p class="text-xs mt-0.5" style="color: var(--text-muted)">Klik kartu jika ustadz <span class="text-emerald-500 font-bold">Hadir (Poin 0)</span>. Sisanya klik tombol Selesai Absen di bawah <span class="text-red-400 font-bold">(Poin 3)</span>.</p>
                 </div>
             </div>
             
@@ -114,7 +50,6 @@
                     <button id="btnMagrib" onclick="setKajian('Magrib')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">MAGRIB</button>
                     <button id="btnSubuh" onclick="setKajian('Subuh')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">SUBUH</button>
                 </div>
-
                 <div class="box-filter p-1 rounded-xl border flex gap-1 shadow-inner">
                     <button id="btnL" onclick="setGender('L')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">LAKI-LAKI</button>
                     <button id="btnP" onclick="setGender('P')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 cursor-pointer transition-all">PEREMPUAN</button>
@@ -124,240 +59,208 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6 py-8">
-        
-        <div id="statusArea" class="flex flex-col items-center justify-center py-24 text-center transition-all">
-            <div class="relative flex items-center justify-center mb-4">
-                <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-emerald-500"></div>
-                <i class="fa-solid fa-cloud-arrow-down absolute text-emerald-500 text-xs"></i>
-            </div>
-            <p id="statusText" class="text-sm font-medium tracking-wide" style="color: var(--text-muted)">Menghubungkan ke pusat pangkalan data asatidzah PPMUY...</p>
+        <div id="statusArea" class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-emerald-500 mb-4"></div>
+            <p class="text-sm font-medium" style="color: var(--text-muted)">Sinkronisasi master data ustadz PPMUY...</p>
         </div>
 
-        <div id="gridUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 opacity-0 hidden transition-all duration-500">
+        <div id="gridUstadz" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 hidden">
             </div>
+
+        <div id="panelAksi" class="mt-12 flex justify-center hidden">
+            <button onclick="prosesUstadzAlpaMassal()" class="px-8 py-3.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-red-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-gavel"></i> Selesai Absen (Kunci Poin 3 Bagi Yang Gaib)
+            </button>
+        </div>
     </main>
 
-    <footer class="max-w-7xl mx-auto px-6 pb-8 text-center text-xs opacity-60" style="color: var(--text-muted)">
-        &copy; 2026 E-Pesantren Core Framework &bull; PPMUY Realtime Gate.
-    </footer>
-
     <script>
-        // URL Web App Terbaru yang Anda Sediakan
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbycq_pur0toFMte0dsiPPXZPhpsKVRwH2CxOnZc3wgvtS20mcb7Lbp2ttLOSr_szZTT/exec";
         
-        let logHarianUstadz = [];
+        let masterUstadz = [];
+        let sisaUstadzDilayar = [];
         let kajianAktif = "Magrib";
         let genderAktif = "L";
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Ambil preferensi tema agar sinkron penuh dengan perizinan-santri.html
             const savedTheme = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(savedTheme);
-            
-            fetchDataLog();
+            fetchDataMaster();
         });
 
-        // Pengatur Tema Mengikuti Skema Dashboard Anda Sebelumnya
         function toggleTema() {
-            const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
-            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
+            const newTheme = document.body.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark';
             setTemaAplikasi(newTheme);
         }
 
         function setTemaAplikasi(tema) {
-            const btnTema = document.getElementById('btn-tema');
+            const btn = document.getElementById('btn-tema');
             if (tema === 'theme-light') {
-                document.body.classList.remove('theme-dark');
-                document.body.classList.add('theme-light');
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-slate-700"></i>`;
+                document.body.className = "theme-light font-sans antialiased min-h-screen";
+                if(btn) btn.innerHTML = `<i class="fa-solid fa-moon text-slate-700"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-light');
             } else {
-                document.body.classList.remove('theme-light');
-                document.body.classList.add('theme-dark');
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i>`;
+                document.body.className = "theme-dark font-sans antialiased min-h-screen";
+                if(btn) btn.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i>`;
                 localStorage.setItem('dashboard_theme', 'theme-dark');
             }
         }
 
-        function kembaliKeDashboard() {
-            // Mengembalikan user ke menu utama/dashboard Apps Script Anda
-            window.location.href = "https://manajemen.ppmuy.com"; 
-        }
+        function kembaliKeDashboard() { window.location.href = "https://manajemen.ppmuy.com"; }
 
-        // Ambil Data Menggunakan Struktur URLSearchParams Bebas Hambatan CORS
-        function fetchDataLog() {
+        function fetchDataMaster() {
             const params = new URLSearchParams({ aksi: "ambil_database_ustadz" });
-            
-            fetch(`${WEB_APP_URL}?${params.toString()}`, {
-                method: "GET",
-                mode: "cors"
-            })
+            fetch(`${WEB_APP_URL}?${params.toString()}`, { method: "GET", mode: "cors" })
             .then(r => r.json())
             .then(res => {
                 if(res.status === "success") {
-                    logHarianUstadz = res.data;
-                    
-                    // Sembunyikan Loading, Munculkan Grid dengan efek fade-in
-                    const statusArea = document.getElementById('statusArea');
-                    const gridUstadz = document.getElementById('gridUstadz');
-                    
-                    statusArea.classList.add('hidden');
-                    gridUstadz.classList.remove('hidden');
-                    setTimeout(() => gridUstadz.classList.add('opacity-100'), 50);
-                    
+                    masterUstadz = res.data;
+                    document.getElementById('statusArea').classList.add('hidden');
+                    document.getElementById('gridUstadz').classList.remove('hidden');
+                    document.getElementById('panelAksi').classList.remove('hidden');
                     saringDanTampilkan();
                 } else {
-                    tampilkanPesanError(res.message);
+                    document.getElementById('statusArea').innerHTML = `<p class="text-red-400 font-bold">${res.message}</p>`;
                 }
             })
             .catch(e => {
-                tampilkanPesanError("Gagal tersambung dengan Cloud Apps Script. Periksa koneksi internet Anda.");
+                document.getElementById('statusArea').innerHTML = `<p class="text-red-400 font-bold">Koneksi Cloud Putus.</p>`;
             });
         }
 
-        function tampilkanPesanError(pesan) {
-            const statusArea = document.getElementById('statusArea');
-            statusArea.innerHTML = `
-                <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl max-w-md">
-                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl mb-2"></i>
-                    <p class="text-sm font-medium text-red-400">${pesan}</p>
-                </div>
-            `;
-        }
+        function setKajian(k) { kajianAktif = k; saringDanTampilkan(); }
+        function setGender(g) { genderAktif = g; saringDanTampilkan(); }
 
-        function setKajian(k) {
-            kajianAktif = k;
-            saringDanTampilkan();
-        }
-
-        function setGender(g) {
-            genderAktif = g;
-            saringDanTampilkan();
-        }
-
-        // Fungsi Render Kartu Dinamis & Cantik
         function saringDanTampilkan() {
-            // Update Tampilan Tombol Filter Aktif
-            document.getElementById('btnMagrib').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Magrib' ? 'btn-active-emerald' : 'text-slate-400'}`;
-            document.getElementById('btnSubuh').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Subuh' ? 'btn-active-emerald' : 'text-slate-400'}`;
-            
-            document.getElementById('btnL').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'L' ? 'btn-active-emerald' : 'text-slate-400'}`;
-            document.getElementById('btnP').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'P' ? 'btn-active-emerald' : 'text-slate-400'}`;
+    // 1. Perbarui efek visual tombol filter yang sedang aktif
+    document.getElementById('btnMagrib').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Magrib' ? 'btn-active-emerald' : 'text-slate-400'}`;
+    document.getElementById('btnSubuh').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${kajianAktif === 'Subuh' ? 'btn-active-emerald' : 'text-slate-400'}`;
+    
+    document.getElementById('btnL').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'L' ? 'btn-active-emerald' : 'text-slate-400'}`;
+    document.getElementById('btnP').className = `px-4 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all ${genderAktif === 'P' ? 'btn-active-emerald' : 'text-slate-400'}`;
 
-            const container = document.getElementById('gridUstadz');
-            container.innerHTML = '';
+    const container = document.getElementById('gridUstadz');
+    container.innerHTML = '';
 
-            // Lakukan Filtering Data Sheet Berdasarkan Kriteria Tombol Atas
-            const hasilSaring = logHarianUstadz.filter(u => {
-                // Pastikan kolom "kajian" dan "gender" tersedia di data sheet
-                let matchKajian = u.kajian && (u.kajian.toLowerCase().includes(kajianAktif.toLowerCase()));
-                
-                let g = u.gender ? u.gender.toUpperCase().trim() : '';
-                let matchGender = false;
-                if (genderAktif === 'L') matchGender = (g === 'L' || g.includes('LAKI'));
-                if (genderAktif === 'P') matchGender = (g === 'P' || g.includes('PEREMPUAN'));
-                
-                return matchKajian && matchGender;
-            });
+    // 2. Saring data MURNI hanya berdasarkan GENDER (LAKI-LAKI / PEREMPUAN) dari sheet Database Induk
+    sisaUstadzDilayar = masterUstadz.filter(u => {
+        let genTarget = genderAktif === 'L' ? 'LAKI-LAKI' : 'PEREMPUAN';
+        return u.gender && u.gender.toUpperCase().trim() === genTarget;
+    });
 
-            if(hasilSaring.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-16 flex flex-col items-center justify-center border border-dashed border-slate-700/60 rounded-3xl p-6">
-                        <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-3 animate-bounce"></i>
-                        <h4 class="text-sm font-semibold">Selesai Menilai!</h4>
-                        <p class="text-xs text-muted mt-1 max-w-xs">Seluruh Asatidzah kelompok ${genderAktif === 'L' ? 'Laki-Laki' : 'Perempuan'} untuk jadwal ${kajianAktif} sudah terabsen atau tidak terjadwal.</p>
-                    </div>
-                `;
-                return;
-            }
+    // 3. Jika data kosong di database
+    if(sisaUstadzDilayar.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-sm opacity-60">Tidak ada data Asatidzah dengan gender ini di dalam sheet Database.</div>`;
+        document.getElementById('panelAksi').classList.add('hidden');
+        return;
+    }
+    
+    document.getElementById('panelAksi').classList.remove('hidden');
 
-            // Loop untuk menggambar kartu asatidzah
-            hasilSaring.forEach(u => {
-                const card = document.createElement('div');
-                card.id = `card-${u.nik}`;
-                // Grid layout box elegan dengan transisi smooth
-                card.className = 'card-ustadz p-5 rounded-2xl border flex flex-col justify-between items-center text-center relative overflow-hidden select-none active:scale-95 shadow-sm group cursor-pointer';
-                
-                card.setAttribute('onclick', `eksekusiAbsenUstadz(\`${u.nik}\`, \`${u.nama.replace(/"/g, '&quot;')}\`)`);
-                
-                // Variasi inisial dua huruf nama ustadz
-                const inisial = u.nama ? u.nama.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : 'AZ';
-                
-                card.innerHTML = `
-                    <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center mb-3 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                        <span class="text-sm font-black tracking-wider">${inisial}</span>
-                    </div>
-                    
-                    <div class="w-full flex-1 flex flex-col justify-center">
-                        <h3 class="text-sm font-bold tracking-tight line-clamp-2 mb-1 group-hover:text-emerald-500 transition-colors duration-200">${u.nama}</h3>
-                        <p class="text-[11px] font-medium tracking-wide opacity-70 mb-2" style="color: var(--text-muted)">
-                            <i class="fa-solid fa-book-open text-[10px] mr-1"></i>${u.mapel || 'Kitab'}
-                        </p>
-                    </div>
-                    
-                    <div class="w-full pt-2 border-t border-slate-700/20 text-[10px] font-mono font-semibold text-emerald-500 bg-emerald-500/5 py-1 rounded-lg">
-                        <i class="fa-solid fa-school mr-1"></i>${u.kelas || 'Halaqah'}
-                    </div>
-                    
-                    <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                `;
-                container.appendChild(card);
-            });
-        }
+    // 4. Render seluruh nama ustadz menjadi kartu tanpa batas waktu/hari
+    sisaUstadzDilayar.forEach(u => {
+        const card = document.createElement('div');
+        card.id = `card-${u.nik}`;
+        card.className = 'card-ustadz p-5 rounded-2xl border flex flex-col justify-center items-center text-center relative overflow-hidden select-none active:scale-95 shadow-sm group cursor-pointer';
+        
+        // Memicu fungsi hadir saat kartu diklik
+        card.setAttribute('onclick', `eksekusiHadir(\`${u.nik}\`, \`${u.nama.replace(/"/g, '&quot;')}\`)`);
+        
+        const ins = u.nama ? u.nama.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : 'US';
 
-        // Fungsi Eksekusi Pengiriman Absensi dengan Animasi Menghilang Indah (Vanish)
-        function eksekusiAbsenUstadz(nik, nama) {
-            const targetCard = document.getElementById(`card-${nik}`);
-            if(!targetCard) return;
+        card.innerHTML = `
+            <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center mb-3 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                <span class="text-sm font-black">${ins}</span>
+            </div>
+            <h3 class="text-sm font-bold tracking-tight line-clamp-2">${u.nama}</h3>
+            <p class="text-[10px] font-mono opacity-50 mt-1">ID: ${u.nik}</p>
+            <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        `;
+        container.appendChild(card);
+    });
+}
 
-            // Kunci kartu secara visual agar tidak bisa diklik ganda selama proses hit ke Google API
-            targetCard.style.pointerEvents = "none";
-            targetCard.classList.add('scale-95');
+        // AKSI 1: KLIK HADIR (POIN 0)
+        function eksekusiHadir(nik, nama) {
+            const card = document.getElementById(`card-${nik}`);
+            if(!card) return;
+            card.style.pointerEvents = "none";
 
             const payload = {
                 aksi: "simpan_absen_ustadz_manual",
                 nik: nik,
-                kajian: kajianAktif
+                nama: nama,
+                kegiatan: kajianAktif
             };
 
             fetch(WEB_APP_URL, {
                 method: "POST",
                 mode: "cors",
-                headers: {
-                    "Content-Type": "text/plain" // Meloloskan preflight CORS Google Apps Script
-                },
+                headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify(payload)
             })
             .then(r => r.json())
             .then(res => {
                 if(res.status === "success") {
-                    // Eksekusi efek animasi kartu mengecil, blur, kemudian lenyap dari layar
-                    targetCard.classList.add('card-vanish');
-                    
+                    card.classList.add('card-vanish');
                     setTimeout(() => {
-                        targetCard.remove();
-                        // Hapus dari data memori cache lokal
-                        logHarianUstadz = logHarianUstadz.filter(u => !(u.nik === nik && u.kajian.toLowerCase().includes(kajianAktif.toLowerCase())));
-                        
-                        const container = document.getElementById('gridUstadz');
-                        // Cek apakah sisa komponen kartu dalam filter aktif tersebut sudah habis
-                        if (container.querySelectorAll('.card-ustadz').length === 0) {
-                            saringDanTampilkan();
-                        }
-                    }, 350); // Waktu jeda animasi CSS terhitung milidetik
-                    
+                        card.remove();
+                        // Buang ustadz ini dari list sisaUstadzDilayar karena dia sudah sukses hadir
+                        sisaUstadzDilayar = sisaUstadzDilayar.filter(u => u.nik !== nik);
+                    }, 300);
                 } else {
-                    // Pulihkan jika backend menolak instruksi
-                    targetCard.classList.remove('scale-95');
-                    targetCard.style.pointerEvents = "auto";
-                    alert("Gagal mencatat kehadiran: " + res.message);
+                    card.style.pointerEvents = "auto";
+                    alert("Gagal: " + res.message);
                 }
             })
-            .catch(e => {
-                // Pulihkan kartu jika jaringan internet putus di tengah jalan
-                targetCard.classList.remove('scale-95');
-                targetCard.style.pointerEvents = "auto";
-                alert("Koneksi gagal terhubung ke Cloud Apps Script. Silakan coba kembali.");
+            .catch(e => { card.style.pointerEvents = "auto"; alert("Jaringan bermasalah."); });
+        }
+
+        // AKSI 2: KLIK TOMBOL SELESAI ABSEN (SISANYA DIANGGAP ALPA & POIN 3)
+        function prosesUstadzAlpaMassal() {
+            if(sisaUstadzDilayar.length === 0) {
+                alert("Semua ustadz di kelompok ini sudah diabsen hadir.");
+                return;
+            }
+
+            if(!confirm(`Apakah Anda yakin mengunci absensi? ${sisaUstadzDilayar.length} Ustadz yang tersisa di layar akan otomatis dicatat TIDAK HADIR dengan Poin Pelanggaran = 3!`)) {
+                return;
+            }
+
+            const btnAksi = document.getElementById('panelAksi');
+            btnAksi.style.pointerEvents = "none";
+            btnAksi.style.opacity = "0.5";
+
+            const payload = {
+                aksi: "simpan_tidak_hadir_massal",
+                kegiatan: kajianAktif,
+                data_alpa: sisaUstadzDilayar
+            };
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === "success") {
+                    alert(`Sukses! ${sisaUstadzDilayar.length} Ustadz berhasil dikunci dengan status Tidak Hadir (Poin 3).`);
+                    // Kosongkan layar karena sesi filter ini sudah selesai total
+                    sisaUstadzDilayar = [];
+                    document.getElementById('gridUstadz').innerHTML = '';
+                    saringDanTampilkan();
+                } else {
+                    alert("Gagal memproses alpa: " + res.message);
+                }
+                btnAksi.style.pointerEvents = "auto";
+                btnAksi.style.opacity = "1";
+            })
+            .catch(e => { 
+                btnAksi.style.pointerEvents = "auto"; 
+                btnAksi.style.opacity = "1"; 
+                alert("Koneksi gagal saat memproses data alpa massal."); 
             });
         }
     </script>
