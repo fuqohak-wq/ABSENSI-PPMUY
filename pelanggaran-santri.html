@@ -408,18 +408,21 @@
                 tombolAksi = `<span class="text-zinc-500 text-[10px] italic">Menunggu Pengasuh</span>`;
               }
 
-              tr.innerHTML = `
-                <td class="py-3 px-4 font-bold">
-                  <div>${namaSantri}</div>
-                  <div class="text-[10px] text-zinc-500 font-normal">NIK: ${idNik}</div>
-                </td>
-                <td class="py-3 px-4 max-w-xs whitespace-normal">
-                  <span class="font-bold text-rose-400 text-[10px] block uppercase">[${tingkatPelanggaran}]</span>
-                  <div class="text-zinc-400 mt-0.5">${deskripsiKejadian}</div>
-                </td>
-                <td class="py-3 px-4 max-w-xs whitespace-normal text-zinc-400">${usulanTakzir}</td>
-                <td class="py-3 px-4 text-center">${badgeStatus}</td>
-                <td class="py-3 px-4 text-center">${tombolAksi}</td>
+              // GANTI BLOK DI DALAM .forEach DATA PADA FUNGSI muatDataLogPelanggaran() DENGAN INI:
+
+tr.innerHTML = `
+  <td class="py-3 px-4 font-bold">
+    <div>${namaSantri}</div>
+    <div class="text-[10px] text-zinc-500 font-normal">NIK: ${idNik}</div>
+  </td>
+  <td class="py-3 px-4 max-w-xs whitespace-normal">
+    <span class="font-bold text-rose-400 text-[10px] block uppercase">[${tingkatPelanggaran}]</span>
+    <div class="text-zinc-400 mt-0.5">${deskripsiKejadian}</div>
+  </td>
+  <td class="py-3 px-4 max-w-xs whitespace-normal text-zinc-400">${usulanTakzir}</td>
+  <td class="py-3 px-4 text-center">${badgeStatus}</td>
+  <td class="py-3 px-4 text-center">${tombolAksi}</td>
+`; // <- Tag penutup </tr> otomatis diurus oleh dokumentasi appendChild, struktur aman!
               `;
               tbody.appendChild(tr);
             });
