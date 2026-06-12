@@ -3,196 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Perizinan Santri - E-Pesantren Core</title>
+    <title>Kiosk Perizinan Santri</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
-        body, header, div, section, button, table, td, th, footer, input, select {
-            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-        }
-        
         .theme-dark {
-            --bg-main: #0f172a;
-            --bg-header: #020617;
-            --bg-box: #020617;
-            --bg-inner: #0f172a;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
+            --bg-main: #020617;
+            --bg-card: #0f172a;
             --border-color: #1e293b;
-            --border-row: #020617;
-            --text-row: #cbd5e1;
-            --text-title: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #1e293b;
         }
-
         .theme-light {
-            --bg-main: #f0f4f8;
-            --bg-header: #0f172a;
-            --bg-box: rgba(255, 255, 255, 0.85);
-            --bg-inner: #e2e8f0;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
             --text-main: #0f172a;
-            --text-muted: #2563eb;
-            --border-color: #cbd5e1;
-            --border-row: #e2e8f0;
-            --text-row: #334155;
-            --text-title: #1e40af;
+            --text-muted: #64748b;
+            --input-bg: #f1f5f9;
         }
-
-        body { background-color: var(--bg-main); color: var(--text-main); }
-        .dynamic-bg-main { background-color: var(--bg-main); }
-        .dynamic-bg-header { background-color: var(--bg-header); }
-        .dynamic-bg-box { background-color: var(--bg-box); backdrop-filter: blur(8px); }
-        .dynamic-bg-inner { background-color: var(--bg-inner); }
-        .dynamic-text-main { color: var(--text-main); }
-        .dynamic-text-muted { color: var(--text-muted); }
-        .dynamic-border { border-color: var(--border-color); }
-        .dynamic-border-row { border-color: var(--border-row); }
-        .dynamic-text-row { color: var(--text-row); }
-        .dynamic-text-title { color: var(--text-title); }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        .dynamic-card {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        .dynamic-input {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+        .dynamic-border-row {
+            border-color: var(--border-color);
+        }
+        @media print {
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
-<body class="theme-dark font-sans min-h-screen flex flex-col justify-between dynamic-bg-main text-slate-100">
+<body class="theme-dark min-h-screen font-sans antialiased selection:bg-blue-600 selection:text-white">
 
-    <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center gap-3">
-            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shadow-sm hover:scale-105 transition-all">
-                <i class="fa-solid fa-arrow-left text-slate-950 text-base"></i>
-            </a>
-            <div>
-                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">PORTAL PERIZINAN INTEGRASI KIOSK V8</h1>
-                <span id="txt-role-badge" class="text-[9px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">GATEKEEPER SECURITY</span>
+    <header class="border-b dynamic-border-row dynamic-card no-print sticky top-0 z-50 backdrop-blur-md bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-between justify-center shadow-lg shadow-blue-500/20 text-white">
+                    <i class="fa-solid fa-id-card-clip text-sm m-auto"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-black uppercase tracking-wider">GATEWAY PERIZINAN</h1>
+                    <p class="text-[9px] text-slate-400 font-bold tracking-widest uppercase">KIOSK KEAMANAN PUSAT v8.2</p>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center cursor-pointer border border-slate-700 text-amber-400 shadow"><i class="fa-solid fa-sun"></i></button>
-            <button onclick="muatDataPerizinan()" class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center cursor-pointer border border-slate-700 shadow"><i class="fa-solid fa-rotate"></i></button>
+            
+            <div class="flex items-center gap-2">
+                <span id="txt-role-badge" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-md text-[9px] font-black tracking-widest uppercase">KEAMANAN GERBANG</span>
+                <button id="btn-tema" onclick="toggleTema()" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-all">
+                    <i class="fa-solid fa-sun m-auto"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-sm border-l-4 border-l-amber-500">
-                <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">MENUNGGU ACC PENGASUH</span>
-                <span id="stat-pending" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
-            </div>
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-blue-500 shadow-sm">
-                <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 tracking-wider block uppercase">SEDANG DI LUAR PONDOK</span>
-                <span id="stat-diluar" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
-            </div>
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-rose-500 shadow-sm">
-                <span class="text-[10px] font-black text-rose-600 dark:text-rose-400 tracking-wider block uppercase">TERLAMBAT (TAKZIR AKTIF)</span>
-                <span id="stat-terlambat" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
-            </div>
-        </div>
+        <section class="lg:col-span-5 space-y-5 no-print">
+            <div class="border rounded-2xl p-5 dynamic-card shadow-sm">
+                <h2 class="text-xs font-black uppercase tracking-wider mb-4 text-blue-500 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> PENCATATAN USULAN BARU
+                </h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button id="btn-metode-cari" onclick="setMetodeInput('CARI')" class="py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all">
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i> Cari Manual
+                    </button>
+                    <button id="btn-metode-qr" onclick="setMetodeInput('QR')" class="py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all">
+                        <i class="fa-solid fa-qrcode mr-1"></i> Scan QR Code
+                    </button>
+                </div>
+
+                <div id="box-pencarian" class="mb-4 relative">
+                    <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Ketik NIK atau Nama Santri</label>
+                    <div class="relative">
+                        <input type="text" id="input-nik-nama" oninput="cariLiveSantri()" autocomplete="off" placeholder="Minimal ketik 2 karakter..." class="w-full px-3 py-2 text-xs rounded-xl border dynamic-input focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium">
+                        <i class="fa-solid fa-keyboard absolute right-3 top-3 text-slate-500 text-xs"></i>
+                    </div>
+                    <div id="dropdown-hasil-cari" class="hidden absolute left-0 right-0 mt-1 bg-slate-900 border border-slate-700 rounded-xl p-1 z-50 max-h-52 overflow-y-auto shadow-xl"></div>
+                </div>
+
+                <div id="box-qr-scanner" class="hidden mb-4 border border-dashed border-slate-700 p-2 rounded-xl bg-black/20">
+                    <div id="reader" class="w-full overflow-hidden rounded-lg"></div>
+                </div>
+
+                <div id="preview-santri" class="hidden p-3 rounded-xl bg-blue-600/10 border border-blue-500/20 mb-4 animate-fade-in">
+                    <div class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-1">Target Santri Terpilih:</div>
+                    <div id="prev-nama" class="font-black text-sm uppercase text-slate-200">NAMA SANTRI...</div>
+                    <div id="prev-kelas" class="font-mono text-[10px] text-slate-400 font-bold uppercase mt-0.5">KELAS / ASRAMA...</div>
+                </div>
+
+                <div class="space-y-3.5">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Jenis Hajat Perizinan</label>
+                        <select id="select-jenis-izin" class="w-full px-3 py-2 text-xs rounded-xl border dynamic-input focus:outline-none focus:ring-2 focus:ring-blue-600 font-black uppercase tracking-wider cursor-pointer">
+                            <option value="PULANG">PULANG (BUTUH PERSUTUJUAN PENGASUH)</option>
+                            <option value="KELUAR SEBENTAR">KELUAR SEBENTAR (OTOMATIS DISETUJUI)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Waktu Mulai Keluar</label>
+                            <input type="datetime-local" id="input-tgl-mulai" class="w-full px-3 py-2 text-xs rounded-xl border dynamic-input focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Janji Batas Kembali</label>
+                            <input type="datetime-local" id="input-janji-kembali" class="w-full px-3 py-2 text-xs rounded-xl border dynamic-input focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Alasan Singkat / Keperluan</label>
+                        <textarea id="input-alasan" rows="2" placeholder="Contoh: Menengok nenek sakit keras, dll..." class="w-full px-3 py-2 text-xs rounded-xl border dynamic-input focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium placeholder:text-slate-500"></textarea>
+                    </div>
+
+                    <button onclick="prosesUsulkanIzin()" class="w-full mt-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-xs tracking-widest shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.99] transition-all cursor-pointer">
+                        LOG & SUBMIT PERIZINAN
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-7 space-y-4">
             
-            <div id="panel-input-izin" class="lg:col-span-1 flex flex-col gap-4">
-                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm">
-                    <h3 class="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                        <i class="fa-solid fa-id-card-clip text-sm"></i> INPUT USULAN IZIN BARU
-                    </h3>
-                    
-                    <div class="flex flex-col gap-3.5 text-xs font-bold">
-                        <div>
-                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Metode Cari Santri</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="setMetodeInput('CARI')" id="btn-metode-cari" class="py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer">Pencarian NIK/Nama</button>
-                                <button onclick="setMetodeInput('QR')" id="btn-metode-qr" class="py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer"><i class="fa-solid fa-qrcode mr-1"></i> Scan QR Code</button>
-                            </div>
-                        </div>
-
-                        <div id="box-qr-scanner" class="hidden border-2 border-dashed border-slate-700 rounded-xl p-2 bg-slate-950">
-                            <div id="reader" style="width: 100%;"></div>
-                            <button onclick="stopQrScanner()" class="w-full mt-2 py-1 bg-rose-600 text-white rounded font-black text-[10px] cursor-pointer">TUTUP KAMERA</button>
-                        </div>
-
-                        <div id="box-pencarian" class="relative">
-                            <label class="block text-[10px] text-slate-400 uppercase mb-1">NIK atau Nama Santri</label>
-                            <input type="text" id="input-nik-nama" onkeyup="cariLiveSantri()" placeholder="Ketik NIK atau sebagian Nama..." class="w-full p-2.5 rounded-xl bg-slate-900/10 border border-slate-700 text-slate-100 text-xs focus:border-blue-500 outline-none">
-                            <div id="dropdown-hasil-cari" class="hidden max-h-40 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl mt-1 p-1 flex flex-col gap-1 absolute z-50 w-full left-0 shadow-xl"></div>
-                        </div>
-
-                        <div id="preview-santri" class="hidden dynamic-bg-inner p-3 rounded-xl border border-dashed dynamic-border">
-                            <span class="text-[9px] text-blue-500 block">SANTRI DIKUNCI:</span>
-                            <div id="prev-nama" class="font-black dynamic-text-main text-xs uppercase">LOADING...</div>
-                            <div id="prev-kelas" class="font-mono text-[10px] text-slate-400 mt-0.5">CLASS...</div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Hajat Perizinan</label>
-                            <select id="select-jenis-izin" class="w-full p-2.5 rounded-xl bg-slate-900/10 border dynamic-border text-xs focus:border-blue-500 outline-none cursor-pointer">
-                                <option value="KELUAR SEBENTAR">KELUAR SEBENTAR (AUTO ACC)</option>
-                                <option value="SAKIT">SAKIT (AUTO ACC)</option>
-                                <option value="PULANG">PULANG (PENDING TELEGRAM PENGASUH)</option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Mulai Keluar</label>
-                                <input type="datetime-local" id="input-tgl-mulai" class="w-full p-2 rounded-xl bg-slate-900/10 border dynamic-border text-[11px] outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Janji Kembali</label>
-                                <input type="datetime-local" id="input-janji-kembali" class="w-full p-2 rounded-xl bg-slate-900/10 border dynamic-border text-[11px] outline-none">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Alasan Detail</label>
-                            <input type="text" id="input-alasan" placeholder="Contoh: Sambang Wali / Berobat Gigi" class="w-full p-2.5 rounded-xl bg-slate-900/10 border dynamic-border text-xs outline-none">
-                        </div>
-
-                        <button onclick="prosesUsulkanIzin()" class="w-full py-3 rounded-xl bg-yellow-400 text-slate-950 font-black tracking-widest uppercase cursor-pointer hover:bg-yellow-300 active:scale-95 transition-all text-xs mt-2">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> LOG & SUBMIT PERIZINAN
-                        </button>
-                    </div>
+            <div class="grid grid-cols-3 gap-3 no-print">
+                <div class="border rounded-xl p-3 dynamic-card flex flex-col justify-center">
+                    <span class="text-[9px] font-black text-amber-500 uppercase tracking-wider">WAITING ACC</span>
+                    <span id="stat-pending" class="text-xl font-black font-mono mt-0.5 text-slate-200">0</span>
+                </div>
+                <div class="border rounded-xl p-3 dynamic-card flex flex-col justify-center">
+                    <span class="text-[9px] font-black text-blue-500 uppercase tracking-wider">DI LUAR PONDOK</span>
+                    <span id="stat-diluar" class="text-xl font-black font-mono mt-0.5 text-slate-200">0</span>
+                </div>
+                <div class="border rounded-xl p-3 dynamic-card flex flex-col justify-center bg-rose-600/5 border-rose-500/10">
+                    <span class="text-[9px] font-black text-rose-500 uppercase tracking-wider">TERLAMBAT / TRZ</span>
+                    <span id="stat-terlambat" class="text-xl font-black font-mono mt-0.5 text-slate-200">0</span>
                 </div>
             </div>
 
-            <div class="lg:col-span-2 flex flex-col gap-4">
-                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm flex flex-col h-full min-h-[450px]">
+            <div class="border rounded-2xl p-5 dynamic-card shadow-sm min-h-[460px]">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 no-print">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-blue-500 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-history"></i> MONITORING LOG REAL-TIME
+                    </h2>
                     
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b dynamic-border pb-3">
-                        <div class="flex gap-2">
-                            <button id="tab-aktif-izin" onclick="gantiTabFilter('AKTIF')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm">DILUAR / PENDING</button>
-                            <button id="tab-riwayat-izin" onclick="gantiTabFilter('RIWAYAT')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer">HISTORI SELESAI</button>
-                        </div>
-                        <h3 class="text-xs font-black dynamic-text-title uppercase tracking-widest"><i class="fa-solid fa-layer-group"></i> LOG REAL-TIME MONITORING</h3>
-                    </div>
-
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-left text-[11px]">
-                            <thead>
-                                <tr class="border-b dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
-                                    <th class="py-2.5">SANTRI</th>
-                                    <th class="py-2.5">HAJAT / REKAP DATA</th>
-                                    <th class="py-2.5">BATAS KEMBALI</th>
-                                    <th class="py-2.5 text-center">STATUS</th>
-                                    <th id="th-aksi" class="py-2.5 text-right">AKSI HARIAN</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbl-izin-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
-                                <tr><td colspan="5" class="py-8 text-center text-slate-500 uppercase tracking-wider">Sinkronisasi pangkalan data perizinan...</td></tr>
-                            </tbody>
-                        </table>
+                    <div class="flex p-0.5 rounded-xl bg-slate-950/40 border border-slate-800">
+                        <button id="tab-aktif-izin" onclick="gantiTabFilter('AKTIF')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm transition-all">AKTIF</button>
+                        <button id="tab-riwayat-izin" onclick="gantiTabFilter('RIWAYAT')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer transition-all">RIWAYAT / SELESAI</button>
                     </div>
                 </div>
+
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b dynamic-border-row text-[9px] font-black tracking-widest text-slate-400 uppercase">
+                                <th class="py-2.5">SANTRI</th>
+                                <th class="py-2.5">HAJAT & REASON</th>
+                                <th class="py-2.5">DEADLINE</th>
+                                <th class="py-2.5 text-center">STATUS</th>
+                                <th class="py-2.5 text-right no-print">AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-izin-body" class="divide-y divide-transparent">
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+                                    <i class="fa-solid fa-spinner animate-spin mr-1.5 text-blue-500 text-xs"></i> Menghubungkan ke cloud server sheet...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
-        </div>
-    </div>
-
-    <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
+        </section>
+    </main>
 
     <script>
-        // MASUKKAN URL WEB APPS KODE ANDA DISINI (URL EXEC DEPLOY TERBARU)
+        // ====================================================================
+        // CONFIGURATION URL WEB APP GOOGLE APPS SCRIPT
+        // ====================================================================
         const API_URL = "https://script.google.com/macros/s/AKfycbzsFOWETDSPw7aquOtBNsgkQGjQBcIJaJW6rSNl915MHIns5HFDwCpBwOfPwlk613Asvw/exec";
         
         let masterSantriCache = [];
@@ -208,10 +209,12 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
+            // Set default waktu mulai (sekarang)
             let skrg = new Date();
             skrg.setMinutes(skrg.getMinutes() - skrg.getTimezoneOffset());
             document.getElementById('input-tgl-mulai').value = skrg.toISOString().slice(0,16);
             
+            // Set default waktu kembali (besok)
             let besok = new Date();
             besok.setDate(besok.getDate() + 1);
             besok.setMinutes(besok.getMinutes() - besok.getTimezoneOffset());
@@ -222,40 +225,38 @@
         });
 
         async function muatMasterSantri() {
-    try {
-        const param = new URLSearchParams({ aksi: "ambil_database" });
-        // Perbaikan: Hapus mode: "cors" agar browser mengikuti redirect Google
-        let res = await fetch(`${API_URL}?${param.toString()}`);
-        let r = await res.json();
-        if(r.status === "success") {
-            masterSantriCache = r.data || [];
-            console.log("Master santri berhasil disinkronkan:", masterSantriCache.length);
-        } else {
-            console.error("Respon cloud gagal:", r.message);
+            try {
+                const param = new URLSearchParams({ aksi: "ambil_database" });
+                let res = await fetch(`${API_URL}?${param.toString()}`);
+                let r = await res.json();
+                if(r.status === "success") {
+                    masterSantriCache = r.data || [];
+                    console.log("Master santri disinkronkan:", masterSantriCache.length);
+                } else {
+                    console.error("Respon master santri gagal:", r.message);
+                }
+            } catch(e) { 
+                console.error("Gagal sinkronisasi master cache santri", e); 
+            }
         }
-    } catch(e) { 
-        console.error("Gagal sinkronisasi master cache santri", e); 
-    }
-}
 
-async function muatDataPerizinan() {
-    const tbody = document.getElementById('tbl-izin-body');
-    try {
-        const param = new URLSearchParams({ aksi: "ambil_perizinan" });
-        // Perbaikan: Hapus mode: "cors" agar browser mengikuti redirect Google
-        let res = await fetch(`${API_URL}?${param.toString()}`);
-        let r = await res.json();
-        if(r.status === "success") {
-            databaseIzinGlobal = r.data || [];
-            kalkulasiStatistikDanRender();
-        } else {
-            if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Error Cloud: ${r.message}</td></tr>`;
+        async function muatDataPerizinan() {
+            const tbody = document.getElementById('tbl-izin-body');
+            try {
+                const param = new URLSearchParams({ aksi: "ambil_perizinan" });
+                let res = await fetch(`${API_URL}?${param.toString()}`);
+                let r = await res.json();
+                if(r.status === "success") {
+                    databaseIzinGlobal = r.data || [];
+                    kalkulasiStatistikDanRender();
+                } else {
+                    if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Error Cloud: ${r.message}</td></tr>`;
+                }
+            } catch(e) {
+                console.error("Gagal load perizinan:", e);
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase font-bold">Gagal memuat data dari cloud server sheet.</td></tr>`;
+            }
         }
-    } catch(e) {
-        console.error("Gagal load perizinan:", e);
-        if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
-    }
-}
 
         function kalkulasiStatistikDanRender() {
             let pending = 0, diluar = 0, terlambat = 0;
@@ -296,7 +297,7 @@ async function muatDataPerizinan() {
             });
 
             if(dataFilter.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 uppercase text-[10px]">Tidak ada catatan perizinan di baris filter ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 uppercase text-[10px] font-bold">Tidak ada catatan perizinan di baris filter ini.</td></tr>`;
                 return;
             }
 
@@ -325,12 +326,11 @@ async function muatDataPerizinan() {
                     badge = `<span class="bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">DI LUAR PONDOK</span>`;
                 }
 
-                let idIzin = item.ID_Izin;
-                let namaSantri = item.Nama_Santri;
-                let nikSantri = item.NIK;
-                let kelasSantri = item.Kelas;
-                let jenisIzin = item.Jenis_Izin;
-                let alasanIzin = item.Alasan;
+                let namaSantri = item.Nama_Santri || "-";
+                let nikSantri = item.NIK || "-";
+                let kelasSantri = item.Kelas || "-";
+                let jenisIzin = item.Jenis_Izin || "-";
+                let alasanIzin = item.Alasan || "-";
 
                 let aksiButton = "";
                 if(statusStr === "PENDING") {
@@ -452,6 +452,9 @@ async function muatDataPerizinan() {
             }
         }
 
+        // ====================================================================
+        // FUNGSI SUBMIT DENGAN STRATEGI PARAMETER URL (ADAPTASI FILE PELANGGARAN)
+        // ====================================================================
         async function prosesUsulkanIzin() {
             if(!santriTerpilihNIK) { 
                 alert("Pilih nama atau Scan QR santri terlebih dahulu!"); 
@@ -467,33 +470,30 @@ async function muatDataPerizinan() {
             
             let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
 
-            // Efek Loading Kiosk Keamanan
+            // Efek Loading Tombol Submit
             const btnSubmit = document.querySelector("button[onclick='prosesUsulkanIzin()']");
             const teksAsli = btnSubmit.innerHTML;
             btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-1"></i> MEMPROSES...`;
             btnSubmit.disabled = true;
 
-            const payload = {
-                nik: santriTerpilihNIK,
-                nama: namaSantri,
-                kelas: kelasSantri,
-                jenisIzin: jenisIzin,
-                tglMulai: tglMulai,
-                janjiKembali: janjiKembali,
-                alasan: alasan,
-                statusAwal: statusAwal
-            };
+            // STRATEGI SAKTI: Tempel parameter ke URL seperti pada sistem Pelanggaran Anda
+            const urlTarget = `${API_URL}?aksi=simpan_perizinan` +
+                              `&nik=${encodeURIComponent(santriTerpilihNIK)}` +
+                              `&nama=${encodeURIComponent(namaSantri)}` +
+                              `&kelas=${encodeURIComponent(kelasSantri)}` +
+                              `&jenisIzin=${encodeURIComponent(jenisIzin)}` +
+                              `&tglMulai=${encodeURIComponent(tglMulai)}` +
+                              `&janjiKembali=${encodeURIComponent(janjiKembali)}` +
+                              `&alasan=${encodeURIComponent(alasan)}` +
+                              `&statusAwal=${encodeURIComponent(statusAwal)}`;
 
             try {
-                let res = await fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-
+                // Eksekusi POST murni tanpa melempar raw body untuk mematikan proteksi CORS OPTIONS
+                let res = await fetch(urlTarget, { method: "POST" });
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    alert(`🎉 BERHASIL!\nData tersimpan dengan ${r.id_izin}.\nSistem telah meneruskan notifikasi ke Telegram.`);
+                    alert(`🎉 BERHASIL!\nData tersimpan dengan ID: ${r.id_izin}.\nSistem telah meneruskan notifikasi ke Telegram.`);
                     
                     // Reset Input Form Kiosk
                     document.getElementById('input-alasan').value = "";
@@ -501,14 +501,14 @@ async function muatDataPerizinan() {
                     document.getElementById('preview-santri').classList.add('hidden');
                     santriTerpilihNIK = null;
                     
-                    // Refresh Log Real-Time otomatis
+                    // Refresh Log Table otomatis
                     muatDataPerizinan();
                 } else {
                     alert("Gagal Server Cloud: " + r.message);
                 }
             } catch (e) {
                 console.error("Crash POST system:", e);
-                alert("Koneksi Error: Gagal mengirim data ke Google Sheets.");
+                alert("Koneksi cloud bermasalah untuk input perizinan.");
             } finally {
                 btnSubmit.innerHTML = teksAsli;
                 btnSubmit.disabled = false;
