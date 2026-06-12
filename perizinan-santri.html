@@ -6,142 +6,555 @@
     <title>Sistem Perizinan Santri - E-Pesantren Core</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        .theme-dark { --bg-main: #0f172a; --bg-header: #020617; --bg-box: #020617; --text-main: #f1f5f9; --border-color: #1e293b; }
-        .theme-light { --bg-main: #f0f4f8; --bg-header: #0f172a; --bg-box: #ffffff; --text-main: #0f172a; --border-color: #cbd5e1; }
-        body { background-color: var(--bg-main); color: var(--text-main); font-family: sans-serif; transition: 0.3s; }
-        .dynamic-bg-box { background-color: var(--bg-box); }
+        body, header, div, section, button, table, td, th, footer, input, select {
+            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+        }
+        
+        .theme-dark {
+            --bg-main: #0f172a;
+            --bg-header: #020617;
+            --bg-box: #020617;
+            --bg-inner: #0f172a;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --border-row: #020617;
+            --text-row: #cbd5e1;
+            --text-title: #38bdf8;
+        }
+
+        .theme-light {
+            --bg-main: #f0f4f8;
+            --bg-header: #0f172a;
+            --bg-box: rgba(255, 255, 255, 0.85);
+            --bg-inner: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #2563eb;
+            --border-color: #cbd5e1;
+            --border-row: #e2e8f0;
+            --text-row: #334155;
+            --text-title: #1e40af;
+        }
+
+        body { background-color: var(--bg-main); color: var(--text-main); }
+        .dynamic-bg-main { background-color: var(--bg-main); }
         .dynamic-bg-header { background-color: var(--bg-header); }
+        .dynamic-bg-box { background-color: var(--bg-box); backdrop-filter: blur(8px); }
+        .dynamic-bg-inner { background-color: var(--bg-inner); }
+        .dynamic-text-main { color: var(--text-main); }
+        .dynamic-text-muted { color: var(--text-muted); }
         .dynamic-border { border-color: var(--border-color); }
+        .dynamic-border-row { border-color: var(--border-row); }
+        .dynamic-text-row { color: var(--text-row); }
+        .dynamic-text-title { color: var(--text-title); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
     </style>
 </head>
-<body class="theme-dark min-h-screen flex flex-col">
+<body class="theme-dark font-sans min-h-screen flex flex-col justify-between dynamic-bg-main text-slate-100">
 
-    <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-6 py-4 flex justify-between items-center">
+    <header class="w-full dynamic-bg-header border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-md">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center"><i class="fa-solid fa-id-card text-slate-900"></i></div>
-            <h1 class="text-sm font-black text-yellow-500 uppercase">PORTAL PERIZINAN V8</h1>
+            <a href="dashboard.html" class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shadow-sm hover:scale-105 transition-all">
+                <i class="fa-solid fa-arrow-left text-slate-950 text-base"></i>
+            </a>
+            <div>
+                <h1 class="text-xs sm:text-sm font-black tracking-wide text-yellow-500 uppercase">PORTAL PERIZINAN INTEGRASI KIOSK V8</h1>
+                <span id="txt-role-badge" class="text-[9px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">GATEKEEPER SECURITY</span>
+            </div>
         </div>
-        <div class="flex gap-2">
-            <button onclick="toggleTema()" class="w-10 h-10 rounded-xl bg-slate-800 text-amber-400 border border-slate-700"><i class="fa-solid fa-sun"></i></button>
-            <button onclick="muatDataPerizinan()" class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 border border-slate-700"><i class="fa-solid fa-rotate"></i></button>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center cursor-pointer border border-slate-700 text-amber-400 shadow"><i class="fa-solid fa-sun"></i></button>
+            <button onclick="muatDataPerizinan()" class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center cursor-pointer border border-slate-700 shadow"><i class="fa-solid fa-rotate"></i></button>
         </div>
     </header>
 
-    <div class="w-full max-w-7xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+    <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1">
         
-        <!-- Kolom Input -->
-        <div class="lg:col-span-1">
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm">
-                <h3 class="text-xs font-black text-yellow-500 uppercase mb-4">INPUT IZIN BARU</h3>
-                <div class="flex flex-col gap-4">
-                    <div class="relative">
-                        <label class="text-[10px] text-slate-400 uppercase font-bold">Cari Santri</label>
-                        <input type="text" id="input-nik-nama" onkeyup="cariLiveSantri()" placeholder="Nama / NIK..." class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white text-xs outline-none focus:border-blue-500">
-                        <div id="dropdown-hasil-cari" class="hidden absolute z-50 w-full mt-1 bg-slate-900 border border-slate-700 rounded-xl max-h-40 overflow-y-auto"></div>
-                    </div>
-                    <div id="preview-santri" class="hidden p-3 rounded-xl border border-dashed border-blue-500 bg-blue-500/5">
-                        <div id="prev-nama" class="font-black text-xs uppercase text-blue-400"></div>
-                        <div id="prev-kelas" class="text-[9px] text-slate-400"></div>
-                    </div>
-                    <select id="select-jenis-izin" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-xs text-white">
-                        <option value="KELUAR SEBENTAR">KELUAR SEBENTAR (AUTO ACC)</option>
-                        <option value="SAKIT">BEROBAT (AUTO ACC)</option>
-                        <option value="PULANG">PULANG (PENDING ACC)</option>
-                    </select>
-                    <input type="text" id="input-alasan" placeholder="Alasan Detail..." class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-xs text-white outline-none">
-                    <input type="datetime-local" id="input-janji-kembali" class="w-full p-3 rounded-xl bg-slate-900/50 border border-slate-700 text-[11px] text-white outline-none">
-                    <button onclick="prosesUsulkanIzin()" class="w-full py-4 rounded-xl bg-yellow-400 text-slate-950 font-black uppercase text-xs">SUBMIT PERIZINAN</button>
-                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-sm border-l-4 border-l-amber-500">
+                <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">MENUNGGU ACC PENGASUH</span>
+                <span id="stat-pending" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+            </div>
+            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-blue-500 shadow-sm">
+                <span class="text-[10px] font-black text-blue-600 dark:text-blue-400 tracking-wider block uppercase">SEDANG DI LUAR PONDOK</span>
+                <span id="stat-diluar" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+            </div>
+            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-rose-500 shadow-sm">
+                <span class="text-[10px] font-black text-rose-600 dark:text-rose-400 tracking-wider block uppercase">TERLAMBAT (TAKZIR AKTIF)</span>
+                <span id="stat-terlambat" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
             </div>
         </div>
 
-        <!-- Kolom Tabel -->
-        <div class="lg:col-span-2">
-            <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 min-h-[500px]">
-                <div class="flex gap-2 mb-4">
-                    <button id="tab-aktif" onclick="gantiTabFilter('AKTIF')" class="text-[10px] font-black px-4 py-2 rounded-lg bg-blue-600 text-white">AKTIF</button>
-                    <button id="tab-riwayat" onclick="gantiTabFilter('RIWAYAT')" class="text-[10px] font-black px-4 py-2 rounded-lg bg-slate-800 text-slate-400">RIWAYAT</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-[11px]">
-                        <thead><tr class="text-left text-slate-500 border-b dynamic-border"><th class="py-3">SANTRI</th><th class="py-3">KEPERLUAN</th><th class="py-3">STATUS</th><th class="py-3 text-right">AKSI</th></tr></thead>
-                        <tbody id="tbl-izin-body" class="divide-y dynamic-border"></tbody>
-                    </table>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div id="panel-input-izin" class="lg:col-span-1 flex flex-col gap-4">
+                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm">
+                    <h3 class="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+                        <i class="fa-solid fa-id-card-clip text-sm"></i> INPUT USULAN IZIN BARU
+                    </h3>
+                    
+                    <div class="flex flex-col gap-3.5 text-xs font-bold">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Metode Cari Santri</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setMetodeInput('CARI')" id="btn-metode-cari" class="py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer">Pencarian NIK/Nama</button>
+                                <button onclick="setMetodeInput('QR')" id="btn-metode-qr" class="py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer"><i class="fa-solid fa-qrcode mr-1"></i> Scan QR Code</button>
+                            </div>
+                        </div>
+
+                        <div id="box-qr-scanner" class="hidden border-2 border-dashed border-slate-700 rounded-xl p-2 bg-slate-950">
+                            <div id="reader" style="width: 100%;"></div>
+                            <button onclick="stopQrScanner()" class="w-full mt-2 py-1 bg-rose-600 text-white rounded font-black text-[10px] cursor-pointer">TUTUP KAMERA</button>
+                        </div>
+
+                        <div id="box-pencarian" class="relative">
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">NIK atau Nama Santri</label>
+                            <input type="text" id="input-nik-nama" onkeyup="cariLiveSantri()" placeholder="Ketik NIK atau sebagian Nama..." class="w-full p-2.5 rounded-xl bg-slate-900/10 border border-slate-700 text-slate-100 text-xs focus:border-blue-500 outline-none">
+                            <div id="dropdown-hasil-cari" class="hidden max-h-40 overflow-y-auto bg-slate-900 border border-slate-700 rounded-xl mt-1 p-1 flex flex-col gap-1 absolute z-50 w-full left-0 shadow-xl"></div>
+                        </div>
+
+                        <div id="preview-santri" class="hidden dynamic-bg-inner p-3 rounded-xl border border-dashed dynamic-border">
+                            <span class="text-[9px] text-blue-500 block">SANTRI DIKUNCI:</span>
+                            <div id="prev-nama" class="font-black dynamic-text-main text-xs uppercase">LOADING...</div>
+                            <div id="prev-kelas" class="font-mono text-[10px] text-slate-400 mt-0.5">CLASS...</div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Hajat Perizinan</label>
+                            <select id="select-jenis-izin" class="w-full p-2.5 rounded-xl bg-slate-900/10 border dynamic-border text-xs focus:border-blue-500 outline-none cursor-pointer">
+                                <option value="KELUAR SEBENTAR">KELUAR SEBENTAR (AUTO ACC)</option>
+                                <option value="SAKIT">SAKIT (AUTO ACC)</option>
+                                <option value="PULANG">PULANG (PENDING TELEGRAM PENGASUH)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Mulai Keluar</label>
+                                <input type="datetime-local" id="input-tgl-mulai" class="w-full p-2 rounded-xl bg-slate-900/10 border dynamic-border text-[11px] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase mb-1">Janji Kembali</label>
+                                <input type="datetime-local" id="input-janji-kembali" class="w-full p-2 rounded-xl bg-slate-900/10 border dynamic-border text-[11px] outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase mb-1">Alasan Detail</label>
+                            <input type="text" id="input-alasan" placeholder="Contoh: Sambang Wali / Berobat Gigi" class="w-full p-2.5 rounded-xl bg-slate-900/10 border dynamic-border text-xs outline-none">
+                        </div>
+
+                        <button onclick="prosesUsulkanIzin()" class="w-full py-3 rounded-xl bg-yellow-400 text-slate-950 font-black tracking-widest uppercase cursor-pointer hover:bg-yellow-300 active:scale-95 transition-all text-xs mt-2">
+                            <i class="fa-solid fa-paper-plane mr-1"></i> LOG & SUBMIT PERIZINAN
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <div class="lg:col-span-2 flex flex-col gap-4">
+                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-sm flex flex-col h-full min-h-[450px]">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b dynamic-border pb-3">
+                        <div class="flex gap-2">
+                            <button id="tab-aktif-izin" onclick="gantiTabFilter('AKTIF')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm">DILUAR / PENDING</button>
+                            <button id="tab-riwayat-izin" onclick="gantiTabFilter('RIWAYAT')" class="text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer">HISTORI SELESAI</button>
+                        </div>
+                        <h3 class="text-xs font-black dynamic-text-title uppercase tracking-widest"><i class="fa-solid fa-layer-group"></i> LOG REAL-TIME MONITORING</h3>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-[11px]">
+                            <thead>
+                                <tr class="border-b dynamic-border dynamic-text-muted font-black uppercase text-[10px] tracking-wider">
+                                    <th class="py-2.5">SANTRI</th>
+                                    <th class="py-2.5">HAJAT / REKAP DATA</th>
+                                    <th class="py-2.5">BATAS KEMBALI</th>
+                                    <th class="py-2.5 text-center">STATUS</th>
+                                    <th id="th-aksi" class="py-2.5 text-right">AKSI HARIAN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl-izin-body" class="divide-y dynamic-border-row font-bold dynamic-text-row">
+                                <tr><td colspan="5" class="py-8 text-center text-slate-500 uppercase tracking-wider">Sinkronisasi pangkalan data perizinan...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <script>
-        const API_URL = "GANTI_DENGAN_URL_WEBAPP_ANDA";
-        let masterSantriCache = [], databaseIzinGlobal = [], filterTab = "AKTIF", santriTerpilih = null;
+    <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header">E-PESANTREN PERIZINAN CORE GATEWAY</footer>
 
-        window.onload = () => { muatDataPerizinan(); muatMasterSantri(); };
+    <script>
+        // MASUKKAN URL WEB APPS KODE ANDA DISINI (URL EXEC DEPLOY TERBARU)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        
+        let masterSantriCache = [];
+        let databaseIzinGlobal = [];
+        let filterTabSekarang = "AKTIF";
+        let santriTerpilihNIK = null;
+        let html5QrcodeScanner = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const role = localStorage.getItem('session_role') || "KEAMANAN GERBANG";
+            document.getElementById('txt-role-badge').innerText = role;
+
+            const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
+            setTemaAplikasi(temaSimpanan);
+            
+            let skrg = new Date();
+            skrg.setMinutes(skrg.getMinutes() - skrg.getTimezoneOffset());
+            document.getElementById('input-tgl-mulai').value = skrg.toISOString().slice(0,16);
+            
+            let besok = new Date();
+            besok.setDate(besok.getDate() + 1);
+            besok.setMinutes(besok.getMinutes() - besok.getTimezoneOffset());
+            document.getElementById('input-janji-kembali').value = besok.toISOString().slice(0,16);
+
+            muatDataPerizinan();
+            muatMasterSantri();
+        });
 
         async function muatMasterSantri() {
-            try { let r = await fetch(`${API_URL}?aksi=ambil_database`).then(res => res.json()); masterSantriCache = r.data; } catch(e) {}
+            try {
+                let res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
+                let r = await res.json();
+                if(r.status === "success") {
+                    masterSantriCache = r.data || [];
+                }
+            } catch(e) { console.error("Gagal sinkronisasi master cache santri", e); }
         }
 
         async function muatDataPerizinan() {
-            try { 
-                let r = await fetch(`${API_URL}?aksi=ambil_perizinan`).then(res => res.json()); 
-                databaseIzinGlobal = r.data; 
-                renderTabel(); 
-            } catch(e) { document.getElementById('tbl-izin-body').innerHTML = "Gagal memuat."; }
+            const tbody = document.getElementById('tbl-izin-body');
+            try {
+                let res = await fetch(`${API_URL}?aksi=ambil_perizinan`, { method: "GET" });
+                let r = await res.json();
+                if(r.status === "success") {
+                    databaseIzinGlobal = r.data || [];
+                    kalkulasiStatistikDanRender();
+                }
+            } catch(e) {
+                if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500 uppercase">Gagal memuat data dari cloud server sheet.</td></tr>`;
+            }
         }
 
-        function renderTabel() {
+        function kalkulasiStatistikDanRender() {
+            let pending = 0, diluar = 0, terlambat = 0;
+            let waktuSekarang = new Date();
+
+            databaseIzinGlobal.forEach(item => {
+                let status = String(item.Status_Persetujuan || "").toUpperCase();
+                let tglKembali = item.Waktu_Kembali;
+                let janjiKembali = new Date(item.Janji_Kembali);
+
+                if(status === "PENDING") pending++;
+                if((status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
+                    diluar++;
+                    if(waktuSekarang > janjiKembali) terlambat++;
+                }
+            });
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-diluar').innerText = diluar;
+            document.getElementById('stat-terlambat').innerText = terlambat;
+
+            renderTabelIzin();
+        }
+
+        function renderTabelIzin() {
             const tbody = document.getElementById('tbl-izin-body');
+            if(!tbody) return;
             tbody.innerHTML = '';
-            let filtered = databaseIzinGlobal.filter(i => filterTab === "AKTIF" ? (i.status_izin !== "SELESAI" && !i.waktu_kembali) : (i.status_izin === "SELESAI" || i.waktu_kembali));
-            
-            filtered.reverse().forEach(i => {
-                let row = `<tr>
-                    <td class="py-3"><div class="font-bold uppercase">${i.nama}</div><div class="text-[9px] text-slate-500">${i.kelas}</div></td>
-                    <td class="py-3"><div class="text-blue-400 font-bold uppercase">${i.jenis}</div><div class="text-[10px]">${i.alasan}</div></td>
-                    <td class="py-3"><span class="font-black ${i.status_izin === 'PENDING' ? 'text-amber-500' : 'text-blue-500'}">${i.status_izin}</span></td>
-                    <td class="py-3 text-right">
-                        ${i.status_izin === "PENDING" ? `<button onclick="eksekusi('${i.id_izin}','SETUJU')" class="bg-emerald-500 text-xs p-1 rounded">ACC</button>` : ''}
-                        ${i.status_izin === "DISETUJUI" ? `<button onclick="tutup('${i.id_izin}')" class="bg-slate-700 text-xs p-1 rounded">IN</button>` : ''}
+
+            let dataFilter = databaseIzinGlobal.filter(item => {
+                let tglKembali = item.Waktu_Kembali;
+                let status = String(item.Status_Persetujuan || "").toUpperCase();
+                
+                if(filterTabSekarang === "AKTIF") {
+                    return (status === "PENDING" || status === "DISETUJUI" || status === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "");
+                } else {
+                    return (status === "REJECTED" || status === "SELESAI" || (tglKembali && String(tglKembali).trim() !== ""));
+                }
+            });
+
+            if(dataFilter.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500 uppercase text-[10px]">Tidak ada catatan perizinan di baris filter ini.</td></tr>`;
+                return;
+            }
+
+            dataFilter.reverse();
+
+            dataFilter.forEach(item => {
+                let row = document.createElement('tr');
+                row.className = "border-b dynamic-border-row hover:bg-blue-500/5 transition-all text-xs";
+                
+                let janjiData = item.Janji_Kembali;
+                let tglJanji = new Date(janjiData);
+                let tglKembali = item.Waktu_Kembali;
+                let statusStr = String(item.Status_Persetujuan || "").toUpperCase();
+                let dendaAmt = parseInt(item.Denda_Kumulatif) || 0;
+                
+                let isTerlambat = (new Date() > tglJanji && (!tglKembali || String(tglKembali).trim() === ""));
+                
+                let badge = "";
+                if(statusStr === "PENDING") {
+                    badge = `<span class="bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto animate-pulse">WAITING PENGASUH</span>`;
+                } else if(statusStr === "SELESAI") {
+                    badge = `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">SELESAI</span>`;
+                } else if(isTerlambat || statusStr === "PENDING TAKZIR") {
+                    badge = `<span class="bg-rose-500/20 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">TERLAMBAT / TAKZIR</span>`;
+                } else {
+                    badge = `<span class="bg-blue-500/15 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-[9px] font-black tracking-wide block w-max mx-auto">DI LUAR PONDOK</span>`;
+                }
+
+                let idIzin = item.ID_Izin;
+                let namaSantri = item.Nama_Santri;
+                let nikSantri = item.NIK;
+                let kelasSantri = item.Kelas;
+                let jenisIzin = item.Jenis_Izin;
+                let alasanIzin = item.Alasan;
+
+                let aksiButton = "";
+                if(statusStr === "PENDING") {
+                    aksiButton = `
+                        <div class="flex justify-end gap-1.5">
+                            <button onclick="eksekusiAccPortal('${idIzin}', 'SETUJU')" class="px-2 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[9px] uppercase hover:bg-emerald-400 cursor-pointer">ACC</button>
+                            <button onclick="eksekusiAccPortal('${idIzin}', 'TOLAK')" class="px-2 py-1 rounded bg-rose-500 text-white font-black text-[9px] uppercase hover:bg-rose-400 cursor-pointer">TOLAK</button>
+                        </div>
+                    `;
+                } else if((statusStr === "DISETUJUI" || statusStr === "PENDING TAKZIR") && (!tglKembali || String(tglKembali).trim() === "")) {
+                    aksiButton = `
+                        <div class="flex justify-end gap-1.5 items-center">
+                            <button onclick="tutupIzinManual('${idIzin}')" class="px-2 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 font-black text-[9px] uppercase hover:bg-slate-600 cursor-pointer"><i class="fa-solid fa-right-to-bracket mr-1"></i>OVERRIDE IN</button>
+                        </div>
+                    `;
+                } else {
+                    aksiButton = `<span class="text-slate-500 text-[10px] italic">Logged by Kiosk</span>`;
+                }
+
+                let infoDendaTeks = dendaAmt > 0 ? `<span class="text-rose-500 font-extrabold block text-[10px] mt-0.5"><i class="fa-solid fa-hand-holding-dollar mr-0.5"></i> Denda Tagihan: Rp ${dendaAmt.toLocaleString('id-ID')}</span>` : '';
+
+                row.innerHTML = `
+                    <td class="py-3 uppercase font-black tracking-wide">
+                        ${namaSantri}<br>
+                        <span class="text-[9px] font-mono text-slate-400 font-bold">${nikSantri} • ${kelasSantri}</span>
                     </td>
-                </tr>`;
-                tbody.innerHTML += row;
+                    <td class="py-3">
+                        <span class="text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase block tracking-wider">${jenisIzin}</span>
+                        <span class="text-slate-500 text-[11px] block mt-0.5">${alasanIzin}</span>
+                        ${infoDendaTeks}
+                    </td>
+                    <td class="py-3 font-mono text-slate-500 text-[10px]">
+                        ${formatTanggalLokal(janjiData)}
+                    </td>
+                    <td class="py-3 text-center">${badge}</td>
+                    <td class="py-3 text-right no-print">${aksiButton}</td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
         function cariLiveSantri() {
-            let q = document.getElementById('input-nik-nama').value.toUpperCase();
-            let drop = document.getElementById('dropdown-hasil-cari');
-            if(q.length < 3) return drop.classList.add('hidden');
-            let res = masterSantriCache.filter(s => s.nama.includes(q) || s.nik.includes(q)).slice(0,5);
-            drop.innerHTML = '';
-            res.forEach(s => {
-                let d = document.createElement('div'); d.className = "p-2 hover:bg-blue-600 text-xs cursor-pointer";
-                d.innerHTML = s.nama; d.onclick = () => {
-                    santriTerpilih = s; document.getElementById('input-nik-nama').value = s.nama;
-                    document.getElementById('prev-nama').innerText = s.nama; document.getElementById('preview-santri').classList.remove('hidden');
-                    drop.classList.add('hidden');
-                }; drop.appendChild(d);
-            }); drop.classList.remove('hidden');
+            const query = document.getElementById('input-nik-nama').value.toUpperCase().trim();
+            const dropdown = document.getElementById('dropdown-hasil-cari');
+            if(query.length < 2) { dropdown.classList.add('hidden'); return; }
+            dropdown.innerHTML = "";
+            
+            let cocok = masterSantriCache.filter(s => 
+                String(s.nama || "").toUpperCase().includes(query) || 
+                String(s.nik || "").toUpperCase().includes(query)
+            ).slice(0, 5);
+
+            if(cocok.length === 0) {
+                dropdown.innerHTML = `<div class="p-2 text-[10px] text-slate-400 italic font-medium">Santri tidak ditemukan...</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            cocok.forEach(s => {
+                let div = document.createElement('div');
+                div.className = "p-2 rounded-lg text-left text-slate-300 hover:bg-blue-600 hover:text-white cursor-pointer font-bold text-[11px] uppercase transition-all";
+                div.innerHTML = `<div>${s.nama}</div><div class="text-[9px] opacity-75 font-mono">${s.nik} - ${s.kelas}</div>`;
+                div.onclick = () => kunciPilihanSantri(s.nik, s.nama, s.kelas);
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.remove('hidden');
+        }
+
+        function kunciPilihanSantri(nik, nama, kelas) {
+            santriTerpilihNIK = nik;
+            document.getElementById('input-nik-nama').value = nik;
+            document.getElementById('dropdown-hasil-cari').classList.add('hidden');
+            document.getElementById('prev-nama').innerText = nama;
+            document.getElementById('prev-kelas').innerText = kelas;
+            document.getElementById('preview-santri').classList.remove('hidden');
+            stopQrScanner();
+        }
+
+        function setMetodeInput(m) {
+            const btnCari = document.getElementById('btn-metode-cari');
+            const btnQR = document.getElementById('btn-metode-qr');
+            if(m === "CARI") {
+                btnCari.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer";
+                btnQR.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer";
+                document.getElementById('box-pencarian').classList.remove('hidden');
+                stopQrScanner();
+            } else {
+                btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer";
+                btnQR.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer";
+                document.getElementById('box-pencarian').classList.add('hidden');
+                startQrScanner();
+            }
+        }
+
+        function startQrScanner() {
+            document.getElementById('box-qr-scanner').classList.remove('hidden');
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    let sKetemu = masterSantriCache.find(s => s.nik.toString().trim() === decodedText.toString().trim());
+                    if(sKetemu) {
+                        kunciPilihanSantri(sKetemu.nik, sKetemu.nama, sKetemu.kelas);
+                        alert("SANTRI TERDETEKSI: " + sKetemu.nama);
+                    } else {
+                        alert("QR Code terbaca: " + decodedText + " (Tidak ditemukan di Master)");
+                    }
+                },
+                (errorMessage) => {}
+            ).catch(err => { console.error("Kamera gagal diakses.", err); });
+        }
+
+        function stopQrScanner() {
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById('box-qr-scanner').classList.add('hidden');
+                }).catch(err => {});
+            }
         }
 
         async function prosesUsulkanIzin() {
-            if(!santriTerpilih) return alert("Pilih santri!");
-            let body = {
-                aksi: "simpan_usulan_izin", nik: santriTerpilih.nik, nama: santriTerpilih.nama, kelas: santriTerpilih.kelas,
-                jenis: document.getElementById('select-jenis-izin').value, alasan: document.getElementById('input-alasan').value,
-                janji: document.getElementById('input-janji-kembali').value.replace('T',' '),
-                status: document.getElementById('select-jenis-izin').value === "PULANG" ? "PENDING" : "DISETUJUI"
-            };
-            await fetch(API_URL, { method: "POST", body: JSON.stringify(body) });
-            muatDataPerizinan();
+            if(!santriTerpilihNIK) { alert("Pilih nama atau Scan QR santri terlebih dahulu!"); return; }
+            
+            const jenisIzin = document.getElementById('select-jenis-izin').value;
+            const tglMulai = document.getElementById('input-tgl-mulai').value;
+            const janjiKembali = document.getElementById('input-janji-kembali').value;
+            const alasan = document.getElementById('input-alasan').value;
+            const namaSantri = document.getElementById('prev-nama').innerText;
+            const kelasSantri = document.getElementById('prev-kelas').innerText;
+            
+            let statusAwal = (jenisIzin === "PULANG") ? "PENDING" : "DISETUJUI";
+
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        aksi: "simpan_usulan_izin",
+                        nik: santriTerpilihNIK,
+                        nama: namaSantri,
+                        kelas: kelasSantri,
+                        jenis: jenisIzin,
+                        mulai: tglMulai.replace('T', ' '),
+                        janji: janjiKembali.replace('T', ' '),
+                        alasan: alasan,
+                        status: statusAwal
+                    })
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    alert("Alhamdulillah, proses izin selesai!");
+                    resetFormIzin();
+                    muatDataPerizinan();
+                }
+            } catch(e) { alert("Koneksi cloud bermasalah untuk input perizinan."); }
         }
 
-        async function eksekusi(id, status) { await fetch(API_URL, { method: "POST", body: JSON.stringify({ aksi: "update_status_izin", id: id, status: status === 'SETUJU' ? 'DISETUJUI' : 'REJECTED' }) }); muatDataPerizinan(); }
-        async function tutup(id) { await fetch(API_URL, { method: "POST", body: JSON.stringify({ aksi: "tutup_izin_manual", id: id }) }); muatDataPerizinan(); }
-        function gantiTabFilter(t) { filterTab = t; renderTabel(); }
-        function toggleTema() { document.body.classList.toggle('theme-light'); document.body.classList.toggle('theme-dark'); }
+        async function eksekusiAccPortal(idIzin, tindakan) {
+            let statusBaru = (tindakan === "SETUJU") ? "DISETUJUI" : "REJECTED";
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ aksi: "update_status_izin", id: idIzin, status: statusBaru })
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    alert("Status perizinan diperbarui dari Portal: " + statusBaru);
+                    muatDataPerizinan();
+                }
+            } catch(e) { alert("Gagal update validasi."); }
+        }
+
+        async function tutupIzinManual(idIzin) {
+            if(!confirm("Gunakan tombol darurat ini jika mesin Kiosk wajah error. Lanjutkan proses santri Check-In manual?")) return;
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ aksi: "tutup_izin_manual", id: idIzin })
+                });
+                let r = await res.json();
+                if(r.status === "success") {
+                    muatDataPerizinan();
+                }
+            } catch(e) { alert("Gagal memproses check-in."); }
+        }
+
+        function gantiTabFilter(tab) {
+            filterTabSekarang = tab;
+            const tAktif = document.getElementById('tab-aktif-izin');
+            const tRiwayat = document.getElementById('tab-riwayat-izin');
+            if(tab === "AKTIF") {
+                tAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-blue-600 text-white uppercase cursor-pointer shadow-sm";
+                tRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
+            } else {
+                tAktif.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white uppercase cursor-pointer";
+                tRiwayat.className = "text-[10px] font-black px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 uppercase cursor-pointer shadow-sm";
+            }
+            renderTabelIzin();
+        }
+
+        function resetFormIzin() {
+            santriTerpilihNIK = null;
+            document.getElementById('input-nik-nama').value = "";
+            document.getElementById('input-alasan').value = "";
+            document.getElementById('preview-santri').classList.add('hidden');
+        }
+
+        function formatTanggalLokal(strDate) {
+            if(!strDate) return "-";
+            let d = new Date(strDate);
+            if(isNaN(d.getTime())) return strDate;
+            return d.toLocaleString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) + " WIB";
+        }
+
+        function toggleTema() {
+            const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
+            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
+            setTemaAplikasi(newTheme);
+        }
+
+        function setTemaAplikasi(tema) {
+            const btnTema = document.getElementById('btn-tema');
+            const isLight = (tema === 'theme-light');
+            if (isLight) {
+                document.body.classList.remove('theme-dark');
+                document.body.classList.add('theme-light');
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-white"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-light');
+            } else {
+                document.body.classList.remove('theme-light'); 
+                document.body.classList.add('theme-dark');
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+                localStorage.setItem('dashboard_theme', 'theme-dark');
+            }
+            if(databaseIzinGlobal.length > 0) renderTabelIzin();
+        }
     </script>
 </body>
 </html>
