@@ -61,7 +61,7 @@
     </div>
   </nav>
 
-  <!-- MAIN MAIN DASHBOARD -->
+  <!-- MAIN DASHBOARD -->
   <main class="max-w-6xl mx-auto px-4 space-y-6">
     
     <!-- MOTIVATIONAL QUOTE CONTAINER -->
@@ -100,7 +100,7 @@
         <h2 class="text-xs font-black uppercase tracking-wider font-mono flex items-center gap-2 text-muted-custom">
           <i class="fa-solid fa-clipboard-list"></i> Daftar Konfirmasi Petugas Piket
         </h2>
-        <span class="text-[10px] bg-emerald-500/10 px-2 py-1 rounded-md font-bold text-emerald-700 dark:text-emerald-300">Tips: Klik nama jika hadir menyapu</span>
+        <span class="text-[10px] bg-emerald-500/10 px-2 py-1 rounded-md font-bold text-emerald-700 dark:text-emerald-300">⚡ Mode Kilat Aktif: Sekali klik kartu langsung terabsen!</span>
       </div>
 
       <!-- CARDS GRID -->
@@ -112,14 +112,12 @@
   </main>
 
   <script>
-    // URL WEB APP SCRIPT ANDA YANG BARU:
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA-yj9bmUrP4rf9SU-QO-Cx_b1VmSQk06F7c7Z_RQsKI3uE4XGUmG_NIFdiaSjUUm2Qw/exec";
 
     let masterJadwalPiket = [];
     let genderAktif = "SEMUA";
     let isDarkMode = false;
 
-    // Kumpulan Quotes Penyemangat Kebersihan
     const quotesKebersihan = [
       "\"Kebersihan sebagian dari Iman. Menjaga kebersihan pondok adalah bukti khidmah terbaik kita.\"",
       "\"Pondok yang bersih melahirkan pikiran yang jernih untuk menghafal dan mutholaah.\"",
@@ -131,7 +129,6 @@
     document.addEventListener("DOMContentLoaded", function() {
       jalankanJamRealtime();
       tarikJadwalHariIni();
-      // Ganti quote acak setiap 15 detik
       setInterval(() => {
         const acak = quotesKebersihan[Math.floor(Math.random() * quotesKebersihan.length)];
         document.getElementById("motivationalQuote").innerText = acak;
@@ -186,7 +183,6 @@
 
     function setGenderFilter(gender) {
       genderAktif = gender;
-      // Perbarui style tombol filter
       const btnAll = document.getElementById("filterAll");
       const btnPutra = document.getElementById("filterPutra");
       const btnPutri = document.getElementById("filterPutri");
@@ -211,17 +207,14 @@
 
       dataFiltered.forEach((s, idx) => {
         const card = document.createElement("div");
-        // Desain mini kartu warna-warni bersih
-        card.className = `rainbow-card-${(idx % 5) + 1} p-2 px-3 rounded-xl shadow-sm flex items-center justify-between gap-1 h-12 cursor-pointer hover:scale-105 transform transition relative group`;
+        card.className = `rainbow-card-${(idx % 5) + 1} p-2 px-3 rounded-xl shadow-sm flex items-center justify-between gap-1 h-12 cursor-pointer hover:scale-105 transform transition relative`;
         
-        // Isian teks nama & sub-teks kelas
         card.innerHTML = `
-          <div class="flex-1 min-w-0" onclick="prosesAbsenSatuan('${s.nik}', 'HADIR')">
+          <div class="flex-1 min-w-0" onclick="prosesAbsenSatuanTanpaKonfirmasi('${s.nik}', 'HADIR')">
             <div class="text-[11px] font-black tracking-tight truncate uppercase">${s.nama}</div>
             <div class="text-[9px] font-mono opacity-70 truncate">${s.kelas} | ${s.gender === "LAKI-LAKI" ? "PUTRA" : "PUTRI"}</div>
           </div>
-          <!-- Opsi Sakit / Izin -->
-          <button onclick="prosesAbsenSatuan('${s.nik}', 'SAKIT/IZIN')" title="Sakit atau Izin Khusus" class="ml-1 bg-white/60 hover:bg-white text-[10px] p-1 px-1.5 rounded-md border font-sans shadow-sm text-amber-700 font-bold z-10">
+          <button onclick="prosesAbsenSatuanTanpaKonfirmasi('${s.nik}', 'SAKIT/IZIN')" title="Sakit atau Izin Khusus" class="ml-1 bg-white/60 hover:bg-white text-[10px] p-1 px-1.5 rounded-md border font-sans shadow-sm text-amber-700 font-bold z-10">
             🏥
           </button>
         `;
@@ -230,12 +223,15 @@
       });
     }
 
-    function prosesAbsenSatuan(nik, status) {
+    // FIX: FUNGSI TERBARU INSTANT TANPA POPUP KONFIRMASI
+    function prosesAbsenSatuanTanpaKonfirmasi(nik, status) {
       const santri = masterJadwalPiket.find(s => s.nik === nik);
       if (!santri) return;
 
-      const konfirmasi = confirm(`Konfirmasi: Apakah ${santri.nama} dinyatakan ${status}?`);
-      if (!konfirmasi) return;
+      // Efek visual instan: hapus dari tampilan lokal sebelum fetch selesai agar terasa super cepat
+      masterJadwalPiket = masterJadwalPiket.filter(s => s.nik !== nik);
+      hitungStatistikManajemen();
+      renderKartuPiket();
 
       const payload = {
         aksi: "simpan_absen_satuan",
@@ -247,21 +243,17 @@
         status: status
       };
 
+      // Pengiriman data berjalan di background seiring hilangnya kartu
       fetch(WEB_APP_URL, {
         method: "POST",
         body: JSON.stringify(payload)
       })
       .then(res => res.json())
       .then(res => {
-        if (res.status === "success") {
-          // Buang dari list lokal agar kartu langsung hilang dari antarmuka
-          masterJadwalPiket = masterJadwalPiket.filter(s => s.nik !== nik);
-          hitungStatistikManajemen();
-          renderKartuPiket();
-        } else {
-          alert("Gagal menyimpan absensi: " + res.message);
+        if (res.status !== "success") {
+          console.error("Gagal sinkronisasi cloud: " + res.message);
         }
-      }).catch(() => alert("Koneksi gagal terhubung."));
+      }).catch(() => console.error("Koneksi gagal sinkronisasi background."));
     }
 
     function kunciAbsensiGaibMassal() {
