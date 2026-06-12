@@ -30,7 +30,7 @@
       --blob-color: rgba(59, 130, 246, 0.06);
     }
 
-    /* MODE TERANG: Luxury Soft Sky Blue (Sesuai Request Latar Belakang Biru) */
+    /* MODE TERANG: Luxury Soft Sky Blue */
     .theme-light {
       --bg-main: #f0f7ff;
       --bg-header: rgba(255, 255, 255, 0.8);
@@ -63,7 +63,7 @@
       border-bottom: 1px solid var(--border-color);
     }
 
-    /* Kartu Ultra Kecil & Compact (Hanya Nama) */
+    /* Kartu Ultra Kecil & Compact */
     .card-oprak {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -184,15 +184,14 @@
   </main>
 
   <script>
-    const urlScript = "https://script.google.com/macros/s/AKfycby0wyCx83Kf8XFpxaLiRy96noe0jaTlWBLg-M2XnfG0YqeZytE0vaR9QPzFWP7mpk_rlQ/exec";
+    const urlScript = "YOUR_WEB_APP_URL_HERE"; // Ganti dengan URL Web App Deployment Anda yang baru
     
     let dataSantriLokal = [];
-    let sisaDisaringlP = [];
+    let dataDisaring = [];
     let filterSekarang = "semua";
     let infoPutaranAktif = 1;
     let infoPutaranMaksimal = 1;
 
-    // Kumpulan kata bijak penyemangat ronda/oprak keamanan
     const quotesOprak = [
       "Keamanan pesantren ada di ketukan langkah patrolimu malam ini.",
       "Mata yang berjaga demi kenyamanan saudaranya menuntut ridho Allah Swt.",
@@ -275,12 +274,12 @@
       const container = document.getElementById('gridOprak');
       container.innerHTML = '';
 
-      sisaDisaringlP = dataSantriLokal.filter(s => {
+      dataDisaring = dataSantriLokal.filter(s => {
         if (filterSekarang === "semua") return true;
         return (s.gender || "").toString().toLowerCase().trim() === filterSekarang;
       });
 
-      if (sisaDisaringlP.length === 0) {
+      if (dataDisaring.length === 0) {
         container.innerHTML = `
           <div class="col-span-full text-center py-16 text-xs font-bold uppercase tracking-widest opacity-40">
             <i class="fa-solid fa-circle-check text-2xl text-blue-500 mb-2 block"></i> Kelompok ini sudah bersih / dikunci
@@ -289,18 +288,18 @@
         return;
       }
 
-      sisaDisaringlP.forEach(santri => {
+      dataDisaring.forEach(santri => {
         const card = document.createElement('div');
         card.id = `card-${santri.nik}`;
         card.className = 'card-oprak';
-        card.setAttribute('onclick', `eksekusiHadirKilat(\`${santri.nik}\`, \`${santri.nama.replace(/"/g, '&quot;')}\`, \`${santri.gender}\`, \`${santri.status}\`, \`${santri.jadwal}\`)`);
+        card.setAttribute('onclick', `eksekusiHadirKilat(\`${santri.nik}\`, \`${santri.nama.replace(/"/g, '&quot;')}\`, \`${santri.gender}\`, \`${santri.status}\`, \`${santri.putaran}\`)`);
         
         card.innerHTML = `<h3>${santri.nama}</h3>`;
         container.appendChild(card);
       });
     }
 
-    function eksekusiHadirKilat(nik, nama, gender, status, jadwal) {
+    function eksekusiHadirKilat(nik, nama, gender, status, putaran) {
       const card = document.getElementById(`card-${nik}`);
       if(card) card.classList.add('vanish');
       
@@ -316,13 +315,18 @@
           nama: nama,
           gender: gender,
           status: status,
-          jadwal: jadwal
+          putaran: putaran
         })
       }).catch(e => console.error("Error background sync:", e));
     }
 
     function kunciSesiAlpaMassal() {
-      if (!confirm(`Kunci Sesi Putaran ${infoPutaranAktif}? ${sisaDisaringlP.length} santri aktif di layar akan dicatat ALPA (Denda Poin 5). Sesi besok otomatis maju.`)) return;
+      if (dataSantriLokal.length === 0) {
+        alert("Tidak ada santri yang tersisa untuk dikunci.");
+        return;
+      }
+
+      if (!confirm(`Kunci Sesi Putaran ${infoPutaranAktif}? Total ${dataSantriLokal.length} santri yang belum absen (Putra & Putri) akan dicatat ALPA secara massal (Denda Poin 5). Sesi besok otomatis maju.`)) return;
 
       const panel = document.getElementById('panelAksi');
       panel.style.opacity = "0.5";
@@ -335,7 +339,7 @@
           aksi: "kunci_alpa_oprak_massal",
           putaran_aktif: infoPutaranAktif,
           putaran_maksimal: infoPutaranMaksimal,
-          data_alpa: sisaDisaringlP
+          data_alpa: dataSantriLokal
         })
       })
       .then(r => r.json())
