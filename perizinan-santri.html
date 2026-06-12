@@ -216,17 +216,15 @@
         });
 
         // 1. AMBIL DATABASE MASTER SANTRI KE CACHE (CORS SECURE FIX)
+        // 1. AMBIL DATABASE MASTER SANTRI KE CACHE (MENGGUNAKAN STRING URL MURNI)
         async function muatMasterSantri() {
             try {
-                let targetUrl = new URL(API_URL);
-                targetUrl.searchParams.append("aksi", "ambil_database");
+                // Menggunakan string murni untuk menjamin kelancaran redirect CORS Google
+                let ruteUrl = API_URL + "?aksi=ambil_database";
 
-                let res = await fetch(targetUrl.toString(), { 
+                let res = await fetch(ruteUrl, { 
                     method: "GET",
-                    redirect: "follow", // WAJIB: Memaksa browser mengikuti pengalihan server Google
-                    headers: {
-                        "Accept": "application/json"
-                    }
+                    redirect: "follow" // Memaksa browser mengikuti lompatan server Google ke secure storage
                 });
                 
                 let r = await res.json();
@@ -239,19 +237,16 @@
             }
         }
 
-        // 2. AMBIL REAL-TIME DATA LOG SPREADSHEET (CORS SECURE FIX)
+        // 2. AMBIL REAL-TIME DATA LOG SPREADSHEET (MENGGUNAKAN STRING URL MURNI)
         async function muatDataPerizinan() {
             const tbody = document.getElementById('tbl-izin-body');
             try {
-                let targetUrl = new URL(API_URL);
-                targetUrl.searchParams.append("aksi", "ambil_perizinan");
+                // Menggunakan string murni untuk menjamin kelancaran redirect CORS Google
+                let ruteUrl = API_URL + "?aksi=ambil_perizinan";
 
-                let res = await fetch(targetUrl.toString(), { 
+                let res = await fetch(ruteUrl, { 
                     method: "GET",
-                    redirect: "follow", // WAJIB: Memaksa browser mengikuti pengalihan server Google
-                    headers: {
-                        "Accept": "application/json"
-                    }
+                    redirect: "follow" // Memaksa browser mengikuti lompatan server Google ke secure storage
                 });
                 
                 let r = await res.json();
