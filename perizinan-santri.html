@@ -511,7 +511,123 @@
                 btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all";
             }
         }
-        function cariLiveSantri() { /* Silakan isi fungsi logika pencarian lokal Anda di sini jika ada */ }
+        // Fungsi Filter & Pencarian Live dari Data Master Cache Santri
+        function cariLiveSantri() {
+            const input = document.getElementById('input-nik-nama').value.trim().toLowerCase();
+            const dropdown = document.getElementById('dropdown-hasil-cari');
+            
+            if (!input) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            // Cari berdasarkan NIK atau Nama yang mengandung teks input
+            const hasilFilter = masterSantriCache.filter(s => 
+                String(s.nik).toLowerCase().includes(input) || 
+                String(s.nama).toLowerCase().includes(input)
+            );
+
+            if (hasilFilter.length === 0) {
+                dropdown.innerHTML = `<div class="p-2.5 text-center text-slate-500 text-[10px] font-bold uppercase">Santri Tidak Ditemukan</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            dropdown.innerHTML = '';
+            // Tampilkan maksimal 5 item agar dropdown rapi di layar kiosk
+            hasilFilter.slice(0, 5).forEach(santri => {
+                const item = document.createElement('div');
+                item.className = "p-2.5 hover:bg-blue-600 hover:text-white cursor-pointer rounded-lg text-xs font-bold transition-all border-b border-slate-800/40 last:border-0 uppercase";
+                item.innerHTML = `
+                    <div>${santri.nama}</div>
+                    <div class="text-[9px] opacity-70 font-mono mt-0.5">${santri.nik} • Kelas ${santri.kelas}</div>
+                `;
+                item.onclick = () => pilihSantriKeForm(santri);
+                dropdown.appendChild(item);
+            });
+            dropdown.classList.remove('hidden');
+        }
+
+        // Memasukkan Data Santri Terpilih ke State Form Preview
+        function pilihSantriKeForm(santri) {
+            santriTerpilihNIK = santri.nik;
+            
+            document.getElementById('prev-nama').innerText = santri.nama;
+            document.getElementById('prev-kelas').innerText = `${santri.nik} • KELAS ${santri.kelas}`;
+            document.getElementById('preview-santri').classList.remove('hidden');
+            
+            // Masukkan nama ke input text utama dan sembunyikan dropdown
+            document.getElementById('input-nik-nama').value = santri.nama;
+            document.getElementById('dropdown-hasil-cari').classList.add('hidden');
+            
+            // Matikan scanner jika sebelumnya sedang aktif memindai QR
+            matikanKameraScanner();
+        }
+
+        // Manajemen Toggle Navigasi Metode Input (Ketik vs Scan QR)
+        function setMetodeInput(m) {
+            const boxCari = document.getElementById('box-pencarian');
+            const boxQr = document.getElementById('box-qr-scanner');
+            const btnCari = document.getElementById('btn-metode-cari');
+            const btnQr = document.getElementById('btn-metode-qr');
+            
+            if(m === 'CARI') {
+                boxCari.classList.remove('hidden'); 
+                boxQr.classList.add('hidden');
+                btnCari.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all";
+                btnQr.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all";
+                matikanKameraScanner();
+            } else {
+                boxCari.classList.add('hidden'); 
+                boxQr.classList.remove('hidden');
+                btnQr.className = "py-2 rounded-lg bg-blue-600 text-white font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all";
+                btnCari.className = "py-2 rounded-lg bg-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider cursor-pointer transition-all";
+                aktifkanKameraScanner();
+            }
+        }
+
+        // Mengaktifkan Modul Kamera QR Code Reader Kiosk
+        function aktifkanKameraScanner() {
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5Qrcode("reader");
+            }
+            
+            const config = { fps: 10, qrbox: { width: 200, height: 200 } };
+            
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                config, 
+                (qrText) => {
+                    // Berhasil Scan: Cari NIK di cache master data
+                    const santriMatch = masterSantriCache.find(s => String(s.nik).trim() === String(qrText).trim());
+                    if (santriMatch) {
+                        pilihSantriKeForm(santriMatch);
+                        alert(`QR Berhasil Dikenali: ${santriMatch.nama}`);
+                    } else {
+                        alert(`Sinyal QR Terbaca (${qrText}), tetapi NIK tidak terdaftar di database master.`);
+                    }
+                },
+                (errorMessage) => { /* Silau / Kamera Bergetar (Silenced) */ }
+            ).catch(err => console.error("Gagal Request Izin Akses Kamera Kiosk:", err));
+        }
+
+        // Mematikan Stream Sensor Kamera
+        function matikanKameraScanner() {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => {
+                    console.log("Kamera scanner dimatikan aman.");
+                }).catch(err => console.error("Gagal mematikan kamera:", err));
+            }
+        }
+
+        // Menutup Dropdown Otomatis Jika Pengguna Klik di Luar Form Pencarian
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('dropdown-hasil-cari');
+            const inputContainer = document.getElementById('box-pencarian');
+            if (dropdown && inputContainer && !inputContainer.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
 
         function toggleTema() {
             const saatIni = localStorage.getItem('dashboard_theme') || 'theme-dark';
