@@ -141,7 +141,7 @@
   </div>
 
   <script>
-    // URL WEB APP APPS SCRIPT YANG SUDAH VALID & TERKUTIP SEMPURNA
+    // 📢 URL WEB APP APPS SCRIPT SUDAH VALID & TERKUTIP SEMPURNA
     const API_URL = "https://script.google.com/macros/s/AKfycbwhjnFUDH8tQSzi6Zh5RaXVJfnme4fz5OvLZYD-Ym2s0Aid69gIJNH9OkQYHFw3SYRX/exec";
 
     // 1. SISTEM CLOCK & TANGGAL DIGITAL
@@ -189,7 +189,7 @@
       return `${hari}/${bulan}/${tahun}`;
     }
 
-    // 4. SUBMIT FORM HANDLER (FIXED FORWARDING REDIRECT METHOD & CORE RES)
+    // 4. SUBMIT FORM HANDLER (VERSI BYPASS CORS GITHUB/VERCEL)
     document.getElementById("formIzin").addEventListener("submit", function(e) {
       e.preventDefault();
       const btnSubmit = document.getElementById("btnSubmit");
@@ -212,24 +212,20 @@
 
       fetch(API_URL, {
         method: "POST",
-        redirect: "follow", // Mengizinkan browser mengikuti pengalihan server Google Apps Script
+        mode: "no-cors", 
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
         body: dataKirim.toString()
       })
-      .then(res => res.json())
-      .then((hasil) => {
+      .then(() => {
         alert("Sukses! Permohonan izin berhasil dikirim ke Google Sheets & Telegram.");
         document.getElementById("formIzin").reset();
-        setTimeout(muatDataLog, 1500);
+        setTimeout(muatDataLog, 3000);
         normalisasiTombol();
       })
       .catch(error => {
-        // Fallback jika respons lambat tapi data terkirim masuk cloud
-        alert("Permohonan izin diproses oleh sistem Cloud.");
-        document.getElementById("formIzin").reset();
-        setTimeout(muatDataLog, 1500);
+        alert("Gagal mengirim data: " + error);
         normalisasiTombol();
       });
     });
@@ -241,13 +237,13 @@
       btnSubmit.classList.remove("opacity-50");
     }
 
-    // 5. READ LOG DATA REALTIME DARI GOOGLE VIA FETCH GET (FIXED REDIRECT OVERRIDE)
+    // 5. READ LOG DATA REALTIME DARI GOOGLE VIA FETCH GET
     function muatDataLog() {
       const tbody = document.getElementById("tabelLog");
       if (!tbody) return;
       tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 dark:text-slate-500">Memperbarui data portal...</td></tr>`;
       
-      fetch(`${API_URL}?aksi=ambilLog`, { method: "GET", redirect: "follow" })
+      fetch(`${API_URL}?aksi=ambilLog`)
       .then(res => res.json())
       .then(response => {
         if (response && response.status === "success") {
@@ -297,9 +293,9 @@
       });
     }
 
-    // 6. AUTO-COMPLETE DAFTAR NAMA VIA FETCH GET (FIXED REDIRECT OVERRIDE)
+    // 6. AUTO-COMPLETE DAFTAR NAMA VIA FETCH GET
     function muatDaftarNamaKeDropdown() {
-      fetch(`${API_URL}?aksi=ambilNama`, { method: "GET", redirect: "follow" })
+      fetch(`${API_URL}?aksi=ambilNama`)
       .then(res => res.json())
       .then(daftarNama => {
         const datalist = document.getElementById("listSantri");
@@ -314,7 +310,7 @@
       .catch(err => console.log("Gagal memuat list nama otomatis: " + err));
     }
 
-    // INITIAL RUNTIME ENGINE ONLOAD
+    // INITIAL RUNTIME
     window.addEventListener("load", function() {
       jalankanJamRealtime();
       muatDataLog();
