@@ -141,8 +141,8 @@
   </div>
 
   <script>
-    // 📢 TEMPELKAN URL WEB APP APPS SCRIPT BERAKHIRAN /exec ANDA DI BAWAH INI:
-    const API_URL = https://script.google.com/macros/s/AKfycbwhjnFUDH8tQSzi6Zh5RaXVJfnme4fz5OvLZYD-Ym2s0Aid69gIJNH9OkQYHFw3SYRX/exec";
+    // 📢 URL WEB APP APPS SCRIPT SUDAH VALID & TERKUTIP SEMPURNA
+    const API_URL = "https://script.google.com/macros/s/AKfycbwhjnFUDH8tQSzi6Zh5RaXVJfnme4fz5OvLZYD-Ym2s0Aid69gIJNH9OkQYHFw3SYRX/exec";
 
     // 1. SISTEM CLOCK & TANGGAL DIGITAL
     function jalankanJamRealtime() {
@@ -189,7 +189,6 @@
       return `${hari}/${bulan}/${tahun}`;
     }
 
-    // 4. SUBMIT FORM HANDLER VIA API FETCH POST
     // 4. SUBMIT FORM HANDLER (VERSI BYPASS CORS GITHUB/VERCEL)
     document.getElementById("formIzin").addEventListener("submit", function(e) {
       e.preventDefault();
@@ -198,14 +197,12 @@
       btnSubmit.innerText = "Sedang Memproses...";
       btnSubmit.classList.add("opacity-50");
 
-      // Ambil data dari elemen input input
       const namaSantri = document.getElementById("namaSantri").value.trim();
       const jenis_izin = document.getElementById("jenis_izin").value;
       const alasan = document.getElementById("alasan").value;
       const tgl_mulai = document.getElementById("tgl_mulai").value;
       const janji_kembali = document.getElementById("janji_kembali").value;
 
-      // Paksa data dikemas dalam format URL agar Google Apps Script mau menerima dari luar
       const dataKirim = new URLSearchParams();
       dataKirim.append("namaSantri", namaSantri);
       dataKirim.append("jenis_izin", jenis_izin);
@@ -213,21 +210,17 @@
       dataKirim.append("tgl_mulai", tgl_mulai);
       dataKirim.append("janji_kembali", janji_kembali);
 
-      // Tembak menggunakan method POST dengan format x-www-form-urlencoded
       fetch(API_URL, {
         method: "POST",
-        mode: "no-cors", // Sekarang aman menggunakan no-cors karena data dibungkus URLSearchParams
+        mode: "no-cors", 
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
         body: dataKirim.toString()
       })
       .then(() => {
-        // Karena no-cors, kita anggap sukses jika tidak masuk ke .catch
         alert("Sukses! Permohonan izin berhasil dikirim ke Google Sheets & Telegram.");
         document.getElementById("formIzin").reset();
-        
-        // Segarkan tabel live monitor setelah 3 detik agar data baru muncul
         setTimeout(muatDataLog, 3000);
         normalisasiTombol();
       })
@@ -236,6 +229,7 @@
         normalisasiTombol();
       });
     });
+
     function normalisasiTombol() {
       const btnSubmit = document.getElementById("btnSubmit");
       btnSubmit.disabled = false;
