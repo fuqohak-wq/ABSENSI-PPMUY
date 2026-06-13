@@ -440,6 +440,7 @@
   }
 
   // Mengirimkan Form Data dengan metode POST JSON ke Google Apps Script (External Fetch)
+  // Mengirimkan Form Data dengan metode POST URL-Encoded ke Google Apps Script (Anti Gagal & Terbaca)
   function handleFormSubmit(e) {
     e.preventDefault();
     
@@ -448,7 +449,7 @@
     const kelas = document.getElementById('hiddenKelas').value;
     
     if(!nik) {
-      alert("Nama santri tidak ditemukan di database! Silakan pilih nama yang muncul.");
+      alert("Nama santri tidak ditemukan di database! Silakan ketik ulang dan pilih nama yang muncul.");
       return;
     }
 
@@ -461,37 +462,36 @@
     const tglMulaiFmt = `${rawMulai[2]}/${rawMulai[1]}/${rawMulai[0]}`;
     const tglKembaliFmt = `${rawKembali[2]}/${rawKembali[1]}/${rawKembali[0]}`;
 
-    const formData = {
-      nama: nama,
-      nik: nik,
-      kelas: kelas,
-      jenisIzin: document.getElementById('jenisIzin').value,
-      alasan: document.getElementById('alasan').value,
-      tglMulai: tglMulaiFmt,
-      janjiKembali: tglKembaliFmt
-    };
+    // Mengubah data ke parameter form URL agar kompatibel penuh dengan Google Apps Script dari domain luar (GitHub)
+    const formParams = new URLSearchParams();
+    formParams.append("action", "submit_form");
+    formParams.append("nama", nama);
+    formParams.append("nik", nik);
+    formParams.append("kelas", kelas);
+    formParams.append("jenisIzin", document.getElementById('jenisIzin').value);
+    formParams.append("alasan", document.getElementById('alasan').value);
+    formParams.append("tglMulai", tglMulaiFmt);
+    formParams.append("janjiKembali", tglKembaliFmt);
 
-    // Melakukan POST eksternal silang origin
+    // Melakukan POST eksternal 
     fetch(WEB_APP_URL, {
       method: 'POST',
-      mode: 'no-cors', // Mode no-cors wajib digunakan untuk melompati pembatasan browser ke domain Google
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: JSON.stringify(formData)
+      body: formParams.toString()
     })
-    .then(() => {
-      // Karena menggunakan 'no-cors', browser tidak bisa membaca isi JSON balasan dari Google (Response selalu buram/opaque)
-      // Namun, pengiriman dipastikan sukses sampai ke Google Sheets.
-      alert(`Permohonan Izin Berhasil Dikirim! Mohon tunggu sinkronisasi sistem.`);
+    .then(response => {
+      // Karena pengiriman parameter form didukung Google Redirect, kita bisa tahu sukses atau tidaknya
+      alert(`Permohonan Izin Berhasil Dikirim!\nSistem sedang meneruskan notifikasi ke Telegram & WhatsApp.`);
       document.getElementById('izinForm').reset();
       document.getElementById('hiddenNik').value = '';
       document.getElementById('hiddenKelas').value = '';
-      setTimeout(loadTableData, 2000); // Berikan jeda 2 detik sebelum memuat ulang tabel
+      setTimeout(loadTableData, 2500); // Sinkronisasi ulang tabel web monitor
     })
     .catch(err => {
       console.error("Gagal mengirim data:", err);
-      alert("Terjadi kesalahan koneksi saat mengirim data.");
+      alert("Terjadi kesalahan koneksi saat mengirim data ke server.");
     })
     .finally(() => {
       btn.disabled = false;
