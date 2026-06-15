@@ -25,18 +25,18 @@
             --text-title: #38bdf8;
         }
 
-        /* PREMIUM CREATIVE MODE SIANG: Kombinasi Ice Blue & Card Kaca Transparan */
+        /* PREMIUM CREATIVE MODE SIANG */
         .theme-light {
-            --bg-main: #f0f4f8;      /* Latar Utama: Abu-abu Kebiruan Lembut */
-            --bg-header: #0f172a;    /* Header Gelap Kontras Tinggi */
-            --bg-box: rgba(255, 255, 255, 0.85); /* Card Putih Transparan (Glassmorphism) */
-            --bg-inner: #e2e8f0;     /* Background dalam box kecil */
-            --text-main: #0f172a;    /* Teks Utama Hitam Navy Pekat */
-            --text-muted: #2563eb;   /* Label Sub-Menu Biru Elektrik */
-            --border-color: #cbd5e1; /* Batas Elemen */
-            --border-row: #e2e8f0;   /* Pembatas Baris */
-            --text-row: #334155;     /* Isi Tabel */
-            --text-title: #1e40af;   /* Judul Section Biru Sapphire */
+            --bg-main: #f0f4f8;
+            --bg-header: #0f172a;
+            --bg-box: rgba(255, 255, 255, 0.85);
+            --bg-inner: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #2563eb;
+            --border-color: #cbd5e1;
+            --border-row: #e2e8f0;
+            --text-row: #334155;
+            --text-title: #1e40af;
         }
 
         body { background-color: var(--bg-main); color: var(--text-main); }
@@ -51,7 +51,6 @@
         .dynamic-text-row { color: var(--text-row); }
         .dynamic-text-title { color: var(--text-title); }
 
-        /* Style Card Royal & Gold Gradasi Kreatif */
         .royal-card { background: linear-gradient(135deg, #1e3a8a 0%, #0d9488 100%); border: 3px solid #facc15; box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15); transition: all 0.3s ease; }
         .royal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(30, 58, 138, 0.25); }
         .gold-card { background: linear-gradient(135deg, #facc15 0%, #eab308 100%); border: 3px solid #1e3a8a; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.15); transition: all 0.3s ease; }
@@ -84,8 +83,9 @@
 
     <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 sm:gap-8 flex-1">
         
+        <!-- SECTION MENU UTAMA (ID ditambahkan untuk kontrol akses) -->
         <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 no-print">
-            <div class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
+            <div id="menu-daftar-wajah" class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
                 <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-camera text-indigo-900 text-base"></i></div>
                 <div class="mt-3">
                     <h2 class="text-sm sm:text-base font-black text-yellow-300 uppercase tracking-wide">Daftar Wajah Santri</h2>
@@ -94,7 +94,7 @@
                 <a href="daftarwajah.html" class="text-xs font-black text-yellow-400 flex items-center gap-1 uppercase tracking-widest mt-4 hover:underline">BUKA MENU <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
 
-            <div class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
+            <div id="menu-scan-wajah" class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
                 <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-face-viewfinder text-indigo-900 text-base"></i></div>
                 <div class="mt-3">
                     <h2 class="text-sm sm:text-base font-black text-yellow-300 uppercase tracking-wide">Absensi Scan Wajah</h2>
@@ -103,7 +103,7 @@
                 <a href="scan-wajah.html" class="text-xs font-black text-yellow-400 flex items-center gap-1 uppercase tracking-widest mt-4 hover:underline">BUKA ALAT <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
 
-            <div class="gold-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:grid-cols-1 sm:aspect-auto sm:min-h-[160px] sm:col-span-2 md:col-span-1">
+            <div id="menu-absen-guru" class="gold-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:grid-cols-1 sm:aspect-auto sm:min-h-[160px] sm:col-span-2 md:col-span-1">
                 <div class="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-yellow-400 text-base"></i></div>
                 <div class="mt-3">
                     <h2 class="text-sm sm:text-base font-black text-indigo-950 uppercase tracking-wide">Absen Guru PDF</h2>
@@ -113,73 +113,74 @@
             </div>
         </section>
 
-        <section class="flex flex-col gap-3 no-print border-t dynamic-border pt-4">
+        <!-- SECTION SUB-MENU ADMINISTRASI (ID ditambahkan untuk kontrol akses) -->
+        <section id="section-sub-menu" class="flex flex-col gap-3 no-print border-t dynamic-border pt-4">
             <div class="flex items-center gap-2 px-1">
                 <i class="fa-solid fa-cubes text-yellow-500 text-xs"></i>
                 <h3 class="text-xs font-black tracking-widest dynamic-text-title uppercase">SISTEM INFORMASI & ADMINISTRASI PONDOK</h3>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <a href="detail-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-detail-santri" href="detail-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">SANTRIMUY</h4><p class="text-[9px] dynamic-text-muted truncate">Detail Santri</p></div>
                 </a>
-                <a href="perpustakaan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-perpustakaan" href="perpustakaan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Perpustakaan</h4><p class="text-[9px] dynamic-text-muted truncate">Perpus PPMUY</p></div>
                 </a>
-                <a href="Aduan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-aduan" href="Aduan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Aduan</h4><p class="text-[9px] dynamic-text-muted truncate">Aduan Santri</p></div>
                 </a>
-                <a href="keuangan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-keuangan" href="keuangan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Keuangan</h4><p class="text-[9px] dynamic-text-muted truncate">Bendahara PPMUY</p></div>
                 </a>
-                <a href="peralatan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-aset" href="peralatan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Aset PPMUY</h4><p class="text-[9px] dynamic-text-muted truncate">Peralatan & Pengairan</p></div>
                 </a>
-                <a href="jadwal-oprak.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-rose-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-jadwal-oprak" href="jadwal-oprak.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-rose-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 text-sm"><i class="fa-solid fa-shield-halved"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Oprak</h4><p class="text-[9px] dynamic-text-muted truncate">Santri Tertentu</p></div>
                 </a>
-                <a href="perizinan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-teal-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-perizinan" href="perizinan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-teal-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-500 text-sm"><i class="fa-solid fa-id-badge"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Perizinan</h4><p class="text-[9px] dynamic-text-muted truncate">Keluar Pondok</p></div>
                 </a>
-                <a href="pelanggaran-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-pelanggaran" href="pelanggaran-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Pelanggaran</h4><p class="text-[9px] dynamic-text-muted truncate">Ringan/Sedang/Berat</p></div>
                 </a>
-                <a href="dispensasi-khusus.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-sky-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-dispensasi" href="dispensasi-khusus.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-sky-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 text-sm"><i class="fa-solid fa-notes-medical"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Dispensasi</h4><p class="text-[9px] dynamic-text-muted truncate">Khidmah/Melekan</p></div>
                 </a>
-                <a href="jadwal-piket.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-emerald-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-jadwal-piket" href="jadwal-piket.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-emerald-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-sm"><i class="fa-solid fa-broom"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Piket</h4><p class="text-[9px] dynamic-text-muted truncate">Kebersihan Asrama</p></div>
                 </a>
-                <a href="absen-ustadz-manual.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-indigo-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-absen-ustadz-manual" href="absen-ustadz-manual.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-indigo-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-sm"><i class="fa-solid fa-clipboard-user"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Absen Ustadz</h4><p class="text-[9px] dynamic-text-muted truncate">Backup Manual</p></div>
                 </a>
-                <a href="rekap-absensi.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-soal-ujian" href="rekap-absensi.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-sm"><i class="fa-solid fa-file-invoice"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Soal Ujian</h4><p class="text-[9px] dynamic-text-muted truncate">Download Laporan</p></div>
                 </a>
-                <a href="rekap-nilai.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-rekap-nilai" href="rekap-nilai.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-sm"><i class="fa-solid fa-file-invoice"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Rekap Nilai</h4><p class="text-[9px] dynamic-text-muted truncate">Laporan Nilai Santri</p></div>
                 </a>
-                <a href="evaluasi-sistem.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-cyan-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                <a id="menu-evaluasi" href="evaluasi-sistem.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-cyan-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500 text-sm"><i class="fa-solid fa-chart-line"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Evaluasi</h4><p class="text-[9px] dynamic-text-muted truncate">Setiap Bakdo Dzuhur</p></div>
                 </a>
             </div>
         </section>
 
+        <!-- REKAP DATA SECTION -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
-            
             <div class="lg:col-span-2 flex flex-col gap-6">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md">
@@ -260,7 +261,6 @@
                     <div class="text-center text-xs py-6 text-slate-500 font-bold uppercase tracking-wider">Menghubungkan ke terminal kiosk...</div>
                 </div>
             </div>
-
         </section>
     </div>
 
@@ -271,39 +271,85 @@
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
 
+        // MAPPING PEMBAGIAN OTORITAS MENU BERDASARKAN ROLE (Sesuai Tabel Anda)
+        const MAP_OTORITAS = {
+            "KIAI": ["*"], // Semua menu terbuka
+            "KEPALA_PONDOK": [
+                "menu-daftar-wajah", "menu-scan-wajah", "menu-absen-guru", "menu-perpustakaan", 
+                "menu-aduan", "menu-keuangan", "menu-aset", "menu-jadwal-oprak", "menu-perizinan", 
+                "menu-pelanggaran", "menu-dispensasi", "menu-jadwal-piket", "menu-absen-ustadz-manual", 
+                "menu-soal-ujian", "menu-rekap-nilai", "menu-evaluasi"
+            ], // Semua menu kecuali detail-santri
+            "GURU_PDF": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian"],
+            "USTADZ": ["menu-daftar-wajah", "menu-scan-wajah"],
+            "PENDIDIKAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian", "menu-dispensasi", "menu-jadwal-oprak", "menu-perpustakaan", "menu-rekap-nilai"],
+            "KEAMANAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-dispensasi", "menu-jadwal-oprak", "menu-pelanggaran", "menu-perizinan", "menu-evaluasi"],
+            "KEBERSIHAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-jadwal-piket"],
+            "HUMAS": ["menu-daftar-wajah", "menu-scan-wajah", "menu-aduan"],
+            "PENGAIRAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-aset"],
+            "BENDAHARA": ["menu-daftar-wajah", "menu-scan-wajah", "menu-keuangan"]
+        };
+
         window.addEventListener('DOMContentLoaded', () => {
-            // --- 1. DETEKSI & KICK PENGGUNA DATA UJI COBA LAMA ---
+            // Force kick device lama (uji coba masa lalu)
             const versiSesi = localStorage.getItem('app_session_version');
-            
             if (versiSesi !== 'v2_resmi') {
-                // Bersihkan data uji coba yang nyangkut di browser
                 localStorage.clear();
-                
-                // Set penanda baru agar saat login dengan akun asli, device tidak di-kick lagi
                 localStorage.setItem('app_session_version', 'v2_resmi');
-                
-                // Lempar ke halaman login untuk masuk sesuai jobdesk masing-masing
                 window.location.href = "index.html";
                 return;
             }
-            // ---------------------------------------------------
 
             const nama = localStorage.getItem('session_nama');
             const role = localStorage.getItem('session_role');
             
-            // 2. Jika session kosong setelah dibersihkan, wajib arahkan ke login
             if (!nama || !role) { 
                 prosesLogout(); 
                 return; 
             } 
 
             document.getElementById('txt-user-nama').innerText = nama;
-            document.getElementById('badge-role').innerText = role;
+            document.getElementById('badge-role').innerText = role.replace('_', ' '); // Merapikan tampilan teks badge
+
+            // JALANKAN PROSES FILTERING MENU BERDASARKAN ROLE
+            terapkanOtoritasMenu(role);
 
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             muatSeluruhRekapDashboard();
         });
+
+        // FUNGSI UTAMA PENYARING HAK AKSES MENU
+        function terapkanOtoritasMenu(userRole) {
+            // Ambil daftar ID elemen menu yang terdaftar di sistem pembatasan
+            const semuaIdMenu = [
+                "menu-daftar-wajah", "menu-scan-wajah", "menu-absen-guru", "menu-detail-santri",
+                "menu-perpustakaan", "menu-aduan", "menu-keuangan", "menu-aset", "menu-jadwal-oprak",
+                "menu-perizinan", "menu-pelanggaran", "menu-dispensasi", "menu-jadwal-piket",
+                "menu-absen-ustadz-manual", "menu-soal-ujian", "menu-rekap-nilai", "menu-evaluasi"
+            ];
+
+            const menuDiizinkan = MAP_OTORITAS[userRole];
+
+            // Jika role tidak terdaftar di dalam map, langsung kick demi keamanan
+            if (!menuDiizinkan) {
+                alert("Role tidak dikenali oleh sistem otoritas!");
+                prosesLogout();
+                return;
+            }
+
+            // Sembunyikan seluruh menu terlebih dahulu, lalu tampilkan yang diizinkan saja
+            semuaIdMenu.forEach(id => {
+                const elemen = document.getElementById(id);
+                if (elemen) {
+                    if (menuDiizinkan.includes("*") || menuDiizinkan.includes(id)) {
+                        elemen.style.display = "flex"; // Tampilkan menu jika berhak
+                    } else {
+                        elemen.remove(); // Hapus permanen dari DOM agar tidak diakali via inspect element
+                    }
+                }
+            });
+        }
 
         function toggleTema() {
             const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
@@ -431,8 +477,6 @@
         }
         
         function prosesLogout() {
-            // Saat logout manual, hapus session login saja.
-            // Biarkan tanda 'app_session_version' tetap ada agar setelah login ulang tidak dianggap data uji coba lagi.
             localStorage.removeItem('session_nama');
             localStorage.removeItem('session_role');
             window.location.href = "index.html";
