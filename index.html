@@ -30,22 +30,32 @@
     </div>
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const b = document.getElementById('btn-login');
             b.disabled = true; b.innerText = "VALIDASI CLOUD...";
             
+            const passwordInput = document.getElementById('inp-pass').value;
             const p = new URLSearchParams();
             p.append('aksi', 'login_admin');
             p.append('username', document.getElementById('inp-user').value);
-            p.append('password', document.getElementById('inp-pass').value);
+            p.append('password', passwordInput);
 
             try {
                 let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: p.toString() });
                 let r = await res.json();
                 if (r.status === "success") {
+                    // Menyimpan data sesi utama
                     localStorage.setItem('session_nama', r.nama);
                     localStorage.setItem('session_role', r.role);
+                    
+                    // MENYIMPAN PASSWORD KE LOKAL (Kunci untuk deteksi ganti password)
+                    localStorage.setItem('session_password', passwordInput);
+                    
+                    // MENYIMPAN VERSI SESI (Mencegah kick otomatis perangkat baru)
+                    localStorage.setItem('app_session_version', 'v2_resmi');
+                    
                     window.location.href = "dashboard.html";
                 } else { alert(r.message); }
             } catch(err) { alert("Koneksi gagal atau masalah CORS!"); }
