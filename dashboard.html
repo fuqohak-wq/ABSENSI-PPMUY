@@ -266,20 +266,20 @@
 
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN CORE ECOSYSTEM</footer>
 
-    <script>
+<script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
 
-        // MAPPING PEMBAGIAN OTORITAS MENU BERDASARKAN ROLE (Sesuai Tabel Anda)
+        // MAPPING PEMBAGIAN OTORITAS MENU BERDASARKAN ROLE
         const MAP_OTORITAS = {
-            "KIAI": ["*"], // Semua menu terbuka
+            "KIAI": ["*"],
             "KEPALA_PONDOK": [
                 "menu-daftar-wajah", "menu-scan-wajah", "menu-absen-guru", "menu-perpustakaan", 
                 "menu-aduan", "menu-keuangan", "menu-aset", "menu-jadwal-oprak", "menu-perizinan", 
                 "menu-pelanggaran", "menu-dispensasi", "menu-jadwal-piket", "menu-absen-ustadz-manual", 
                 "menu-soal-ujian", "menu-rekap-nilai", "menu-evaluasi"
-            ], // Semua menu kecuali detail-santri
+            ],
             "GURU_PDF": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian"],
             "USTADZ": ["menu-daftar-wajah", "menu-scan-wajah"],
             "PENDIDIKAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian", "menu-dispensasi", "menu-jadwal-oprak", "menu-perpustakaan", "menu-rekap-nilai"],
@@ -309,9 +309,9 @@
             } 
 
             document.getElementById('txt-user-nama').innerText = nama;
-            document.getElementById('badge-role').innerText = role.replace('_', ' '); // Merapikan tampilan teks badge
+            document.getElementById('badge-role').innerText = role.replace('_', ' ');
 
-            // JALANKAN PROSES FILTERING MENU BERDASARKAN ROLE
+            // Jalankan filter menu
             terapkanOtoritasMenu(role);
 
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
@@ -319,9 +319,7 @@
             muatSeluruhRekapDashboard();
         });
 
-        // FUNGSI UTAMA PENYARING HAK AKSES MENU
         function terapkanOtoritasMenu(userRole) {
-            // Ambil daftar ID elemen menu yang terdaftar di sistem pembatasan
             const semuaIdMenu = [
                 "menu-daftar-wajah", "menu-scan-wajah", "menu-absen-guru", "menu-detail-santri",
                 "menu-perpustakaan", "menu-aduan", "menu-keuangan", "menu-aset", "menu-jadwal-oprak",
@@ -331,21 +329,19 @@
 
             const menuDiizinkan = MAP_OTORITAS[userRole];
 
-            // Jika role tidak terdaftar di dalam map, langsung kick demi keamanan
             if (!menuDiizinkan) {
                 alert("Role tidak dikenali oleh sistem otoritas!");
                 prosesLogout();
                 return;
             }
 
-            // Sembunyikan seluruh menu terlebih dahulu, lalu tampilkan yang diizinkan saja
             semuaIdMenu.forEach(id => {
                 const elemen = document.getElementById(id);
                 if (elemen) {
                     if (menuDiizinkan.includes("*") || menuDiizinkan.includes(id)) {
-                        elemen.style.display = "flex"; // Tampilkan menu jika berhak
+                        elemen.style.display = "flex";
                     } else {
-                        elemen.remove(); // Hapus permanen dari DOM agar tidak diakali via inspect element
+                        elemen.remove();
                     }
                 }
             });
@@ -428,11 +424,25 @@
 
         async function muatSeluruhRekapDashboard() {
             const feedBox = document.getElementById('box-live-feed');
+            const passwordLokal = localStorage.getItem('session_password');
+            const roleLokal = localStorage.getItem('session_role');
+
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard`, { method: "GET" });
+                // Kita kirim data role saat ini ke Google Sheets untuk dicocokkan password-nya
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`, { method: "GET" });
                 let r = await res.json();
 
                 if (r.status === "success") {
+                    
+                    // --- PROTEKSI OTOMATIS: JIKA PASSWORD DI GOOGLE SHEETS SUDAH BERUBAH ---
+                    // Google Sheets harus mengembalikan data password_terbaru di dalam respon JSON-nya
+                    if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
+                        alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
+                        prosesLogout();
+                        return;
+                    }
+                    // ---------------------------------------------------------------------
+
                     dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
                     dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
 
@@ -477,8 +487,10 @@
         }
         
         function prosesLogout() {
+            // Hapus seluruh data sesi login
             localStorage.removeItem('session_nama');
             localStorage.removeItem('session_role');
+            localStorage.removeItem('session_password');
             window.location.href = "index.html";
         }
     </script>
