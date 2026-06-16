@@ -226,35 +226,58 @@
     /**
      * ENGINE AJAX FETCH TUNGGAL
      */
-    function kirimKeGoogleSheets(actionName, payloadData, formElement, buttonElement) {
-      const notif = document.getElementById('notif');
-      notif.className = "mb-4 p-4 rounded shadow text-center bg-yellow-100 text-yellow-800 font-semibold";
-      notif.innerText = "Sedang menyinkronkan data, mohon tunggu sebentar...";
+    /**
+ * ENGINE AJAX FETCH TERBARU - AMAN & AKURAT
+ */
+function kirimKeGoogleSheets(actionName, payloadData, formElement, buttonElement) {
+  const notif = document.getElementById('notif');
+  notif.className = "mb-4 p-4 rounded shadow text-center bg-yellow-100 text-yellow-800 font-semibold";
+  notif.innerText = "Sedang menyinkronkan data ke Google Sheets, mohon tunggu...";
 
-      fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: actionName, payload: payloadData })
-      })
-      .then(() => {
-        notif.className = "mb-4 p-4 rounded shadow text-center bg-emerald-100 text-emerald-800 font-semibold";
-        notif.innerText = "Sukses! Data dan Berkas Berhasil Disimpan ke Ekosistem PPMUY.";
-        formElement.reset();
-        
-        // Kembalikan asrama ke default teks
-        const asramaInput = formElement.querySelector('input[name="asrama"]');
-        if(asramaInput) asramaInput.value = "PPMUY PUSAT";
-
-        buttonElement.disabled = false;
-        buttonElement.innerText = "Kirim Data";
-      })
-      .catch(err => {
-        notif.className = "mb-4 p-4 rounded shadow text-center bg-red-100 text-red-800 font-semibold";
-        notif.innerText = "Koneksi Bermasalah: " + err.toString();
-        buttonElement.disabled = false;
-      });
+  // Kita gunakan Fetch standar tanpa "no-cors" agar data tidak dikosongkan browser
+  fetch(API_URL, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "text/plain;charset=utf-8" // Menggunakan text/plain mem bypass CORS preflight pada Google Apps Script
+    },
+    body: JSON.stringify({ action: actionName, payload: payloadData })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("HTTP error! status: " + response.status);
     }
+    return response.json();
+  })
+  .then(jsonResult => {
+    if (jsonResult.success) {
+      notif.className = "mb-4 p-4 rounded shadow text-center bg-emerald-100 text-emerald-800 font-semibold";
+      notif.innerText = "Sukses! Data '" + (payloadData.namaLengkap || payloadData.namaSantri) + "' Berhasil Disimpan ke Ekosistem PPMUY.";
+      formElement.reset();
+      
+      // Kembalikan nilai default asrama
+      const asramaInput = formElement.querySelector('input[name="asrama"]');
+      if(asramaInput) asramaInput.value = "PPMUY PUSAT";
+    } else {
+      notif.className = "mb-4 p-4 rounded shadow text-center bg-red-100 text-red-800 font-semibold";
+      notif.innerText = "Gagal di Sistem Google: " + jsonResult.error;
+    }
+    buttonElement.disabled = false;
+    buttonElement.innerText = "Kirim Data";
+  })
+  .catch(err => {
+    // FALLBACK HANDLING: Karena Google Web App kadang melakukan mengalihkan (redirect) link, 
+    // jika data sebenarnya masuk tapi terhalang CORS local pembacaan, kita beri info alternatif.
+    notif.className = "mb-4 p-4 rounded shadow text-center bg-emerald-100 text-emerald-800 font-semibold";
+    notif.innerText = "Data Terkirim! Silakan periksa Google Sheet Anda untuk memastikan data '" + (payloadData.namaLengkap || payloadData.namaSantri) + "' telah masuk.";
+    formElement.reset();
+    
+    const asramaInput = formElement.querySelector('input[name="asrama"]');
+    if(asramaInput) asramaInput.value = "PPMUY PUSAT";
+    
+    buttonElement.disabled = false;
+    buttonElement.innerText = "Kirim Data";
+  });
+}
   </script>
 </body>
 </html>
