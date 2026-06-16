@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Informasi Terpadu - PPMUY</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <nav class="bg-emerald-700 text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+      <span class="font-bold text-lg">PPMUY Central App</span>
+      <div class="flex space-x-4">
+        <button onclick="switchTab('pendaftaran')" class="hover:bg-emerald-800 px-3 py-2 rounded font-medium">Pendaftaran</button>
+        <button onclick="switchTab('pembayaran')" class="hover:bg-emerald-800 px-3 py-2 rounded font-medium">Input Kwitansi</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-3xl mx-auto mt-8 px-4">
+    <div id="notif" class="hidden mb-4 p-4 rounded shadow text-center font-semibold"></div>
+
+    <div id="tab-pendaftaran" class="tab-content bg-white p-6 rounded-xl shadow-md">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Formulir Santri Baru</h3>
+      <form id="formDaftar" onsubmit="submitForm(event, 'pendaftaran_baru')" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Nama Lengkap *</label>
+            <input type="text" name="namaLengkap" required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">NIK (KTP/KK) *</label>
+            <input type="text" name="nik" required class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">No. WhatsApp *</label>
+            <input type="text" name="whatsapp" placeholder="08..." required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Tanggal Lahir</label>
+            <input type="date" name="tglLahir" class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Alamat Lengkap *</label>
+          <textarea name="alamat" required class="w-full border p-2 rounded"></textarea>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Gender *</label>
+            <select name="gender" required class="w-full border p-2 bg-white rounded">
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Daftar Di Kelas *</label>
+            <input type="text" name="daftarKelas" required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Pilihan Asrama *</label>
+            <input type="text" name="asrama" required class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Lulusan / Sekolah Asal</label>
+            <input type="text" name="lulusan" class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Referal / Rekomendasi</label>
+            <input type="text" name="referal" class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded hover:bg-emerald-700">Daftarkan Santri</button>
+      </form>
+    </div>
+
+    <div id="tab-pembayaran" class="tab-content hidden bg-white p-6 rounded-xl shadow-md">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Input Pembayaran & Kwitansi</h3>
+      <form id="formBayar" onsubmit="submitForm(event, 'input_pembayaran')" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">No. Kwitansi *</label>
+            <input type="text" name="noKwitansi" required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Tanggal *</label>
+            <input type="date" name="tanggal" id="tglBayar" required class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Nama Santri *</label>
+            <input type="text" name="namaSantri" required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Nama Wali *</label>
+            <input type="text" name="namaWali" required class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Nomor WA Wali *</label>
+          <input type="text" name="nomorWa" required class="w-full border p-2 rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Jenis Pembayaran *</label>
+          <select name="jenisPembayaran" required class="w-full border p-2 bg-white rounded">
+            <option value="Registrasi Pendaftaran Baru">Registrasi Pendaftaran Baru</option>
+            <option value="Syahriah Bulanan">Syahriah Bulanan</option>
+            <option value="Uang Gedung">Uang Gedung</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-1">Nominal Angka *</label>
+            <input type="number" name="nominal" required class="w-full border p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Petugas Penerima *</label>
+            <input type="text" name="petugas" required class="w-full border p-2 rounded">
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded hover:bg-blue-700">Cetak & Proses Kwitansi</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // GANTI TAUTAN INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA SETELAH DEPLOY
+    const API_URL = "https://script.google.com/macros/s/AKfycb...MOHON_GANTI_DENGAN_API_URL_ANDA.../exec";
+
+    document.getElementById('tglBayar').value = new Date().toISOString().split('T')[0];
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+    }
+
+    function submitForm(event, actionName) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      
+      const notif = document.getElementById('notif');
+      const btn = form.querySelector('button[type="submit"]');
+      
+      btn.disabled = true;
+      btn.innerText = "Memproses Ke Cloud...";
+      notif.className = "mb-4 p-4 rounded shadow text-center bg-yellow-100 text-yellow-800 font-semibold";
+      notif.innerText = "Sedang mengirim data ke Google Sheets, mohon tunggu...";
+
+      fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors", // Mengabaikan pembatasan lintas domain browser lokal
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: actionName, payload: payload })
+      })
+      .then(() => {
+        notif.className = "mb-4 p-4 rounded shadow text-center bg-emerald-100 text-emerald-800 font-semibold";
+        notif.innerText = "Sukses! Data telah berhasil disinkronkan ke seluruh ekosistem Cloud.";
+        form.reset();
+        btn.disabled = false;
+        btn.innerText = "Kirim Data";
+      })
+      .catch(err => {
+        notif.className = "mb-4 p-4 rounded shadow text-center bg-red-100 text-red-800 font-semibold";
+        notif.innerText = "Gangguan Jaringan: " + err.toString();
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
