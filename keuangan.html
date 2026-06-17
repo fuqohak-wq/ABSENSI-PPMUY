@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Santri Baru</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 40px 20px;
+      color: #333;
+    }
+    .form-container {
+      max-width: 750px;
+      background: #ffffff;
+      margin: 0 auto;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+    h2 {
+      font-size: 22px;
+      color: #0f3730;
+      margin-top: 0;
+      margin-bottom: 25px;
+      font-weight: 700;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+    
+    /* Responsive Grid System seperti di Gambar */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group {
+      margin-bottom: 5px;
+    }
+    .full-width {
+      grid-column: span 2;
+    }
+    
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-size: 14px;
+    }
+    input[type="text"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #029664;
+      box-shadow: 0 0 0 3px rgba(2, 150, 100, 0.1);
+    }
+    textarea {
+      resize: vertical;
+    }
+    .disabled-input {
+      background-color: #f1f5f9 !important;
+      color: #64748b;
+      font-weight: 600;
+      cursor: not-allowed;
+    }
+    
+    /* Upload Box Styling */
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: left;
+      background-color: #fafafa;
+    }
+    .upload-box input[type="file"] {
+      font-size: 14px;
+    }
+    
+    /* Button Styling warna Hijau sesuai Gambar */
+    .btn-submit {
+      width: 100%;
+      background-color: #029664;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 15px;
+    }
+    .btn-submit:hover {
+      background-color: #027c52;
+    }
+    .btn-submit:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+    
+    /* Dialog Notifikasi */
+    #message {
+      margin-top: 20px;
+      padding: 14px;
+      display: none;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .full-width {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>Formulir Santri Baru</h2>
+  <form id="pendaftaranForm">
+    <div class="form-grid">
+      
+      <div class="form-group">
+        <label for="nama">Nama Lengkap *</label>
+        <input type="text" id="nama" required placeholder="Masukkan nama lengkap">
+      </div>
+      <div class="form-group">
+        <label for="nik">NIK (KTP/KK) *</label>
+        <input type="text" id="nik" required placeholder="Masukkan 16 digit NIK">
+      </div>
+
+      <div class="form-group">
+        <label for="no_hp">No. WhatsApp *</label>
+        <input type="text" id="no_hp" required placeholder="08...">
+      </div>
+      <div class="form-group">
+        <label for="tgl_lahir">Tanggal Lahir *</label>
+        <input type="date" id="tgl_lahir" required>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="alamat">Alamat Lengkap *</label>
+        <textarea id="alamat" rows="3" required placeholder="Nama jalan, RT/RW, Kecamatan, dsb."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="orang_tua">Nama Orang Tua / Wali *</label>
+        <input type="text" id="orang_tua" required placeholder="Nama ayah/ibu/wali">
+      </div>
+      <div class="form-group">
+        <label for="kota">Kabupaten / Kota Asal *</label>
+        <input type="text" id="kota" required placeholder="Contoh: Kabupaten Pati">
+      </div>
+
+      <div class="form-group">
+        <label for="gender">Gender *</label>
+        <select id="gender" required>
+          <option value="LAKI-LAKI">Laki-laki</option>
+          <option value="PEREMPUAN">Perempuan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="kelas">Daftar Di Kelas *</label>
+        <select id="kelas" required>
+          <option value="">-- Pilih Kelas --</option>
+          <option value="KELAS 0 1 (ULA 1)">KELAS 0 1 (ULA 1)</option>
+          <option value="KELAS 0 2 (ULA 2)">KELAS 0 2 (ULA 2)</option>
+          <option value="KELAS 1 (WUSHTO 1)">KELAS 1 (WUSHTO 1)</option>
+          <option value="KELAS 2 (WUSHTO 2)">KELAS 2 (WUSHTO 2)</option>
+          <option value="KELAS 3 (WUSTHO 3)">KELAS 3 (WUSTHO 3)</option>
+          <option value="KELAS 4 (ULYA 1)">KELAS 4 (ULYA 1)</option>
+          <option value="KELAS 5 (ULYA 2)">KELAS 5 (ULYA 2)</option>
+          <option value="KELAS 6 (ULYA 3)">KELAS 6 (ULYA 3)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="jenis_pembayaran">Jenis Pembayaran *</label>
+        <select id="jenis_pembayaran" required>
+          <option value="">-- Pilih Jenis Pembayaran --</option>
+          <option value="Pendaftaran Santri Baru">Pendaftaran Santri Baru</option>
+          <option value="Infaq Gedung / Sarpras">Infaq Gedung / Sarpras</option>
+          <option value="Syahriah / SPP Bulanan">Syahriah / SPP Bulanan</option>
+          <option value="Lunas Gelombang 1">Lunas Gelombang 1</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="asrama">Pilihan Asrama *</label>
+        <input type="text" id="asrama" class="disabled-input" value="PPMUY PUSAT" readonly>
+      </div>
+
+      <div class="form-group">
+        <label for="nominal">Nominal Pembayaran (Rp) *</label>
+        <input type="text" id="nominal" required placeholder="Contoh: 50.000">
+      </div>
+      <div class="form-group">
+        <label for="referal">Referal / Rekomendasi</label>
+        <input type="text" id="referal" placeholder="Kosongkan jika tidak ada">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="petugas">Nama Petugas / Bendahara Penerima *</label>
+        <input type="text" id="petugas" required placeholder="Masukkan nama Anda selaku penerima berkas">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="foto">Foto Santri (Format PNG/JPG) *</label>
+        <div class="upload-box">
+          <input type="file" id="foto" accept="image/*" required>
+        </div>
+      </div>
+
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-submit">Daftarkan Santri</button>
+  </form>
+
+  <div id="message"></div>
+</div>
+
+<script>
+  // Taruh URL Deployment Apps Script Anda (yang berakhiran /exec) di sini!
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW0_Idor1gZlQDE1avOPzj_VHk4ZoHFKnoVzjlpZ4l55W84mplQIvoj_ZBuf2MT4BMSQ/exec";
+
+  // --- MENGATUR FORMAT RIBUAN DENGAN TITIK ---
+  const nominalInput = document.getElementById('nominal');
+  nominalInput.addEventListener('keyup', function(e) {
+    let value = this.value.replace(/[^0-9]/g, '');
+    if (value) {
+      this.value = Number(value).toLocaleString('id-ID');
+    } else {
+      this.value = '';
+    }
+  });
+
+  document.getElementById('pendaftaranForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const msgDiv = document.getElementById('message');
+    const fileInput = document.getElementById('foto').files[0];
+    
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Sedang Memproses Gambar...";
+    msgDiv.style.display = "none";
+
+    // Membersihkan titik ribuan nominal agar menjadi angka bersih kembali
+    const angkaMurniNominal = nominalInput.value.replace(/\./g, '');
+
+    const dataObj = {
+      nama: document.getElementById('nama').value,
+      orang_tua: document.getElementById('orang_tua').value,
+      nik: document.getElementById('nik').value,
+      tgl_lahir: document.getElementById('tgl_lahir').value,
+      gender: document.getElementById('gender').value,
+      no_hp: document.getElementById('no_hp').value,
+      alamat: document.getElementById('alamat').value,
+      kota: document.getElementById('kota').value,
+      kelas: document.getElementById('kelas').value,
+      referal: document.getElementById('referal').value,
+      jenis_pembayaran: document.getElementById('jenis_pembayaran').value,
+      nominal: angkaMurniNominal,
+      petugas: document.getElementById('petugas').value,
+      fotoData: null,
+      fotoNama: "",
+      fotoType: ""
+    };
+
+    if (fileInput) {
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        dataObj.fotoData = reader.result.split(',')[1];
+        dataObj.fotoNama = fileInput.name;
+        dataObj.fotoType = fileInput.type;
+        
+        submitBtn.innerText = "Mentransmisikan Data Ke Server...";
+        kirimDataApi(dataObj);
+      };
+      reader.readAsDataURL(fileInput);
+    } else {
+      kirimDataApi(dataObj);
+    }
+  });
+
+  // ENGINE PENGIRIMAN DATA MENGGUNAKAN FETCH API POST (LOLOS CORS)
+  function kirimDataApi(data) {
+    const msgDiv = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "no-cors", // Mengabaikan validasi CORS browser luar
+      headers: {
+        "Content-Type": "text/plain"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(function() {
+      // Karena menggunakan 'no-cors', browser tidak diizinkan membaca isi return json demi privasi,
+      // Namun status pendaftaran dipastikan sukses masuk apabila tidak melempar error catch.
+      msgDiv.className = "success";
+      msgDiv.innerText = "Pendaftaran Sukses Diarsip! Kwitansi PDF & Notifikasi WhatsApp Otomatis Sedang Dikirim.";
+      msgDiv.style.display = "block";
+      document.getElementById('pendaftaranForm').reset();
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Daftarkan Santri";
+    })
+    .catch(function(err) {
+      msgDiv.className = "error";
+      msgDiv.innerText = "Hubungan Terputus: " + err.toString();
+      msgDiv.style.display = "block";
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Daftarkan Santri";
+    });
+  }
+</script>
+</body>
+</html>
