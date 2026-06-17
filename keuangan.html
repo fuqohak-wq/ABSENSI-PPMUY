@@ -3,86 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pendataan Santri PPMUY</title>
+    <title>PPMUY Central App - Pendaftaran</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 min-h-screen py-8 px-4 font-sans">
+<body class="bg-slate-100 min-h-screen font-sans">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-        <header class="bg-green-700 text-white p-6 text-center">
-            <h1 class="text-xl font-bold tracking-wide">Formulir Pendataan PPMUY</h1>
-            <p class="text-xs text-green-100 mt-1">Sistem Otomatisasi Database Cloud Google Drive & Sheets</p>
-        </header>
+    <nav class="bg-green-800 text-white px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="font-bold text-lg tracking-wide">PPMUY Central App</div>
+        <div class="space-x-6 text-sm font-medium">
+            <a href="#" class="border-b-2 border-white pb-1">Pendaftaran</a>
+            <a href="#" class="text-green-200 hover:text-white transition">Input Kwitansi</a>
+        </div>
+    </nav>
 
-        <form id="formData" onsubmit="prosesSebelumKirim(event)" class="p-6 space-y-4">
-            
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Lengkap</label>
-                <input type="text" id="nama" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
-            </div>
+    <div class="max-w-3xl mx-auto my-8 px-4">
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 md:p-8">
+            <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-6">Formulir Santri Baru</h2>
 
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Alamat Rumah</label>
-                <textarea id="alamat" required rows="2" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">NIK (Sesuai KTP/KK)</label>
-                    <input type="number" id="nik" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+            <form id="formData" onsubmit="prosesSebelumKirim(event)" class="space-y-5">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap *</label>
+                        <input type="text" id="nama" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">NIK (KTP/KK) *</label>
+                        <input type="number" id="nik" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Tanggal Lahir</label>
-                    <input type="date" id="tgl_lahir" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">No. HP / WhatsApp</label>
-                    <input type="tel" id="no_hp" required placeholder="Contoh: 08123456789" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">No. WhatsApp *</label>
+                        <input type="tel" id="no_hp" required placeholder="08..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir *</label>
+                        <input type="date" id="tgl_lahir" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Gender</label>
-                    <select id="gender" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">-- Pilih --</option>
-                        <option value="Laki-laki">Laki-laki</option>
-                        <option value="Perempuan">Perempuan</option>
-                    </select>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Kelas</label>
-                    <input type="text" id="kelas" required placeholder="Contoh: 10-A" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Lengkap *</label>
+                    <textarea id="alamat" required rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Asrama</label>
-                    <input type="text" id="asrama" required placeholder="Contoh: Sunan Ampel" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Gender *</label>
+                        <select id="gender" required class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Daftar Di Kelas *</label>
+                        <select id="kelas" required class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="7 Wustho">7 Wustho</option>
+                            <option value="8 Wustho">8 Wustho</option>
+                            <option value="9 Wustho">9 Wustho</option>
+                            <option value="10 Ulya">10 Ulya</option>
+                            <option value="11 Ulya">11 Ulya</option>
+                            <option value="12 Ulya">12 Ulya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Pilihan Asrama *</label>
+                        <input type="text" id="asrama" value="PPMUY PUSAT" required class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-50 font-semibold text-slate-600 focus:outline-none">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Tahun Masuk</label>
-                    <input type="number" id="masuk" required placeholder="Contoh: 2024" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Lulusan / Sekolah Asal</label>
+                        <input type="text" id="lulusan" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Referal / Rekomendasi</label>
+                        <input type="text" id="referal" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Orang Tua / Wali</label>
-                <input type="text" id="orang_tua" required class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
-            </div>
+                <div class="border border-dashed border-slate-300 rounded-lg p-4 bg-slate-50/50">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Foto Santri (Format PNG/JPG) *</label>
+                    <input type="file" id="fotoFile" accept="image/*" required class="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg bg-white file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200">
+                    <p class="text-slate-400 text-xs mt-1">Ukuran berkas disarankan di bawah 2MB.</p>
+                </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Upload Foto Santri (Maksimal 2MB)</label>
-                <input type="file" id="fotoFile" accept="image/*" required class="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:outline-none file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200">
-            </div>
-
-            <div class="pt-4">
-                <button type="submit" id="btnSubmit" class="w-full bg-green-700 hover:bg-green-800 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md">
-                    🚀 Kirim Data & Upload Foto
-                </button>
-            </div>
-        </form>
+                <div class="pt-2">
+                    <button type="submit" id="btnSubmit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 shadow-md">
+                        Daftarkan Santri
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -96,12 +112,12 @@
             const fileInput = document.getElementById('fotoFile');
             const file = fileInput.files[0];
 
-            btn.innerText = "⏳ Memproses berkas gambar...";
+            btn.innerText = "⏳ Memproses foto...";
             btn.disabled = true;
 
             if (file && file.size > 2 * 1024 * 1024) {
                 alert("Gagal! Ukuran file foto terlalu besar (Maksimal 2MB).");
-                btn.innerText = "🚀 Kirim Data & Upload Foto";
+                btn.innerText = "Daftarkan Santri";
                 btn.disabled = false;
                 return;
             }
@@ -123,7 +139,7 @@
 
         function eksekusiKirimSemuaData(base64Data, namaFile) {
             const btn = document.getElementById('btnSubmit');
-            btn.innerText = "⏳ Mengunggah data ke Google Cloud...";
+            btn.innerText = "⏳ Mengirim data pendaftaran...";
 
             const payload = {
                 nama: document.getElementById('nama').value,
@@ -134,8 +150,8 @@
                 gender: document.getElementById('gender').value,
                 kelas: document.getElementById('kelas').value,
                 asrama: document.getElementById('asrama').value,
-                masuk: document.getElementById('masuk').value,
-                orang_tua: document.getElementById('orang_tua').value,
+                lulusan: document.getElementById('lulusan').value,
+                referal: document.getElementById('referal').value,
                 foto_base64: base64Data,
                 foto_nama: namaFile
             };
@@ -149,18 +165,18 @@
             .then(res => res.json())
             .then(hasil => {
                 if(hasil.status === 'success') {
-                    alert("Alhamdulillah! Seluruh data beserta berkas foto pendaftaran sukses disimpan!");
+                    alert("Alhamdulillah! Data santri baru & foto sukses dikirim ke database cloud PPMUY.");
                     document.getElementById('formData').reset();
                 } else {
-                    alert("Error Aplikasi: " + hasil.message);
+                    alert("Gagal menyimpan: " + hasil.message);
                 }
             })
             .catch(err => {
                 console.error("Terjadi Hambatan:", err);
-                alert("Koneksi gagal! Pastikan Web App Anda sudah di-deploy dengan benar.");
+                alert("Koneksi gagal! Pastikan Web App Anda di Google Apps Script sudah diperbarui (Deploy New Deployment).");
             })
             .finally(() => {
-                btn.innerText = "🚀 Kirim Data & Upload Foto";
+                btn.innerText = "Daftarkan Santri";
                 btn.disabled = false;
             });
         }
