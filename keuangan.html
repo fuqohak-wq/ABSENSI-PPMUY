@@ -3,335 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulir Santri Baru</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f2f5;
-      margin: 0;
-      padding: 40px 20px;
-      color: #333;
+  <title>Formulir Santri Baru - PPMUY</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              success: '#029664',
+              hover: '#027c52',
+              orange: '#f97316',
+              darkbg: '#0f172a',
+              darkcard: '#1e293b'
+            }
+          }
+        }
+      }
     }
-    .form-container {
-      max-width: 750px;
-      background: #ffffff;
-      margin: 0 auto;
-      padding: 35px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-    }
-    h2 {
-      font-size: 22px;
-      color: #0f3730;
-      margin-top: 0;
-      margin-bottom: 25px;
-      font-weight: 700;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 12px;
-    }
-    
-    /* Responsive Grid System seperti di Gambar */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .form-group {
-      margin-bottom: 5px;
-    }
-    .full-width {
-      grid-column: span 2;
-    }
-    
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #2d3748;
-      font-size: 14px;
-    }
-    input[type="text"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-      background-color: #fff;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #029664;
-      box-shadow: 0 0 0 3px rgba(2, 150, 100, 0.1);
-    }
-    textarea {
-      resize: vertical;
-    }
-    .disabled-input {
-      background-color: #f1f5f9 !important;
-      color: #64748b;
-      font-weight: 600;
-      cursor: not-allowed;
-    }
-    
-    /* Upload Box Styling */
-    .upload-box {
-      border: 2px dashed #cbd5e1;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: left;
-      background-color: #fafafa;
-    }
-    .upload-box input[type="file"] {
-      font-size: 14px;
-    }
-    
-    /* Button Styling warna Hijau sesuai Gambar */
-    .btn-submit {
-      width: 100%;
-      background-color: #029664;
-      color: white;
-      border: none;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 15px;
-    }
-    .btn-submit:hover {
-      background-color: #027c52;
-    }
-    .btn-submit:disabled {
-      background-color: #94a3b8;
-      cursor: not-allowed;
-    }
-    
-    /* Dialog Notifikasi */
-    #message {
-      margin-top: 20px;
-      padding: 14px;
-      display: none;
-      border-radius: 6px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  </script>
 
-    @media (max-width: 600px) {
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-      .full-width {
-        grid-column: span 1;
-      }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
     }
+    
+    /* Efek Gradasi Berwarna-warni Lembut untuk Background */
+    .bg-colorful-light {
+      background: linear-gradient(135deg, #f0fdf4 0%, #fff7ed 50%, #f0f9ff 100%);
+    }
+    .bg-colorful-dark {
+      background: linear-gradient(135deg, #090d16 0%, #0f172a 100%);
+    }
+
+    /* Kustomisasi scrollbar halus */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
   </style>
 </head>
-<body>
+<body class="bg-colorful-light dark:bg-colorful-dark text-slate-800 dark:text-slate-100 min-h-screen antialiased flex flex-col justify-between">
 
-<div class="form-container">
-  <h2>Formulir Santri Baru</h2>
-  <form id="pendaftaranForm">
-    <div class="form-grid">
-      
-      <div class="form-group">
-        <label for="nama">Nama Lengkap *</label>
-        <input type="text" id="nama" required placeholder="Masukkan nama lengkap">
-      </div>
-      <div class="form-group">
-        <label for="nik">NIK (KTP/KK) *</label>
-        <input type="text" id="nik" required placeholder="Masukkan 16 digit NIK">
-      </div>
-
-      <div class="form-group">
-        <label for="no_hp">No. WhatsApp *</label>
-        <input type="text" id="no_hp" required placeholder="08...">
-      </div>
-      <div class="form-group">
-        <label for="tgl_lahir">Tanggal Lahir *</label>
-        <input type="date" id="tgl_lahir" required>
-      </div>
-
-      <div class="form-group full-width">
-        <label for="alamat">Alamat Lengkap *</label>
-        <textarea id="alamat" rows="3" required placeholder="Nama jalan, RT/RW, Kecamatan, dsb."></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="orang_tua">Nama Orang Tua / Wali *</label>
-        <input type="text" id="orang_tua" required placeholder="Nama ayah/ibu/wali">
-      </div>
-      <div class="form-group">
-        <label for="kota">Kabupaten / Kota Asal *</label>
-        <input type="text" id="kota" required placeholder="Contoh: Kabupaten Pati">
-      </div>
-
-      <div class="form-group">
-        <label for="gender">Gender *</label>
-        <select id="gender" required>
-          <option value="LAKI-LAKI">Laki-laki</option>
-          <option value="PEREMPUAN">Perempuan</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="kelas">Daftar Di Kelas *</label>
-        <select id="kelas" required>
-          <option value="">-- Pilih Kelas --</option>
-          <option value="KELAS 0 1 (ULA 1)">KELAS 0 1 (ULA 1)</option>
-          <option value="KELAS 0 2 (ULA 2)">KELAS 0 2 (ULA 2)</option>
-          <option value="KELAS 1 (WUSHTO 1)">KELAS 1 (WUSHTO 1)</option>
-          <option value="KELAS 2 (WUSHTO 2)">KELAS 2 (WUSHTO 2)</option>
-          <option value="KELAS 3 (WUSTHO 3)">KELAS 3 (WUSTHO 3)</option>
-          <option value="KELAS 4 (ULYA 1)">KELAS 4 (ULYA 1)</option>
-          <option value="KELAS 5 (ULYA 2)">KELAS 5 (ULYA 2)</option>
-          <option value="KELAS 6 (ULYA 3)">KELAS 6 (ULYA 3)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="jenis_pembayaran">Jenis Pembayaran *</label>
-        <select id="jenis_pembayaran" required>
-          <option value="">-- Pilih Jenis Pembayaran --</option>
-          <option value="Pendaftaran Santri Baru">Pendaftaran Santri Baru</option>
-          <option value="Infaq Gedung / Sarpras">Infaq Gedung / Sarpras</option>
-          <option value="Syahriah / SPP Bulanan">Syahriah / SPP Bulanan</option>
-          <option value="Lunas Gelombang 1">Lunas Gelombang 1</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="asrama">Pilihan Asrama *</label>
-        <input type="text" id="asrama" class="disabled-input" value="PPMUY PUSAT" readonly>
-      </div>
-
-      <div class="form-group">
-        <label for="nominal">Nominal Pembayaran (Rp) *</label>
-        <input type="text" id="nominal" required placeholder="Contoh: 50.000">
-      </div>
-      <div class="form-group">
-        <label for="referal">Referal / Rekomendasi</label>
-        <input type="text" id="referal" placeholder="Kosongkan jika tidak ada">
-      </div>
-
-      <div class="form-group full-width">
-        <label for="petugas">Nama Petugas / Bendahara Penerima *</label>
-        <input type="text" id="petugas" required placeholder="Masukkan nama Anda selaku penerima berkas">
-      </div>
-
-      <div class="form-group full-width">
-        <label for="foto">Foto Santri (Format PNG/JPG) *</label>
-        <div class="upload-box">
-          <input type="file" id="foto" accept="image/*" required>
-        </div>
-      </div>
-
+  <header class="w-full max-w-2xl mx-auto px-4 pt-4 flex justify-between items-center text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400">
+    <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800/85 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+      <i class="fa-regular fa-calendar-days text-brand-orange"></i>
+      <span id="txt-tanggal">Memuat...</span>
+      <span class="text-slate-300 dark:text-slate-600">|</span>
+      <i class="fa-regular fa-clock text-brand-success"></i>
+      <span id="txt-jam" class="font-mono">00:00:00</span>
     </div>
+    
+    <button id="theme-toggle" class="p-2.5 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-brand-orange dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all">
+      <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+    </button>
+  </header>
 
-    <button type="submit" id="submitBtn" class="btn-submit">Daftarkan Santri</button>
-  </form>
+  <main class="w-full max-w-2xl mx-auto p-4 flex-grow flex flex-col justify-center">
+    <div class="bg-white/90 dark:bg-slate-800/95 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-xl border border-white dark:border-slate-700/50 relative overflow-hidden">
+      
+      <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-orange-400 to-sky-500"></div>
 
-  <div id="message"></div>
-</div>
+      <div class="flex flex-col items-center text-center mb-6">
+        <img src="https://i.postimg.cc/bvLrZc8d/Hitam-Oranye-Lingkaran-Paguyuban-Kelas-Logo-removebg-preview.png" 
+             alt="Logo PPMUY" 
+             class="w-24 h-24 object-contain drop-shadow-md mb-3 hover:rotate-6 transition-transform duration-300">
+        <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">
+          Formulir Santri Baru
+        </h1>
+        <p class="text-xs font-semibold text-brand-success dark:text-emerald-400 mt-1 uppercase tracking-wider">
+          PPMUY PUSAT TAHUN MASUK 2026
+        </p>
+      </div>
 
-<script>
-  // Taruh URL Deployment Apps Script Anda (yang berakhiran /exec) di sini!
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW0_Idor1gZlQDE1avOPzj_VHk4ZoHFKnoVzjlpZ4l55W84mplQIvoj_ZBuf2MT4BMSQ/exec";
+      <div class="bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-slate-700/40 dark:to-emerald-950/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 mb-6 text-center animate-pulse-slow">
+        <i class="fa-solid fa-quote-left text-emerald-400 dark:text-emerald-600 text-lg mb-1 block"></i>
+        <p id="quote-khidmah" class="text-sm italic font-medium text-emerald-800 dark:text-emerald-300 px-2">
+          "Memuat kalimat penyemangat khidmah..."
+        </p>
+      </div>
 
-  // --- MENGATUR FORMAT RIBUAN DENGAN TITIK ---
-  const nominalInput = document.getElementById('nominal');
-  nominalInput.addEventListener('keyup', function(e) {
-    let value = this.value.replace(/[^0-9]/g, '');
-    if (value) {
-      this.value = Number(value).toLocaleString('id-ID');
-    } else {
-      this.value = '';
+      <form id="pendaftaranForm" class="space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div class="form-group">
+            <label for="nama"><i class="fa-regular fa-user mr-1.5 text-emerald-500"></i>Nama Lengkap *</label>
+            <input type="text" id="nama" required placeholder="Masukkan nama lengkap santri">
+          </div>
+          
+          <div class="form-group">
+            <label for="nik"><i class="fa-regular fa-id-card mr-1.5 text-orange-500"></i>NIK (KTP/KK) *</label>
+            <input type="text" id="nik" required placeholder="16 Digit Nomor Induk Kependudukan">
+          </div>
+
+          <div class="form-group">
+            <label for="no_hp"><i class="fa-brands fa-whatsapp mr-1.5 text-emerald-500 text-base"></i>No. WhatsApp Wali *</label>
+            <input type="text" id="no_hp" required placeholder="Contoh: 08123456789">
+          </div>
+          
+          <div class="form-group">
+            <label for="tgl_lahir"><i class="fa-regular fa-calendar mr-1.5 text-orange-500"></i>Tanggal Lahir *</label>
+            <input type="date" id="tgl_lahir" required class="dark:color-scheme-dark">
+          </div>
+
+          <div class="form-group md:col-span-2">
+            <label for="alamat"><i class="fa-solid fa-map-location-dot mr-1.5 text-sky-500"></i>Alamat Lengkap Rumah *</label>
+            <textarea id="alamat" rows="2" required placeholder="Nama jalan, RT/RW, Dusun, Desa, Kecamatan"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="orang_tua"><i class="fa-solid fa-user-group mr-1.5 text-emerald-500"></i>Nama Orang Tua / Wali *</label>
+            <input type="text" id="orang_tua" required placeholder="Nama Ayah/Ibu Kandung">
+          </div>
+          
+          <div class="form-group">
+            <label for="kota"><i class="fa-solid fa-city mr-1.5 text-orange-500"></i>Kabupaten / Kota Asal *</label>
+            <input type="text" id="kota" required placeholder="Contoh: Kabupaten Pati">
+          </div>
+
+          <div class="form-group">
+            <label for="gender"><i class="fa-solid fa-venus-mars mr-1.5 text-sky-500"></i>Jenis Kelamin *</label>
+            <select id="gender" required>
+              <option value="LAKI-LAKI">Laki-laki</option>
+              <option value="PEREMPUAN">Perempuan</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="kelas"><i class="fa-solid fa-graduation-cap mr-1.5 text-emerald-500"></i>Daftar Di Kelas Pilihan *</label>
+            <select id="kelas" required>
+              <option value="">-- Pilih Tingkatan Kelas --</option>
+              <option value="KELAS 0 1 (ULA 1)">KELAS 0 1 (ULA 1)</option>
+              <option value="KELAS 0 2 (ULA 2)">KELAS 0 2 (ULA 2)</option>
+              <option value="KELAS 1 (WUSHTO 1)">KELAS 1 (WUSHTO 1)</option>
+              <option value="KELAS 2 (WUSHTO 2)">KELAS 2 (WUSHTO 2)</option>
+              <option value="KELAS 3 (WUSTHO 3)">KELAS 3 (WUSTHO 3)</option>
+              <option value="KELAS 4 (ULYA 1)">KELAS 4 (ULYA 1)</option>
+              <option value="KELAS 5 (ULYA 2)">KELAS 5 (ULYA 2)</option>
+              <option value="KELAS 6 (ULYA 3)">KELAS 6 (ULYA 3)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="jenis_pembayaran"><i class="fa-solid fa-receipt mr-1.5 text-orange-500"></i>Jenis Pembayaran *</label>
+            <select id="jenis_pembayaran" required>
+              <option value="">-- Pilih Jenis Transaksi --</option>
+              <option value="Pendaftaran Santri Baru">Pendaftaran Santri Baru</option>
+              <option value="Infaq Gedung / Sarpras">Infaq Gedung / Sarpras</option>
+              <option value="Syahriah / SPP Bulanan">Syahriah / SPP Bulanan</option>
+              <option value="Lunas Gelombang 1">Lunas Gelombang 1</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="asrama"><i class="fa-solid fa-hotel mr-1.5 text-sky-500"></i>Lokasi Asrama Penempatan</label>
+            <input type="text" id="asrama" class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold cursor-not-allowed border-dashed" value="PPMUY PUSAT" readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="nominal"><i class="fa-solid fa-money-bill-wave mr-1.5 text-emerald-500"></i>Nominal Pembayaran (Rp) *</label>
+            <input type="text" id="nominal" required placeholder="Contoh: 50.000" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+          </div>
+          
+          <div class="form-group">
+            <label for="referal"><i class="fa-solid fa-user-plus mr-1.5 text-orange-500"></i>Rekomendasi / Referal (Opsional)</label>
+            <input type="text" id="referal" placeholder="Nama pengajak / pengurus">
+          </div>
+
+          <div class="form-group md:col-span-2">
+            <label for="petugas"><i class="fa-solid fa-user-check mr-1.5 text-sky-500"></i>Nama Petugas / Bendahara Penerima *</label>
+            <input type="text" id="petugas" required placeholder="Masukkan nama Anda sebagai pencatat berkas">
+          </div>
+
+          <div class="form-group md:col-span-2">
+            <label for="foto"><i class="fa-solid fa-camera-retro mr-1.5 text-emerald-500"></i>Upload Foto Santri / Berkas Rumah *</label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-600 border-dashed rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 hover:border-brand-success dark:hover:border-emerald-500 transition-colors relative">
+              <div class="space-y-1 text-center">
+                <i class="fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block" id="icon-foto"></i>
+                <div class="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
+                  <label id="label-foto" for="foto" class="relative cursor-pointer bg-white dark:bg-slate-700 rounded-md font-semibold text-brand-success dark:text-emerald-400 hover:text-brand-hover focus-within:outline-none px-2 py-0.5 shadow-sm border border-slate-200 dark:border-slate-600">
+                    <span>Pilih Berkas Foto</span>
+                    <input id="foto" type="file" accept="image/*" required class="sr-only">
+                  </label>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400" id="nama-file-terpilih">Format JPG atau PNG saja</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-[0.99] transition-all text-base tracking-wide flex items-center justify-center gap-2 mt-4">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>
+        </button>
+      </form>
+
+      <div id="message" class="mt-5 p-4 rounded-2xl text-sm font-semibold hidden text-center flex items-center justify-center gap-2 animate-bounce-short"></div>
+    </div>
+  </main>
+
+  <footer class="w-full text-center py-4 text-xs font-medium text-slate-400 dark:text-slate-600">
+    &copy; 2026 PPMUY PUSAT. All Rights Reserved. Terintegrasi Cloud Server Vercel & GitHub.
+  </footer>
+
+  <style>
+    .form-group label { @apply block font-bold text-sm text-slate-600 dark:text-slate-300 mb-1.5 transition-colors; }
+    .form-group input[type="text"], .form-group input[type="date"], .form-group select, .form-group textarea {
+      @apply w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-sm transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600;
     }
-  });
-
-  document.getElementById('pendaftaranForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.getElementById('submitBtn');
-    const msgDiv = document.getElementById('message');
-    const fileInput = document.getElementById('foto').files[0];
-    
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Sedang Memproses Gambar...";
-    msgDiv.style.display = "none";
-
-    // Membersihkan titik ribuan nominal agar menjadi angka bersih kembali
-    const angkaMurniNominal = nominalInput.value.replace(/\./g, '');
-
-    const dataObj = {
-      nama: document.getElementById('nama').value,
-      orang_tua: document.getElementById('orang_tua').value,
-      nik: document.getElementById('nik').value,
-      tgl_lahir: document.getElementById('tgl_lahir').value,
-      gender: document.getElementById('gender').value,
-      no_hp: document.getElementById('no_hp').value,
-      alamat: document.getElementById('alamat').value,
-      kota: document.getElementById('kota').value,
-      kelas: document.getElementById('kelas').value,
-      referal: document.getElementById('referal').value,
-      jenis_pembayaran: document.getElementById('jenis_pembayaran').value,
-      nominal: angkaMurniNominal,
-      petugas: document.getElementById('petugas').value,
-      fotoData: null,
-      fotoNama: "",
-      fotoType: ""
-    };
-
-    if (fileInput) {
-      const reader = new FileReader();
-      reader.onloadend = function() {
-        dataObj.fotoData = reader.result.split(',')[1];
-        dataObj.fotoNama = fileInput.name;
-        dataObj.fotoType = fileInput.type;
-        
-        submitBtn.innerText = "Mentransmisikan Data Ke Server...";
-        kirimDataApi(dataObj);
-      };
-      reader.readAsDataURL(fileInput);
-    } else {
-      kirimDataApi(dataObj);
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      @apply outline-none border-emerald-500 dark:border-emerald-500 bg-white dark:bg-slate-950 ring-4 ring-emerald-500/10 dark:ring-emerald-500/5 shadow-sm;
     }
-  });
+    @keyframes bounce-short { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .animate-bounce-short { animation: bounce-short 1s ease infinite; }
+  </style>
 
-  // ENGINE PENGIRIMAN DATA MENGGUNAKAN FETCH API POST (LOLOS CORS)
-  function kirimDataApi(data) {
-    const msgDiv = document.getElementById('message');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      mode: "no-cors", // Mengabaikan validasi CORS browser luar
-      headers: {
-        "Content-Type": "text/plain"
-      },
-      body: JSON.stringify(data)
-    })
-    .then(function() {
-      // Karena menggunakan 'no-cors', browser tidak diizinkan membaca isi return json demi privasi,
-      // Namun status pendaftaran dipastikan sukses masuk apabila tidak melempar error catch.
-      msgDiv.className = "success";
-      msgDiv.innerText = "Pendaftaran Sukses Diarsip! Kwitansi PDF & Notifikasi WhatsApp Otomatis Sedang Dikirim.";
-      msgDiv.style.display = "block";
-      document.getElementById('pendaftaranForm').reset();
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Daftarkan Santri";
-    })
-    .catch(function(err) {
-      msgDiv.className = "error";
-      msgDiv.innerText = "Hubungan Terputus: " + err.toString();
-      msgDiv.style.display = "block";
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Daftarkan Santri";
+  <script>
+    // MASUKKAN URL BACKEND GOOGLE APPS SCRIPT ANDA DI SINI
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW0_Idor1gZlQDE1avOPzj_VHk4ZoHFKnoVzjlpZ4l55W84mplQIvoj_ZBuf2MT4BMSQ/exec";
+
+    // KAMUS KALIMAT MOTIVASI KHIDMAH SANTRI RANDOM
+    const quotesKhidmah = [
+      "Khidmah dumateng pondok lan kiai niku kunci berekahipun ilmu ingkang sejati.",
+      "Lelahmu di pesantren akan menjadi lillah, penuntun jalan berkah dunia dan akhirat.",
+      "Khidmah mboten pados panggung utawi pujian, nanging pados ridha lan sambungipun sanad ilmu.",
+      "Mutiara itu bersinar di dasar laut, santri itu bersinar lewat indahnya adab dan khidmah suci.",
+      "Satu goresan pena santri yang ikhlas berlatih, jauh lebih tajam dari sekadar mimpi tanpa pengabdian.",
+      "Santri ingkang gemati lan remen khidmah, bakal diangkat drajate dening Gusti Allah subhanahu wa ta'ala.",
+      "Niatkan pendaftaran ini sebagai langkah awal thalabul ilmi dan berbakti kepada umat serta agama!"
+    ];
+
+    // Eksekusi Fitur Ketika Dokumen Dimuat Lengkap
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Pilih Motivasi Secara Acak
+      const randomIdx = Math.floor(Math.random() * quotesKhidmah.length);
+      document.getElementById("quote-khidmah").innerText = `"${quotesKhidmah[randomIdx]}"`;
+      
+      // 2. Jalankan Engine Jam & Tanggal Digital Real-time
+      updateJamTanggal();
+      setInterval(updateJamTanggal, 1000);
+
+      // 3. Engine Dark/Light Mode Premium Kontrol
+      initThemeEngine();
     });
-  }
-</script>
+
+    // SISTEM CLOCK ENGINE
+    function updateJamTanggal() {
+      const skr = new Date();
+      
+      // Format Tanggal Indonesia
+      const opsiTgl = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("txt-tanggal").innerText = skr.toLocaleDateString('id-ID', opsiTgl);
+      
+      // Format Jam Digital
+      const jam = String(skr.getHours()).padStart(2, '0');
+      const menit = String(skr.getMinutes()).padStart(2, '0');
+      const detik = String(skr.getSeconds()).padStart(2, '0');
+      document.getElementById("txt-jam").innerText = `${jam}:${menit}:${detik}`;
+    }
+
+    // SISTEM SWITCH THEME PREMIUM ENGINE
+    function initThemeEngine() {
+      const btn = document.getElementById("theme-toggle");
+      const icon = document.getElementById("theme-icon");
+      
+      // Deteksi simpanan memori user sebelumnya
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        icon.className = "fa-solid fa-sun text-lg";
+      } else {
+        document.documentElement.classList.remove('dark');
+        icon.className = "fa-solid fa-moon text-lg";
+      }
+
+      btn.addEventListener("click", function() {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          icon.className = "fa-solid fa-moon text-lg";
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          icon.className = "fa-solid fa-sun text-lg";
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+
+    // INTERAKTIF: Mendeteksi File Foto & Mengubah Teks Label Box
+    const fotoInput = document.getElementById('foto');
+    fotoInput.addEventListener('change', function() {
+      const label = document.getElementById('nama-file-terpilih');
+      const icon = document.getElementById('icon-foto');
+      if (this.files && this.files.length > 0) {
+        label.innerText = "Terpilih: " + this.files[0].name;
+        label.className = "text-xs font-bold text-emerald-600 dark:text-emerald-400";
+        icon.className = "fa-solid fa-circle-check text-emerald-500 text-3xl mb-2 block";
+      } else {
+        label.innerText = "Format JPG atau PNG saja";
+        label.className = "text-xs text-slate-500 dark:text-slate-400";
+        icon.className = "fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block";
+      }
+    });
+
+    // MENGATUR FORMAT RIBUAN PADA KOLOM NOMINAL (OTOMATIS BERI TITIK SAAT DIKETIK)
+    const nominalInput = document.getElementById('nominal');
+    nominalInput.addEventListener('keyup', function(e) {
+      let value = this.value.replace(/[^0-9]/g, '');
+      if (value) {
+        this.value = Number(value).toLocaleString('id-ID');
+      } else {
+        this.value = '';
+      }
+    });
+
+    // ENGINE SUBMISSION DATA FORM
+    document.getElementById('pendaftaranForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const msgDiv = document.getElementById('message');
+      const fileInput = fotoInput.files[0];
+      
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Sedang Mengompres Foto...</span>`;
+      msgDiv.style.display = "none";
+
+      const angkaMurniNominal = nominalInput.value.replace(/\./g, '');
+
+      const dataObj = {
+        nama: document.getElementById('nama').value,
+        orang_tua: document.getElementById('orang_tua').value,
+        nik: document.getElementById('nik').value,
+        tgl_lahir: document.getElementById('tgl_lahir').value,
+        gender: document.getElementById('gender').value,
+        no_hp: document.getElementById('no_hp').value,
+        alamat: document.getElementById('alamat').value,
+        kota: document.getElementById('kota').value,
+        kelas: document.getElementById('kelas').value,
+        referal: document.getElementById('referal').value,
+        jenis_pembayaran: document.getElementById('jenis_pembayaran').value,
+        nominal: angkaMurniNominal,
+        petugas: document.getElementById('petugas').value,
+        fotoData: null,
+        fotoNama: "",
+        fotoType: ""
+      };
+
+      if (fileInput) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          dataObj.fotoData = reader.result.split(',')[1];
+          dataObj.fotoNama = fileInput.name;
+          dataObj.fotoType = fileInput.type;
+          
+          submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Mengirim Ke Server Cloud...</span>`;
+          kirimDataApi(dataObj);
+        };
+        reader.readAsDataURL(fileInput);
+      } else {
+        kirimDataApi(dataObj);
+      }
+    });
+
+    // TRANSMISI API POST VIA FETCH ENGINE (ANTI-CORS CORRECTION)
+    function kirimDataApi(data) {
+      const msgDiv = document.getElementById('message');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(data)
+      })
+      .then(function() {
+        // Eksekusi sukses transmisi data
+        msgDiv.className = "mt-5 p-4 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 success animate-bounce-short";
+        msgDiv.innerHTML = `<i class="fa-solid fa-circle-check text-lg"></i> <span>Pendaftaran Sukses Diarsip! Kwitansi PDF & WhatsApp Otomatis sedang terkirim.</span>`;
+        msgDiv.style.display = "flex";
+        
+        document.getElementById('pendaftaranForm').reset();
+        document.getElementById('nama-file-terpilih').innerText = "Format JPG atau PNG saja";
+        document.getElementById('nama-file-terpilih').className = "text-xs text-slate-500 dark:text-slate-400";
+        document.getElementById('icon-foto').className = "fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block";
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>`;
+      })
+      .catch(function(err) {
+        // Eksekusi jika transmisi server gagal/putus
+        msgDiv.className = "mt-5 p-4 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 error";
+        msgDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation text-lg"></i> <span>Koneksi Terputus: ${err.toString()}</span>`;
+        msgDiv.style.display = "flex";
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>`;
+      });
+    }
+  </script>
 </body>
 </html>
