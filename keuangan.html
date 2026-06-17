@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulir Santri Baru - PPMUY</title>
+  <title>Sistem Informasi Pendaftaran Santri Baru - PPMUY</title>
   
+  <!-- Tailwind CSS & Font Awesome (Official Style) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -14,12 +15,14 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              success: '#029664',
-              hover: '#027c52',
-              orange: '#f97316',
-              darkbg: '#0f172a',
-              darkcard: '#1e293b'
+            institute: {
+              primary: '#0a4d3c',    /* Hijau Resmi Institusi */
+              primaryHover: '#07362a',
+              accent: '#dd6b20',     /* Oranye Formal */
+              darkBg: '#0f172a',
+              darkCard: '#1e293b',
+              borderLight: '#e2e8f0',
+              borderDark: '#334155'
             }
           }
         }
@@ -28,209 +31,229 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.2s, color 0.2s;
     }
-    
-    /* Efek Gradasi Berwarna-warni Lembut untuk Background */
-    .bg-colorful-light {
-      background: linear-gradient(135deg, #f0fdf4 0%, #fff7ed 50%, #f0f9ff 100%);
+    .form-input-focus {
+      transition: all 0.2s ease;
     }
-    .bg-colorful-dark {
-      background: linear-gradient(135deg, #090d16 0%, #0f172a 100%);
+    .form-input-focus:focus {
+      outline: none;
+      border-color: #0a4d3c;
+      box-shadow: 0 0 0 3px rgba(10, 77, 60, 0.15);
     }
-
-    /* Kustomisasi scrollbar halus */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .dark .form-input-focus:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
   </style>
 </head>
-<body class="bg-colorful-light dark:bg-colorful-dark text-slate-800 dark:text-slate-100 min-h-screen antialiased flex flex-col justify-between">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen flex flex-col justify-between">
 
-  <header class="w-full max-w-2xl mx-auto px-4 pt-4 flex justify-between items-center text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-400">
-    <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800/85 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-slate-200/50 dark:border-slate-700/50">
-      <i class="fa-regular fa-calendar-days text-brand-orange"></i>
-      <span id="txt-tanggal">Memuat...</span>
-      <span class="text-slate-300 dark:text-slate-600">|</span>
-      <i class="fa-regular fa-clock text-brand-success"></i>
-      <span id="txt-jam" class="font-mono">00:00:00</span>
-    </div>
-    
-    <button id="theme-toggle" class="p-2.5 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-brand-orange dark:text-yellow-400 hover:scale-110 active:scale-95 transition-all">
-      <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
-    </button>
-  </header>
-
-  <main class="w-full max-w-2xl mx-auto p-4 flex-grow flex flex-col justify-center">
-    <div class="bg-white/90 dark:bg-slate-800/95 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-xl border border-white dark:border-slate-700/50 relative overflow-hidden">
+  <!-- TOP BAR: Status Jam, Tanggal & Switcher Mode Resmi -->
+  <div class="w-full bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex justify-between items-center text-xs font-medium text-slate-600 dark:text-slate-400">
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-regular fa-calendar-check text-institute-primary dark:text-emerald-400"></i>
+          <span id="txt-tanggal">Memuat Tanggal...</span>
+        </span>
+        <span class="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
+        <span class="flex items-center gap-1.5">
+          <i class="fa-regular fa-clock text-slate-400"></i>
+          <span id="txt-jam" class="font-mono font-semibold">00:00:00</span>
+        </span>
+      </div>
       
-      <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-orange-400 to-sky-500"></div>
+      <button id="theme-toggle" class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
+        <span class="text-[11px] uppercase tracking-wider font-semibold">Mode</span>
+      </button>
+    </div>
+  </div>
 
-      <div class="flex flex-col items-center text-center mb-6">
+  <!-- CONTAINER UTAMA -->
+  <main class="w-full max-w-3xl mx-auto px-4 py-8 flex-grow">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+      
+      <!-- HEADER RESMI INSTITUSI -->
+      <div class="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
         <img src="https://i.postimg.cc/bvLrZc8d/Hitam-Oranye-Lingkaran-Paguyuban-Kelas-Logo-removebg-preview.png" 
-             alt="Logo PPMUY" 
-             class="w-24 h-24 object-contain drop-shadow-md mb-3 hover:rotate-6 transition-transform duration-300">
-        <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">
-          Formulir Santri Baru
-        </h1>
-        <p class="text-xs font-semibold text-brand-success dark:text-emerald-400 mt-1 uppercase tracking-wider">
-          PPMUY PUSAT TAHUN MASUK 2026
+             alt="Logo Resmi PPMUY" 
+             class="w-20 h-20 object-contain">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Penerimaan Santri Baru (PSB) Online
+          </h1>
+          <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            Pondok Pesantren Pembangunan Mangunan Yogyakarta (PPMUY PUSAT)
+          </p>
+          <div class="inline-block bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold px-2.5 py-0.5 rounded mt-2 uppercase tracking-wide">
+            Tahun Ajaran 2026 / 2027
+          </div>
+        </div>
+      </div>
+
+      <!-- KOTAK MOTIVASI KHIDMAH (ELEGANT DESIGN) -->
+      <div class="mx-6 md:mx-8 mt-6 p-4 rounded-lg border-l-4 border-institute-primary dark:border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/10 text-sm">
+        <span class="block text-[10px] uppercase font-bold text-institute-primary dark:text-emerald-400 tracking-wider mb-1">Mutiara Khidmah:</span>
+        <p id="quote-khidmah" class="italic text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
+          "Memuat kalimat motivasi..."
         </p>
       </div>
 
-      <div class="bg-gradient-to-r from-emerald-50/70 to-teal-50/70 dark:from-slate-700/40 dark:to-emerald-950/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 mb-6 text-center animate-pulse-slow">
-        <i class="fa-solid fa-quote-left text-emerald-400 dark:text-emerald-600 text-lg mb-1 block"></i>
-        <p id="quote-khidmah" class="text-sm italic font-medium text-emerald-800 dark:text-emerald-300 px-2">
-          "Memuat kalimat penyemangat khidmah..."
-        </p>
-      </div>
+      <!-- FORMULIR INPUT DATA -->
+      <form id="pendaftaranForm" class="p-6 md:p-8 space-y-6">
+        
+        <!-- SEKSI 1: IDENTITAS DIRI -->
+        <div>
+          <h2 class="text-xs font-bold text-institute-primary dark:text-emerald-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-700 pb-1.5 mb-4">
+            I. Identitas Calon Santri
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="nama" class="form-label">Nama Lengkap Santri *</label>
+              <input type="text" id="nama" required placeholder="Sesuai dengan berkas Ijazah / KK" class="form-input form-input-focus">
+            </div>
+            <div>
+              <label for="nik" class="form-label">Nomor Induk Kependudukan (NIK) *</label>
+              <input type="text" id="nik" required placeholder="16 Digit Angka Nomor KTP / KK" class="form-input form-input-focus">
+            </div>
+            <div>
+              <label for="no_hp" class="form-label">Nomor WhatsApp Wali *</label>
+              <input type="text" id="no_hp" required placeholder="Contoh: 08123456789" class="form-input form-input-focus">
+            </div>
+            <div>
+              <label for="tgl_lahir" class="form-label">Tanggal Lahir *</label>
+              <input type="date" id="tgl_lahir" required class="form-input form-input-focus dark:color-scheme-dark">
+            </div>
+            <div class="md:col-span-2">
+              <label for="alamat" class="form-label">Alamat Domisili Lengkap *</label>
+              <textarea id="alamat" rows="2" required placeholder="Nama jalan, nomor rumah, RT/RW, Dusun, Kelurahan, Kecamatan" class="form-input form-input-focus"></textarea>
+            </div>
+            <div>
+              <label for="orang_tua" class="form-label">Nama Orang Tua / Wali *</label>
+              <input type="text" id="orang_tua" required placeholder="Nama lengkap penanggung jawab" class="form-input form-input-focus">
+            </div>
+            <div>
+              <label for="kota" class="form-label">Kabupaten / Kota Asal *</label>
+              <input type="text" id="kota" required placeholder="Contoh: Kabupaten Pati" class="form-input form-input-focus">
+            </div>
+            <div>
+              <label for="gender" class="form-label">Jenis Kelamin *</label>
+              <select id="gender" required class="form-input form-input-focus">
+                <option value="LAKI-LAKI">Laki-laki</option>
+                <option value="PEREMPUAN">Perempuan</option>
+              </select>
+            </div>
+            <div>
+              <label for="kelas" class="form-label">Pilihan Tingkatan Kelas *</label>
+              <select id="kelas" required class="form-input form-input-focus">
+                <option value="">-- Pilih Tingkatan --</option>
+                <option value="KELAS 0 1 (ULA 1)">KELAS 0 1 (ULA 1)</option>
+                <option value="KELAS 0 2 (ULA 2)">KELAS 0 2 (ULA 2)</option>
+                <option value="KELAS 1 (WUSHTO 1)">KELAS 1 (WUSHTO 1)</option>
+                <option value="KELAS 2 (WUSHTO 2)">KELAS 2 (WUSHTO 2)</option>
+                <option value="KELAS 3 (WUSTHO 3)">KELAS 3 (WUSTHO 3)</option>
+                <option value="KELAS 4 (ULYA 1)">KELAS 4 (ULYA 1)</option>
+                <option value="KELAS 5 (ULYA 2)">KELAS 5 (ULYA 2)</option>
+                <option value="KELAS 6 (ULYA 3)">KELAS 6 (ULYA 3)</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-      <form id="pendaftaranForm" class="space-y-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div class="form-group">
-            <label for="nama"><i class="fa-regular fa-user mr-1.5 text-emerald-500"></i>Nama Lengkap *</label>
-            <input type="text" id="nama" required placeholder="Masukkan nama lengkap santri">
-          </div>
-          
-          <div class="form-group">
-            <label for="nik"><i class="fa-regular fa-id-card mr-1.5 text-orange-500"></i>NIK (KTP/KK) *</label>
-            <input type="text" id="nik" required placeholder="16 Digit Nomor Induk Kependudukan">
-          </div>
-
-          <div class="form-group">
-            <label for="no_hp"><i class="fa-brands fa-whatsapp mr-1.5 text-emerald-500 text-base"></i>No. WhatsApp Wali *</label>
-            <input type="text" id="no_hp" required placeholder="Contoh: 08123456789">
-          </div>
-          
-          <div class="form-group">
-            <label for="tgl_lahir"><i class="fa-regular fa-calendar mr-1.5 text-orange-500"></i>Tanggal Lahir *</label>
-            <input type="date" id="tgl_lahir" required class="dark:color-scheme-dark">
-          </div>
-
-          <div class="form-group md:col-span-2">
-            <label for="alamat"><i class="fa-solid fa-map-location-dot mr-1.5 text-sky-500"></i>Alamat Lengkap Rumah *</label>
-            <textarea id="alamat" rows="2" required placeholder="Nama jalan, RT/RW, Dusun, Desa, Kecamatan"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="orang_tua"><i class="fa-solid fa-user-group mr-1.5 text-emerald-500"></i>Nama Orang Tua / Wali *</label>
-            <input type="text" id="orang_tua" required placeholder="Nama Ayah/Ibu Kandung">
-          </div>
-          
-          <div class="form-group">
-            <label for="kota"><i class="fa-solid fa-city mr-1.5 text-orange-500"></i>Kabupaten / Kota Asal *</label>
-            <input type="text" id="kota" required placeholder="Contoh: Kabupaten Pati">
-          </div>
-
-          <div class="form-group">
-            <label for="gender"><i class="fa-solid fa-venus-mars mr-1.5 text-sky-500"></i>Jenis Kelamin *</label>
-            <select id="gender" required>
-              <option value="LAKI-LAKI">Laki-laki</option>
-              <option value="PEREMPUAN">Perempuan</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="kelas"><i class="fa-solid fa-graduation-cap mr-1.5 text-emerald-500"></i>Daftar Di Kelas Pilihan *</label>
-            <select id="kelas" required>
-              <option value="">-- Pilih Tingkatan Kelas --</option>
-              <option value="KELAS 0 1 (ULA 1)">KELAS 0 1 (ULA 1)</option>
-              <option value="KELAS 0 2 (ULA 2)">KELAS 0 2 (ULA 2)</option>
-              <option value="KELAS 1 (WUSHTO 1)">KELAS 1 (WUSHTO 1)</option>
-              <option value="KELAS 2 (WUSHTO 2)">KELAS 2 (WUSHTO 2)</option>
-              <option value="KELAS 3 (WUSTHO 3)">KELAS 3 (WUSTHO 3)</option>
-              <option value="KELAS 4 (ULYA 1)">KELAS 4 (ULYA 1)</option>
-              <option value="KELAS 5 (ULYA 2)">KELAS 5 (ULYA 2)</option>
-              <option value="KELAS 6 (ULYA 3)">KELAS 6 (ULYA 3)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="jenis_pembayaran"><i class="fa-solid fa-receipt mr-1.5 text-orange-500"></i>Jenis Pembayaran *</label>
-            <select id="jenis_pembayaran" required>
-              <option value="">-- Pilih Jenis Transaksi --</option>
-              <option value="Pendaftaran Santri Baru">Pendaftaran Santri Baru</option>
-              <option value="Infaq Gedung / Sarpras">Infaq Gedung / Sarpras</option>
-              <option value="Syahriah / SPP Bulanan">Syahriah / SPP Bulanan</option>
-              <option value="Lunas Gelombang 1">Lunas Gelombang 1</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="asrama"><i class="fa-solid fa-hotel mr-1.5 text-sky-500"></i>Lokasi Asrama Penempatan</label>
-            <input type="text" id="asrama" class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-bold cursor-not-allowed border-dashed" value="PPMUY PUSAT" readonly>
-          </div>
-
-          <div class="form-group">
-            <label for="nominal"><i class="fa-solid fa-money-bill-wave mr-1.5 text-emerald-500"></i>Nominal Pembayaran (Rp) *</label>
-            <input type="text" id="nominal" required placeholder="Contoh: 50.000" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-          </div>
-          
-          <div class="form-group">
-            <label for="referal"><i class="fa-solid fa-user-plus mr-1.5 text-orange-500"></i>Rekomendasi / Referal (Opsional)</label>
-            <input type="text" id="referal" placeholder="Nama pengajak / pengurus">
-          </div>
-
-          <div class="form-group md:col-span-2">
-            <label for="petugas"><i class="fa-solid fa-user-check mr-1.5 text-sky-500"></i>Nama Petugas / Bendahara Penerima *</label>
-            <input type="text" id="petugas" required placeholder="Masukkan nama Anda sebagai pencatat berkas">
-          </div>
-
-          <div class="form-group md:col-span-2">
-            <label for="foto"><i class="fa-solid fa-camera-retro mr-1.5 text-emerald-500"></i>Upload Foto Santri / Berkas Rumah *</label>
-            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-600 border-dashed rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 hover:border-brand-success dark:hover:border-emerald-500 transition-colors relative">
-              <div class="space-y-1 text-center">
-                <i class="fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block" id="icon-foto"></i>
-                <div class="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
-                  <label id="label-foto" for="foto" class="relative cursor-pointer bg-white dark:bg-slate-700 rounded-md font-semibold text-brand-success dark:text-emerald-400 hover:text-brand-hover focus-within:outline-none px-2 py-0.5 shadow-sm border border-slate-200 dark:border-slate-600">
-                    <span>Pilih Berkas Foto</span>
-                    <input id="foto" type="file" accept="image/*" required class="sr-only">
-                  </label>
+        <!-- SEKSI 2: ADMINISTRASI & PEMBAYARAN -->
+        <div class="pt-2">
+          <h2 class="text-xs font-bold text-institute-primary dark:text-emerald-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-700 pb-1.5 mb-4">
+            II. Berkas & Administrasi Keuangan
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="jenis_pembayaran" class="form-label">Jenis Alokasi Pembayaran *</label>
+              <select id="jenis_pembayaran" required class="form-input form-input-focus">
+                <option value="">-- Pilih Jenis Pembayaran --</option>
+                <option value="Pendaftaran Santri Baru">Pendaftaran Santri Baru</option>
+                <option value="Infaq Gedung / Sarpras">Infaq Gedung / Sarpras</option>
+                <option value="Syahriah / SPP Bulanan">Syahriah / SPP Bulanan</option>
+                <option value="Lunas Gelombang 1">Lunas Gelombang 1</option>
+              </select>
+            </div>
+            <div>
+              <label for="asrama" class="form-label">Kompleks Asrama Penempatan</label>
+              <input type="text" id="asrama" class="form-input bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400 font-semibold cursor-not-allowed border-dashed" value="PPMUY PUSAT" readonly>
+            </div>
+            <div>
+              <label for="nominal" class="form-label">Nominal Uang Masuk (Rp) *</label>
+              <input type="text" id="nominal" required placeholder="Contoh: 50.000" class="form-input form-input-focus font-semibold text-institute-primary dark:text-emerald-400">
+            </div>
+            <div>
+              <label for="referal" class="form-label">Rekomendasi / Referal Pengurus</label>
+              <input type="text" id="referal" placeholder="Nama perekomendasi (jika ada)" class="form-input form-input-focus">
+            </div>
+            <div class="md:col-span-2">
+              <label for="petugas" class="form-label">Nama Petugas Akreditasi / Penerima *</label>
+              <input type="text" id="petugas" required placeholder="Ketik nama admin pencatat transaksi keuangan" class="form-input form-input-focus">
+            </div>
+            
+            <!-- Dokumen File Upload -->
+            <div class="md:col-span-2">
+              <label class="form-label">Berkas Foto Santri / Bukti Fisik *</label>
+              <div class="mt-1 flex items-center gap-4 p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50/50 dark:bg-slate-900/40">
+                <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400" id="wrapper-icon">
+                  <i class="fa-solid fa-file-image text-xl" id="icon-foto"></i>
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400" id="nama-file-terpilih">Format JPG atau PNG saja</p>
+                <div class="flex-grow">
+                  <label for="foto" class="inline-block cursor-pointer bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-3 py-1.5 text-xs font-semibold shadow-sm hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors">
+                    Pilih File Foto
+                  </label>
+                  <input id="foto" type="file" accept="image/*" required class="sr-only">
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" id="nama-file-terpilih">Format dokumen (.jpg, .png) maksimal berkas standar web</p>
+                </div>
               </div>
             </div>
           </div>
-
         </div>
 
-        <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold py-3.5 px-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-[0.99] transition-all text-base tracking-wide flex items-center justify-center gap-2 mt-4">
-          <i class="fa-solid fa-paper-plane"></i>
-          <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>
-        </button>
+        <!-- TOMBOL SIMPAN & SUBMIT RESMI -->
+        <div class="pt-4">
+          <button type="submit" id="submitBtn" class="w-full bg-institute-primary hover:bg-institute-primaryHover text-white font-semibold py-3 px-4 rounded shadow transition-colors text-sm tracking-wide flex items-center justify-center gap-2">
+            <i class="fa-solid fa-print"></i>
+            <span>SUBMIT DATA & PROSES KWITANSI DIGITAL</span>
+          </button>
+        </div>
       </form>
 
-      <div id="message" class="mt-5 p-4 rounded-2xl text-sm font-semibold hidden text-center flex items-center justify-center gap-2 animate-bounce-short"></div>
+      <!-- NOTIFIKASI SYSTEM -->
+      <div id="message" class="mx-6 md:mx-8 mb-6 p-4 rounded text-xs font-semibold hidden items-center justify-center gap-2 border"></div>
     </div>
   </main>
 
-  <footer class="w-full text-center py-4 text-xs font-medium text-slate-400 dark:text-slate-600">
-    &copy; 2026 PPMUY PUSAT. All Rights Reserved. Terintegrasi Cloud Server Vercel & GitHub.
+  <!-- FOOTER -->
+  <footer class="w-full text-center py-4 text-[11px] font-medium text-slate-400 dark:text-slate-600 border-t border-slate-200/50 dark:border-slate-800 bg-white dark:bg-slate-900">
+    Sistem Aplikasi PSB Online &copy; 2026 PPMUY PUSAT. Manajemen Arsip Terenkripsi Otomatis.
   </footer>
 
+  <!-- GLOBAL STYLING CLASSES (MENGHINDARI KESAN ACAK-ACAKAN) -->
   <style>
-    .form-group label { @apply block font-bold text-sm text-slate-600 dark:text-slate-300 mb-1.5 transition-colors; }
-    .form-group input[type="text"], .form-group input[type="date"], .form-group select, .form-group textarea {
-      @apply w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl text-sm transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600;
+    .form-label {
+      @apply block font-semibold text-xs text-slate-700 dark:text-slate-300 mb-1.5;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      @apply outline-none border-emerald-500 dark:border-emerald-500 bg-white dark:bg-slate-950 ring-4 ring-emerald-500/10 dark:ring-emerald-500/5 shadow-sm;
+    .form-input {
+      @apply w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500;
     }
-    @keyframes bounce-short { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-    .animate-bounce-short { animation: bounce-short 1s ease infinite; }
+    .success { @apply bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50; }
+    .error { @apply bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50; }
   </style>
 
+  <!-- PROGRAM JAVASCRIPT KONTROLLER -->
   <script>
-    // MASUKKAN URL BACKEND GOOGLE APPS SCRIPT ANDA DI SINI
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW0_Idor1gZlQDE1avOPzj_VHk4ZoHFKnoVzjlpZ4l55W84mplQIvoj_ZBuf2MT4BMSQ/exec";
+    // MASUKKAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAI3lDT24kLujhxK_ZSvQe7O02lDfkiUU1TesLt5Gzw2yL03wQr-6qFzB-HpOIw2bl-Q/exec";
 
-    // KAMUS KALIMAT MOTIVASI KHIDMAH SANTRI RANDOM
+    // DATABASE QUOTES KHIDMAH INSTITUSIONAL
     const quotesKhidmah = [
       "Khidmah dumateng pondok lan kiai niku kunci berekahipun ilmu ingkang sejati.",
       "Lelahmu di pesantren akan menjadi lillah, penuntun jalan berkah dunia dan akhirat.",
@@ -241,79 +264,76 @@
       "Niatkan pendaftaran ini sebagai langkah awal thalabul ilmi dan berbakti kepada umat serta agama!"
     ];
 
-    // Eksekusi Fitur Ketika Dokumen Dimuat Lengkap
     document.addEventListener("DOMContentLoaded", function() {
-      // 1. Pilih Motivasi Secara Acak
+      // Set Kutipan Acak
       const randomIdx = Math.floor(Math.random() * quotesKhidmah.length);
       document.getElementById("quote-khidmah").innerText = `"${quotesKhidmah[randomIdx]}"`;
       
-      // 2. Jalankan Engine Jam & Tanggal Digital Real-time
+      // Jalankan Jam Real-time
       updateJamTanggal();
       setInterval(updateJamTanggal, 1000);
 
-      // 3. Engine Dark/Light Mode Premium Kontrol
+      // Inisialisasi Mode Gelap
       initThemeEngine();
     });
 
-    // SISTEM CLOCK ENGINE
     function updateJamTanggal() {
       const skr = new Date();
-      
-      // Format Tanggal Indonesia
       const opsiTgl = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       document.getElementById("txt-tanggal").innerText = skr.toLocaleDateString('id-ID', opsiTgl);
       
-      // Format Jam Digital
       const jam = String(skr.getHours()).padStart(2, '0');
       const menit = String(skr.getMinutes()).padStart(2, '0');
       const detik = String(skr.getSeconds()).padStart(2, '0');
       document.getElementById("txt-jam").innerText = `${jam}:${menit}:${detik}`;
     }
 
-    // SISTEM SWITCH THEME PREMIUM ENGINE
     function initThemeEngine() {
       const btn = document.getElementById("theme-toggle");
       const icon = document.getElementById("theme-icon");
       
-      // Deteksi simpanan memori user sebelumnya
       if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
-        icon.className = "fa-solid fa-sun text-lg";
+        icon.className = "fa-solid fa-sun text-emerald-400";
       } else {
         document.documentElement.classList.remove('dark');
-        icon.className = "fa-solid fa-moon text-lg";
+        icon.className = "fa-solid fa-moon text-slate-500";
       }
 
       btn.addEventListener("click", function() {
         if (document.documentElement.classList.contains('dark')) {
           document.documentElement.classList.remove('dark');
-          icon.className = "fa-solid fa-moon text-lg";
+          icon.className = "fa-solid fa-moon text-slate-500";
           localStorage.setItem('theme', 'light');
         } else {
           document.documentElement.classList.add('dark');
-          icon.className = "fa-solid fa-sun text-lg";
+          icon.className = "fa-solid fa-sun text-emerald-400";
           localStorage.setItem('theme', 'dark');
         }
       });
     }
 
-    // INTERAKTIF: Mendeteksi File Foto & Mengubah Teks Label Box
+    // Deteksi interaksi berkas foto masuk
     const fotoInput = document.getElementById('foto');
     fotoInput.addEventListener('change', function() {
       const label = document.getElementById('nama-file-terpilih');
       const icon = document.getElementById('icon-foto');
+      const wrapper = document.getElementById('wrapper-icon');
+      
       if (this.files && this.files.length > 0) {
-        label.innerText = "Terpilih: " + this.files[0].name;
-        label.className = "text-xs font-bold text-emerald-600 dark:text-emerald-400";
-        icon.className = "fa-solid fa-circle-check text-emerald-500 text-3xl mb-2 block";
+        label.innerText = "Berkas Terpilih: " + this.files[0].name;
+        label.className = "text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1";
+        icon.className = "fa-solid fa-check text-emerald-600 dark:text-emerald-400 text-xl";
+        wrapper.className = "p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg border border-emerald-200 dark:border-emerald-800";
       } else {
-        label.innerText = "Format JPG atau PNG saja";
-        label.className = "text-xs text-slate-500 dark:text-slate-400";
-        icon.className = "fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block";
+        label.innerText = "Format dokumen (.jpg, .png) maksimal berkas standar web";
+        label.className = "text-xs text-slate-500 dark:text-slate-400 mt-1";
+        icon.className = "fa-solid fa-file-image text-xl";
+        wrapper.className = "p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400";
       }
     });
 
-    // MENGATUR FORMAT RIBUAN PADA KOLOM NOMINAL (OTOMATIS BERI TITIK SAAT DIKETIK)
+    // Masking otomatis format ribuan dengan titik
     const nominalInput = document.getElementById('nominal');
     nominalInput.addEventListener('keyup', function(e) {
       let value = this.value.replace(/[^0-9]/g, '');
@@ -324,7 +344,7 @@
       }
     });
 
-    // ENGINE SUBMISSION DATA FORM
+    // Form submission controller
     document.getElementById('pendaftaranForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -333,7 +353,7 @@
       const fileInput = fotoInput.files[0];
       
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Sedang Mengompres Foto...</span>`;
+      submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>MENGOMPRES DOKUMEN BERKAS...</span>`;
       msgDiv.style.display = "none";
 
       const angkaMurniNominal = nominalInput.value.replace(/\./g, '');
@@ -364,7 +384,7 @@
           dataObj.fotoNama = fileInput.name;
           dataObj.fotoType = fileInput.type;
           
-          submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Mengirim Ke Server Cloud...</span>`;
+          submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>MENGIRIM ARSIP DATABASE CLOUD...</span>`;
           kirimDataApi(dataObj);
         };
         reader.readAsDataURL(fileInput);
@@ -373,7 +393,6 @@
       }
     });
 
-    // TRANSMISI API POST VIA FETCH ENGINE (ANTI-CORS CORRECTION)
     function kirimDataApi(data) {
       const msgDiv = document.getElementById('message');
       const submitBtn = document.getElementById('submitBtn');
@@ -385,27 +404,26 @@
         body: JSON.stringify(data)
       })
       .then(function() {
-        // Eksekusi sukses transmisi data
-        msgDiv.className = "mt-5 p-4 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 success animate-bounce-short";
-        msgDiv.innerHTML = `<i class="fa-solid fa-circle-check text-lg"></i> <span>Pendaftaran Sukses Diarsip! Kwitansi PDF & WhatsApp Otomatis sedang terkirim.</span>`;
+        msgDiv.className = "mx-6 md:mx-8 mb-6 p-4 rounded text-xs font-semibold flex items-center justify-center gap-2 border success";
+        msgDiv.innerHTML = `<i class="fa-solid fa-circle-check text-sm"></i> <span>Data pendaftaran berhasil diverifikasi sistem. Bukti dokumen Kwitansi PDF dan pesan WA sedang diteruskan ke Wali Santri.</span>`;
         msgDiv.style.display = "flex";
         
         document.getElementById('pendaftaranForm').reset();
-        document.getElementById('nama-file-terpilih').innerText = "Format JPG atau PNG saja";
-        document.getElementById('nama-file-terpilih').className = "text-xs text-slate-500 dark:text-slate-400";
-        document.getElementById('icon-foto').className = "fa-solid fa-images text-slate-400 dark:text-slate-500 text-3xl mb-2 block";
+        document.getElementById('nama-file-terpilih').innerText = "Format dokumen (.jpg, .png) maksimal berkas standar web";
+        document.getElementById('nama-file-terpilih').className = "text-xs text-slate-500 dark:text-slate-400 mt-1";
+        document.getElementById('icon-foto').className = "fa-solid fa-file-image text-xl";
+        document.getElementById('wrapper-icon').className = "p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400";
         
         submitBtn.disabled = false;
-        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-print"></i> <span>SUBMIT DATA & PROSES KWITANSI DIGITAL</span>`;
       })
       .catch(function(err) {
-        // Eksekusi jika transmisi server gagal/putus
-        msgDiv.className = "mt-5 p-4 rounded-2xl text-sm font-semibold text-center flex items-center justify-center gap-2 error";
-        msgDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation text-lg"></i> <span>Koneksi Terputus: ${err.toString()}</span>`;
+        msgDiv.className = "mx-6 md:mx-8 mb-6 p-4 rounded text-xs font-semibold flex items-center justify-center gap-2 border error";
+        msgDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-sm"></i> <span>Kegagalan Transmisi Jaringan: ${err.toString()}</span>`;
         msgDiv.style.display = "flex";
         
         submitBtn.disabled = false;
-        submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>DAFTARKAN SANTRI & TERBITKAN KWITANSI</span>`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-print"></i> <span>SUBMIT DATA & PROSES KWITANSI DIGITAL</span>`;
       });
     }
   </script>
