@@ -162,10 +162,18 @@
 
     <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-top:20px;">
       <h3 style="font-size:14px; margin-bottom:10px; color:#d97706;">💸 Catat Penyerahan Uang Tunai (Cash) ke Nyai</h3>
+      
       <div class="form-group">
         <label for="dropdownBayarNyai">Pilih Kategori Yang Dibayarkan:</label>
-        <select id="dropdownBayarNyai"></select>
+        <select id="dropdownBayarNyai" onchange="handleDropdownBayarNyai(this.value)">
+          </select>
       </div>
+
+      <div class="form-group" id="inputKategoriManualContainer" style="display:none;">
+        <label for="customKategoriBayar" style="color:#b45309;">Ketik Nama Kategori Baru:</label>
+        <input type="text" id="customKategoriBayar" placeholder="Contoh: KEPERLUAN MENDADAK">
+      </div>
+
       <div class="form-group">
         <label for="cashNominal">Jumlah Cash yang Diserahkan (Rp):</label>
         <input type="number" id="cashNominal" placeholder="Contoh: 1000000">
@@ -177,7 +185,7 @@
 
 <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
-  const PASSWORD_ADMIN = "12345"; // Silakan ganti password ruang admin di sini sesuai keinginan Anda
+  const PASSWORD_ADMIN = "12345"; 
   
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
@@ -191,7 +199,7 @@
     const inputPass = prompt("Masukkan Password Ruang Admin:");
     if (inputPass === PASSWORD_ADMIN) {
       document.getElementById("adminModal").classList.add("active");
-      loadRekapTable();
+      ambilDataRekapServer(); // Panggil fungsi fetch data riil dari Google Sheets
     } else if (inputPass !== null) {
       alert("⚠️ Password salah! Akses ditolak.");
     }
@@ -208,47 +216,78 @@
     });
   }
 
-  function loadRekapTable() {
+  // Fungsi mengambil data dari server, lalu dilempar ke Tabel & Dropdown
+  function ambilDataRekapServer() {
     const tbody = document.querySelector("#tableRekap tbody");
-    const selectBayar = document.getElementById("dropdownBayarNyai");
-    tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Memperbarui data rekap buku...</td></tr>";
-
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat data terbaru...</td></tr>';
+    
     fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "getRekapSetoranNyai" }) })
-    .then(res => res.json()).then(response => {
-      if(response.success) {
-        tbody.innerHTML = ""; selectBayar.innerHTML = "";
-        let grandTotalFinal = 0; let grandSudahBayar = 0; let grandBelumBayar = 0;
-
-        response.data.forEach(row => {
-          grandTotalFinal += row.totalFinal; grandSudahBayar += row.sudahTerbayar; grandBelumBayar += row.belumTerbayar;
-
-          let tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><b>${row.jenisPembayaran}</b></td>
-            <td>${row.jumlahSantri}</td>
-            <td>${row.nominalPerSantri === "-" ? "-" : "Rp " + row.nominalPerSantri.toLocaleString('id-ID')}</td>
-            <td>Rp ${row.totalFinal.toLocaleString('id-ID')}</td>
-            <td style="color:#0d9488;">Rp ${row.sudahTerbayar.toLocaleString('id-ID')}</td>
-            <td style="color:${row.belumTerbayar > 0 ? '#dc2626':'#16a34a'}; font-weight:bold;">Rp ${row.belumTerbayar.toLocaleString('id-ID')}</td>
-          `;
-          tbody.appendChild(tr);
-
-          let opt = document.createElement("option");
-          opt.value = row.jenisPembayaran; opt.innerText = row.jenisPembayaran;
-          selectBayar.appendChild(opt);
-        });
-
-        let totalTr = document.createElement("tr");
-        totalTr.className = "total-row";
-        totalTr.innerHTML = `
-          <td colspan="3">TOTAL KESELURUHAN</td>
-          <td>Rp ${grandTotalFinal.toLocaleString('id-ID')}</td>
-          <td style="color:#0d9488;">Rp ${grandSudahBayar.toLocaleString('id-ID')}</td>
-          <td style="color:#dc2626;">Rp ${grandBelumBayar.toLocaleString('id-ID')}</td>
-        `;
-        tbody.appendChild(totalTr);
+    .then(res => res.json())
+    .then(res => {
+      if(res.success) {
+        renderTabelRekap(res.data);
+        loadDropdownKategoriBayar(res.data);
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat rekap!</td></tr>';
       }
+    }).catch(err => {
+       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Koneksi Bermasalah!</td></tr>';
     });
+  }
+
+  // Fungsi membuat isi baris tabel di Ruang Admin
+  function renderTabelRekap(data) {
+    const tbody = document.querySelector("#tableRekap tbody");
+    tbody.innerHTML = "";
+    
+    data.forEach(item => {
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>${item.jenisPembayaran}</b></td>
+        <td>${item.jumlahSantri}</td>
+        <td>${item.nominalPerSantri !== "-" ? "Rp " + item.nominalPerSantri.toLocaleString('id-ID') : "-"}</td>
+        <td>Rp ${item.totalFinal.toLocaleString('id-ID')}</td>
+        <td style="color:#16a34a; font-weight:600;">Rp ${item.sudahTerbayar.toLocaleString('id-ID')}</td>
+        <td style="color:#dc2626; font-weight:600;">Rp ${item.belumTerbayar.toLocaleString('id-ID')}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Fungsi membuat pilihan dropdown dinamis penyerahan uang cash
+  function loadDropdownKategoriBayar(data) {
+    const dropdownKategori = document.getElementById("dropdownBayarNyai");
+    dropdownKategori.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+
+    data.forEach(item => {
+      let optionText = item.jenisPembayaran;
+      
+      if (item.jenisPembayaran === "Syahriyyah") {
+        optionText = "Syahriyyah (Tagihan: Rp 75.000)";
+      }
+
+      let option = document.createElement("option");
+      option.value = item.jenisPembayaran; 
+      option.textContent = optionText;
+      dropdownKategori.appendChild(option);
+    });
+
+    let opsiLain = document.createElement("option");
+    opsiLain.value = "LAIN-LAIN";
+    opsiLain.textContent = "Lain-lain (Tulis Sendiri)";
+    dropdownKategori.appendChild(opsiLain);
+  }
+
+  // Logika memunculkan kolom input baru jika admin memilih "LAIN-LAIN"
+  function handleDropdownBayarNyai(val) {
+    const containerManual = document.getElementById("inputKategoriManualContainer");
+    if (val === "LAIN-LAIN") {
+      containerManual.style.display = "block";
+      document.getElementById("customKategoriBayar").focus();
+    } else {
+      containerManual.style.display = "none";
+      document.getElementById("customKategoriBayar").value = "";
+    }
   }
 
   function handleDropdownKategori(val) {
@@ -310,12 +349,16 @@
         document.getElementById("textKeterangan").value = "";
         document.getElementById("nominalPerAnak").value = "";
         listSantriKhususAcara = []; renderBadges();
+        loadTotalSantriCount();
       }
     });
   }
 
   function simpanBayarCash() {
-    const jenis = document.getElementById("dropdownBayarNyai").value;
+    let jenis = document.getElementById("dropdownBayarNyai").value;
+    if (jenis === "LAIN-LAIN") {
+      jenis = document.getElementById("customKategoriBayar").value.trim().toUpperCase();
+    }
     const nominal = document.getElementById("cashNominal").value;
     if(!jenis || !nominal) { alert("Kategori dan nominal wajib diisi!"); return; }
 
@@ -325,7 +368,9 @@
     }).then(res => res.json()).then(res => {
       if(res.success) {
         alert("Penyerahan uang tunai sukses dicatat!");
-        document.getElementById("cashNominal").value = ""; loadRekapTable();
+        document.getElementById("cashNominal").value = "";
+        document.getElementById("inputKategoriManualContainer").style.display = "none";
+        ambilDataRekapServer(); // Segarkan ulang tabel rekap & dropdown setelah data masuk
       }
     });
   }
