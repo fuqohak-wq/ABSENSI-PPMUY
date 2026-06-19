@@ -94,7 +94,7 @@
     </div>
     <div class="form-group" style="margin-top: 10px;">
       <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
-      <input type="number" id="nominalTabungan" placeholder="Contoh: 5000" disabled>
+      <input type="text" id="nominalTabungan" placeholder="Contoh: 5.000" onkeyup="this.value = formatRupiah(this.value)" disabled>
     </div>
     <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
     <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
@@ -113,11 +113,6 @@
     </div>
 
     <div class="form-group">
-      <label for="textKeterangan">Keterangan Transaksi Pusat (Teks Bebas ke Transaksi Induk):</label>
-      <input type="text" id="textKeterangan" placeholder="Contoh: PEMBAYARAN BUBUR SYURO">
-    </div>
-
-    <div class="form-group">
       <label>Cakupan Beban Santri:</label>
       <label style="font-weight:normal; margin-right:20px; font-size:13px;"><input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri (<span id="countDbSantri">-</span> anak)</label>
       <label style="font-weight:normal; font-size:13px;"><input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Manual)</label>
@@ -131,7 +126,7 @@
 
     <div class="form-group">
       <label for="nominalPerAnak">Nominal Per Santri (Rp):</label>
-      <input type="number" id="nominalPerAnak" placeholder="Contoh: 10000">
+      <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
     </div>
 
     <button class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
@@ -177,7 +172,7 @@
 
       <div class="form-group">
         <label for="cashNominal">Jumlah Cash yang Diserahkan (Rp):</label>
-        <input type="number" id="cashNominal" placeholder="Contoh: 1000000">
+        <input type="text" id="cashNominal" placeholder="Contoh: 1.000.000" onkeyup="this.value = formatRupiah(this.value)">
       </div>
       <button class="btn btn-orange" onclick="simpanBayarCash()">Simpan & Perbarui Buku Kontrol</button>
     </div>
@@ -190,6 +185,20 @@
   
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
+
+  // Fungsi Format Rupiah
+  function formatRupiah(angka) {
+    var number_string = angka.replace(/[^,\d]/g, '').toString(),
+    split = number_string.split(','),
+    sisa = split[0].length % 3,
+    rupiah = split[0].substr(0, sisa),
+    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      var separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
+    }
+    return rupiah;
+  }
 
   window.onload = function() {
     fetchNotification();
@@ -340,24 +349,26 @@
   function simpanAcaraBaru() {
     let jenis = document.getElementById("dropdownKategori").value;
     if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
-    const keterangan = document.getElementById("textKeterangan").value;
+    // Keterangan dihapus
     const cakupan = document.querySelector('input[name="cakupan"]:checked').value;
-    const nominal = document.getElementById("nominalPerAnak").value;
+    const nominal = document.getElementById("nominalPerAnak").value.replace(/\./g, ""); // Hapus titik
 
-    if(!jenis || !keterangan || !nominal) { alert("Lengkapi seluruh formulir!"); return; }
+    if(!jenis || !nominal) { alert("Lengkapi seluruh formulir!"); return; }
     if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama santri!"); return; }
 
     fetch(WEB_APP_URL, {
       method: "POST",
       mode: "cors",
       body: JSON.stringify({
-        action: "submitAcaraBaru", jenisSetorNyai: jenis, keteranganTransaksi: keterangan,
-        cakupan: cakupan, nominalPerAnak: nominal, santriList: listSantriKhususAcara
+        action: "submitAcaraBaru", 
+        jenisSetorNyai: jenis, 
+        cakupan: cakupan, 
+        nominalPerAnak: nominal, 
+        santriList: listSantriKhususAcara
       })
     }).then(res => res.json()).then(res => {
       if(res.success) {
         alert(`Sukses! Data kegiatan berhasil dilempar ke transaksi induk.`);
-        document.getElementById("textKeterangan").value = "";
         document.getElementById("nominalPerAnak").value = "";
         listSantriKhususAcara = []; renderBadges();
         loadTotalSantriCount();
@@ -372,7 +383,7 @@
     if (jenis === "LAIN-LAIN") {
       jenis = document.getElementById("customKategoriBayar").value.trim().toUpperCase();
     }
-    const nominal = document.getElementById("cashNominal").value;
+    const nominal = document.getElementById("cashNominal").value.replace(/\./g, ""); // Hapus titik
     if(!jenis || !nominal) { alert("Kategori dan nominal wajib diisi!"); return; }
 
     fetch(WEB_APP_URL, {
@@ -482,7 +493,7 @@
   }
 
   function simpanTabungan() {
-    const nominal = document.getElementById("nominalTabungan").value;
+    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, ""); // Hapus titik
     const statusDiv = document.getElementById("tabunganStatus");
     const btn = document.getElementById("btnSimpanTabungan");
     if(!nominal || nominal <= 0) return;
