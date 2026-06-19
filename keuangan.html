@@ -6,92 +6,88 @@
   <title>Dashboard Bendahara PPMUY</title>
   <style>
     :root { --primary: #1e3a8a; --accent: #0d9488; --bg: #f8fafc; --text: #1e293b; --card-bg: #ffffff; }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     .container { max-width: 750px; margin: 0 auto; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; }
     .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
     .card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
     .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-    /* ... (tambahkan CSS lainnya dari file asli Anda di sini) ... */
+    .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
+    .alert-box.active { display: block; }
+    /* ... CSS lainnya tetap sama ... */
   </style>
 </head>
 <body>
-
 <div class="container">
-  <header>
-    <div><h1>DASHBOARD BENDAHARA PUSAT</h1></div>
-    <button class="btn btn-admin" onclick="bukaRuangAdmin()">🔐 Ruang Admin</button>
-  </header>
-
   <div class="card">
-    <h2>✍️ Input Tabungan</h2>
-    <div class="form-group">
-      <label>Nominal Tabungan (Rp):</label>
-      <input type="text" id="nominalTabungan" placeholder="1.000.000" onkeyup="this.value = formatRupiah(this.value)">
+    <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
+    <div class="form-group" style="margin-top: 10px;">
+      <label>Nominal Tabungan Baru (Rp):</label>
+      <input type="text" id="nominalTabungan" placeholder="Contoh: 5.000" onkeyup="this.value = formatRupiah(this.value)" disabled>
     </div>
-    <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()">Simpan Transaksi</button>
+    <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
   </div>
 
   <div class="card">
-    <h2>📅 Input Kegiatan Setoran Nyai</h2>
+    <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
     <div class="form-group">
       <label>Jenis Setoran Nyai:</label>
       <select id="dropdownKategori" onchange="handleDropdownKategori(this.value)">
         <option value="ACARA BUBUR SYURO">ACARA BUBUR SYURO</option>
-        <option value="LAINNYA">Lainnya...</option>
+        <option value="LAINNYA">Ketik Sendiri (Lainnya...)</option>
       </select>
       <input type="text" id="customKategori" placeholder="Tulis nama kategori..." style="display:none; margin-top:8px;">
     </div>
     <div class="form-group">
       <label>Nominal Per Santri (Rp):</label>
-      <input type="text" id="nominalPerAnak" placeholder="50.000" onkeyup="this.value = formatRupiah(this.value)">
+      <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
     </div>
     <button class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
   </div>
 </div>
 
 <script>
-  // FUNGSI FORMAT RUPIAH OTOMATIS
+  // FUNGSI FORMAT RUPIAH
   function formatRupiah(angka) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
-        split   = number_string.split(','),
-        sisa    = split[0].length % 3,
-        rupiah  = split[0].substr(0, sisa),
-        ribuan  = split[0].substr(sisa).match(/\d{3}/gi);
+        split = number_string.split(','),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
     if (ribuan) {
-      separator = sisa ? '.' : '';
+      var separator = sisa ? '.' : '';
       rupiah += separator + ribuan.join('.');
     }
     return rupiah;
   }
 
-  // Fungsi simpan acara baru yang sudah disesuaikan (Tanpa Keterangan Manual)
+  // FUNGSI SIMPAN TABUNGAN (Disesuaikan)
+  function simpanTabungan() {
+    let nominalRaw = document.getElementById("nominalTabungan").value.replace(/\./g, ""); // Hapus titik
+    // ... panggil fetch dengan nominalRaw ...
+  }
+
+  // FUNGSI SIMPAN ACARA (Disesuaikan)
   function simpanAcaraBaru() {
     let jenis = document.getElementById("dropdownKategori").value;
     if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
-    const nominal = document.getElementById("nominalPerAnak").value;
-
+    let nominalRaw = document.getElementById("nominalPerAnak").value.replace(/\./g, ""); // Hapus titik
+    
+    // ... logika fetch, tanpa mengirim keteranganTransaksi ...
     fetch(WEB_APP_URL, {
       method: "POST",
-      mode: "cors",
       body: JSON.stringify({
-        action: "saveAcaraBaru", 
+        action: "submitAcaraBaru", 
         jenisSetorNyai: jenis, 
-        nominalPerAnak: nominal,
-        // Keterangan dihapus karena sudah otomatis di Apps Script
         cakupan: document.querySelector('input[name="cakupan"]:checked').value,
+        nominalPerAnak: nominalRaw, 
         santriList: listSantriKhususAcara
       })
-    }).then(res => res.json()).then(res => {
-      if(res.success) alert("Sukses!");
-    });
+    }).then(...)
   }
-
-  // Panggil fungsi formatRupiah pada semua input nominal saat diketik
-  // Pastikan ID elemen disesuaikan dengan kode Anda
 </script>
 </body>
 </html>
