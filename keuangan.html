@@ -14,7 +14,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 900px; margin: 0 auto; }
+    .container { max-width: 1000px; margin: 0 auto; }
     header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 25px; display: none; }
@@ -22,46 +22,75 @@
     .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
     .btn:hover { opacity: 0.9; }
     .btn-orange { background: #d97706; }
+    .btn-blue { background: #2563eb; }
     
     .card { background: var(--card-bg); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
     .card h2 { margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; font-size: 18px; }
     
     .form-group { margin-bottom: 15px; position: relative; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-    .form-group input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+    .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background: white; }
     
     .search-container { position: relative; }
-    .search-results { position: absolute; left: 0; right: 0; max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; color: var(--text); }
+    .search-results { position: absolute; left: 0; right: 0; max-height: 180px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; }
     .search-item:hover { background: #f1f5f9; color: var(--primary); }
     
     .info-saldo { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin-top: 15px; display: none; }
     .info-saldo.active { display: block; }
-    .info-saldo table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-    .info-saldo td { padding: 5px 0; font-size: 15px; }
     
-    .status-msg { margin-top: 10px; font-weight: 600; font-size: 14px; }
-    .text-success { color: #16a34a; }
-    .text-danger { color: #dc2626; }
+    table.rekap-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    table.rekap-table th, table.rekap-table td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; font-size: 14px; }
+    table.rekap-table th { background: #f1f5f9; color: var(--primary); font-weight: bold; }
+    table.rekap-table tr.total-row { font-weight: bold; background: #eff6ff; }
+
+    .flex-row { display: flex; gap: 15px; }
+    .flex-row .form-group { flex: 1; }
+    .badge-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+    .badge { background: #e2e8f0; padding: 5px 10px; border-radius: 15px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+    .badge span { cursor: pointer; color: #dc2626; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <header>
-    <h1>DASHBOARD BENDAHARA PUSAT</h1>
-    <p>Integrasi Pendaftaran Santri Baru & Input Tabungan Santri</p>
+    <h1>DASHBOARD BUKU KONTROL BENDAHARA</h1>
+    <p>Pengelolaan Tabungan Santri & Monitoring Realisasi Buku Setoran Nyai</p>
   </header>
 
   <div id="nyaiAlert" class="alert-box">
-    <h3 style="margin-bottom: 5px; color: #92400e;">🔔 Pemberitahuan Setoran Santri Baru (Nyai)</h3>
-    <p style="margin-bottom: 10px;" id="nyaiAlertText">Sedang memeriksa data pendaftaran...</p>
-    <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none;">Proses & Setor ke Nyai Sekarang</button>
+    <h3 style="margin-bottom: 5px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
+    <p style="margin-bottom: 10px;" id="nyaiAlertText">Sedang memeriksa antrean data mentah...</p>
+    <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none;">Proses & Sinkron Ke Nyai</button>
+  </div>
+
+  <div class="card">
+    <h2>📊 Ringkasan Buku Kontrol Setoran Nyai</h2>
+    <table class="rekap-table" id="tableRekap">
+      <thead>
+        <tr>
+          <th>Jenis Pembayaran</th>
+          <th>Jml Santri</th>
+          <th>Nominal /Anak</th>
+          <th>Total Final (Tagihan)</th>
+          <th>Sudah Terbayar (Cash)</th>
+          <th>Belum Terbayar (Sisa)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align:center;">Memuat data rekap setoran...</td></tr>
+      </tbody>
+    </table>
+    
+    <div style="margin-top: 15px; display: flex; gap: 10px;">
+      <button class="btn btn-blue" onclick="document.getElementById('sectionAcara').scrollIntoView({behavior: 'smooth'})">+ Input Kegiatan/Acara Baru</button>
+      <button class="btn btn-orange" onclick="document.getElementById('sectionCash').scrollIntoView({behavior: 'smooth'})">💸 Catat Penyerahan Cash ke Nyai</button>
+    </div>
   </div>
 
   <div class="card">
     <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
-    
     <div class="form-group">
       <label for="searchKey">Cari Nama / Scan Barcode NIK Santri:</label>
       <div class="search-container">
@@ -69,137 +98,271 @@
         <div id="searchResults" class="search-results" style="display:none;"></div>
       </div>
     </div>
-
     <div id="infoSaldoBox" class="info-saldo">
-      <strong style="color: #166534;">📋 Profil & Tabungan Santri Terpilih:</strong>
-      <table>
-        <tr><td style="width: 30%; font-weight:600;">NIK:</td><td id="viewNik">-</td></tr>
-        <tr><td style="font-weight:600;">Nama:</td><td id="viewNama">-</td></tr>
-        <tr><td style="font-weight:600;">Gender:</td><td id="viewGender">-</td></tr>
-        <tr><td style="font-weight:600; color: #15803d;">Total Saldo:</td><td id="viewSaldo" style="font-weight:bold; color: #15803d; font-size: 18px;">Rp 0</td></tr>
-      </table>
+      <strong style="color: #166534;">📋 Profil Terpilih:</strong>
+      <p>NIK: <span id="viewNik">-</span> | Nama: <span id="viewNama">-</span> | Saldo Akhir: <b id="viewSaldo" style="color:#15803d;">Rp 0</b></p>
     </div>
-
-    <div class="form-group" style="margin-top: 20px;">
+    <div class="form-group" style="margin-top: 15px;">
       <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
       <input type="number" id="nominalTabungan" placeholder="Contoh: 5000" disabled>
     </div>
-
     <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
-    <div id="tabunganStatus" class="status-msg"></div>
+    <div id="tabunganStatus" style="margin-top:10px; font-weight:600;"></div>
+  </div>
+
+  <div class="card" id="sectionAcara">
+    <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
+    <div class="form-group">
+      <label for="dropdownKategori">Jenis Setoran Nyai:</label>
+      <select id="dropdownKategori" onchange="handleDropdownKategori(this.value)">
+        <option value="Pendapatan Royalti Lagi PPMUY">Pendapatan Royalti Lagi PPMUY</option>
+        <option value="Donasi">Donasi</option>
+        <option value="LAINNYA">Ketik Sendiri (Lainnya...)</option>
+      </select>
+      <input type="text" id="customKategori" placeholder="Tulis nama kategori setoran baru..." style="display:none; margin-top:10px;">
+    </div>
+
+    <div class="form-group">
+      <label for="textKeterangan">Keterangan Transaksi Pusat (Teks Bebas ke Transaksi Induk):</label>
+      <input type="text" id="textKeterangan" placeholder="Contoh Kebutuhan: PEMBAYARAN BUBUR SYURO">
+    </div>
+
+    <div class="form-group">
+      <label>Cakupan Beban Santri:</label>
+      <label style="font-weight:normal; margin-right:20px;"><input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri Aktif (<span id="countDbSantri">-</span> anak)</label>
+      <label style="font-weight:normal;"><input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Pilih Manual)</label>
+    </div>
+
+    <div id="boxSantriKhusus" style="display:none; background:#f1f5f9; padding:15px; border-radius:6px; margin-bottom:15px;">
+      <label style="font-weight:600; font-size:14px;">Cari dan Tambah Santri Spesifik:</label>
+      <input type="text" id="searchAcaraSantri" placeholder="Ketik nama santri khusus..." oninput="cariSantriAcara(this.value)">
+      <div id="searchAcaraResults" class="search-results" style="display:none;"></div>
+      <div class="badge-list" id="listBadgeSantri"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="nominalPerAnak">Nominal Per Santri (Rp):</label>
+      <input type="number" id="nominalPerAnak" placeholder="Contoh: 10000">
+    </div>
+
+    <button class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
+  </div>
+
+  <div class="card" id="sectionCash">
+    <h2>💸 Form Penyerahan Uang Tunai (Cash) ke Nyai</h2>
+    <div class="form-group">
+      <label for="dropdownBayarNyai">Pilih Kategori Yang Akan Dibayar:</label>
+      <select id="dropdownBayarNyai"></select>
+    </div>
+    <div class="form-group">
+      <label for="cashNominal">Jumlah Uang Tunai Yang Diserahkan (Rp):</label>
+      <input type="number" id="cashNominal" placeholder="Contoh: 1000000">
+    </div>
+    <button class="btn btn-orange" onclick="simpanBayarCash()">Simpan Penyerahan Uang Cash</button>
   </div>
 </div>
 
 <script>
-  // URL Web App Google Apps Script Anda yang sudah aktif
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
-
+  
   let santriTerpilih = null;
+  let listSantriKhususAcara = [];
 
   window.onload = function() {
     fetchNotification();
+    loadRekapTable();
+    loadTotalSantriCount();
   };
 
+  function loadTotalSantriCount() {
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "getDatabaseSantriCount" }) })
+    .then(res => res.json()).then(res => {
+      if(res.success) document.getElementById("countDbSantri").innerText = res.data.totalSantri;
+    });
+  }
+
+  function loadRekapTable() {
+    const tbody = document.querySelector("#tableRekap tbody");
+    const selectBayar = document.getElementById("dropdownBayarNyai");
+
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "getRekapSetoranNyai" }) })
+    .then(res => res.json()).then(response => {
+      if(response.success) {
+        tbody.innerHTML = "";
+        selectBayar.innerHTML = "";
+        
+        let grandTotalFinal = 0; let grandSudahBayar = 0; let grandBelumBayar = 0;
+
+        response.data.forEach(row => {
+          grandTotalFinal += row.totalFinal;
+          grandSudahBayar += row.sudahTerbayar;
+          grandBelumBayar += row.belumTerbayar;
+
+          let tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><b>${row.jenisPembayaran}</b></td>
+            <td>${row.jumlahSantri}</td>
+            <td>${row.nominalPerSantri === "-" ? "-" : "Rp " + row.nominalPerSantri.toLocaleString('id-ID')}</td>
+            <td>Rp ${row.totalFinal.toLocaleString('id-ID')}</td>
+            <td style="color:#0d9488;">Rp ${row.sudahTerbayar.toLocaleString('id-ID')}</td>
+            <td style="color:${row.belumTerbayar > 0 ? '#dc2626':'#16a34a'}; font-weight:bold;">Rp ${row.belumTerbayar.toLocaleString('id-ID')}</td>
+          `;
+          tbody.appendChild(tr);
+
+          let opt = document.createElement("option");
+          opt.value = row.jenisPembayaran; opt.innerText = row.jenisPembayaran;
+          selectBayar.appendChild(opt);
+        });
+
+        let totalTr = document.createElement("tr");
+        totalTr.className = "total-row";
+        totalTr.innerHTML = `
+          <td colspan="3">TOTAL FINAL KESELURUHAN</td>
+          <td>Rp ${grandTotalFinal.toLocaleString('id-ID')}</td>
+          <td style="color:#0d9488;">Rp ${grandSudahBayar.toLocaleString('id-ID')}</td>
+          <td style="color:#dc2626;">Rp ${grandBelumBayar.toLocaleString('id-ID')}</td>
+        `;
+        tbody.appendChild(totalTr);
+      }
+    });
+  }
+
+  function handleDropdownKategori(val) {
+    document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
+  }
+
+  function toggleCakupanSantri(type) {
+    document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
+  }
+
+  function cariSantriAcara(val) {
+    const resDiv = document.getElementById("searchAcaraResults");
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "searchSantri", keyword: val }) })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data.length > 0) {
+        resDiv.innerHTML = ""; resDiv.style.display = "block";
+        response.data.forEach(item => {
+          let div = document.createElement("div"); div.className = "search-item";
+          div.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
+          div.onclick = function() {
+            if(!listSantriKhususAcara.some(s => s.nik === item.nik)) {
+              listSantriKhususAcara.push(item); renderBadges();
+            }
+            resDiv.style.display = "none"; document.getElementById("searchAcaraSantri").value = "";
+          };
+          resDiv.appendChild(div);
+        });
+      }
+    });
+  }
+
+  function renderBadges() {
+    const box = document.getElementById("listBadgeSantri"); box.innerHTML = "";
+    listSantriKhususAcara.forEach((s, idx) => {
+      let b = document.createElement("div"); b.className = "badge";
+      b.innerHTML = `${s.nama} <span onclick="listSantriKhususAcara.splice(${idx},1); renderBadges();">×</span>`;
+      box.appendChild(b);
+    });
+  }
+
+  function simpanAcaraBaru() {
+    let jenis = document.getElementById("dropdownKategori").value;
+    if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
+    const keterangan = document.getElementById("textKeterangan").value;
+    const cakupan = document.querySelector('input[name="cakupan"]:checked').value;
+    const nominal = document.getElementById("nominalPerAnak").value;
+
+    if(!jenis || !keterangan || !nominal) { alert("Lengkapi seluruh form input!"); return; }
+    if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama santri khusus!"); return; }
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "submitAcaraBaru", jenisSetorNyai: jenis, keteranganTransaksi: keterangan,
+        cakupan: cakupan, nominalPerAnak: nominal, santriList: listSantriKhususAcara
+      })
+    }).then(res => res.json()).then(res => {
+      if(res.success) {
+        alert(`Sukses menyimpan kegiatan! Memotong saldo transaksi induk untuk ${res.data.jumlahSantri} anak.`);
+        document.getElementById("textKeterangan").value = "";
+        document.getElementById("nominalPerAnak").value = "";
+        listSantriKhususAcara = []; renderBadges(); loadRekapTable();
+      }
+    });
+  }
+
+  function simpanBayarCash() {
+    const jenis = document.getElementById("dropdownBayarNyai").value;
+    const nominal = document.getElementById("cashNominal").value;
+    if(!jenis || !nominal) { alert("Pilih kategori dan isi nominal penyerahan!"); return; }
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "submitBayarCashNyai", jenis: jenis, nominal: nominal })
+    }).then(res => res.json()).then(res => {
+      if(res.success) {
+        alert("Kwitansi penyerahan uang cash ke Nyai sukses disimpan!");
+        document.getElementById("cashNominal").value = ""; loadRekapTable();
+      }
+    });
+  }
+
+  // --- RE-PASTE LOGIKAL LAMA (JANGAN DIUBAH AGAR TIDAK EROR) ---
   function fetchNotification() {
     const alertBox = document.getElementById("nyaiAlert");
     const alertText = document.getElementById("nyaiAlertText");
     const btnProses = document.getElementById("btnProsesNyai");
-
     alertBox.classList.add("active");
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "getNotificationData" })
-    })
-    .then(res => res.json())
-    .then(response => {
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "getNotificationData" }) })
+    .then(res => res.json()).then(response => {
       if(response.success) {
         const info = response.data;
         if(info.jumlahSantriBaru > 0) {
-          alertText.innerHTML = `Terdeteksi ada <b>${info.jumlahSantriBaru} santri baru</b> di tahun 2026 yang belum disetor ke Nyai.<br>Total estimasi nilai kewajiban setoran: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
+          alertText.innerHTML = `Terdeteksi ada <b>${info.jumlahSantriBaru} santri baru</b> di tahun 2026 yang belum disetor ke Nyai.<br>Total kewajiban: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
           btnProses.style.display = "inline-block";
         } else {
-          alertText.innerHTML = "Semua data pendaftaran santri baru tahun 2026 sudah sinkron & terekam di pusat Nyai.";
+          alertText.innerHTML = "Semua data pendaftaran santri baru tahun 2026 sudah sinkron dengan pusat Nyai.";
           btnProses.style.display = "none";
         }
-      } else {
-        alertText.innerText = "Gagal memuat notifikasi pendaftaran.";
       }
-    }).catch(() => {
-      alertText.innerText = "Gagal terhubung dengan database pusat.";
     });
   }
 
   function prosesSetoranNyai() {
-    const btnProses = document.getElementById("btnProsesNyai");
-    btnProses.innerText = "Memproses...";
-    btnProses.disabled = true;
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "processSantriBaru" })
-    })
-    .then(res => res.json())
-    .then(response => {
-      if(response.success) {
-        alert("Sukses memproses " + response.data.processedCount + " data setoran santri baru ke Nyai!");
-        fetchNotification();
-      } else {
-        alert("Terjadi kesalahan sistem saat memproses.");
-        btnProses.disabled = false;
-        btnProses.innerText = "Proses & Setor ke Nyai Sekarang";
-      }
+    const btn = document.getElementById("btnProsesNyai"); btn.innerText = "Memproses..."; btn.disabled = true;
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "processSantriBaru" }) })
+    .then(res => res.json()).then(res => {
+      if(res.success) { alert("Sukses memproses setoran pendaftaran!"); fetchNotification(); loadRekapTable(); }
     });
   }
 
   function cariSantri(val) {
     const resDiv = document.getElementById("searchResults");
-    if(!val || val.trim().length < 2) { 
-      resDiv.style.display = "none"; 
-      resDiv.innerHTML = "";
-      return; 
-    }
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "searchSantri", keyword: val })
-    })
-    .then(res => res.json())
-    .then(response => {
-      if(response.success && response.data && response.data.length > 0) {
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "searchSantri", keyword: val }) })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data.length > 0) {
         resDiv.innerHTML = "";
         response.data.forEach(item => {
-          let itemEl = document.createElement("div");
-          itemEl.className = "search-item";
+          let itemEl = document.createElement("div"); itemEl.className = "search-item";
           itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
-          itemEl.addEventListener("click", function() {
-            pilihSantri(item);
-          });
+          itemEl.addEventListener("click", function() { pilihSantri(item); });
           resDiv.appendChild(itemEl);
         });
         resDiv.style.display = "block";
-      } else {
-        resDiv.style.display = "none";
-        resDiv.innerHTML = "";
-      }
-    })
-    .catch(() => {
-      resDiv.style.display = "none";
+      } else { resDiv.style.display = "none"; }
     });
   }
 
   function pilihSantri(santri) {
     santriTerpilih = santri;
     document.getElementById("searchResults").style.display = "none";
-    document.getElementById("searchResults").innerHTML = "";
     document.getElementById("searchKey").value = santri.nama;
-
     document.getElementById("viewNik").innerText = santri.nik;
     document.getElementById("viewNama").innerText = santri.nama;
-    document.getElementById("viewGender").innerText = santri.gender;
     document.getElementById("viewSaldo").innerText = "Rp " + santri.saldo.toLocaleString('id-ID');
     document.getElementById("infoSaldoBox").classList.add("active");
-
     document.getElementById("nominalTabungan").disabled = false;
     document.getElementById("btnSimpanTabungan").disabled = false;
     document.getElementById("nominalTabungan").focus();
@@ -209,36 +372,16 @@
     const nominal = document.getElementById("nominalTabungan").value;
     const statusDiv = document.getElementById("tabunganStatus");
     const btn = document.getElementById("btnSimpanTabungan");
-
-    if(!nominal || nominal <= 0) {
-      statusDiv.innerHTML = "<span class='text-danger'>Masukkan nominal tabungan valid!</span>";
-      return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Menyimpan...";
-    statusDiv.innerHTML = "";
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "submitTabungan", nik: santriTerpilih.nik, nominal: nominal })
-    })
-    .then(res => res.json())
-    .then(response => {
-      btn.disabled = false;
-      btn.innerText = "Simpan Transaksi Tabungan";
-      
+    if(!nominal || nominal <= 0) return;
+    btn.disabled = true; btn.innerText = "Menyimpan...";
+    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "submitTabungan", nik: santriTerpilih.nik, nominal: nominal }) })
+    .then(res => res.json()).then(response => {
+      btn.disabled = false; btn.innerText = "Simpan Transaksi Tabungan";
       if(response.success) {
-        statusDiv.innerHTML = `<span class='text-success'>Sukses! Tabungan ${response.data.nama} berhasil direkam. Saldo terbaru: Rp ${response.data.saldoAkhir.toLocaleString('id-ID')}</span>`;
+        statusDiv.innerHTML = `<span class='text-success'>Sukses! Saldo terbaru: Rp ${response.data.saldoAkhir.toLocaleString('id-ID')}</span>`;
         document.getElementById("viewSaldo").innerText = "Rp " + response.data.saldoAkhir.toLocaleString('id-ID');
-        document.getElementById("nominalTabungan").value = "";
-      } else {
-        statusDiv.innerHTML = `<span class='text-danger'>Gagal menyimpan: ${response.error}</span>`;
+        document.getElementById("nominalTabungan").value = ""; loadRekapTable();
       }
-    }).catch(() => {
-      btn.disabled = false;
-      btn.innerText = "Simpan Transaksi Tabungan";
-      statusDiv.innerHTML = "<span class='text-danger'>Masalah koneksi internet.</span>";
     });
   }
 </script>
