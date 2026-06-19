@@ -138,7 +138,7 @@
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
     <h2 style="color:var(--primary); font-size:18px; margin-bottom:15px; border-bottom:2px solid #f1f5f9; padding-bottom:8px;">🔐 Ruang Utama Kendali Admin & Setoran Nyai</h2>
     
-    <h3 style="font-size:14px; margin-bottom:8px; color:#475569;">📊 Ringkasan Buku Kontrol Setoran Nyai</h3>
+    <h3 style="font-size: 14px; margin-bottom: 5px; color: #e11d48;">⚠️ Tagihan Belum Selesai (Aktif)</h3>
     <table class="rekap-table" id="tableRekap">
       <thead>
         <tr>
@@ -152,6 +152,21 @@
       </thead>
       <tbody>
         <tr><td colspan="6" style="text-align:center;">Memuat rekap...</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size: 14px; margin: 20px 0 5px 0; color: #16a34a;">✅ Riwayat Tagihan Lunas</h3>
+    <table class="rekap-table" id="tableRekapLunas">
+      <thead>
+        <tr>
+          <th>Jenis Pembayaran</th>
+          <th>Total Final (Tagihan)</th>
+          <th>Sudah Terbayar (Cash)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="4" style="text-align:center; color: #64748b;">Belum ada tagihan lunas.</td></tr>
       </tbody>
     </table>
 
@@ -256,57 +271,98 @@
     });
   }
 
+  // PENGATURAN REVISI 3: OPTIMALISASI RENDER UTK MEMBAGI DATA KE DUA TABEL
   function renderTabelRekap(data) {
-    const tbody = document.querySelector("#tableRekap tbody");
-    tbody.innerHTML = "";
+    const tbodyAktif = document.querySelector("#tableRekap tbody");
+    const tbodyLunas = document.querySelector("#tableRekapLunas tbody");
     
-    // Inisialisasi variabel total
+    tbodyAktif.innerHTML = "";
+    tbodyLunas.innerHTML = "";
+    
     let totalTagihan = 0;
     let totalBayar = 0;
     let totalSisa = 0;
+    let adaLunas = false;
     
     data.forEach(item => {
-      // Hitung akumulasi
-      totalTagihan += item.totalFinal;
-      totalBayar += item.sudahTerbayar;
-      totalSisa += item.belumTerbayar;
+      if (item.belumTerbayar > 0) {
+        // Masuk Tabel Aktif
+        totalTagihan += item.totalFinal;
+        totalBayar += item.sudahTerbayar;
+        totalSisa += item.belumTerbayar;
 
-      let tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><b>${item.jenisPembayaran}</b></td>
-        <td>${item.jumlahSantri}</td>
-        <td>${item.nominalPerSantri !== "-" ? "Rp " + Number(item.nominalPerSantri).toLocaleString('id-ID') : "-"}</td>
-        <td>Rp ${Number(item.totalFinal).toLocaleString('id-ID')}</td>
-        <td style="color:#16a34a; font-weight:600;">Rp ${Number(item.sudahTerbayar).toLocaleString('id-ID')}</td>
-        <td style="color:#dc2626; font-weight:600;">Rp ${Number(item.belumTerbayar).toLocaleString('id-ID')}</td>
-      `;
-      tbody.appendChild(tr);
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${item.jenisPembayaran}</b></td>
+          <td>${item.jumlahSantri}</td>
+          <td>${item.nominalPerSantri !== "-" ? "Rp " + Number(item.nominalPerSantri).toLocaleString('id-ID') : "-"}</td>
+          <td>Rp ${Number(item.totalFinal).toLocaleString('id-ID')}</td>
+          <td style="color:#16a34a; font-weight:600;">Rp ${Number(item.sudahTerbayar).toLocaleString('id-ID')}</td>
+          <td style="color:#dc2626; font-weight:600; background:#fff1f2;">Rp ${Number(item.belumTerbayar).toLocaleString('id-ID')}</td>
+        `;
+        tbodyAktif.appendChild(tr);
+      } else {
+        // Masuk Tabel Lunas
+        adaLunas = true;
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span style="text-decoration: line-through; color: #94a3b8;">${item.jenisPembayaran}</span></td>
+          <td>Rp ${Number(item.totalFinal).toLocaleString('id-ID')}</td>
+          <td style="color:#16a34a; font-weight:600;">Rp ${Number(item.sudahTerbayar).toLocaleString('id-ID')}</td>
+          <td><span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:5px; font-size:11px; font-weight:bold;">LUNAS</span></td>
+        `;
+        tbodyLunas.appendChild(tr);
+      }
     });
 
-    // Tambahkan Baris Total Paling Bawah
-    let trTotal = document.createElement("tr");
-    trTotal.className = "total-row";
-    trTotal.innerHTML = `
-      <td colspan="3" style="text-align:right; border-top: 2px solid #cbd5e1;"><b>TOTAL SEMUA</b></td>
-      <td style="border-top: 2px solid #cbd5e1;"><b>Rp ${totalTagihan.toLocaleString('id-ID')}</b></td>
-      <td style="color:#16a34a; border-top: 2px solid #cbd5e1;"><b>Rp ${totalBayar.toLocaleString('id-ID')}</b></td>
-      <td style="color:#dc2626; border-top: 2px solid #cbd5e1;"><b>Rp ${totalSisa.toLocaleString('id-ID')}</b></td>
-    `;
-    tbody.appendChild(trTotal);
+    // Jika tabel aktif kosong
+    if (tbodyAktif.innerHTML === "") {
+      tbodyAktif.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#16a34a; font-weight:bold; padding:15px;">🎉 Semua tagihan telah lunas disetorkan ke Nyai!</td></tr>';
+    } else {
+      // Tambahkan Baris Total hanya untuk yang Aktif
+      let trTotal = document.createElement("tr");
+      trTotal.className = "total-row";
+      trTotal.innerHTML = `
+        <td colspan="3" style="text-align:right; border-top: 2px solid #cbd5e1;"><b>TOTAL AKTIF</b></td>
+        <td style="border-top: 2px solid #cbd5e1;"><b>Rp ${totalTagihan.toLocaleString('id-ID')}</b></td>
+        <td style="color:#16a34a; border-top: 2px solid #cbd5e1;"><b>Rp ${totalBayar.toLocaleString('id-ID')}</b></td>
+        <td style="color:#dc2626; border-top: 2px solid #cbd5e1;"><b>Rp ${totalSisa.toLocaleString('id-ID')}</b></td>
+      `;
+      tbodyAktif.appendChild(trTotal);
+    }
+
+    if (!adaLunas) {
+      tbodyLunas.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #64748b; padding:10px;">Belum ada tagihan lunas.</td></tr>';
+    }
   }
+
+  // PENGATURAN REVISI 2: MENAMBAHKAN OPSI BORONGAN (GLOBAL) DI DROPDOWN
   function loadDropdownKategoriBayar(data) {
     const dropdownKategori = document.getElementById("dropdownBayarNyai");
     dropdownKategori.innerHTML = '<option value="">-- Pilih Kategori --</option>';
 
+    // Tempatkan opsi GLOBAL paling atas agar mudah dijangkau admin
+    let opsiGlobal = document.createElement("option");
+    opsiGlobal.value = "GLOBAL";
+    opsiGlobal.textContent = "⭐️ POTONG SEMUA TAGIHAN (GLOBAL TOTAL)";
+    opsiGlobal.style.fontWeight = "bold";
+    opsiGlobal.style.color = "#2563eb";
+    dropdownKategori.appendChild(opsiGlobal);
+
     data.forEach(item => {
-      let optionText = item.jenisPembayaran;
-      if (item.jenisPembayaran === "Syahriyyah") {
-        optionText = "Syahriyyah (Tagihan: Rp 75.000)";
+      // Hanya masukkan kategori yang belum lunas ke pilihan bayar spesifik
+      if (item.belumTerbayar > 0) {
+        let optionText = item.jenisPembayaran;
+        if (item.jenisPembayaran === "Syahriyyah") {
+          optionText = "Syahriyyah (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
+        } else {
+          optionText = item.jenisPembayaran + " (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
+        }
+        let option = document.createElement("option");
+        option.value = item.jenisPembayaran; 
+        option.textContent = optionText;
+        dropdownKategori.appendChild(option);
       }
-      let option = document.createElement("option");
-      option.value = item.jenisPembayaran; 
-      option.textContent = optionText;
-      dropdownKategori.appendChild(option);
     });
 
     let opsiLain = document.createElement("option");
@@ -369,9 +425,8 @@
   function simpanAcaraBaru() {
     let jenis = document.getElementById("dropdownKategori").value;
     if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
-    // Keterangan dihapus
     const cakupan = document.querySelector('input[name="cakupan"]:checked').value;
-    const nominal = document.getElementById("nominalPerAnak").value.replace(/\./g, ""); // Hapus titik
+    const nominal = document.getElementById("nominalPerAnak").value.replace(/\./g, "");
 
     if(!jenis || !nominal) { alert("Lengkapi seluruh formulir!"); return; }
     if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama santri!"); return; }
@@ -380,7 +435,7 @@
       method: "POST",
       mode: "cors",
       body: JSON.stringify({
-        action: "submitAcaraBaru", 
+        action: "saveAcaraBaru", 
         jenisSetorNyai: jenis, 
         cakupan: cakupan, 
         nominalPerAnak: nominal, 
@@ -392,6 +447,9 @@
         document.getElementById("nominalPerAnak").value = "";
         listSantriKhususAcara = []; renderBadges();
         loadTotalSantriCount();
+        if (document.getElementById("adminModal").classList.contains("active")) {
+          ambilDataRekapServer();
+        }
       } else {
         alert(`⚠️ Gagal Menyimpan: ${res.error}`);
       }
@@ -403,13 +461,13 @@
     if (jenis === "LAIN-LAIN") {
       jenis = document.getElementById("customKategoriBayar").value.trim().toUpperCase();
     }
-    const nominal = document.getElementById("cashNominal").value.replace(/\./g, ""); // Hapus titik
+    const nominal = document.getElementById("cashNominal").value.replace(/\./g, ""); 
     if(!jenis || !nominal) { alert("Kategori dan nominal wajib diisi!"); return; }
 
     fetch(WEB_APP_URL, {
       method: "POST",
       mode: "cors",
-      body: JSON.stringify({ action: "submitBayarCashNyai", jenis: jenis, nominal: nominal })
+      body: JSON.stringify({ action: "saveBayarCashNyai", jenis: jenis, nominal: nominal })
     }).then(res => res.json()).then(res => {
       if(res.success) {
         alert("Penyerahan uang tunai sukses dicatat!");
@@ -422,6 +480,7 @@
     }).catch(err => alert("Gagal terhubung ke server."));
   }
 
+  // Memastikan pemicu ke action yang tepat sesuai ketersediaan backend code.gs
   function fetchNotification() {
     const alertBox = document.getElementById("nyaiAlert");
     const alertText = document.getElementById("nyaiAlertText");
@@ -431,7 +490,7 @@
     fetch(WEB_APP_URL, { 
       method: "POST", 
       mode: "cors",
-      body: JSON.stringify({ action: "getNotificationData" }) 
+      body: JSON.stringify({ action: "checkAndPreviewSantriBaru" }) 
     })
     .then(res => res.json()).then(response => {
       if(response.success) {
@@ -459,7 +518,7 @@
     fetch(WEB_APP_URL, { 
       method: "POST", 
       mode: "cors",
-      body: JSON.stringify({ action: "processSantriBaru" }) 
+      body: JSON.stringify({ action: "executeSetoranSantriBaru" }) 
     })
     .then(res => res.json()).then(res => {
       btn.innerText = "Proses & Sinkron Ke Nyai";
@@ -467,6 +526,9 @@
       if(res.success) { 
         alert("Sukses memproses setoran pendaftaran!"); 
         fetchNotification(); 
+        if (document.getElementById("adminModal").classList.contains("active")) {
+          ambilDataRekapServer();
+        }
       } else {
         alert(`⚠️ Gagal Eksekusi: ${res.error}`);
       }
@@ -513,7 +575,7 @@
   }
 
   function simpanTabungan() {
-    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, ""); // Hapus titik
+    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
     const statusDiv = document.getElementById("tabunganStatus");
     const btn = document.getElementById("btnSimpanTabungan");
     if(!nominal || nominal <= 0) return;
@@ -525,7 +587,7 @@
     fetch(WEB_APP_URL, { 
       method: "POST", 
       mode: "cors",
-      body: JSON.stringify({ action: "submitTabungan", nik: santriTerpilih.nik, nominal: nominal }) 
+      body: JSON.stringify({ action: "saveTabunganSantri", nik: santriTerpilih.nik, nominalInput: nominal }) 
     })
     .then(res => res.json()).then(response => {
       btn.disabled = false; 
