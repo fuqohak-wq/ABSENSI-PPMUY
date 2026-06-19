@@ -136,46 +136,42 @@
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
-    <h2 style="color:var(--primary); font-size:18px; margin-bottom:15px; border-bottom:2px solid #f1f5f9; padding-bottom:8px;">🔐 Ruang Utama Kendali Admin & Setoran Nyai</h2>
+    <h2 style="color:var(--primary);">🔐 Update Data Keuangan</h2>
     
-    <h3 style="font-size:14px; margin-bottom:8px; color:#475569;">📊 Ringkasan Buku Kontrol Setoran Nyai</h3>
-    <table class="rekap-table" id="tableRekap">
-      <thead>
-        <tr>
-          <th>Jenis Pembayaran</th>
-          <th>Jml Santri</th>
-          <th>Nominal /Anak</th>
-          <th>Total Final (Tagihan)</th>
-          <th>Sudah Terbayar (Cash)</th>
-          <th>Belum Terbayar (Sisa)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="6" style="text-align:center;">Memuat rekap...</td></tr>
-      </tbody>
-    </table>
-
-    <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-top:20px;">
-      <h3 style="font-size:14px; margin-bottom:10px; color:#d97706;">💸 Catat Penyerahan Uang Tunai (Cash) ke Nyai</h3>
+    <div style="background:#f1f5f9; padding:20px; border-radius:10px; margin-bottom:20px;">
+      <h3 style="font-size:14px; margin-bottom:10px;">Input/Edit Data Kategori:</h3>
       
       <div class="form-group">
-        <label for="dropdownBayarNyai">Pilih Kategori Yang Dibayarkan:</label>
-        <select id="dropdownBayarNyai" onchange="handleDropdownBayarNyai(this.value)">
-          <option value="">-- Pilih Kategori --</option>
+        <label>Pilih Kategori:</label>
+        <select id="editKategori" onchange="autoFillData(this.value)">
+          <option value="Syahriyyah">Syahriyyah</option>
+          <option value="Infaq Pendaftaran">Infaq Pendaftaran</option>
+          <option value="Donasi">Donasi</option>
+          <option value="Lainnya">Lainnya (Custom)</option>
         </select>
+        <input type="text" id="customKategori" placeholder="Nama Kategori..." style="display:none; margin-top:5px;">
       </div>
 
-      <div class="form-group" id="inputKategoriManualContainer" style="display:none;">
-        <label for="customKategoriBayar" style="color:#b45309;">Ketik Nama Kategori Baru:</label>
-        <input type="text" id="customKategoriBayar" placeholder="Contoh: KEPERLUAN MENDADAK">
+      <div style="display:flex; gap:10px;">
+        <div class="form-group" style="flex:1;">
+          <label>Total Tagihan (Rp):</label>
+          <input type="text" id="inputTotal" placeholder="0">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Sudah Terbayar (Rp):</label>
+          <input type="text" id="inputBayar" placeholder="0">
+        </div>
       </div>
-
-      <div class="form-group">
-        <label for="cashNominal">Jumlah Cash yang Diserahkan (Rp):</label>
-        <input type="text" id="cashNominal" placeholder="Contoh: 1.000.000" onkeyup="this.value = formatRupiah(this.value)">
-      </div>
-      <button class="btn btn-orange" onclick="simpanBayarCash()">Simpan & Perbarui Buku Kontrol</button>
+      
+      <button class="btn btn-blue" onclick="simpanDataKeuangan()">Simpan / Update Data</button>
     </div>
+
+    <table class="rekap-table" id="tableRekap">
+      <thead>
+        <tr><th>Kategori</th><th>Total Tagihan</th><th>Sudah Bayar</th><th>Sisa</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 </div>
 
