@@ -15,7 +15,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     .container { max-width: 900px; margin: 0 auto; }
-    header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--primary); color: white; rounded-radius: 8px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header { text-align: center; margin-bottom: 30px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 25px; display: none; }
     .alert-box.active { display: block; }
@@ -23,17 +23,17 @@
     .btn:hover { opacity: 0.9; }
     .btn-orange { background: #d97706; }
     
-    .grid { display: block; margin-top: 20px; }
     .card { background: var(--card-bg); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; }
     .card h2 { margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; font-size: 18px; }
     
-    .form-group { margin-bottom: 15px; }
+    .form-group { margin-bottom: 15px; position: relative; }
     .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
     .form-group input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
     
-    .search-results { max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; }
-    .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-    .search-item:hover { background: #f1f5f9; }
+    .search-container { position: relative; }
+    .search-results { position: absolute; left: 0; right: 0; max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; color: var(--text); }
+    .search-item:hover { background: #f1f5f9; color: var(--primary); }
     
     .info-saldo { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 6px; margin-top: 15px; display: none; }
     .info-saldo.active { display: block; }
@@ -59,44 +59,43 @@
     <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none;">Proses & Setor ke Nyai Sekarang</button>
   </div>
 
-  <div class="grid">
-    <div class="card">
-      <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
-      
-      <div class="form-group">
-        <label for="searchKey">Cari Nama / Scan Barcode NIK Santri:</label>
+  <div class="card">
+    <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
+    
+    <div class="form-group">
+      <label for="searchKey">Cari Nama / Scan Barcode NIK Santri:</label>
+      <div class="search-container">
         <input type="text" id="searchKey" placeholder="Ketik nama lengkap atau scan NIK..." oninput="cariSantri(this.value)">
         <div id="searchResults" class="search-results" style="display:none;"></div>
       </div>
-
-      <div id="infoSaldoBox" class="info-saldo">
-        <strong style="color: #166534;">📋 Profil & Tabungan Santri Terpilih:</strong>
-        <table>
-          <tr><td style="width: 30%; font-weight:600;">NIK:</td><td id="viewNik">-</td></tr>
-          <tr><td style="font-weight:600;">Nama:</td><td id="viewNama">-</td></tr>
-          <tr><td style="font-weight:600;">Gender:</td><td id="viewGender">-</td></tr>
-          <tr><td style="font-weight:600; color: #15803d;">Total Saldo:</td><td id="viewSaldo" style="font-weight:bold; color: #15803d; font-size: 18px;">Rp 0</td></tr>
-        </table>
-      </div>
-
-      <div class="form-group" style="margin-top: 20px;">
-        <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
-        <input type="number" id="nominalTabungan" placeholder="Contoh: 5000" disabled>
-      </div>
-
-      <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
-      <div id="tabunganStatus" class="status-msg"></div>
     </div>
+
+    <div id="infoSaldoBox" class="info-saldo">
+      <strong style="color: #166534;">📋 Profil & Tabungan Santri Terpilih:</strong>
+      <table>
+        <tr><td style="width: 30%; font-weight:600;">NIK:</td><td id="viewNik">-</td></tr>
+        <tr><td style="font-weight:600;">Nama:</td><td id="viewNama">-</td></tr>
+        <tr><td style="font-weight:600;">Gender:</td><td id="viewGender">-</td></tr>
+        <tr><td style="font-weight:600; color: #15803d;">Total Saldo:</td><td id="viewSaldo" style="font-weight:bold; color: #15803d; font-size: 18px;">Rp 0</td></tr>
+      </table>
+    </div>
+
+    <div class="form-group" style="margin-top: 20px;">
+      <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
+      <input type="number" id="nominalTabungan" placeholder="Contoh: 5000" disabled>
+    </div>
+
+    <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
+    <div id="tabunganStatus" class="status-msg"></div>
   </div>
 </div>
 
 <script>
-  // GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA SETELAH DI-DEPLOY AS WEBAPP
+  // URL Web App Google Apps Script Anda yang sudah aktif
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
 
   let santriTerpilih = null;
 
-  // Ambil notifikasi pendaftaran santri baru saat halaman dibuka
   window.onload = function() {
     fetchNotification();
   };
@@ -155,7 +154,11 @@
 
   function cariSantri(val) {
     const resDiv = document.getElementById("searchResults");
-    if(val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    if(!val || val.trim().length < 2) { 
+      resDiv.style.display = "none"; 
+      resDiv.innerHTML = "";
+      return; 
+    }
 
     fetch(WEB_APP_URL, {
       method: "POST",
@@ -163,35 +166,40 @@
     })
     .then(res => res.json())
     .then(response => {
-      if(response.success && response.data.length > 0) {
+      if(response.success && response.data && response.data.length > 0) {
         resDiv.innerHTML = "";
-        resDiv.style.display = "block";
         response.data.forEach(item => {
-          let div = document.createElement("div");
-          div.className = "search-item";
-          div.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
-          div.onclick = function() { pilihSantri(item); };
-          resDiv.appendChild(div);
+          let itemEl = document.createElement("div");
+          itemEl.className = "search-item";
+          itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
+          itemEl.addEventListener("click", function() {
+            pilihSantri(item);
+          });
+          resDiv.appendChild(itemEl);
         });
+        resDiv.style.display = "block";
       } else {
         resDiv.style.display = "none";
+        resDiv.innerHTML = "";
       }
+    })
+    .catch(() => {
+      resDiv.style.display = "none";
     });
   }
 
   function pilihSantri(santri) {
     santriTerpilih = santri;
     document.getElementById("searchResults").style.display = "none";
+    document.getElementById("searchResults").innerHTML = "";
     document.getElementById("searchKey").value = santri.nama;
 
-    // Tampilkan kartu info saldo
     document.getElementById("viewNik").innerText = santri.nik;
     document.getElementById("viewNama").innerText = santri.nama;
     document.getElementById("viewGender").innerText = santri.gender;
     document.getElementById("viewSaldo").innerText = "Rp " + santri.saldo.toLocaleString('id-ID');
     document.getElementById("infoSaldoBox").classList.add("active");
 
-    // Aktifkan input nominal
     document.getElementById("nominalTabungan").disabled = false;
     document.getElementById("btnSimpanTabungan").disabled = false;
     document.getElementById("nominalTabungan").focus();
@@ -222,8 +230,6 @@
       
       if(response.success) {
         statusDiv.innerHTML = `<span class='text-success'>Sukses! Tabungan ${response.data.nama} berhasil direkam. Saldo terbaru: Rp ${response.data.saldoAkhir.toLocaleString('id-ID')}</span>`;
-        
-        // Perbarui info tampilan saldo terbaru santri tersebut
         document.getElementById("viewSaldo").innerText = "Rp " + response.data.saldoAkhir.toLocaleString('id-ID');
         document.getElementById("nominalTabungan").value = "";
       } else {
