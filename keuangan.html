@@ -210,11 +210,14 @@
   }
 
   function loadTotalSantriCount() {
-    fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "getDatabaseSantriCount" }) })
-    .then(res => res.json()).then(res => {
-      if(res.success) document.getElementById("countDbSantri").innerText = res.data.totalSantri;
-    });
-  }
+    fetch(WEB_APP_URL, { 
+  method: "POST", 
+  mode: "cors", // Tambahkan baris ini di setiap fungsi fetch Anda
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8" // Menggunakan text/plain seringkali menghindari pre-flight CORS block pada Apps Script
+  },
+  body: JSON.stringify({ action: "getRekapSetoranNyai" }) 
+})
 
   // Fungsi mengambil data dari server, lalu dilempar ke Tabel & Dropdown
   function ambilDataRekapServer() {
