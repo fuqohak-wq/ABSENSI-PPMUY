@@ -304,11 +304,12 @@
             }
 
             dataTersaring.forEach(item => {
-                const nama = item.nama || item.Nama || "-";
-                const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : (item.poin_harian !== undefined ? item.poin_harian : 0);
-                const poinMingguanStr = item["Poin Mingguan + Status"] || item.poin_mingguan || "0 (AMAN)";
-                const isiTakziran = item["Isi Takziran (Harian)"] || item.isi_takziran_harian || "Pertahankan kedisiplinan.";
-                const statusStr = item["Status (Harian)"] || item.status || "AMAN";
+            // KODE BARU (SUDAH DIKUNCI SESUAI DATA MATANG CODE2.GS):
+            const nama = item.nama || "-";
+            const poinHarian = item["Poin Harian"] !== undefined ? item["Poin Harian"] : 0;
+            const poinMingguanStr = item["Poin Mingguan + Status"] || "0 (AMAN)";
+            const isiTakziran = item["Isi Takziran (Harian)"] || "Pertahankan kedisiplinan.";
+            const statusStr = item["Status (Harian)"] || "AMAN";
 
                 let tr = document.createElement('tr');
                 tr.className = "border-b dynamic-border-row hover:bg-blue-500/5 transition-colors";
