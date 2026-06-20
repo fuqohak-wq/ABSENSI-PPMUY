@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perpustakaan Digital PPMUY</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+    body {
+      background: linear-gradient(135deg,#0f172a,#064e3b,#022c22);
+      color: white;
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-active {
+      background: rgba(16, 185, 129, 0.25) !important;
+      border: 1px solid rgba(16, 185, 129, 0.5) !important;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="max-w-6xl mx-auto px-5 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2 tracking-wide">
+      📚 <span>Perpustakaan PPMUY</span>
+    </h1>
+    <div class="flex gap-2">
+      <button onclick="openUsulan()" class="glass px-3 py-2 rounded-xl text-xs md:text-sm hover:scale-105 transition flex items-center gap-1.5 font-medium">
+        💡 <span>Usulan Kitab</span>
+      </button>
+      <button onclick="openLogin()" class="glass px-3 py-2 rounded-xl text-xs md:text-sm hover:scale-105 transition flex items-center gap-1.5 font-medium">
+        ⚙️ <span>Admin</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
+    <div class="w-full md:w-1/2">
+      <input id="searchInput" oninput="searchBook()" placeholder="Cari kitab..." 
+        class="w-full p-3 rounded-xl glass outline-none focus:ring-2 focus:ring-emerald-500 transition placeholder-white/40 text-sm">
+    </div>
+    
+    <div class="w-full md:w-1/2 glass p-3 rounded-xl flex justify-around items-center text-xs md:text-sm font-medium">
+      <div>Total Kitab: <span id="totalBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Total Fan: <span id="totalFans" class="font-bold text-emerald-400 ml-1">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Tersedia: <span id="availableBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
+    </div>
+  </div>
+
+  <div id="fanCategoryContainer" class="flex flex-wrap gap-2 mb-8">
+    <span class="text-xs text-white/40 animate-pulse">Memuat kategori...</span>
+  </div>
+
+  <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+    <h2 id="listTitle" class="text-base font-semibold tracking-wide text-emerald-400 uppercase">Semua Kitab</h2>
+    <button id="resetFilterBtn" onclick="resetFanFilter()" class="hidden text-xs bg-red-500/20 hover:bg-red-500/40 text-red-300 px-2.5 py-1 rounded-lg transition font-medium">
+      ❌ Reset Filter
+    </button>
+  </div>
+
+  <div id="bookList" class="grid md:grid-cols-2 gap-4"></div>
+</div>
+
+<div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="glass p-6 rounded-xl w-80 m-4">
+    <h2 class="text-xl mb-4 font-bold text-center">Login Admin</h2>
+    <input id="password" type="password" placeholder="Password" class="w-full p-2 rounded bg-black/40 border border-white/10 mb-4 outline-none focus:border-emerald-500 text-sm">
+    <div class="flex gap-2">
+      <button onclick="closeModal('loginModal')" class="w-1/2 bg-white/10 py-2 rounded hover:bg-white/20 text-sm">Batal</button>
+      <button onclick="loginAdmin()" class="w-1/2 bg-emerald-600 py-2 rounded hover:bg-emerald-500 font-semibold text-sm">Login</button>
+    </div>
+  </div>
+</div>
+
+<div id="usulanModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="glass p-6 rounded-xl w-96 m-4">
+    <h2 class="text-xl mb-4 font-bold text-center">💡 Usulan Kitab</h2>
+    <input id="uNama" placeholder="Nama Kitab" class="w-full p-2 mb-2 rounded bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-sm">
+    <input id="uPengarang" placeholder="Pengarang" class="w-full p-2 mb-2 rounded bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-sm">
+    <input id="uFan" placeholder="Fan / Bidang Ilmu" class="w-full p-2 mb-4 rounded bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-sm">
+    <div class="flex gap-2">
+      <button onclick="closeModal('usulanModal')" class="w-1/2 bg-white/10 py-2 rounded hover:bg-white/20 text-sm">Batal</button>
+      <button onclick="kirimUsulan()" class="w-1/2 bg-emerald-600 py-2 rounded hover:bg-emerald-500 font-semibold text-sm">Kirim Usulan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI BAWAH INI
+const API_URL = "GANTI_DENGAN_URL_WEB_APP_GAS_ANDA";
+
+let ALL = [];
+let selectedFan = null;
+
+window.onload = () => {
+  loadBooks();
+  loadStats();
+};
+
+function loadBooks(){
+  fetch(`${API_URL}?action=getAllBooks`)
+    .then(res => res.json())
+    .then(res => {
+      if(res && res.success && res.data) {
+        ALL = res.data;
+        renderFanCategories();
+        render(ALL);
+      } else {
+        document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-red-400">Gagal memuat data dari Spreadsheet.</span>`;
+      }
+    }).catch(() => {
+      document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-red-400">Error koneksi ke API.</span>`;
+    });
+}
+
+function renderFanCategories() {
+  let fanCounts = {};
+  ALL.forEach(b => {
+    if(b && b.fan) {
+      let namaFan = String(b.fan).trim();
+      if(namaFan !== "") { fanCounts[namaFan] = (fanCounts[namaFan] || 0) + 1; }
+    }
+  });
+
+  let sortedFans = Object.keys(fanCounts).sort();
+  if(sortedFans.length === 0) {
+    document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-white/40">Belum ada kategori fan yang terisi di sheet.</span>`;
+    return;
+  }
+
+  let html = "";
+  sortedFans.forEach(fanName => {
+    let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_');
+    html += `
+      <button onclick="filterByFan('${fanName.replace(/'/g, "\\'")}')" id="fanBtn-${safeId}" 
+        class="glass px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 hover:bg-white/15 flex items-center gap-1.5">
+        <span>${fanName}</span>
+        <span class="bg-emerald-500/20 px-1.5 py-0.5 rounded-md text-[10px] text-emerald-300 font-bold">${fanCounts[fanName]}</span>
+      </button>
+    `;
+  });
+  document.getElementById("fanCategoryContainer").innerHTML = html;
+}
+
+function filterByFan(fanName) {
+  document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active"));
+  if (selectedFan === fanName) { resetFanFilter(); return; }
+  selectedFan = fanName;
+  let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_');
+  const activeBtn = document.getElementById(`fanBtn-${safeId}`);
+  if(activeBtn) activeBtn.classList.add("glass-active");
+  document.getElementById("resetFilterBtn").classList.remove("hidden");
+  document.getElementById("listTitle").innerText = `Fan: ${fanName}`;
+  let filtered = ALL.filter(b => b && b.fan && String(b.fan).trim().toLowerCase() === fanName.toLowerCase());
+  render(filtered);
+}
+
+function resetFanFilter() {
+  selectedFan = null;
+  document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active"));
+  document.getElementById("resetFilterBtn").classList.add("hidden");
+  document.getElementById("listTitle").innerText = "Semua Kitab";
+  document.getElementById("searchInput").value = "";
+  render(ALL);
+}
+
+function render(data){
+  let html = "";
+  if(!data || data.length === 0) {
+    html = `<div class="glass p-6 rounded-xl col-span-2 text-center text-white/40 text-sm">Tidak ada kitab ditemukan</div>`;
+    document.getElementById("bookList").innerHTML = html;
+    return;
+  }
+
+  data.forEach(b => {
+    if(!b) return;
+    let statusColor = String(b.status).toLowerCase().includes("tersedia") ? "text-emerald-400 font-semibold" : "text-amber-400 font-semibold";
+    html += `
+      <div class="glass p-4 rounded-xl flex flex-col justify-between hover:border-white/10 transition">
+        <div>
+          <div class="font-semibold text-base text-slate-100 tracking-wide">${b.namaKitab || 'Tanpa Nama'}</div>
+          <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">👤 <span>${b.pengarang || '-'}</span></div>
+          <div class="text-[11px] bg-white/5 inline-block px-2 py-0.5 rounded mt-2 text-emerald-300">📚 Fan: ${b.fan || '-'}</div>
+        </div>
+        <div class="mt-4 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+          <div class="text-slate-400">Rak: <span class="text-slate-200 font-medium">${b.rak || '-'}</span></div>
+          <div class="${statusColor}">${b.status || 'Tersedia'} (${b.jumlah || '1'})</div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById("bookList").innerHTML = html;
+}
+
+function searchBook(){
+  let val = document.getElementById("searchInput").value.toLowerCase();
+  let filtered = ALL.filter(b => {
+    if(!b) return false;
+    let matchSearch = (b.namaKitab && b.namaKitab.toLowerCase().includes(val)) || 
+                      (b.pengarang && b.pengarang.toLowerCase().includes(val)) || 
+                      (b.fan && b.fan.toLowerCase().includes(val));
+    if (selectedFan) { return matchSearch && b.fan && String(b.fan).trim().toLowerCase() === selectedFan.toLowerCase(); }
+    return matchSearch;
+  });
+  render(filtered);
+}
+
+function loadStats(){
+  fetch(`${API_URL}?action=getStatistics`)
+    .then(res => res.json())
+    .then(res => {
+      if(res && res.success) {
+        document.getElementById("totalBooks").innerText = res.totalBooks || 0;
+        document.getElementById("totalFans").innerText = res.totalFans || 0;
+        document.getElementById("availableBooks").innerText = res.availableBooks || 0;
+      }
+    });
+}
+
+function openLogin(){ document.getElementById("loginModal").classList.remove("hidden"); }
+function openUsulan(){ document.getElementById("usulanModal").classList.remove("hidden"); }
+function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+function loginAdmin(){
+  let pass = document.getElementById("password").value;
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "loginAdmin", password: pass })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res && res.success){
+      alert("Login sukses");
+      closeModal("loginModal");
+    } else {
+      alert("Password salah");
+    }
+  });
+}
+
+function kirimUsulan(){
+  let data = {
+    nama: document.getElementById("uNama").value,
+    pengarang: document.getElementById("uPengarang").value,
+    fan: document.getElementById("uFan").value
+  };
+
+  if(!data.nama) { alert("Nama kitab wajib diisi!"); return; }
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "addUsulan", data: data })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res && res.success){
+      alert("Usulan terkirim");
+      document.getElementById("uNama").value = "";
+      document.getElementById("uPengarang").value = "";
+      document.getElementById("uFan").value = "";
+      closeModal("usulanModal");
+    }
+  });
+}
+</script>
+
+</body>
+</html>
