@@ -30,9 +30,9 @@
 
 <body>
 
-<div class="max-w-6xl mx-auto px-5 py-8">
+<div class="max-w-6xl mx-auto px-5 py-8 space-y-8">
   
-  <div class="flex justify-between items-center mb-8">
+  <div class="flex justify-between items-center pb-4 border-b border-white/5">
     <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2 tracking-wide">
       📚 <span>Perpustakaan PPMUY</span>
     </h1>
@@ -40,34 +40,67 @@
       <button onclick="openUsulan()" class="glass px-3 py-2 rounded-xl text-xs md:text-sm hover:scale-105 transition flex items-center gap-1.5 font-medium">
         💡 <span>Usulan Kitab</span>
       </button>
-      <button id="adminNavBtn" onclick="toggleAdminPanel()" class="glass px-3 py-2 rounded-xl text-xs md:text-sm hover:scale-105 transition flex items-center gap-1.5 font-medium text-emerald-400">
-        ⚙️ <span id="adminBtnText">Login Admin</span>
-      </button>
     </div>
   </div>
 
-  <div id="userInterface">
-    <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
-      <div class="w-full md:w-1/2">
-        <input id="searchInput" oninput="searchBook()" placeholder="Cari kitab..." 
-          class="w-full p-3 rounded-xl glass outline-none focus:ring-2 focus:ring-emerald-500 transition placeholder-white/40 text-sm">
-      </div>
-      
-      <div class="w-full md:w-1/2 glass p-3 rounded-xl flex justify-around items-center text-xs md:text-sm font-medium">
-        <div>Total Kitab: <span id="totalBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
-        <div class="h-4 w-px bg-white/10"></div>
-        <div>Total Fan: <span id="totalFans" class="font-bold text-emerald-400 ml-1">0</span></div>
-        <div class="h-4 w-px bg-white/10"></div>
-        <div>Tersedia: <span id="availableBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
-      </div>
+  <div class="flex flex-col md:flex-row gap-4 items-center">
+    <div class="w-full md:w-1/2">
+      <input id="searchInput" oninput="searchBook()" placeholder="Cari kitab..." 
+        class="w-full p-3 rounded-xl glass outline-none focus:ring-2 focus:ring-emerald-500 transition placeholder-white/40 text-sm text-white">
     </div>
-
-    <div id="fanCategoryContainer" class="flex flex-wrap gap-2 mb-8">
-      <span class="text-xs text-white/40 animate-pulse">Memuat kategori...</span>
+    
+    <div class="w-full md:w-1/2 glass p-3 rounded-xl flex justify-around items-center text-xs md:text-sm font-medium">
+      <div>Total Kitab: <span id="totalBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Total Fan: <span id="totalFans" class="font-bold text-emerald-400 ml-1">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Tersedia: <span id="availableBooks" class="font-bold text-emerald-400 ml-1">0</span></div>
     </div>
+  </div>
 
+  <div id="fanCategoryContainer" class="flex flex-wrap gap-2">
+    <span class="text-xs text-white/40 animate-pulse">Memuat kategori...</span>
+  </div>
+
+  <div class="glass p-6 rounded-2xl border border-emerald-500/30">
+    <h2 class="text-base font-bold text-emerald-400 mb-4 flex items-center gap-2">➕ Input Kitab Baru</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+      <input id="admNama" placeholder="Nama Kitab" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-white">
+      <input id="admPengarang" placeholder="Pengarang" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-white">
+      <input id="admFan" placeholder="Fan / Bidang Ilmu" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-white">
+      <input id="admJumlah" type="number" placeholder="Jumlah" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-white">
+      <input id="admRak" placeholder="Lokasi Rak" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500 text-white">
+      <select id="admStatus" class="p-2.5 rounded-xl bg-slate-800 border border-white/10 outline-none focus:border-emerald-500 text-white">
+        <option value="Tersedia">Tersedia</option>
+        <option value="Dipinjam">Dipinjam</option>
+      </select>
+    </div>
+    <button onclick="submitNewBook()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 font-semibold px-6 py-2 rounded-xl transition text-sm">Simpan Kitab</button>
+  </div>
+
+  <div class="glass p-6 rounded-2xl border border-amber-500/20">
+    <h2 class="text-base font-bold text-amber-400 mb-4 flex items-center gap-2">🔍 Papan Pantauan Kitab Hilang</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-white/10 text-slate-400">
+            <th class="py-2 px-3">Nama Kitab</th>
+            <th class="py-2 px-3">Juz / Bagian</th>
+            <th class="py-2 px-3">Rak Asal</th>
+            <th class="py-2 px-3">Tgl Lapor</th>
+            <th class="py-2 px-3 text-center">Penyelesaian</th>
+          </tr>
+        </thead>
+        <tbody id="lostBookTableBody" class="divide-y divide-white/5">
+          <tr><td colspan="5" class="py-4 text-center text-white/40">Tidak ada laporan kitab hilang.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
     <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
-      <h2 id="listTitle" class="text-base font-semibold tracking-wide text-emerald-400 uppercase">Semua Kitab</h2>
+      <h2 id="listTitle" class="text-base font-semibold tracking-wide text-emerald-400 uppercase">Semua Koleksi Kitab</h2>
       <button id="resetFilterBtn" onclick="resetFanFilter()" class="hidden text-xs bg-red-500/20 hover:bg-red-500/40 text-red-300 px-2.5 py-1 rounded-lg transition font-medium">
         ❌ Reset Filter
       </button>
@@ -76,69 +109,17 @@
     <div id="bookList" class="grid md:grid-cols-2 gap-4"></div>
   </div>
 
-  <div id="adminPanel" class="hidden space-y-8">
-    <div class="glass p-6 rounded-2xl border border-emerald-500/30">
-      <h2 class="text-lg font-bold text-emerald-400 mb-4 flex items-center gap-2">➕ Tambah Kitab Baru</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-        <input id="admNama" placeholder="Nama Kitab" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500">
-        <input id="admPengarang" placeholder="Pengarang" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500">
-        <input id="admFan" placeholder="Fan / Bidang Ilmu" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500">
-        <input id="admJumlah" type="number" placeholder="Jumlah" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500">
-        <input id="admRak" placeholder="Lokasi Rak" class="p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-emerald-500">
-        <select id="admStatus" class="p-2.5 rounded-xl bg-slate-800 border border-white/10 outline-none focus:border-emerald-500 text-white">
-          <option value="Tersedia">Tersedia</option>
-          <option value="Dipinjam">Dipinjam</option>
-        </select>
-      </div>
-      <button onclick="submitNewBook()" class="mt-4 bg-emerald-600 hover:bg-emerald-500 font-semibold px-6 py-2 rounded-xl transition text-sm">Simpan Kitab</button>
-    </div>
-
-    <div class="glass p-6 rounded-2xl">
-      <h2 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">💡 Daftar Usulan Kitab dari Santri</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-white/10 text-slate-400">
-              <th class="py-2 px-3 w-12">No</th>
-              <th class="py-2 px-3">Nama Kitab</th>
-              <th class="py-2 px-3">Pengarang</th>
-              <th class="py-2 px-3">Fan</th>
-            </tr>
-          </thead>
-          <tbody id="usulanTableBody" class="divide-y divide-white/5">
-            <tr><td colspan="4" class="py-4 text-center text-white/40">Memuat data usulan...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="glass p-6 rounded-2xl">
-      <h2 class="text-lg font-bold text-red-400 mb-4">🗑️ Manajemen / Hapus Kitab</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-white/10 text-slate-400">
-              <th class="py-2 px-3">Judul</th>
-              <th class="py-2 px-3">Fan</th>
-              <th class="py-2 px-3">Rak</th>
-              <th class="py-2 px-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="adminBookTableBody" class="divide-y divide-white/5"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+<div id="lostModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
   <div class="glass p-6 rounded-xl w-80 m-4">
-    <h2 class="text-xl mb-4 font-bold text-center">Login Admin</h2>
-    <input id="password" type="password" placeholder="Password" class="w-full p-2 rounded bg-black/40 border border-white/10 mb-4 outline-none focus:border-emerald-500 text-sm text-white">
+    <h2 class="text-md font-bold mb-2 text-amber-400">Juz / Bagian Mana Yang Hilang?</h2>
+    <p id="lostModalBookTitle" class="text-xs text-slate-300 mb-4 italic"></p>
+    <input id="lostJuzInput" type="text" placeholder="Contoh: Juz 2, Jilid 1, atau Semua" class="w-full p-2.5 rounded bg-black/40 border border-white/10 mb-4 outline-none focus:border-amber-500 text-sm text-white">
+    <input id="lostBookIdHidden" type="hidden">
     <div class="flex gap-2">
-      <button onclick="closeModal('loginModal')" class="w-1/2 bg-white/10 py-2 rounded hover:bg-white/20 text-sm">Batal</button>
-      <button onclick="loginAdmin()" class="w-1/2 bg-emerald-600 py-2 rounded hover:bg-emerald-500 font-semibold text-sm">Login</button>
+      <button onclick="closeModal('lostModal')" class="w-1/2 bg-white/10 py-2 rounded text-sm">Batal</button>
+      <button onclick="submitMarkAsLost()" class="w-1/2 bg-amber-600 py-2 rounded font-semibold text-sm">Simpan Laporan</button>
     </div>
   </div>
 </div>
@@ -157,16 +138,16 @@
 </div>
 
 <script>
-// MASUKKAN URL WEB APP GOOGLE APPS SCRIPT BARU ANDA DI BAWAH INI
+// !!! GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA !!!
 const API_URL = "https://script.google.com/macros/s/AKfycbyVFCZDzBWSx14utRs7zVA1UVEgmgB2wIL2srVsk7FJijGbBUsy1eeypnqhmCBi2vQ/exec";
 
 let ALL = [];
 let selectedFan = null;
-let isAdminLoggedIn = false;
 
 window.onload = () => {
   loadBooks();
   loadStats();
+  loadLostBooks();
 };
 
 function loadBooks(){
@@ -177,7 +158,6 @@ function loadBooks(){
         ALL = res.data;
         renderFanCategories();
         render(ALL);
-        renderAdminBookTable();
       }
     });
 }
@@ -190,90 +170,96 @@ function render(data){
     return;
   }
   data.forEach(b => {
-    let statusColor = String(b.status).toLowerCase().includes("tersedia") ? "text-emerald-400 font-semibold" : "text-amber-400 font-semibold";
+    let isHilang = String(b.status).toLowerCase().includes("hilang");
+    let statusColor = isHilang ? "text-red-400 font-semibold" : (String(b.status).toLowerCase().includes("tersedia") ? "text-emerald-400 font-semibold" : "text-amber-400 font-semibold");
+    
     html += `
-      <div class="glass p-4 rounded-xl flex flex-col justify-between hover:border-white/10 transition">
+      <div class="glass p-4 rounded-xl flex flex-col justify-between hover:border-white/10 transition space-y-4">
         <div>
           <div class="font-semibold text-base text-slate-100 tracking-wide">${b.namaKitab || 'Tanpa Nama'}</div>
           <div class="text-xs text-slate-400 mt-1 flex items-center gap-1">👤 <span>${b.pengarang || '-'}</span></div>
           <div class="text-[11px] bg-white/5 inline-block px-2 py-0.5 rounded mt-2 text-emerald-300">📚 Fan: ${b.fan || '-'}</div>
         </div>
-        <div class="mt-4 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+        <div class="pt-2 border-t border-white/5 flex justify-between items-center text-xs">
           <div class="text-slate-400">Rak: <span class="text-slate-200 font-medium">${b.rak || '-'}</span></div>
           <div class="${statusColor}">${b.status || 'Tersedia'} (${b.jumlah || '1'})</div>
+        </div>
+        <div class="flex gap-2 pt-1 border-t border-white/5">
+          <button onclick="openLostModal('${b.id}', '${b.namaKitab.replace(/'/g, "\\'")}')" ${isHilang ? 'disabled class="w-1/2 bg-gray-700/50 text-gray-500 py-1.5 rounded-lg text-xs cursor-not-allowed"' : 'class="w-1/2 bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white py-1.5 rounded-lg text-xs transition font-medium flex items-center justify-center gap-1"'}>⚠️ Laporkan Hilang</button>
+          <button onclick="deleteBook('${b.id}')" class="w-1/2 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white py-1.5 rounded-lg text-xs transition font-medium flex items-center justify-center gap-1">🗑️ Hapus</button>
         </div>
       </div>`;
   });
   document.getElementById("bookList").innerHTML = html;
 }
 
-function toggleAdminPanel() {
-  if(!isAdminLoggedIn) {
-    document.getElementById("loginModal").classList.remove("hidden");
-  } else {
-    // Logout
-    isAdminLoggedIn = false;
-    document.getElementById("adminBtnText").innerText = "Login Admin";
-    document.getElementById("adminPanel").classList.add("hidden");
-    document.getElementById("userInterface").classList.remove("hidden");
-  }
+/* FUNGSI HUBUNGAN KITAB HILANG */
+function openLostModal(id, title) {
+  document.getElementById("lostBookIdHidden").value = id;
+  document.getElementById("lostModalBookTitle").innerText = title;
+  document.getElementById("lostJuzInput").value = "";
+  document.getElementById("lostModal").classList.remove("hidden");
 }
 
-function loginAdmin(){
-  let pass = document.getElementById("password").value;
+function submitMarkAsLost() {
+  let id = document.getElementById("lostBookIdHidden").value;
+  let juz = document.getElementById("lostJuzInput").value || "Semua";
+  
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ action: "loginAdmin", password: pass })
+    body: JSON.stringify({ action: "markAsLost", id: id, juz: juz })
   })
   .then(res => res.json())
   .then(res => {
-    if(res && res.success){
-      isAdminLoggedIn = true;
-      document.getElementById("adminBtnText").innerText = "Keluar Admin";
-      closeModal("loginModal");
-      document.getElementById("userInterface").classList.add("hidden");
-      document.getElementById("adminPanel").classList.remove("hidden");
-      loadUsulanList();
-    } else {
-      alert("Password salah");
+    if(res.success) {
+      alert("Laporan Kitab Hilang Berhasil Disimpan!");
+      closeModal("lostModal");
+      loadBooks();
+      loadLostBooks();
+      loadStats();
     }
   });
 }
 
-function loadUsulanList() {
-  fetch(`${API_URL}?action=getUsulanList`)
+function loadLostBooks() {
+  fetch(`${API_URL}?action=getLostBooks`)
     .then(res => res.json())
     .then(res => {
       let html = "";
       if(res.success && res.data && res.data.length > 0) {
-        res.data.forEach(u => {
+        res.data.forEach(l => {
           html += `<tr>
-            <td class="py-2 px-3 text-slate-400">${u.no}</td>
-            <td class="py-2 px-3 font-medium">${u.nama}</td>
-            <td class="py-2 px-3">${u.pengarang || '-'}</td>
-            <td class="py-2 px-3 text-emerald-300">${u.fan || '-'}</td>
+            <td class="py-2 px-3 font-medium">${l.namaKitab}</td>
+            <td class="py-2 px-3 text-amber-300 font-semibold">${l.juz}</td>
+            <td class="py-2 px-3">${l.rak}</td>
+            <td class="py-2 px-3 text-xs text-slate-400">${l.tanggal}</td>
+            <td class="py-2 px-3 text-center flex justify-center gap-1.5">
+              <button onclick="resolveLost('${l.bookId}', '${l.lostId}', 'Tersedia')" class="bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 px-2.5 py-1 rounded-lg text-xs transition">✔️ Ketemu</button>
+              <button onclick="resolveLost('${l.bookId}', '${l.lostId}', 'Tersedia (Ganti Baru)')" class="bg-blue-600/30 hover:bg-blue-600 text-blue-200 px-2.5 py-1 rounded-lg text-xs transition">🔄 Diganti</button>
+            </td>
           </tr>`;
         });
       } else {
-        html = `<tr><td colspan="4" class="py-4 text-center text-white/40">Belum ada usulan kitab.</td></tr>`;
+        html = `<tr><td colspan="5" class="py-4 text-center text-white/40">Tidak ada laporan kitab hilang.</td></tr>`;
       }
-      document.getElementById("usulanTableBody").innerHTML = html;
+      document.getElementById("lostBookTableBody").innerHTML = html;
     });
 }
 
-function renderAdminBookTable() {
-  let html = "";
-  ALL.forEach(b => {
-    html += `<tr>
-      <td class="py-2 px-3 font-medium">${b.namaKitab}</td>
-      <td class="py-2 px-3 text-emerald-300">${b.fan}</td>
-      <td class="py-2 px-3">${b.rak}</td>
-      <td class="py-2 px-3 text-center">
-        <button onclick="deleteBook('${b.id}')" class="bg-red-600/30 hover:bg-red-600 text-red-200 px-2.5 py-1 rounded-lg text-xs transition">Hapus</button>
-      </td>
-    </tr>`;
+function resolveLost(bookId, lostId, statusBaru) {
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "resolveLostBook", id: bookId, lostId: lostId, statusBaru: statusBaru })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.success) {
+      alert("Status Pemulihan Kitab Berhasil!");
+      loadBooks();
+      loadLostBooks();
+      loadStats();
+    }
   });
-  document.getElementById("adminBookTableBody").innerHTML = html;
 }
 
 function submitNewBook() {
@@ -295,7 +281,6 @@ function submitNewBook() {
   .then(res => {
     if(res.success) {
       alert("Kitab Berhasil Ditambahkan!");
-      // Reset Form
       ["admNama","admPengarang","admFan","admJumlah","admRak"].forEach(id => document.getElementById(id).value = "");
       loadBooks();
       loadStats();
@@ -315,30 +300,16 @@ function deleteBook(id) {
       alert("Kitab Berhasil Dihapus!");
       loadBooks();
       loadStats();
-    } else {
-      alert("Gagal menghapus: " + res.message);
     }
   });
 }
 
-// FUNGSI PENDUKUNG LAIN (Bawaan awal tetap dipertahankan)
-function renderFanCategories() {
-  let fanCounts = {};
-  ALL.forEach(b => { if(b && b.fan) { let namaFan = String(b.fan).trim(); if(namaFan !== "") { fanCounts[namaFan] = (fanCounts[namaFan] || 0) + 1; } } });
-  let sortedFans = Object.keys(fanCounts).sort();
-  if(sortedFans.length === 0) { document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-white/40">Belum ada kategori fan.</span>`; return; }
-  let html = "";
-  sortedFans.forEach(fanName => {
-    let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_');
-    html += `<button onclick="filterByFan('${fanName.replace(/'/g, "\\'")}')" id="fanBtn-${safeId}" class="glass px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 hover:bg-white/15 flex items-center gap-1.5"><span>${fanName}</span><span class="bg-emerald-500/20 px-1.5 py-0.5 rounded-md text-[10px] text-emerald-300 font-bold">${fanCounts[fanName]}</span></button>`;
-  });
-  document.getElementById("fanCategoryContainer").innerHTML = html;
-}
+// FUNGSI STANDAR FILTER & PENCARIAN
+function renderFanCategories() { let fanCounts = {}; ALL.forEach(b => { if(b && b.fan) { let namaFan = String(b.fan).trim(); if(namaFan !== "") { fanCounts[namaFan] = (fanCounts[namaFan] || 0) + 1; } } }); let sortedFans = Object.keys(fanCounts).sort(); if(sortedFans.length === 0) { document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-white/40">Belum ada kategori fan.</span>`; return; } let html = ""; sortedFans.forEach(fanName => { let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); html += `<button onclick="filterByFan('${fanName.replace(/'/g, "\\'")}')" id="fanBtn-${safeId}" class="glass px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 hover:bg-white/15 flex items-center gap-1.5"><span>${fanName}</span><span class="bg-emerald-500/20 px-1.5 py-0.5 rounded-md text-[10px] text-emerald-300 font-bold">${fanCounts[fanName]}</span></button>`; }); document.getElementById("fanCategoryContainer").innerHTML = html; }
 function filterByFan(fanName) { document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active")); if (selectedFan === fanName) { resetFanFilter(); return; } selectedFan = fanName; let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); const activeBtn = document.getElementById(`fanBtn-${safeId}`); if(activeBtn) activeBtn.classList.add("glass-active"); document.getElementById("resetFilterBtn").classList.remove("hidden"); document.getElementById("listTitle").innerText = `Fan: ${fanName}`; let filtered = ALL.filter(b => b && b.fan && String(b.fan).trim().toLowerCase() === fanName.toLowerCase()); render(filtered); }
-function resetFanFilter() { selectedFan = null; document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active")); document.getElementById("resetFilterBtn").classList.add("hidden"); document.getElementById("listTitle").innerText = "Semua Kitab"; document.getElementById("searchInput").value = ""; render(ALL); }
+function resetFanFilter() { selectedFan = null; document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active")); document.getElementById("resetFilterBtn").classList.add("hidden"); document.getElementById("listTitle").innerText = "Semua Koleksi Kitab"; document.getElementById("searchInput").value = ""; render(ALL); }
 function searchBook(){ let val = document.getElementById("searchInput").value.toLowerCase(); let filtered = ALL.filter(b => { if(!b) return false; let matchSearch = (b.namaKitab && b.namaKitab.toLowerCase().includes(val)) || (b.pengarang && b.pengarang.toLowerCase().includes(val)) || (b.fan && b.fan.toLowerCase().includes(val)); if (selectedFan) { return matchSearch && b.fan && String(b.fan).trim().toLowerCase() === selectedFan.toLowerCase(); } return matchSearch; }); render(filtered); }
 function loadStats(){ fetch(`${API_URL}?action=getStatistics`).then(res => res.json()).then(res => { if(res && res.success) { document.getElementById("totalBooks").innerText = res.totalBooks || 0; document.getElementById("totalFans").innerText = res.totalFans || 0; document.getElementById("availableBooks").innerText = res.availableBooks || 0; } }); }
-function openLogin(){ document.getElementById("loginModal").classList.remove("hidden"); }
 function openUsulan(){ document.getElementById("usulanModal").classList.remove("hidden"); }
 function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
 function kirimUsulan(){ let data = { nama: document.getElementById("uNama").value, pengarang: document.getElementById("uPengarang").value, fan: document.getElementById("uFan").value }; if(!data.nama) { alert("Nama kitab wajib diisi!"); return; } fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addUsulan", data: data }) }).then(res => res.json()).then(res => { if(res && res.success){ alert("Usulan terkirim"); document.getElementById("uNama").value = ""; document.getElementById("uPengarang").value = ""; document.getElementById("uFan").value = ""; closeModal("usulanModal"); } }); }
