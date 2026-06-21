@@ -315,65 +315,57 @@
         }
 
         function eksekusiAmbilDanAnalisis() {
-            const video = document.getElementById('video-feed');
-            const canvas = document.getElementById('capture-canvas');
-            const btnSubmit = document.getElementById('btn-submit-foto');
-            const textBtn = document.getElementById('text-btn-submit');
-            const preview = document.getElementById('freeze-preview');
-            const laser = document.getElementById('laser-scanner');
+    const video = document.getElementById('video-feed');
+    const canvas = document.getElementById('capture-canvas');
+    const btnSubmit = document.getElementById('btn-submit-foto');
+    const textBtn = document.getElementById('text-btn-submit');
+    const preview = document.getElementById('freeze-preview');
+    const laser = document.getElementById('laser-scanner');
 
-            if (!localStream || video.classList.contains('hidden')) return;
+    if (!localStream || video.classList.contains('hidden')) return;
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            const base64Bytes = dataUrl.split(',')[1];
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    const base64Bytes = dataUrl.split(',')[1];
 
-            preview.src = dataUrl;
-            preview.classList.remove('hidden');
-            laser.classList.add('hidden');
+    preview.src = dataUrl;
+    preview.classList.remove('hidden');
+    laser.classList.add('hidden');
 
-            btnSubmit.disabled = true;
-            textBtn.innerText = "TRANSMISI DATA KE SERVER...";
+    btnSubmit.disabled = true;
+    textBtn.innerText = "TRANSMISI DATA KE SERVER...";
 
-            fetch(WEBAPP_URL, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "text/plain" 
-                },
-                body: JSON.stringify({ 
-                    action: "insert",
-                    imageBytes: base64Bytes 
-                })
-            })
-            .then(res => res.json())
-            .then(responsServer => {
-                if (responsServer.status === "success") {
-                    alert("BERKAS BERHASIL DIUNGGAH DAN DIEKSTRAKSI!");
-                    tutupModalKamera();
-                    btnSubmit.disabled = false;
-                    textBtn.innerText = "Proses & Kirim Dokumen";
-                    setTimeout(muatUlangDataAduan, 1500);
-                } else {
-                    alert("Sistem Gagal: " + responsServer.message);
-                    preview.classList.add('hidden');
-                    laser.classList.remove('hidden');
-                    btnSubmit.disabled = false;
-                    textBtn.innerText = "Proses & Kirim Dokumen";
-                }
-            })
-            .catch(error => {
-                alert("Gangguan Transmisi: " + error.message);
-                preview.classList.add('hidden');
-                laser.classList.remove('hidden');
-                btnSubmit.disabled = false;
-                textBtn.innerText = "Proses & Kirim Dokumen";
-            });
+    // --- PERBAIKAN DI SINI (Menghapus no-cors agar payload terbaca penuh) ---
+    fetch(WEBAPP_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "insert", imageBytes: base64Bytes })
+    })
+    .then(res => res.json()) // Membaca respon balik dari Google Apps Script
+    .then(result => {
+        if (result.status === "success") {
+            alert("BERKAS BERHASIL DIUNGGAH!\n\nAI berhasil membaca berkas & memperbarui basis data.");
+            tutupModalKamera();
+            setTimeout(muatUlangDataAduan, 1000);
+        } else {
+            alert("Gagal di Server: " + result.message);
+            preview.classList.add('hidden');
+            laser.classList.remove('hidden');
         }
-
+    })
+    .catch(error => {
+        alert("Gangguan Transmisi: " + error.message);
+        preview.classList.add('hidden');
+        laser.classList.remove('hidden');
+    })
+    .finally(() => {
+        btnSubmit.disabled = false;
+        textBtn.innerText = "Proses & Kirim Dokumen";
+    });
+}
         function muatUlangDataAduan() {
             const tblBody = document.getElementById('tbl-aduan-body');
             const mobileList = document.getElementById('mobile-aduan-list');
