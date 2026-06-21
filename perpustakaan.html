@@ -7,556 +7,357 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perpustakaan Digital PPMUY</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] }
+          colors: {
+            luxury: {
+              blue: '#0b1b3d',
+              accent: '#fbbf24', // Kuning Emas
+              hover: '#f59e0b'
+            }
+          }
         }
       }
     }
   </script>
-  
+
   <style>
-    body { transition: background-color 0.3s, color 0.3s; }
-    .premium-shadow { box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.1); }
-    .dark .premium-shadow { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5); }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(14, 165, 233, 0.1);
+    * { font-family: 'Poppins', sans-serif; }
+    /* Mode Terang: Gradasi Biru Cerah Premium */
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a, #0f2042);
+      color: white;
+      min-height: 100vh;
+      transition: background 0.3s ease;
     }
-    .dark .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Mode Gelap: Lebih Deep Blue */
+    .dark body {
+      background: linear-gradient(135deg, #020617, #0f172a, #030712);
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+    .glass-active {
+      background: rgba(251, 191, 36, 0.15) !important;
+      border: 1px solid rgba(251, 191, 36, 0.5) !important;
     }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-height-screen">
+<body>
 
-  <!-- NAVBAR ATAS -->
-  <nav class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800 px-4 py-3.5 transition-all">
-    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
-      
-      <!-- Kiri: Logo & Navigasi Luar -->
-      <div class="flex items-center gap-4">
-        <a href="https://manajemen.ppmuy.com/dashboard.html" class="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 px-3 py-2 rounded-xl border border-sky-100 dark:border-sky-900/50 hover:bg-sky-100 transition">
-          ⬅️ <span>Dashboard</span>
-        </a>
-        <div class="h-5 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
-        <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-sky-600 to-indigo-600 dark:from-sky-400 dark:to-indigo-400 bg-clip-text text-transparent">
-          📚 PPMUY Library
-        </h1>
-      </div>
+<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+  
+  <!-- HEADER & NAVIGASI -->
+  <div class="flex flex-wrap justify-between items-center gap-3 pb-4 border-b border-white/10">
+    <div class="flex items-center gap-3">
+      <a href="https://manajemen.ppmuy.com/dashboard.html" class="glass px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-white/10 transition border border-white/10 flex items-center gap-1">
+        ⬅️ <span class="text-slate-300">Dashboard</span>
+      </a>
+      <div class="h-5 w-px bg-white/10"></div>
+      <h1 class="text-lg md:text-xl font-extrabold tracking-wide flex items-center gap-2">
+        📚 <span class="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 bg-clip-text text-transparent">Perpustakaan PPMUY</span>
+      </h1>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button onclick="openUsulan()" class="glass px-3 py-1.5 rounded-xl text-xs hover:scale-105 transition font-medium text-amber-400 border border-amber-400/20">
+        💡 Usulan Kitab
+      </button>
+      <button onclick="toggleDarkMode()" class="p-2 rounded-xl glass hover:scale-105 transition text-xs">
+        <span class="dark:hidden">🌙 Mode Gelap</span><span class="hidden dark:inline">☀️ Mode Terang</span>
+      </button>
+    </div>
+  </div>
 
-      <!-- Kanan: Menu Mode & Admin -->
-      <div class="flex items-center gap-2">
-        <button onclick="toggleView('user')" id="btnNavUser" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white">📖 Jelajah</button>
-        <button onclick="toggleView('statistik')" id="btnNavStatistik" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">📊 Info Lacak</button>
-        <button onclick="openLoginModal()" id="btnNavAdmin" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30">⚙️ Admin</button>
-        
-        <div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-        
-        <!-- Toggle Mode Gelap/Terang -->
-        <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:scale-105 transition">
-          <span class="dark:hidden">🌙</span><span class="hidden dark:inline">☀️</span>
-        </button>
+  <!-- STATISTIK DAN PENCARIAN UTAMA -->
+  <div class="flex flex-col md:flex-row gap-4 items-center">
+    <div class="w-full md:w-1/2">
+      <div class="relative">
+        <input id="searchInput" oninput="searchBook()" placeholder="Cari judul kitab atau pengarang..." 
+          class="w-full p-3 pl-10 rounded-xl glass outline-none focus:ring-2 focus:ring-amber-400 transition placeholder-white/30 text-xs text-white">
+        <span class="absolute left-3 top-3.5 text-xs text-white/40">🔍</span>
       </div>
     </div>
-  </nav>
-
-  <!-- KONTEN UTAMA -->
-  <main class="max-w-6xl mx-auto px-4 py-8">
-
-    <!-- ========================================== -->
-    <!-- PANEL 1: HALAMAN JELAJAH UTAMA (MEWAH)      -->
-    <!-- ========================================== -->
-    <div id="sectionUser" class="space-y-8">
-      <!-- Banner Sambutan Mewah -->
-      <div class="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-sky-500 via-sky-600 to-indigo-700 text-white premium-shadow relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">📚</div>
-        <div class="max-w-xl space-y-2 relative z-10">
-          <span class="text-xs font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full text-sky-100">Maktabah Digital</span>
-          <h2 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">Temukan Kedalaman Ilmu di Sini.</h2>
-          <p class="text-xs md:text-sm text-sky-100/90 font-light leading-relaxed">Sistem pelacakan mutakhir koleksi kitab suci & ilmiah santri Pesantren Mamba'ul 'Ulum Awipari.</p>
-        </div>
-        
-        <!-- Statistik Mini Mengambang -->
-        <div class="grid grid-cols-3 gap-3 mt-8 pt-6 border-t border-white/20 text-center">
-          <div><div id="totalBooks" class="text-xl md:text-3xl font-extrabold text-white">0</div><div class="text-[10px] uppercase tracking-wider text-sky-200">Total Kitab</div></div>
-          <div><div id="totalFans" class="text-xl md:text-3xl font-extrabold text-white">0</div><div class="text-[10px] uppercase tracking-wider text-sky-200">Total Bidang</div></div>
-          <div><div id="availableBooks" class="text-xl md:text-3xl font-extrabold text-white">0</div><div class="text-[10px] uppercase tracking-wider text-sky-200">Tersedia</div></div>
-        </div>
-      </div>
-
-      <!-- Kotak Pencarian Modern -->
-      <div class="w-full max-w-2xl mx-auto">
-        <div class="relative flex items-center">
-          <span class="absolute left-4 text-slate-400">🔍</span>
-          <input id="searchInput" oninput="searchBook()" placeholder="Ketik judul kitab, nama pengarang, atau bidang ilmu..." 
-            class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:ring-2 focus:ring-sky-500 shadow-sm transition placeholder-slate-400 text-sm">
-        </div>
-      </div>
-
-      <!-- Navigasi Kategori Fan -->
-      <div class="space-y-2">
-        <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-          <span>Klasifikasi Fan Ilmu</span>
-          <button id="resetFilterBtn" onclick="resetFanFilter()" class="hidden text-red-500 hover:underline">❌ Reset Filter</button>
-        </div>
-        <div id="fanCategoryContainer" class="flex flex-wrap gap-2">
-          <span class="text-xs text-slate-400 animate-pulse">Menyiapkan kategori...</span>
-        </div>
-      </div>
-
-      <!-- List Kartu Kitab Untuk Santri -->
-      <div class="space-y-4">
-        <h3 id="listTitle" class="text-sm font-bold uppercase tracking-wider text-slate-400">Katalog Utama</h3>
-        <div id="bookList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      </div>
+    
+    <div class="w-full md:w-1/2 glass p-3 rounded-xl flex justify-around items-center text-xs font-semibold tracking-wide">
+      <div>Total Kitab: <span id="totalBooks" class="text-amber-400 ml-1 font-bold">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Total Fan: <span id="totalFans" class="text-amber-400 ml-1 font-bold">0</span></div>
+      <div class="h-4 w-px bg-white/10"></div>
+      <div>Tersedia: <span id="availableBooks" class="text-amber-400 ml-1 font-bold">0</span></div>
     </div>
+  </div>
 
+  <!-- KATEGORI FAN -->
+  <div id="fanCategoryContainer" class="flex flex-wrap gap-2">
+    <span class="text-xs text-white/30 animate-pulse">Memuat klasifikasi fan ilmu...</span>
+  </div>
 
-    <!-- ========================================== -->
-    <!-- PANEL 2: RUANG STATISTIK & LAPORAN PUBLIK    -->
-    <!-- ========================================== -->
-    <div id="sectionStatistik" class="hidden space-y-8">
-      
-      <!-- Edukasi / Petunjuk Lapor -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="glass-card p-5 rounded-2xl border border-sky-500/10 space-y-2">
-          <div class="text-2xl">🔍</div>
-          <h4 class="font-bold text-sm text-sky-600 dark:text-sky-400">1. Cari Kitabnya</h4>
-          <p class="text-xs text-slate-500 leading-relaxed">Cari kitab yang hilang di halaman depan katalog utama untuk memastikan datanya terdaftar.</p>
-        </div>
-        <div class="glass-card p-5 rounded-2xl border border-sky-500/10 space-y-2">
-          <div class="text-2xl">📝</div>
-          <h4 class="font-bold text-sm text-amber-500">2. Laporkan Juz</h4>
-          <p class="text-xs text-slate-500 leading-relaxed">Klik tombol "Laporkan Hilang" di kartu kitab tersebut, lalu tulis juz atau jilid yang hilang.</p>
-        </div>
-        <div class="glass-card p-5 rounded-2xl border border-sky-500/10 space-y-2">
-          <div class="text-2xl">🔄</div>
-          <h4 class="font-bold text-sm text-emerald-500">3. Pantau Status</h4>
-          <p class="text-xs text-slate-500 leading-relaxed">Pantau tabel di bawah ini. Pengurus akan memverifikasi jika kitab telah ketemu atau diganti.</p>
-        </div>
-      </div>
-
-      <!-- Tabel Daftar Kitab Hilang Yang Sedang Dilacak -->
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/80 shadow-sm">
-        <div class="mb-4">
-          <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">⚠️ Daftar Kitab dalam Pelacakan Resmi</h3>
-          <p class="text-xs text-slate-400">Daftar di bawah ini diisi oleh santri/pengurus dan tidak dapat diubah di ruang publik ini demi keamanan data.</p>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead>
-              <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 text-xs">
-                <th class="py-3 px-3">Judul Kitab</th>
-                <th class="py-3 px-3">Juz / Jilid</th>
-                <th class="py-3 px-3">Posisi Rak</th>
-                <th class="py-3 px-3">Tanggal Lapor</th>
-              </tr>
-            </thead>
-            <tbody id="publicLostBookTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50 text-xs">
-              <tr><td colspan="4" class="py-6 text-center text-slate-400">Memuat data pelacakan...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- ========================================== -->
-    <!-- PANEL 3: OPERASIONAL KOMPLIT ADMINISTRATOR -->
-    <!-- ========================================== -->
-    <div id="sectionAdmin" class="hidden space-y-8">
-      
-      <!-- Indikator Logged In -->
-      <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex justify-between items-center">
-        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400">🔑 Anda berada di Ruang Operasional Komplit Pengurus</span>
-        <button onclick="logoutAdmin()" class="text-xs font-bold text-red-500 hover:underline">Keluar Admin</button>
-      </div>
-
-      <!-- Tambah Kitab Form -->
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">➕ Registrasi / Tambah Kitab Baru</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <input id="admNama" placeholder="Nama Lengkap Kitab" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-          <input id="admPengarang" placeholder="Nama Muallif / Pengarang" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-          <input id="admFan" placeholder="Fan (Contoh: Fiqih, Nahwu)" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-          <input id="admJumlah" type="number" placeholder="Jumlah Fisik Ekspl" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-          <input id="admRak" placeholder="Nomor / Kode Rak" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-          <select id="admStatus" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-            <option value="Tersedia">Tersedia</option>
-            <option value="Dipinjam">Dipinjam</option>
-          </select>
-        </div>
-        <button onclick="submitNewBook()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition">Simpan ke Database</button>
-      </div>
-
-      <!-- Resolusi Penyelesaian Kitab Hilang (Hanya Ada di Admin) -->
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-amber-500 mb-4">🛠️ Tindakan Penyelesaian Laporan Hilang</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400">
-                <th class="py-2 px-3">Nama Kitab</th>
-                <th class="py-2 px-3">Bagian</th>
-                <th class="py-2 px-3">Tindakan Eksekusi</th>
-              </tr>
-            </thead>
-            <tbody id="adminLostBookTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50">
-              <tr><td colspan="3" class="py-4 text-center text-slate-400">Tidak ada aksi pelacakan tertunda.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tabel Semua Kitab (Edit/Hapus Total) -->
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">📋 Semua Manajemen Data Kitab</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400">
-                <th class="py-2 px-3">Judul</th>
-                <th class="py-2 px-3">Fan</th>
-                <th class="py-2 px-3">Status</th>
-                <th class="py-2 px-3 text-center">Opsi Pengurus</th>
-              </tr>
-            </thead>
-            <tbody id="adminBookTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/50"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- MODAL POP-UP INPUT JUZ YANG HILANG (BISA DIBUKA PUBLIK) -->
-  <div id="lostModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700 shadow-xl space-y-4">
+  <!-- GRID OPERASIONAL DEPAN (INPUT BARU & LACAK HILANG) -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- KOLOM 1: INPUT KITAB BARU (BISA DIFAKULALKAN OLEH PUBLIK / TANPA EDIT HAPUS) -->
+    <div class="glass p-5 rounded-2xl border border-amber-400/20 space-y-4 lg:col-span-1">
       <div>
-        <h2 class="text-base font-extrabold text-amber-500">Laporkan Bagian / Juz yang Hilang</h2>
-        <p id="lostModalBookTitle" class="text-xs text-slate-400 mt-1 italic"></p>
+        <h2 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">➕ Tambah Koleksi Baru</h2>
+        <p class="text-[10px] text-white/50">Santri & Pengurus bisa mendaftarkan kitab baru ke sistem di sini.</p>
       </div>
-      <input id="lostJuzInput" type="text" placeholder="Contoh: Juz 3, Jilid 2, atau Semua Jilid" 
-        class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs outline-none focus:border-amber-500">
-      <input id="lostBookIdHidden" type="hidden">
-      <div class="flex gap-2 text-xs">
-        <button onclick="closeModal('lostModal')" class="w-1/2 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 font-bold">Batal</button>
-        <button onclick="submitMarkAsLost()" class="w-1/2 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold transition">Simpan Laporan</button>
+      <div class="space-y-2.5 text-xs">
+        <input id="admNama" placeholder="Nama Judul Kitab" class="w-full p-2.5 rounded-xl bg-black/30 border border-white/10 outline-none focus:border-amber-400 text-white">
+        <input id="admPengarang" placeholder="Nama Pengarang / Muallif" class="w-full p-2.5 rounded-xl bg-black/30 border border-white/10 outline-none focus:border-amber-400 text-white">
+        <input id="admFan" placeholder="Fan Ilmu (Contoh: Fiqih)" class="w-full p-2.5 rounded-xl bg-black/30 border border-white/10 outline-none focus:border-amber-400 text-white">
+        <div class="grid grid-cols-2 gap-2">
+          <input id="admJumlah" type="number" placeholder="Jumlah Ekspl" class="w-full p-2.5 rounded-xl bg-black/30 border border-white/10 outline-none focus:border-amber-400 text-white">
+          <input id="admRak" placeholder="Posisi Rak" class="w-full p-2.5 rounded-xl bg-black/30 border border-white/10 outline-none focus:border-amber-400 text-white">
+        </div>
+        <select id="admStatus" class="w-full p-2.5 rounded-xl bg-slate-800 border border-white/10 outline-none focus:border-amber-400 text-white">
+          <option value="Tersedia">Tersedia</option>
+          <option value="Dipinjam">Dipinjam</option>
+        </select>
+      </div>
+      <button onclick="submitNewBook()" class="w-full bg-amber-500 hover:bg-amber-600 font-bold py-2 rounded-xl transition text-xs text-slate-950 shadow-lg shadow-amber-500/10">Simpan Kitab</button>
+    </div>
+
+    <!-- KOLOM 2 & 3: PAPAN PANTAUAN LAJU KITAB HILANG (PUBLIK TIDAK BISA EDIT/HAPUS) -->
+    <div class="glass p-5 rounded-2xl border border-white/5 lg:col-span-2 flex flex-col justify-between">
+      <div class="space-y-3">
+        <div>
+          <h2 class="text-sm font-bold text-amber-400 flex items-center gap-1.5">🔍 Papan Info Pelacakan Kitab Hilang</h2>
+          <p class="text-[10px] text-white/50">Daftar laporan aktif kehilangan jilid/juz kitab di perpustakaan.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-white/40 font-medium">
+                <th class="py-2 px-2">Nama Kitab</th>
+                <th class="py-2 px-2">Juz/Jilid</th>
+                <th class="py-2 px-2">Rak</th>
+                <th class="py-2 px-2">Waktu Lapor</th>
+              </tr>
+            </thead>
+            <tbody id="lostBookTableBody" class="divide-y divide-white/5 text-slate-200">
+              <tr><td colspan="4" class="py-4 text-center text-white/30 text-[11px]">Alhamdulillah, tidak ada laporan kehilangan saat ini.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-300 p-2.5 rounded-xl mt-4">
+        💡 <b>Cara Melaporkan:</b> Cari kitab yang hilang pada daftar katalog di bawah ini, kemudian klik tombol kuning berkode <b>"⚠️ Laporkan Jilid Hilang"</b> untuk memasukkan data juz.
       </div>
     </div>
+
   </div>
 
-  <!-- MODAL USULAN KITAB -->
-  <div id="usulanModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 shadow-xl space-y-4">
-      <h2 class="text-lg font-bold text-sky-600 dark:text-sky-400">💡 Usulkan Kitab Pengadaan</h2>
-      <div class="space-y-3 text-xs">
-        <input id="uNama" placeholder="Judul Kitab" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-        <input id="uPengarang" placeholder="Pengarang" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-        <input id="uFan" placeholder="Fan Keilmuan" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none focus:border-sky-500">
-      </div>
-      <div class="flex gap-2 text-xs">
-        <button onclick="closeModal('usulanModal')" class="w-1/2 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 font-bold">Batal</button>
-        <button onclick="kirimUsulan()" class="w-1/2 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold transition">Kirim</button>
-      </div>
+  <!-- DISPLAY DISPLAY UTAMA DISPLAY DATA UTAMA -->
+  <div class="space-y-4">
+    <div class="flex justify-between items-center border-b border-white/5 pb-2">
+      <h2 id="listTitle" class="text-xs font-bold tracking-widest text-amber-400 uppercase">Semua Koleksi Perpustakaan</h2>
+      <button id="resetFilterBtn" onclick="resetFanFilter()" class="hidden text-[10px] bg-red-500/20 hover:bg-red-500/40 text-red-300 px-2.5 py-1 rounded-lg transition font-medium">
+        ❌ Reset Filter
+      </button>
+    </div>
+
+    <!-- DAFTAR KITAB DENGAN AKSES LAPOR LANGSUNG (TANPA TOMBOL HAPUS AMAN DARI SANTRI) -->
+    <div id="bookList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </div>
+
+</div>
+
+<!-- MODAL INPUT JUZ YANG HILANG -->
+<div id="lostModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+  <div class="glass p-5 rounded-2xl w-full max-w-sm space-y-4 border border-amber-400/30">
+    <div>
+      <h2 class="text-sm font-bold text-amber-400">Juz / Bagian Mana Yang Hilang?</h2>
+      <p id="lostModalBookTitle" class="text-[11px] text-slate-300 mt-1 italic"></p>
+    </div>
+    <input id="lostJuzInput" type="text" placeholder="Contoh: Juz 3, Jilid 4, atau Semua Jilid" class="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-amber-400 text-xs text-white">
+    <input id="lostBookIdHidden" type="hidden">
+    <div class="flex gap-2 text-xs">
+      <button onclick="closeModal('lostModal')" class="w-1/2 bg-white/10 py-2 rounded-xl">Batal</button>
+      <button onclick="submitMarkAsLost()" class="w-1/2 bg-amber-500 text-slate-950 font-bold py-2 rounded-xl transition">Simpan Laporan</button>
     </div>
   </div>
+</div>
 
-  <!-- MODAL LOGIN ADMIN -->
-  <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl w-full max-w-xs border border-slate-200 dark:border-slate-700 shadow-xl space-y-3 text-center">
-      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Verifikasi Pengurus</h2>
-      <input id="password" type="password" placeholder="Masukkan Sandi Keamanan" class="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-center outline-none focus:border-amber-500">
-      <div class="flex gap-2 text-xs">
-        <button onclick="closeModal('loginModal')" class="w-1/2 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 font-bold">Batal</button>
-        <button onclick="loginAdmin()" class="w-1/2 py-2.5 rounded-xl bg-amber-500 text-white font-bold">Masuk</button>
-      </div>
+<!-- MODAL USULAN -->
+<div id="usulanModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+  <div class="glass p-5 rounded-2xl w-full max-w-sm space-y-4">
+    <h2 class="text-sm font-bold text-center text-amber-400">💡 Usulan Pengadaan Kitab</h2>
+    <div class="space-y-2 text-xs">
+      <input id="uNama" placeholder="Nama Kitab" class="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-amber-400 text-white">
+      <input id="uPengarang" placeholder="Pengarang" class="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-amber-400 text-white">
+      <input id="uFan" placeholder="Fan / Bidang Ilmu" class="w-full p-2.5 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-amber-400 text-white">
+    </div>
+    <div class="flex gap-2 text-xs">
+      <button onclick="closeModal('usulanModal')" class="w-1/2 bg-white/10 py-2 rounded-xl">Batal</button>
+      <button onclick="kirimUsulan()" class="w-1/2 bg-amber-500 text-slate-950 font-bold py-2 rounded-xl transition">Kirim Usulan</button>
     </div>
   </div>
+</div>
 
-  <script>
-    // !!! WAJIB PASTI DIISI URL WEB APP GOOGLE APPS SCRIPT ANDA !!!
-    const API_URL = "https://script.google.com/macros/s/AKfycbyVFCZDzBWSx14utRs7zVA1UVEgmgB2wIL2srVsk7FJijGbBUsy1eeypnqhmCBi2vQ/exec";
+<script>
+// !!! GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA !!!
+const API_URL = "https://script.google.com/macros/s/AKfycbyVFCZDzBWSx14utRs7zVA1UVEgmgB2wIL2srVsk7FJijGbBUsy1eeypnqhmCBi2vQ/exec";
 
-    let ALL = [];
-    let selectedFan = null;
-    let isAdminLoggedIn = false;
+let ALL = [];
+let selectedFan = null;
 
-    window.onload = () => {
-      // Set light mode default jika tidak disetting
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
+window.onload = () => {
+  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  loadBooks();
+  loadStats();
+  loadLostBooks();
+};
+
+function toggleDarkMode() {
+  if (document.documentElement.classList.contains('dark')) {
+    document.documentElement.classList.remove('dark');
+    localStorage.theme = 'light';
+  } else {
+    document.documentElement.classList.add('dark');
+    localStorage.theme = 'dark';
+  }
+}
+
+function loadBooks(){
+  fetch(`${API_URL}?action=getAllBooks`)
+    .then(res => res.json())
+    .then(res => {
+      if(res && res.success && res.data) {
+        ALL = res.data;
+        renderFanCategories();
+        render(ALL);
       }
+    });
+}
+
+function render(data){
+  let html = "";
+  if(!data || data.length === 0) {
+    html = `<div class="glass p-6 rounded-xl col-span-full text-center text-white/40 text-xs">Data kitab tidak ditemukan</div>`;
+    document.getElementById("bookList").innerHTML = html;
+    return;
+  }
+  data.forEach(b => {
+    let isHilang = String(b.status).toLowerCase().includes("hilang");
+    let statusColor = isHilang ? "text-red-400 font-bold" : (String(b.status).toLowerCase().includes("tersedia") ? "text-amber-400 font-bold" : "text-yellow-500 font-bold");
+    
+    html += `
+      <div class="glass p-4 rounded-xl flex flex-col justify-between hover:border-amber-400/40 transition-all duration-200 text-xs space-y-4">
+        <div>
+          <div class="font-bold text-sm text-slate-100 tracking-wide">${b.namaKitab}</div>
+          <div class="text-[11px] text-slate-400 mt-1">👤 ${b.pengarang || '-'}</div>
+          <div class="text-[10px] bg-amber-400/10 inline-block px-2 py-0.5 rounded-md mt-2 text-amber-300 border border-amber-400/10">📚 Fan: ${b.fan || '-'}</div>
+        </div>
+        <div class="pt-2 border-t border-white/5 flex justify-between items-center text-[11px]">
+          <div class="text-slate-400">Rak: <span class="text-slate-200 font-medium">${b.rak || '-'}</span></div>
+          <div class="${statusColor}">${b.status || 'Tersedia'} (${b.jumlah || '1'})</div>
+        </div>
+        <!-- TOMBOL LAPOR DISEDIAKAN UNTUK PUBLIK, TIDAK ADA TOMBOL HAPUS AGAR AMAN -->
+        <div class="pt-1">
+          <button onclick="openLostModal('${b.id}', '${b.namaKitab.replace(/'/g, "\\'")}')" ${isHilang ? 'disabled class="w-full bg-slate-800 text-slate-600 py-2 rounded-xl text-[11px] font-semibold cursor-not-allowed border border-white/5"' : 'class="w-full bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-slate-950 border border-amber-400/20 py-2 rounded-xl text-[11px] font-bold transition duration-150 flex items-center justify-center gap-1"'}>⚠️ Laporkan Jilid Hilang</button>
+        </div>
+      </div>`;
+  });
+  document.getElementById("bookList").innerHTML = html;
+}
+
+function openLostModal(id, title) {
+  document.getElementById("lostBookIdHidden").value = id;
+  document.getElementById("lostModalBookTitle").innerText = title;
+  document.getElementById("lostJuzInput").value = "";
+  document.getElementById("lostModal").classList.remove("hidden");
+}
+
+function submitMarkAsLost() {
+  let id = document.getElementById("lostBookIdHidden").value;
+  let juz = document.getElementById("lostJuzInput").value || "Semua";
+  
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "markAsLost", id: id, juz: juz })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.success) {
+      alert("Laporan Kitab Hilang Berhasil Terkirim ke Papan Pantau!");
+      closeModal("lostModal");
+      loadBooks();
+      loadLostBooks();
+      loadStats();
+    }
+  });
+}
+
+function loadLostBooks() {
+  fetch(`${API_URL}?action=getLostBooks`)
+    .then(res => res.json())
+    .then(res => {
+      let html = "";
+      if(res.success && res.data && res.data.length > 0) {
+        res.data.forEach(l => {
+          html += `<tr class="hover:bg-white/5 text-[11px]">
+            <td class="py-2.5 px-2 font-medium">${l.namaKitab}</td>
+            <td class="py-2.5 px-2 text-amber-400 font-bold">${l.juz}</td>
+            <td class="py-2.5 px-2">${l.rak}</td>
+            <td class="py-2.5 px-2 text-white/40">${l.tanggal}</td>
+          </tr>`;
+        });
+      } else {
+        html = `<tr><td colspan="4" class="py-5 text-center text-white/30 text-[11px]">Alhamdulillah, tidak ada laporan kehilangan saat ini.</td></tr>`;
+      }
+      document.getElementById("lostBookTableBody").innerHTML = html;
+    });
+}
+
+function submitNewBook() {
+  let data = {
+    namaKitab: document.getElementById("admNama").value,
+    pengarang: document.getElementById("admPengarang").value,
+    fan: document.getElementById("admFan").value,
+    jumlah: document.getElementById("admJumlah").value,
+    rak: document.getElementById("admRak").value,
+    status: document.getElementById("admStatus").value
+  };
+  if(!data.namaKitab) return alert("Nama kitab wajib diisi!");
+  
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "addBook", data: data })
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.success) {
+      alert("Kitab Baru Berhasil Terdaftar di Database!");
+      ["admNama","admPengarang","admFan","admJumlah","admRak"].forEach(id => document.getElementById(id).value = "");
       loadBooks();
       loadStats();
-      loadLostBooks();
-    };
-
-    function toggleDarkMode() {
-      if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        localStorage.theme = 'light';
-      } else {
-        document.documentElement.classList.add('dark');
-        localStorage.theme = 'dark';
-      }
     }
+  });
+}
 
-    function toggleView(view) {
-      document.getElementById("sectionUser").classList.add("hidden");
-      document.getElementById("sectionStatistik").classList.add("hidden");
-      document.getElementById("sectionAdmin").classList.add("hidden");
-      
-      document.getElementById("btnNavUser").className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
-      document.getElementById("btnNavStatistik").className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
-      
-      if(view === 'user') {
-        document.getElementById("sectionUser").classList.remove("hidden");
-        document.getElementById("btnNavUser").className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white";
-      } else if(view === 'statistik') {
-        document.getElementById("sectionStatistik").classList.remove("hidden");
-        document.getElementById("btnNavStatistik").className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white";
-        loadLostBooks();
-      } else if(view === 'admin') {
-        if(!isAdminLoggedIn) { openLoginModal(); return; }
-        document.getElementById("sectionAdmin").classList.remove("hidden");
-      }
-    }
-
-    function openLoginModal() {
-      if(isAdminLoggedIn) { toggleView('admin'); return; }
-      document.getElementById("loginModal").classList.remove("hidden");
-    }
-
-    function loginAdmin() {
-      let pass = document.getElementById("password").value;
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "loginAdmin", password: pass })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res && res.success){
-          isAdminLoggedIn = true;
-          document.getElementById("btnNavAdmin").innerText = "🛠️ Dashboard Admin";
-          closeModal("loginModal");
-          toggleView('admin');
-          renderAdminBookTable();
-        } else { alert("Sandi Keamanan Salah!"); }
-      });
-    }
-
-    function logoutAdmin() {
-      isAdminLoggedIn = false;
-      document.getElementById("btnNavAdmin").innerText = "⚙️ Admin";
-      toggleView('user');
-    }
-
-    function loadBooks(){
-      fetch(`${API_URL}?action=getAllBooks`)
-        .then(res => res.json())
-        .then(res => {
-          if(res && res.success && res.data) {
-            ALL = res.data;
-            renderFanCategories();
-            render(ALL);
-          }
-        });
-    }
-
-    function render(data){
-      let html = "";
-      if(!data || data.length === 0) {
-        html = `<div class="bg-white dark:bg-slate-800 p-8 rounded-2xl col-span-full text-center text-slate-400 text-xs">Maaf, nama atau fan kitab tidak ditemukan</div>`;
-        document.getElementById("bookList").innerHTML = html;
-        return;
-      }
-      data.forEach(b => {
-        let isHilang = String(b.status).toLowerCase().includes("hilang");
-        let statusBadge = isHilang 
-          ? `<span class="bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 px-2 py-0.5 rounded-md font-semibold">${b.status}</span>` 
-          : `<span class="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 px-2 py-0.5 rounded-md font-semibold">Tersedia (${b.jumlah})</span>`;
-        
-        html += `
-          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 hover:border-sky-500 dark:hover:border-sky-500 hover:shadow-md transition duration-200 flex flex-col justify-between premium-shadow text-xs">
-            <div class="space-y-2">
-              <div class="font-bold text-sm text-slate-800 dark:text-slate-100 leading-snug">${b.namaKitab}</div>
-              <div class="text-slate-400 flex items-center gap-1">👤 <span>${b.pengarang || '-'}</span></div>
-              <div class="inline-block bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/40 px-2 py-0.5 rounded text-sky-600 dark:text-sky-400 font-medium">✨ Fan: ${b.fan || '-'}</div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/50 flex flex-col gap-3">
-              <div class="flex justify-between items-center text-[11px]">
-                <div class="text-slate-400">📍 Lokasi Rak: <span class="text-slate-700 dark:text-slate-300 font-bold">${b.rak || '-'}</span></div>
-                <div>${statusBadge}</div>
-              </div>
-              <!-- Tombol Lapor Bebas Akses Untuk Publik/Santri -->
-              <button onclick="openLostModal('${b.id}', '${b.namaKitab.replace(/'/g, "\\'")}')" ${isHilang ? 'disabled class="w-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 py-2 rounded-xl font-bold cursor-not-allowed"' : 'class="w-full bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20 py-2 rounded-xl font-bold hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:hover:text-white transition duration-150 text-center"'}>⚠️ Laporkan Kitab Ini Hilang</button>
-            </div>
-          </div>`;
-      });
-      document.getElementById("bookList").innerHTML = html;
-    }
-
-    function openLostModal(id, title) {
-      document.getElementById("lostBookIdHidden").value = id;
-      document.getElementById("lostModalBookTitle").innerText = title;
-      document.getElementById("lostJuzInput").value = "";
-      document.getElementById("lostModal").classList.remove("hidden");
-    }
-
-    function submitMarkAsLost() {
-      let id = document.getElementById("lostBookIdHidden").value;
-      let juz = document.getElementById("lostJuzInput").value || "Semua";
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "markAsLost", id: id, juz: juz })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.success) {
-          alert("Laporan Hilang Berhasil Terkirim ke Papan Pantau!");
-          closeModal("lostModal");
-          loadBooks();
-          loadLostBooks();
-          loadStats();
-        }
-      });
-    }
-
-    function loadLostBooks() {
-      fetch(`${API_URL}?action=getLostBooks`)
-        .then(res => res.json())
-        .then(res => {
-          let publicHtml = "";
-          let adminHtml = "";
-          
-          if(res.success && res.data && res.data.length > 0) {
-            res.data.forEach(l => {
-              // Untuk Ruang Informasi Publik (Tanpa Tombol Edit/Hapus)
-              publicHtml += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td class="py-3 px-3 font-semibold text-slate-700 dark:text-slate-200">${l.namaKitab}</td>
-                <td class="py-3 px-3 text-amber-500 font-bold">${l.juz}</td>
-                <td class="py-3 px-3">${l.rak}</td>
-                <td class="py-3 px-3 text-slate-400">${l.tanggal}</td>
-              </tr>`;
-
-              // Untuk Ruang Admin Operasional Komplit
-              adminHtml += `<tr>
-                <td class="py-2 px-3 font-medium">${l.namaKitab} (${l.juz})</td>
-                <td class="py-2 px-3 text-slate-400">Rak ${l.rak}</td>
-                <td class="py-2 px-3 flex gap-1">
-                  <button onclick="resolveLost('${l.bookId}', '${l.lostId}', 'Tersedia')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">✔️ Ketemu</button>
-                  <button onclick="resolveLost('${l.bookId}', '${l.lostId}', 'Tersedia (Ganti Baru)')" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold">🔄 Diganti</button>
-                </td>
-              </tr>`;
-            });
-          } else {
-            let emptyRow = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Alhamdulillah, tidak ada laporan kehilangan saat ini.</td></tr>`;
-            publicHtml = emptyRow;
-            adminHtml = `<tr><td colspan="3" class="py-4 text-center text-slate-400">Tidak ada aksi tertunda.</td></tr>`;
-          }
-          document.getElementById("publicLostBookTableBody").innerHTML = publicHtml;
-          document.getElementById("adminLostBookTableBody").innerHTML = adminHtml;
-        });
-    }
-
-    function renderAdminBookTable() {
-      let html = "";
-      ALL.forEach(b => {
-        html += `<tr class="text-[11px]">
-          <td class="py-2 px-3 font-bold">${b.namaKitab}</td>
-          <td class="py-2 px-3 text-sky-500">${b.fan}</td>
-          <td class="py-2 px-3">${b.status}</td>
-          <td class="py-2 px-3 text-center">
-            <button onclick="deleteBook('${b.id}')" class="bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white px-2.5 py-1 rounded-lg transition font-bold">🗑️ Hapus Permanen</button>
-          </td>
-        </tr>`;
-      });
-      document.getElementById("adminBookTableBody").innerHTML = html;
-    }
-
-    function resolveLost(bookId, lostId, statusBaru) {
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "resolveLostBook", id: bookId, lostId: lostId, statusBaru: statusBaru })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.success) {
-          alert("Status Kitab Berhasil Diperbarui!");
-          loadBooks();
-          loadLostBooks();
-          loadStats();
-          if(isAdminLoggedIn) renderAdminBookTable();
-        }
-      });
-    }
-
-    function submitNewBook() {
-      let data = {
-        namaKitab: document.getElementById("admNama").value,
-        pengarang: document.getElementById("admPengarang").value,
-        fan: document.getElementById("admFan").value,
-        jumlah: document.getElementById("admJumlah").value,
-        rak: document.getElementById("admRak").value,
-        status: document.getElementById("admStatus").value
-      };
-      if(!data.namaKitab) return alert("Nama kitab wajib diisi!");
-      
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "addBook", data: data })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.success) {
-          alert("Kitab Berhasil Ditambahkan ke Database!");
-          ["admNama","admPengarang","admFan","admJumlah","admRak"].forEach(id => document.getElementById(id).value = "");
-          loadBooks();
-          loadStats();
-          if(isAdminLoggedIn) renderAdminBookTable();
-        }
-      });
-    }
-
-    function deleteBook(id) {
-      if(!confirm("Hapus permanen kitab ini dari Google Sheet?")) return;
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "deleteBook", id: id })
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.success) {
-          alert("Kitab Telah Terhapus!");
-          loadBooks();
-          loadStats();
-          if(isAdminLoggedIn) renderAdminBookTable();
-        }
-      });
-    }
-
-    // FUNGSI UTILITAS PENCARIAN & STATISTIK
-    function renderFanCategories() { let fanCounts = {}; ALL.forEach(b => { if(b && b.fan) { let namaFan = String(b.fan).trim(); if(namaFan !== "") { fanCounts[namaFan] = (fanCounts[namaFan] || 0) + 1; } } }); let sortedFans = Object.keys(fanCounts).sort(); if(sortedFans.length === 0) { document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-slate-400">Belum ada kategori fan.</span>`; return; } let html = ""; sortedFans.forEach(fanName => { let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); html += `<button onclick="filterByFan('${fanName.replace(/'/g, "\\'")}')" id="fanBtn-${safeId}" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs font-semibold transition hover:bg-sky-50 dark:hover:bg-sky-950/20 hover:border-sky-300 flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span>${fanName}</span><span class="bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 px-1.5 py-0.5 rounded-md text-[10px] font-bold">${fanCounts[fanName]}</span></button>`; }); document.getElementById("fanCategoryContainer").innerHTML = html; }
-    function filterByFan(fanName) { document.querySelectorAll("#fanCategoryContainer button").forEach(btn => { btn.className = "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 dark:text-slate-300 flex items-center gap-1.5"; }); if (selectedFan === fanName) { resetFanFilter(); return; } selectedFan = fanName; let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); const activeBtn = document.getElementById(`fanBtn-${safeId}`); if(activeBtn) activeBtn.className = "bg-sky-600 text-white border border-sky-600 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5"; document.getElementById("resetFilterBtn").classList.remove("hidden"); document.getElementById("listTitle").innerText = `Koleksi Fan: ${fanName}`; let filtered = ALL.filter(b => b && b.fan && String(b.fan).trim().toLowerCase() === fanName.toLowerCase()); render(filtered); }
-    function resetFanFilter() { selectedFan = null; document.getElementById("resetFilterBtn").classList.add("hidden"); document.getElementById("listTitle").innerText = "Katalog Utama"; document.getElementById("searchInput").value = ""; render(ALL); renderFanCategories(); }
-    function searchBook(){ let val = document.getElementById("searchInput").value.toLowerCase(); let filtered = ALL.filter(b => { if(!b) return false; let matchSearch = (b.namaKitab && b.namaKitab.toLowerCase().includes(val)) || (b.pengarang && b.pengarang.toLowerCase().includes(val)) || (b.fan && b.fan.toLowerCase().includes(val)); if (selectedFan) { return matchSearch && b.fan && String(b.fan).trim().toLowerCase() === selectedFan.toLowerCase(); } return matchSearch; }); render(filtered); }
-    function loadStats(){ fetch(`${API_URL}?action=getStatistics`).then(res => res.json()).then(res => { if(res && res.success) { document.getElementById("totalBooks").innerText = res.totalBooks || 0; document.getElementById("totalFans").innerText = res.totalFans || 0; document.getElementById("availableBooks").innerText = res.availableBooks || 0; } }); }
-    function openUsulan(){ document.getElementById("usulanModal").classList.remove("hidden"); }
-    function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
-    function kirimUsulan(){ let data = { nama: document.getElementById("uNama").value, pengarang: document.getElementById("uPengarang").value, fan: document.getElementById("uFan").value }; if(!data.nama) { alert("Nama kitab wajib diisi!"); return; } fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addUsulan", data: data }) }).then(res => res.json()).then(res => { if(res && res.success){ alert("Usulan berhasil dikirim!"); ["uNama","uPengarang","uFan"].forEach(id => document.getElementById(id).value = ""); closeModal("usulanModal"); } }); }
-  </script>
+// UTILITAS FILTER DAN HITUNGAN STATISTIK
+function renderFanCategories() { let fanCounts = {}; ALL.forEach(b => { if(b && b.fan) { let namaFan = String(b.fan).trim(); if(namaFan !== "") { fanCounts[namaFan] = (fanCounts[namaFan] || 0) + 1; } } }); let sortedFans = Object.keys(fanCounts).sort(); if(sortedFans.length === 0) { document.getElementById("fanCategoryContainer").innerHTML = `<span class="text-xs text-white/30">Belum ada kategori fan.</span>`; return; } let html = ""; sortedFans.forEach(fanName => { let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); html += `<button onclick="filterByFan('${fanName.replace(/'/g, "\\'")}')" id="fanBtn-${safeId}" class="glass px-3 py-1.5 rounded-xl text-xs font-medium transition hover:bg-white/10 flex items-center gap-1.5 text-slate-200"><span>${fanName}</span><span class="bg-amber-400/20 px-1.5 py-0.5 rounded-md text-[10px] text-amber-400 font-bold">${fanCounts[fanName]}</span></button>`; }); document.getElementById("fanCategoryContainer").innerHTML = html; }
+function filterByFan(fanName) { document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active")); if (selectedFan === fanName) { resetFanFilter(); return; } selectedFan = fanName; let safeId = fanName.replace(/[^a-zA-Z0-9]/g, '_'); const activeBtn = document.getElementById(`fanBtn-${safeId}`); if(activeBtn) activeBtn.classList.add("glass-active"); document.getElementById("resetFilterBtn").classList.remove("hidden"); document.getElementById("listTitle").innerText = `Koleksi Fan Ilmu: ${fanName}`; let filtered = ALL.filter(b => b && b.fan && String(b.fan).trim().toLowerCase() === fanName.toLowerCase()); render(filtered); }
+function resetFanFilter() { selectedFan = null; document.querySelectorAll("#fanCategoryContainer button").forEach(btn => btn.classList.remove("glass-active")); document.getElementById("resetFilterBtn").classList.add("hidden"); document.getElementById("listTitle").innerText = "Semua Koleksi Perpustakaan"; document.getElementById("searchInput").value = ""; render(ALL); }
+function searchBook(){ let val = document.getElementById("searchInput").value.toLowerCase(); let filtered = ALL.filter(b => { if(!b) return false; let matchSearch = (b.namaKitab && b.namaKitab.toLowerCase().includes(val)) || (b.pengarang && b.pengarang.toLowerCase().includes(val)) || (b.fan && b.fan.toLowerCase().includes(val)); if (selectedFan) { return matchSearch && b.fan && String(b.fan).trim().toLowerCase() === selectedFan.toLowerCase(); } return matchSearch; }); render(filtered); }
+function loadStats(){ fetch(`${API_URL}?action=getStatistics`).then(res => res.json()).then(res => { if(res && res.success) { document.getElementById("totalBooks").innerText = res.totalBooks || 0; document.getElementById("totalFans").innerText = res.totalFans || 0; document.getElementById("availableBooks").innerText = res.availableBooks || 0; } }); }
+function openUsulan(){ document.getElementById("usulanModal").classList.remove("hidden"); }
+function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+function kirimUsulan(){ let data = { nama: document.getElementById("uNama").value, pengarang: document.getElementById("uPengarang").value, fan: document.getElementById("uFan").value }; if(!data.nama) { alert("Nama kitab wajib diisi!"); return; } fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "addUsulan", data: data }) }).then(res => res.json()).then(res => { if(res && res.success){ alert("Usulan terkirim!"); ["uNama","uPengarang","uFan"].forEach(id => document.getElementById(id).value = ""); closeModal("usulanModal"); } }); }
+</script>
 
 </body>
 </html>
