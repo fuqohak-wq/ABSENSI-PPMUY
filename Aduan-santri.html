@@ -62,7 +62,7 @@
             left: 0; width: 100%; height: 3px;
             background: linear-gradient(to right, transparent, #22d3ee, #3b82f6, #22d3ee, transparent);
             box-shadow: 0 0 15px #22d3ee;
-            animation: laserMove 3s infinite linear;
+            animation: laserMove 2.5s infinite linear;
         }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -75,17 +75,17 @@
     <!-- HEADER -->
     <header class="w-full bg-[var(--bg-header)] border-b border-indigo-500/20 px-4 sm:px-8 py-3.5 flex justify-between items-center shadow-2xl sticky top-0 z-40 backdrop-blur-md">
         <div class="flex items-center gap-3">
-            <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-700/50 flex items-center justify-center text-indigo-400 shadow-md hover:text-white hover:border-indigo-400 active:scale-95 transition-all" title="Kembali">
+            <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-700/50 flex items-center justify-center text-indigo-400 shadow-md hover:text-white hover:border-indigo-400 active:scale-95 transition-all">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div>
-                <h1 class="text-xs sm:text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-blue-500 uppercase">ADUAN SANTRI</h1>
+                <h1 class="text-xs sm:text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-blue-500 uppercase">LOG ADUAN</h1>
                 <span class="text-[8px] sm:text-[9px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-1.5 py-0.5 rounded font-bold tracking-widest block w-max uppercase mt-0.5">HUMAS INTERNAL • PPMUY</span>
             </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-center cursor-pointer text-amber-400 active:scale-95 transition-all">
+            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-center text-amber-400 active:scale-95 transition-all">
                 <i class="fa-solid fa-sun text-sm"></i>
             </button>
         </div>
@@ -98,51 +98,62 @@
         <section class="grid grid-cols-3 gap-3 w-full">
             <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Total</span>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Total Masuk</span>
                     <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-indigo-400" id="stat-total">0</h3>
                 </div>
                 <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-sm sm:text-lg"><i class="fa-solid fa-folder-open"></i></div>
             </div>
             <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Proses</span>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Belum Selesai</span>
                     <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-amber-400" id="stat-proses">0</h3>
                 </div>
-                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 text-sm sm:text-lg"><i class="fa-solid fa-circle-notch animate-spin"></i></div>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 text-sm sm:text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div>
             </div>
             <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Selesai</span>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Arsip Selesai</span>
                     <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-emerald-400" id="stat-selesai">0</h3>
                 </div>
-                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm sm:text-lg"><i class="fa-solid fa-shield-check"></i></div>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm sm:text-lg"><i class="fa-solid fa-box-archive"></i></div>
             </div>
         </section>
 
-        <!-- LOG DATA -->
+        <!-- DATA CONSOLE & CONTROLLER -->
         <section class="premium-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col flex-1">
-            <div class="flex justify-between items-center pb-4 border-b border-dashed border-[var(--border-color)]">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-dashed border-[var(--border-color)] gap-3">
                 <div>
-                    <h2 class="text-xs sm:text-sm font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Log Koordinasi Berkas</h2>
-                    <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] mt-0.5">Pembaruan berkala database aspirasi santri</p>
+                    <div class="flex items-center gap-2">
+                        <h2 id="view-title" class="text-xs sm:text-sm font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Daftar Penanganan Aktif</h2>
+                        <span id="badge-mode" class="px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase">UNTUK DIAMALKAN</span>
+                    </div>
+                    <p id="view-desc" class="text-[9px] sm:text-[10px] text-[var(--text-body)] mt-0.5">Menampilkan seluruh masalah santri yang belum tervalidasi selesai.</p>
                 </div>
-                <button onclick="muatUlangDataAduan()" class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700/60 hover:border-indigo-400 text-[10px] sm:text-xs font-bold flex items-center gap-1.5 hover:text-indigo-400 active:scale-95 transition-all cursor-pointer">
-                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> <span class="hidden sm:inline">Refresh Data</span>
-                </button>
+                
+                <!-- NAVIGATION TAB PRESTISIUS -->
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                    <div class="bg-[var(--bg-inner)] p-1 rounded-xl border border-[var(--border-color)] flex gap-1 text-[10px] font-bold">
+                        <button id="tab-aktif" onclick="gantiModeTampilan('aktif')" class="px-3 py-1.5 rounded-lg bg-indigo-500 text-white transition-all cursor-pointer shadow">Aktif</button>
+                        <button id="tab-riwayat" onclick="gantiModeTampilan('riwayat')" class="px-3 py-1.5 rounded-lg text-[var(--text-body)] hover:text-white transition-all cursor-pointer">Riwayat</button>
+                    </div>
+                    <button onclick="muatUlangDataAduan()" class="w-9 h-9 rounded-xl bg-slate-900/80 border border-slate-700/60 hover:border-indigo-400 flex items-center justify-center hover:text-indigo-400 active:scale-95 transition-all cursor-pointer shadow">
+                        <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- ADAPTIVE LOG DATA CONTAINER -->
+            <!-- VIEW RENDER AREA -->
             <div class="mt-4">
-                <!-- Desktop View -->
+                <!-- Desktop View (Tabel) -->
                 <div class="hidden md:block overflow-x-auto rounded-xl border border-[var(--border-color)]">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-[var(--bg-inner)] text-[10px] font-black tracking-wider text-[var(--text-body)] uppercase border-b border-[var(--border-color)]">
                                 <th class="py-3 px-4 w-[12%]">Tanggal</th>
-                                <th class="py-3 px-4 w-[25%]">Masalah Utama</th>
+                                <th class="py-3 px-4 w-[23%]">Masalah Utama</th>
                                 <th class="py-3 px-4 w-[28%]">Solusi Taktis</th>
-                                <th class="py-3 px-4 w-[25%]">Strategi Jangka Panjang</th>
-                                <th class="py-3 px-4 w-[10%] text-center">Status</th>
+                                <th class="py-3 px-4 w-[23%]">Strategi Jangka Panjang</th>
+                                <th class="py-3 px-4 w-[14%] text-center">Aksi Operasional</th>
                             </tr>
                         </thead>
                         <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium">
@@ -157,33 +168,33 @@
         </section>
     </main>
 
-    <!-- FLOATING HUB PINDAI (HP JEMPOL-FRIENDLY) -->
+    <!-- FLOATING JEMPOL TRIGGER BUTTON -->
     <div class="fixed bottom-5 right-5 z-40 md:bottom-8 md:right-8">
         <button onclick="bukaModalKamera()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer transition-all border border-white/20">
             <i class="fa-solid fa-camera text-xl animate-pulse"></i>
         </button>
     </div>
 
-    <!-- MODAL INTEGRASI DOKUMEN -->
-    <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg hidden flex items-center justify-center p-0 sm:p-4">
+    <!-- MODAL CAMERA: DENGAN FIX SPLIT-SCREEN LAYOUT KHUSUS MOBILE HP -->
+    <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg hidden flex flex-col sm:items-center sm:justify-center p-0 sm:p-4">
         <div class="premium-card w-full h-full sm:h-auto sm:max-w-xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
             
             <!-- Modal Header -->
-            <div class="bg-[var(--bg-header)] px-4 py-3.5 border-b border-[var(--border-color)] flex justify-between items-center">
+            <div class="bg-[var(--bg-header)] px-4 py-3 border-b border-[var(--border-color)] flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2 text-cyan-400">
                     <i class="fa-solid fa-expand-arrows-alt text-xs"></i>
-                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Dokumentasi Utama</h3>
+                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Dokumentasi Berkas</h3>
                 </div>
                 <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-xs bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
-            <!-- Modal Body -->
-            <div class="p-4 flex flex-col flex-1 sm:flex-initial gap-4 bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-main)] justify-between sm:justify-start">
+            <!-- Modal Body Area dengan Kontrol Tinggi Statis Agar Tidak Overflow di HP -->
+            <div class="p-4 flex flex-col flex-1 sm:flex-initial gap-4 bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-main)] overflow-y-auto">
                 
-                <!-- CAMERA VIEWPORT -->
-                <div class="relative w-full flex-1 sm:flex-initial sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center min-h-[320px] sm:min-h-0">
+                <!-- CAMERA VIEWPORT: Dikunci maksimal h-48 sampai h-56 di HP agar tombol tidak tenggelam -->
+                <div class="relative w-full h-48 sm:h-auto sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center shrink-0">
                     
                     <div id="laser-scanner" class="laser-line"></div>
                     
@@ -193,30 +204,30 @@
                     <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-cyan-400 pointer-events-none"></div>
 
                     <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2 px-4">
-                        <i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-500"></i>
-                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Sinkronisasi Sensor Optik...</span>
+                        <i class="fa-solid fa-circle-notch animate-spin text-xl text-indigo-500"></i>
+                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Menghubungkan Dokumen Optik...</span>
                     </div>
                     
                     <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-                    
-                    <!-- Preview Gambar Statis Saat Berhasil Dijepret -->
-                    <img id="freeze-preview" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="" alt="Captured Preview">
-                    
+                    <img id="freeze-preview" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="" alt="Preview">
                     <canvas id="capture-canvas" class="hidden"></canvas>
                 </div>
 
-                <div class="w-full bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-3 flex gap-2.5 items-start text-left">
+                <!-- INFO DRIVE TERPUSAT -->
+                <div class="w-full bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-3 flex gap-2.5 items-start text-left shrink-0">
                     <i class="fa-solid fa-cloud-arrow-up text-indigo-400 text-xs mt-0.5"></i>
                     <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] leading-relaxed">
-                        Arahkan lensa ke arah berkas teks, posisikan di tengah bidang, lalu ketuk tombol <span class="text-cyan-400 font-bold">"PROSES & KIRIM DOKUMEN"</span> di bawah ini.
+                        Posisikan dokumen aduan dengan tegak. Sistem akan memuat berkas gambar, membuat folder penyimpanan otomatis, dan memperbarui basis data penanganan secara dinamis.
                     </p>
                 </div>
 
-                <!-- TRIGGER BUTTON (DITEMPATKAN DI BAWAH UNTUK LAYAR HP) -->
-                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-4 sm:py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-95 transition-all uppercase disabled:opacity-50">
-                    <i class="fa-solid fa-bolt text-xs"></i>
-                    <span id="text-btn-submit">Proses & Kirim Dokumen</span>
-                </button>
+                <!-- ACTION TRIGGER BUTTON: Selalu kelihatan di layar HP paling bawah -->
+                <div class="w-full pt-2 sm:pt-0 shrink-0">
+                    <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-4 sm:py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-95 transition-all uppercase disabled:opacity-50">
+                        <i class="fa-solid fa-bolt text-xs"></i>
+                        <span id="text-btn-submit">Proses & Kirim Dokumen</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -229,6 +240,8 @@
     <script>
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzlYJ7O5FDseh0pxoGouw4yIx0fdDwlqxiYo6Xwn8LHd7pepKgZQBFq-9R6DNst0fgI/exec";
         let localStream = null;
+        let cacheDataMaster = [];
+        let modeTampilanSaatIni = 'aktif'; // 'aktif' atau 'riwayat'
 
         window.addEventListener('DOMContentLoaded', () => {
             const temaSimpanan = localStorage.getItem('aduan_theme') || 'theme-dark';
@@ -254,16 +267,39 @@
             }
         }
 
+        function gantiModeTampilan(mode) {
+            modeTampilanSaatIni = mode;
+            const btnAktif = document.getElementById('tab-aktif');
+            const btnRiwayat = document.getElementById('tab-riwayat');
+            const modeTitle = document.getElementById('view-title');
+            const modeDesc = document.getElementById('view-desc');
+            const modeBadge = document.getElementById('badge-mode');
+
+            if (mode === 'aktif') {
+                btnAktif.className = "px-3 py-1.5 rounded-lg bg-indigo-500 text-white transition-all cursor-pointer shadow";
+                btnRiwayat.className = "px-3 py-1.5 rounded-lg text-[var(--text-body)] hover:text-white transition-all cursor-pointer";
+                modeTitle.innerText = "Daftar Penanganan Aktif";
+                modeDesc.innerText = "Menampilkan seluruh masalah santri yang belum tervalidasi selesai.";
+                modeBadge.innerText = "UNTUK DIAMALKAN";
+                modeBadge.className = "px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase";
+            } else {
+                btnRiwayat.className = "px-3 py-1.5 rounded-lg bg-indigo-500 text-white transition-all cursor-pointer shadow";
+                btnAktif.className = "px-3 py-1.5 rounded-lg text-[var(--text-body)] hover:text-white transition-all cursor-pointer";
+                modeTitle.innerText = "Arsip Riwayat Selesai";
+                modeDesc.innerText = "Log arsip dokumentasi masalah santri yang telah diselesaikan seluruhnya.";
+                modeBadge.innerText = "VALID SELESAI";
+                modeBadge.className = "px-2 py-0.5 rounded text-[8px] font-black tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase";
+            }
+            renderLogAduanSistem();
+        }
+
         function bukaModalKamera() {
-            const modal = document.getElementById('modal-kamera');
-            modal.classList.remove('hidden');
-            
-            // Reset status tampilan gambar
+            document.getElementById('modal-kamera').classList.remove('hidden');
             document.getElementById('freeze-preview').classList.add('hidden');
             document.getElementById('laser-scanner').classList.remove('hidden');
 
             navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+                video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
             })
             .then(stream => {
                 localStream = stream;
@@ -275,7 +311,7 @@
                 }
                 if(placeholder) placeholder.classList.add('hidden');
             }).catch(err => {
-                alert("Akses Sensor Gagal. Aktifkan perizinan kamera pada pengaturan privasi browser Anda.");
+                alert("Gagal memuat sensor optik. Izinkan kamera pada browser Anda!");
                 tutupModalKamera();
             });
         }
@@ -312,10 +348,9 @@
             const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
             const base64Bytes = dataUrl.split(',')[1];
 
-            // Efek pembekuan layar (Buku petunjuk visual sukses jepret)
             preview.src = dataUrl;
             preview.classList.remove('hidden');
-            laser.classList.add('hidden'); // Sembunyikan laser animasi
+            laser.classList.add('hidden');
 
             btnSubmit.disabled = true;
             textBtn.innerText = "TRANSMISI DATA KE SERVER...";
@@ -324,11 +359,10 @@
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({ imageBytes: base64Bytes })
+                body: JSON.stringify({ action: "insert", imageBytes: base64Bytes })
             })
             .then(() => {
-                // Notifikasi instan berhasil dibuat di sini
-                alert("DOKUMEN BERHASIL DIUNGGAH!\n\nBerkas masuk antrean penyimpanan Cloud. Halaman utama akan diperbarui dalam beberapa detik.");
+                alert("BERKAS BERHASIL DIUNGGAH!\n\nDokumen masuk antrean penyimpanan Cloud. Sinkronisasi basis data berjalan.");
                 tutupModalKamera();
                 btnSubmit.disabled = false;
                 textBtn.innerText = "Proses & Kirim Dokumen";
@@ -360,79 +394,134 @@
             fetch(WEBAPP_URL)
             .then(res => res.json())
             .then(data => {
-                tblBody.innerHTML = "";
-                mobileList.innerHTML = "";
-                
-                if (!data || data.length === 0) {
-                    const emptyHtml = `
-                        <div class="py-12 text-center text-slate-500 uppercase tracking-widest text-xs italic w-full">
-                            <i class="fa-solid fa-inbox text-xl block mb-2"></i> Belum Ada Log Arsip Masuk
-                        </div>
-                    `;
-                    tblBody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
-                    mobileList.innerHTML = emptyHtml;
-                    return;
-                }
-
-                data.reverse();
-                let countProses = 0, countSelesai = 0;
-
-                data.forEach(item => {
-                    const statusBersih = (item.status || "").trim().toUpperCase();
-                    if (statusBersih.includes("SELESAI")) countSelesai++; else countProses++;
-
-                    let badgeColor = statusBersih.includes("SELESAI") 
-                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" 
-                        : "bg-amber-500/15 text-amber-400 border-amber-500/20";
-                    
-                    let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                    let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
-
-                    let tr = document.createElement('tr');
-                    tr.className = "hover:bg-indigo-500/5 transition-colors border-b border-[var(--border-color)]";
-                    tr.innerHTML = `
-                        <td class="py-3 px-4 font-mono font-bold opacity-70">${tglTampil}</td>
-                        <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah || '-'}</td>
-                        <td class="py-3 px-4 text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
-                        <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi || '-'}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-2 py-0.5 border rounded-md text-[9px] font-black tracking-widest inline-block ${badgeColor}">${item.status || '⏳ PROSES'}</span>
-                        </td>
-                    `;
-                    tblBody.appendChild(tr);
-
-                    let card = document.createElement('div');
-                    card.className = "premium-card p-4 rounded-xl flex flex-col gap-2.5 text-left";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
-                            <span class="text-[10px] font-mono font-bold opacity-60">${tglTampil}</span>
-                            <span class="px-2 py-0.5 border rounded-md text-[8px] font-black tracking-widest ${badgeColor}">${item.status || '⏳ PROSES'}</span>
-                        </div>
-                        <div>
-                            <span class="text-[8px] uppercase tracking-wider text-indigo-400 font-black block">Masalah Utama</span>
-                            <p class="text-xs font-bold text-[var(--text-title)] mt-0.5">${item.masalah || '-'}</p>
-                        </div>
-                        <div class="bg-[var(--bg-inner)] p-2 rounded-lg border border-[var(--border-color)]">
-                            <span class="text-[8px] uppercase tracking-wider text-cyan-400 font-black block">Usulan Taktis</span>
-                            <p class="text-xs text-slate-300 font-medium italic mt-0.5"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</p>
-                        </div>
-                        <div>
-                            <span class="text-[8px] uppercase tracking-wider text-slate-500 font-black block">Strategi Jangka Panjang</span>
-                            <p class="text-xs text-[var(--text-body)] mt-0.5">${item.strategi || '-'}</p>
-                        </div>
-                    `;
-                    mobileList.appendChild(card);
-                });
-
-                document.getElementById('stat-total').innerText = data.length;
-                document.getElementById('stat-proses').innerText = countProses;
-                document.getElementById('stat-selesai').innerText = countSelesai;
+                cacheDataMaster = data || [];
+                renderLogAduanSistem();
             })
             .catch(err => {
                 console.error(err);
-                const errorHtml = `<div class="py-6 text-center text-red-400 text-xs font-bold uppercase">Gagal sinkronisasi data!</div>`;
+                const errorHtml = `<div class="py-6 text-center text-red-400 text-xs font-bold uppercase">Gagal sinkronisasi data server!</div>`;
                 tblBody.innerHTML = `<tr><td colspan="5">${errorHtml}</td></tr>`;
                 mobileList.innerHTML = errorHtml;
+            });
+        }
+
+        function renderLogAduanSistem() {
+            const tblBody = document.getElementById('tbl-aduan-body');
+            const mobileList = document.getElementById('mobile-aduan-list');
+            
+            tblBody.innerHTML = "";
+            mobileList.innerHTML = "";
+
+            let dataTerfilter = cacheDataMaster.filter(item => {
+                const statusClean = (item.status || "").trim().toUpperCase();
+                const isSelesai = statusClean.includes("SELESAI");
+                return modeTampilanSaatIni === 'aktif' ? !isSelesai : isSelesai;
+            });
+
+            // Hitung Counter Statistik Global Terlepas Dari Mode Tab Aktif
+            let totalMasuk = cacheDataMaster.length;
+            let totalSelesai = cacheDataMaster.filter(i => (i.status || "").trim().toUpperCase().includes("SELESAI")).length;
+            let totalProses = totalMasuk - totalSelesai;
+
+            document.getElementById('stat-total').innerText = totalMasuk;
+            document.getElementById('stat-proses').innerText = totalProses;
+            document.getElementById('stat-selesai').innerText = totalSelesai;
+
+            if (dataTerfilter.length === 0) {
+                const txtKosong = modeTampilanSaatIni === 'aktif' ? 'Tidak Ada Masalah Aktif Tersisa' : 'Belum Ada Arsip Riwayat Selesai';
+                const emptyHtml = `
+                    <div class="py-12 text-center text-slate-500 uppercase tracking-widest text-xs italic w-full">
+                        <i class="fa-solid fa-square-check text-xl block mb-2 text-indigo-500/40"></i> ${txtKosong}
+                    </div>
+                `;
+                tblBody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
+                mobileList.innerHTML = emptyHtml;
+                return;
+            }
+
+            // Urutkan data terbaru di paling atas
+            let dataRender = [...dataTerfilter].reverse();
+
+            dataRender.forEach(item => {
+                let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
+                
+                // Unik ID baris (menggunakan id dari sheet atau fallback ke index enkripsi)
+                let rowId = item.id || "";
+
+                // Tombol Aksi Operasional Kondisional
+                let actionBtnHtml = "";
+                if (modeTampilanSaatIni === 'aktif') {
+                    actionBtnHtml = `
+                        <button onclick="eksekusiSelesaikanMasalah('${rowId}')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 rounded-lg text-[10px] font-black tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1 w-full uppercase shadow-sm">
+                            <i class="fa-solid fa-check-double text-[9px]"></i> Selesai
+                        </button>
+                    `;
+                } else {
+                    actionBtnHtml = `
+                        <span class="px-2 py-1 border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 rounded-md text-[9px] font-black tracking-widest inline-block uppercase shadow-sm">
+                           <i class="fa-solid fa-circle-check mr-1"></i>Arsip Selesai
+                        </span>
+                    `;
+                }
+
+                // Render Desktop Table Row
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-indigo-500/5 transition-colors border-b border-[var(--border-color)]";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono font-bold opacity-70">${tglTampil}</td>
+                    <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah || '-'}</td>
+                    <td class="py-3 px-4 text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
+                    <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi || '-'}</td>
+                    <td class="py-3 px-4 text-center">${actionBtnHtml}</td>
+                `;
+                tblBody.appendChild(tr);
+
+                // Render Mobile Premium Layout (Card Stack)
+                let card = document.createElement('div');
+                card.className = "premium-card p-4 rounded-xl flex flex-col gap-2.5 text-left";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                        <span class="text-[10px] font-mono font-bold opacity-60">${tglTampil}</span>
+                        <div class="w-28 text-right">${actionBtnHtml}</div>
+                    </div>
+                    <div>
+                        <span class="text-[8px] uppercase tracking-wider text-indigo-400 font-black block">Masalah Utama</span>
+                        <p class="text-xs font-bold text-[var(--text-title)] mt-0.5">${item.masalah || '-'}</p>
+                    </div>
+                    <div class="bg-[var(--bg-inner)] p-2 rounded-lg border border-[var(--border-color)]">
+                        <span class="text-[8px] uppercase tracking-wider text-cyan-400 font-black block">Usulan Taktis</span>
+                        <p class="text-xs text-slate-300 font-medium italic mt-0.5"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] uppercase tracking-wider text-slate-500 font-black block">Strategi Jangka Panjang</span>
+                        <p class="text-xs text-[var(--text-body)] mt-0.5">${item.strategi || '-'}</p>
+                    </div>
+                `;
+                mobileList.appendChild(card);
+            });
+        }
+
+        function eksekusiSelesaikanMasalah(id) {
+            if(!id) {
+                alert("Gagal eksekusi: ID Log Data tidak valid atau tidak terstruktur di Google Sheets.");
+                return;
+            }
+            if(!confirm("Validasi Penanganan:\nApakah Anda yakin masalah ini sudah selesai diamalkan pengurus?")) return;
+
+            // Trigger integrasi post balik status ke App Script
+            fetch(WEBAPP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "updateStatus", id: id, status: "Selesai" })
+            })
+            .then(() => {
+                alert("STATUS BERHASIL DIPERBARUI!\n\nAduan telah resmi dipindahkan ke dalam Arsip Riwayat.");
+                setTimeout(muatUlangDataAduan, 1000);
+            })
+            .catch(err => {
+                alert("Gagal merubah status: " + err.message);
             });
         }
     </script>
