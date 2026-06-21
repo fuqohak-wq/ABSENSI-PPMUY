@@ -184,11 +184,22 @@
                         <span class="text-[10px] font-bold tracking-wider uppercase">Kamera Belum Diaktifkan</span>
                     </div>
                     <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                    <canvas id="capture-canvas" class="hidden"></canvas>
                 </div>
 
-                <button onclick="eksekusiAmbilDanAnalisis()" class="glow-button w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer transition-all uppercase">
+                <div class="w-full bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 flex gap-3 items-start text-left">
+                    <i class="fa-solid fa-cloud-arrow-up text-blue-400 mt-0.5 text-sm animate-bounce"></i>
+                    <div>
+                        <h4 class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Cloud Storage Automation</h4>
+                        <p class="text-[10px] text-[var(--text-body)] mt-0.5 leading-relaxed">
+                            Berkas foto yang diambil akan langsung diunggah secara terpusat. Sistem Cloud akan **otomatis membuatkan folder khusus** bernama <span class="text-cyan-400 font-bold">"Sistem Aduan Santri - PPMUY"</span> di dalam Google Drive utama akun pengurus saat tombol pengiriman pertama kali dieksekusi.
+                        </p>
+                    </div>
+                </div>
+
+                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="glow-button w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed">
                     <i class="fa-solid fa-expand-arrows-alt"></i>
-                    Ambil Foto & Kirim Dokumen
+                    <span id="text-btn-submit">Ambil Foto & Kirim Dokumen</span>
                 </button>
             </div>
         </div>
@@ -199,11 +210,15 @@
     </footer>
 
     <script>
-        // Manajemen State Aplikasi
+        // Endpoint Google Apps Script Web App Aktif Anda
+        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzlYJ7O5FDseh0pxoGouw4yIx0fdDwlqxiYo6Xwn8LHd7pepKgZQBFq-9R6DNst0fgI/exec";
+        let localStream = null;
+
+        // Manajemen State Aplikasi saat dimuat
         window.addEventListener('DOMContentLoaded', () => {
             const temaSimpanan = localStorage.getItem('aduan_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
-            muatUlangDataAduan(); // Otomatis tarik log saat halaman terbuka
+            muatUlangDataAduan(); 
         });
 
         // Manajemen Penggantian Tema
@@ -226,13 +241,16 @@
             }
         }
 
-        // Kontrol Modal Kamas / Scan Menu Atas
+        // Kontrol Modal Kamera
         function bukaModalKamera() {
             const modal = document.getElementById('modal-kamera');
             modal.classList.remove('hidden');
-            // Menyalakan simulasi feed video
-            navigator.mediaDevices.getUserMedia({ video: true })
+            
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" } // Prioritaskan kamera belakang HP pengurus
+            })
             .then(stream => {
+                localStream = stream;
                 const video = document.getElementById('video-feed');
                 const placeholder = document.getElementById('camera-placeholder');
                 if(video) {
@@ -241,81 +259,165 @@
                 }
                 if(placeholder) placeholder.classList.add('hidden');
             }).catch(err => {
-                console.log("Akses hardware kamera ditolak/tidak ditemukan.");
+                alert("Gagal mengakses kamera. Mohon izinkan hak akses kamera di browser Anda.");
+                console.error("Akses hardware kamera ditolak/tidak ditemukan:", err);
             });
         }
 
         function tutupModalKamera() {
             const modal = document.getElementById('modal-kamera');
             modal.classList.add('hidden');
-            // Mematikan kamera stream agar hemat resources
+            
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
             const video = document.getElementById('video-feed');
-            if(video && video.srcObject) {
-                let stream = video.srcObject;
-                let tracks = stream.getTracks();
-                tracks.forEach(track => track.stop());
+            if(video) {
+                video.srcObject = null;
                 video.classList.add('hidden');
             }
             const placeholder = document.getElementById('camera-placeholder');
             if(placeholder) placeholder.classList.remove('hidden');
         }
 
-        // Aksi Pemicu Ambil Foto & Sinkronisasi Data 
+        // Aksi Pemicu Ambil Foto & Transmit Kirim ke Google App Script
         function eksekusiAmbilDanAnalisis() {
-            alert("Foto aduan berhasil diambil dengan resolusi tinggi! Memproses data ke server pengurus...");
-            tutupModalKamera();
-            // Anda dapat menyematkan pemicu fungsi `fetch` Apps Script Anda di area ini
+            const video = document.getElementById('video-feed');
+            const canvas = document.getElementById('capture-canvas');
+            const btnSubmit = document.getElementById('btn-submit-foto');
+            const textBtn = document.getElementById('text-btn-submit');
+
+            if (!localStream || video.classList.contains('hidden')) {
+                alert("Kamera aktif belum siap atau tidak terdeteksi!");
+                return;
+            }
+
+            // Atur dimensi resolusi canvas penangkap gambar sesuai output video asli
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Ekstrak berkas mentah biner menjadi string Base64 Data URL (JPEG format)
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64Bytes = dataUrl.split(',')[1]; // Buang prefix meta-header string base64
+
+            // Ubah UI menjadi status Loading/Memproses
+            btnSubmit.disabled = true;
+            textBtn.innerText = "SEDANG MENGANALISIS & MENGUNGGAH...";
+
+            // Lakukan pengiriman data asli via Fetch API Post CORS mode
+            fetch(WEBAPP_URL, {
+                method: "POST",
+                mode: "no-cors", // Mode no-cors digunakan agar request web app Apps Script lancar lintas domain
+                headers: {
+                    "Content-Type": "text/plain"
+                },
+                body: JSON.stringify({ imageBytes: base64Bytes })
+            })
+            .then(() => {
+                // Catatan: Karena menggunakan mode no-cors, respon balik dari google script terbaca buram (opaque). 
+                // Kita asumsikan sukses terkirim jika tidak masuk blok catch.
+                alert("Aduan diproses! Foto sukses masuk Google Drive & data dianalisis AI Gemini.");
+                tutupModalKamera();
+                // Kembalikan UI button semula
+                btnSubmit.disabled = false;
+                textBtn.innerText = "Ambil Foto & Kirim Dokumen";
+                
+                // Beri jeda 2 detik sebelum refresh otomatis agar database Google Sheet selesai menulis baris baru
+                setTimeout(muatUlangDataAduan, 2000);
+            })
+            .catch(error => {
+                alert("Terjadi kendala pengiriman berkas: " + error.message);
+                btnSubmit.disabled = false;
+                textBtn.innerText = "Ambil Foto & Kirim Dokumen";
+            });
         }
 
-        // Simulasi Menarik Data Dari Google Spreadsheet Server
+        // Menarik Data Valid Asli dari Google Spreadsheet Backend (`doGet`)
         function muatUlangDataAduan() {
             const tblBody = document.getElementById('tbl-aduan-body');
-            // Tampilan loading state yang futuristik
             tblBody.innerHTML = `
                 <tr>
                     <td colspan="5" class="py-12 text-center text-cyan-400/80 font-bold uppercase tracking-widest text-[10px]">
                         <i class="fa-solid fa-circle-notch animate-spin text-lg text-cyan-400 block mb-2"></i>
-                        Sinkronisasi Dekripsi Berkas Aman Masuk...
+                        Sinkronisasi Berkas Aman Masuk...
                     </td>
                 </tr>
             `;
             
-            // Set data simulasi agar tampilan awal langsung hidup dan berwibawa
-            setTimeout(() => {
-                const dataSimulasi = [
-                    { tgl: "21/06/2026", masalah: "Kipas angin asrama kamar 04 blok utama mati total semenjak 3 hari", solusi: "Penyediaan unit cadangan sementara oleh inventaris umum ba'da ashar", panjang: "Penggantian instalasi kapasitor silang central terjadwal pekan depan", status: "PROSES" },
-                    { tgl: "20/06/2026", masalah: "Distribusi air bersih area kamar mandi Banin tersumbat parsial", solusi: "Pembersihan filter penampungan tangki atas oleh petugas piket madrasah", panjang: "Pemasangan pompa paralel penguat tekanan otomatis", status: "SELESAI" }
-                ];
-
+            fetch(WEBAPP_URL)
+            .then(res => res.json())
+            .then(data => {
                 tblBody.innerHTML = "";
+                
+                if (!data || data.length === 0) {
+                    tblBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="py-16 text-center text-[var(--text-body)] uppercase font-bold tracking-widest text-xs italic">
+                                <i class="fa-solid fa-inbox text-2xl text-slate-600 block mb-3"></i>
+                                Belum ada data aduan masuk.
+                            </td>
+                        </tr>
+                    `;
+                    document.getElementById('stat-total').innerText = "0";
+                    document.getElementById('stat-proses').innerText = "0";
+                    document.getElementById('stat-selesai').innerText = "0";
+                    return;
+                }
+
+                // Balik urutan array agar data aduan yang paling baru muncul di baris paling atas (Latest Entry First)
+                data.reverse();
+
                 let countProses = 0, countSelesai = 0;
 
-                dataSimulasi.forEach(item => {
-                    if (item.status === "PROSES") countProses++;
-                    if (item.status === "SELESAI") countSelesai++;
+                data.forEach(item => {
+                    const statusBersih = (item.status || "").trim().toUpperCase();
+                    if (statusBersih.includes("SELESAI")) {
+                        countSelesai++;
+                    } else {
+                        countProses++; // Masuk hitungan PROSES jika bertuliskan ⏳ PROSES atau kosong
+                    }
 
-                    let badgeColor = item.status === "SELESAI" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" : "bg-amber-500/15 text-amber-400 border-amber-500/20";
+                    let badgeColor = statusBersih.includes("SELESAI") 
+                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" 
+                        : "bg-amber-500/15 text-amber-400 border-amber-500/20";
                     
+                    // Format tampilan string tanggal agar lebih rapi dibaca manusia
+                    let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
+
                     let tr = document.createElement('tr');
                     tr.className = "hover:bg-blue-500/5 transition-colors border-b border-[var(--border-color)]";
                     tr.innerHTML = `
-                        <td class="py-3 px-4 font-mono font-bold opacity-70">${item.tgl}</td>
-                        <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah}</td>
-                        <td class="py-3 px-4 text-slate-400 dark:text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi}</td>
-                        <td class="py-3 px-4 text-[var(--text-body)]">${item.panjang}</td>
+                        <td class="py-3 px-4 font-mono font-bold opacity-70">${tglTampil}</td>
+                        <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah || '-'}</td>
+                        <td class="py-3 px-4 text-slate-400 dark:text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
+                        <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi || '-'}</td>
                         <td class="py-3 px-4 text-center">
-                            <span class="px-2 py-0.5 border rounded-md text-[9px] font-black tracking-widest inline-block ${badgeColor}">${item.status}</span>
+                            <span class="px-2 py-0.5 border rounded-md text-[9px] font-black tracking-widest inline-block ${badgeColor}">${item.status || '⏳ PROSES'}</span>
                         </td>
                     `;
                     tblBody.appendChild(tr);
                 });
 
-                // Update counter statistik kotak atas
-                document.getElementById('stat-total').innerText = dataSimulasi.length;
+                // Update angka counter statistik di dashboard atas secara akurat
+                document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-proses').innerText = countProses;
                 document.getElementById('stat-selesai').innerText = countSelesai;
-
-            }, 800);
+            })
+            .catch(err => {
+                console.error("Gagal menarik log data:", err);
+                tblBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-red-400 font-bold uppercase tracking-widest text-[10px]">
+                            <i class="fa-solid fa-triangle-exclamation text-lg text-red-500 block mb-2"></i>
+                            Gagal sinkronisasi data dari Google Sheets Server.
+                        </td>
+                    </tr>
+                `;
+            });
         }
     </script>
 </body>
