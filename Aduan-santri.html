@@ -2,252 +2,248 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Manajemen Aduan Santri PPMUY - Premium Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body, header, div, section, button, table, td, th, footer {
+        body, header, div, section, button, table, td, th, footer, tr {
             transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* TEMA FUTURISTIK CYBER (DARK) */
+        /* PREMIUM CYBER DARK THEME */
         .theme-dark {
-            --bg-main: #0b0f19;
-            --bg-header: #030712;
-            --bg-card: #111827;
-            --bg-inner: #1f2937;
-            --text-title: #f9fafb;
-            --text-body: #9ca3af;
-            --border-glow: rgba(59, 130, 246, 0.2);
-            --border-color: #374151;
-            --accent-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+            --bg-main: #060814;
+            --bg-header: #02040a;
+            --bg-card: #0d1127;
+            --bg-inner: #151b3a;
+            --text-title: #ffffff;
+            --text-body: #94a3b8;
+            --border-color: rgba(99, 102, 241, 0.15);
+            --accent-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* TEMA SAPPHIRE GLASS (LIGHT) */
+        /* PREMIUM LIGHT THEME */
         .theme-light {
-            --bg-main: #f0f4f8;
+            --bg-main: #f4f6fa;
             --bg-header: #0f172a;
             --bg-card: #ffffff;
             --bg-inner: #f8fafc;
             --text-title: #0f172a;
-            --text-body: #475569;
-            --border-glow: rgba(30, 64, 175, 0.1);
-            --border-color: #cbd5e1;
-            --accent-glow: 0 10px 25px rgba(15, 23, 42, 0.05);
+            --text-body: #64748b;
+            --border-color: #e2e8f0;
+            --accent-glow: 0 10px 30px rgba(15, 23, 42, 0.04);
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-title);
             font-family: system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .premium-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             box-shadow: var(--accent-glow);
+            backdrop-filter: blur(8px);
         }
 
-        /* Efek Shimmer Pemuatan Data */
-        .glow-button {
-            position: relative;
-            overflow: hidden;
+        /* Animasi Garis Laser Scanner */
+        @keyframes laserMove {
+            0% { top: 0%; opacity: 0.8; }
+            50% { top: 100%; opacity: 0.8; }
+            100% { top: 0%; opacity: 0.2; }
         }
-        .glow-button::after {
-            content: '';
+
+        .laser-line {
             position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: 0.5s;
-        }
-        .glow-button:hover::after {
-            left: 120%;
+            left: 0; width: 100%; height: 3px;
+            background: linear-gradient(to right, transparent, #22d3ee, #3b82f6, #22d3ee, transparent);
+            box-shadow: 0 0 15px #22d3ee;
+            animation: laserMove 3s infinite linear;
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
     </style>
 </head>
-<body id="body-app" class="theme-dark min-h-screen flex flex-col justify-between antialiased">
+<body id="body-app" class="theme-dark min-h-screen flex flex-col justify-between antialiased pb-safe">
 
-    <header class="w-full bg-[var(--bg-header)] border-b border-cyan-500/30 px-4 sm:px-8 py-4 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-4">
-            <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-11 h-11 rounded-xl bg-slate-900 border border-slate-700/60 flex items-center justify-center text-cyan-400 shadow-md hover:text-white hover:border-cyan-400 hover:scale-105 transition-all" title="Kembali ke Dashboard">
-                <i class="fa-solid fa-arrow-left text-base"></i>
+    <header class="w-full bg-[var(--bg-header)] border-b border-indigo-500/20 px-4 sm:px-8 py-3.5 flex justify-between items-center shadow-2xl sticky top-0 z-40 backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-700/50 flex items-center justify-center text-indigo-400 shadow-md hover:text-white hover:border-indigo-400 active:scale-95 transition-all" title="Kembali">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div>
-                <h1 class="text-xs sm:text-sm font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 uppercase">MANAJEMEN ADUAN SANTRI</h1>
-                <span class="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-md font-bold tracking-widest block w-max uppercase mt-0.5">DIVISI HUMAS INTERNAL • PPMUY PUSAT</span>
+                <h1 class="text-xs sm:text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-blue-500 uppercase">ADUAN SANTRI</h1>
+                <span class="text-[8px] sm:text-[9px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-1.5 py-0.5 rounded font-bold tracking-widest block w-max uppercase mt-0.5">HUMAS INTERNAL • PPMUY</span>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            <button onclick="bukaModalKamera()" class="glow-button px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black tracking-wider flex items-center gap-2 shadow-lg shadow-cyan-500/20 cursor-pointer transform hover:-translate-y-0.5 transition-all">
-                <i class="fa-solid fa-camera-retro text-sm animate-pulse"></i>
-                <span>SCAN ADUAN</span>
-            </button>
-
-            <div class="h-6 w-[1px] bg-slate-700/50 mx-1"></div>
-
-            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center cursor-pointer text-amber-400 hover:scale-105 hover:border-amber-400 transition-all">
-                <i class="fa-solid fa-sun text-base"></i>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-center cursor-pointer text-amber-400 active:scale-95 transition-all">
+                <i class="fa-solid fa-sun text-sm"></i>
             </button>
         </div>
     </header>
 
-    <main class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-6 flex-1 justify-start">
+    <main class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-5 flex-1 justify-start">
         
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-            <div class="premium-card p-4 rounded-2xl flex items-center justify-between">
+        <section class="grid grid-cols-3 gap-3 w-full">
+            <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[10px] uppercase font-black tracking-wider text-[var(--text-body)]">Total Aduan Masuk</span>
-                    <h3 class="text-2xl font-black mt-1 text-cyan-400" id="stat-total">0</h3>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Total</span>
+                    <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-indigo-400" id="stat-total">0</h3>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400"><i class="fa-solid fa-folder-open text-xl"></i></div>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-sm sm:text-lg"><i class="fa-solid fa-folder-open"></i></div>
             </div>
-            <div class="premium-card p-4 rounded-2xl flex items-center justify-between">
+            <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[10px] uppercase font-black tracking-wider text-[var(--text-body)]">Sedang Ditangani</span>
-                    <h3 class="text-2xl font-black mt-1 text-amber-400" id="stat-proses">0</h3>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Proses</span>
+                    <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-amber-400" id="stat-proses">0</h3>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400"><i class="fa-solid fa-circle-notch animate-spin text-xl"></i></div>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 text-sm sm:text-lg"><i class="fa-solid fa-circle-notch animate-spin"></i></div>
             </div>
-            <div class="premium-card p-4 rounded-2xl flex items-center justify-between">
+            <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
-                    <span class="text-[10px] uppercase font-black tracking-wider text-[var(--text-body)]">Selesai Validasi</span>
-                    <h3 class="text-2xl font-black mt-1 text-emerald-400" id="stat-selesai">0</h3>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-[var(--text-body)] block">Selesai</span>
+                    <h3 class="text-lg sm:text-2xl font-black mt-0.5 text-emerald-400" id="stat-selesai">0</h3>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-shield-check text-xl"></i></div>
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm sm:text-lg"><i class="fa-solid fa-shield-check"></i></div>
             </div>
         </section>
 
         <section class="premium-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col flex-1">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-dashed border-[var(--border-color)] gap-3">
+            <div class="flex justify-between items-center pb-4 border-b border-dashed border-[var(--border-color)]">
                 <div>
-                    <h2 class="text-sm font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 dark:from-white dark:to-slate-400">Data Aspirasi & Strategi Solusi</h2>
-                    <p class="text-[10px] text-[var(--text-body)] mt-0.5">Log koordinasi berkas penanganan berkala Humas Internal</p>
+                    <h2 class="text-xs sm:text-sm font-black tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Log Koordinasi Berkas</h2>
+                    <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] mt-0.5">Pembaruan berkala database aspirasi santri</p>
                 </div>
-                <button onclick="muatUlangDataAduan()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-xs font-bold flex items-center gap-2 hover:text-cyan-400 transition-all cursor-pointer">
-                    <i class="fa-solid fa-arrows-rotate text-xs"></i> Refresh Data
+                <button onclick="muatUlangDataAduan()" class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700/60 hover:border-indigo-400 text-[10px] sm:text-xs font-bold flex items-center gap-1.5 hover:text-indigo-400 active:scale-95 transition-all cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate text-[10px]"></i> <span class="hidden sm:inline">Refresh Data</span>
                 </button>
             </div>
 
-            <div class="overflow-x-auto mt-4 rounded-xl border border-[var(--border-color)]">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-[var(--bg-inner)] text-[10px] font-black tracking-wider text-[var(--text-body)] uppercase border-b border-[var(--border-color)]">
-                            <th class="py-3 px-4 w-[12%]">Tanggal</th>
-                            <th class="py-3 px-4 w-[25%]">Masalah Utama</th>
-                            <th class="py-3 px-4 w-[28%]">Usulan Penanganan (Solusi Cepat)</th>
-                            <th class="py-3 px-4 w-[25%]">Strategi Jangka Panjang</th>
-                            <th class="py-3 px-4 w-[10%] text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium">
-                        <tr>
-                            <td colspan="5" class="py-16 text-center text-[var(--text-body)] uppercase font-bold tracking-widest text-xs italic">
-                                <i class="fa-solid fa-inbox text-2xl text-slate-600 block mb-3"></i>
-                                Belum ada data aduan masuk.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="mt-4">
+                <div class="hidden md:block overflow-x-auto rounded-xl border border-[var(--border-color)]">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[var(--bg-inner)] text-[10px] font-black tracking-wider text-[var(--text-body)] uppercase border-b border-[var(--border-color)]">
+                                <th class="py-3 px-4 w-[12%]">Tanggal</th>
+                                <th class="py-3 px-4 w-[25%]">Masalah Utama</th>
+                                <th class="py-3 px-4 w-[28%]">Solusi Taktis</th>
+                                <th class="py-3 px-4 w-[25%]">Strategi Jangka Panjang</th>
+                                <th class="py-3 px-4 w-[10%] text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="mobile-aduan-list" class="block md:hidden flex flex-col gap-3">
+                    </div>
             </div>
         </section>
     </main>
 
-    <div id="modal-kamera" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="premium-card w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl transform scale-95 transition-all duration-300">
-            <div class="bg-[var(--bg-header)] px-5 py-4 border-b border-[var(--border-color)] flex justify-between items-center">
+    <div class="fixed bottom-5 right-5 z-40 md:bottom-8 md:right-8">
+        <button onclick="bukaModalKamera()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer transition-all border border-white/20">
+            <i class="fa-solid fa-camera text-xl animate-pulse"></i>
+        </button>
+    </div>
+
+    <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg hidden flex items-center justify-center p-0 sm:p-4">
+        <div class="premium-card w-full h-full sm:h-auto sm:max-w-xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+            
+            <div class="bg-[var(--bg-header)] px-4 py-3 sm:py-4 border-b border-[var(--border-color)] flex justify-between items-center">
                 <div class="flex items-center gap-2 text-cyan-400">
-                    <i class="fa-solid fa-camera-retro"></i>
-                    <h3 class="text-xs font-black tracking-wider uppercase">Menu Pengurus: Ambil Foto Aduan Santri</h3>
+                    <i class="fa-solid fa-expand-arrows-alt text-xs animate-pulse"></i>
+                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Pindai Aduan Gemini AI</h3>
                 </div>
-                <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-sm bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
+                <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-xs bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
-            <div class="p-5 flex flex-col items-center gap-4 bg-[var(--bg-card)]">
-                <div class="relative w-full aspect-video rounded-2xl bg-black border-2 border-cyan-500/40 overflow-hidden shadow-inner flex items-center justify-center">
-                    <div class="absolute inset-0 border-2 border-dashed border-cyan-400/20 m-4 pointer-events-none rounded-lg"></div>
-                    <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2">
-                        <i class="fa-solid fa-video-slash text-3xl"></i>
-                        <span class="text-[10px] font-bold tracking-wider uppercase">Kamera Belum Diaktifkan</span>
+            <div class="p-4 flex flex-col flex-1 sm:flex-initial gap-4 bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-main)] justify-between sm:justify-start">
+                
+                <div class="relative w-full flex-1 sm:flex-initial sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center min-h-[280px] sm:min-h-0">
+                    <div class="laser-line"></div>
+                    
+                    <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-cyan-400 pointer-events-none"></div>
+                    <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-cyan-400 pointer-events-none"></div>
+                    <div class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-cyan-400 pointer-events-none"></div>
+                    <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-cyan-400 pointer-events-none"></div>
+
+                    <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2 px-4">
+                        <i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-500"></i>
+                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Menghubungkan Sensor Kamera...</span>
                     </div>
                     <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
                     <canvas id="capture-canvas" class="hidden"></canvas>
                 </div>
 
-                <div class="w-full bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 flex gap-3 items-start text-left">
-                    <i class="fa-solid fa-cloud-arrow-up text-blue-400 mt-0.5 text-sm animate-bounce"></i>
-                    <div>
-                        <h4 class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Cloud Storage Automation</h4>
-                        <p class="text-[10px] text-[var(--text-body)] mt-0.5 leading-relaxed">
-                            Berkas foto yang diambil akan langsung diunggah secara terpusat. Sistem Cloud akan **otomatis membuatkan folder khusus** bernama <span class="text-cyan-400 font-bold">"Sistem Aduan Santri - PPMUY"</span> di dalam Google Drive utama akun pengurus saat tombol pengiriman pertama kali dieksekusi.
-                        </p>
-                    </div>
+                <div class="w-full bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-3 flex gap-2.5 items-start text-left">
+                    <i class="fa-solid fa-cloud text-indigo-400 text-xs mt-0.5"></i>
+                    <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] leading-relaxed">
+                        Foto berkas otomatis masuk ke folder <span class="text-cyan-400 font-bold">"Sistem Aduan Santri - PPMUY"</span> di Google Drive utama Anda secara terstruktur.
+                    </p>
                 </div>
 
-                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="glow-button w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer transition-all uppercase disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i class="fa-solid fa-expand-arrows-alt"></i>
-                    <span id="text-btn-submit">Ambil Foto & Kirim Dokumen</span>
+                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-3.5 sm:py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-98 transition-all uppercase disabled:opacity-40">
+                    <i class="fa-solid fa-bolt text-xs"></i>
+                    <span id="text-btn-submit">Ambil & Pindai Dokumen</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <footer class="w-full text-center py-4 text-[9px] text-[var(--text-body)] font-black tracking-widest border-t border-[var(--border-color)] bg-[var(--bg-header)]">
-        SISTEM VALIDASI HUB HUMAS INTERNAL • MANAGEMENT CONSOLE @2026
+    <footer class="w-full text-center py-3.5 text-[8px] text-[var(--text-body)] font-bold tracking-widest border-t border-[var(--border-color)] bg-[var(--bg-header)] z-10">
+        MANAGEMENT CONSOLE • DIVISION INTERNAL HUMAS PPMUY CENTRE @2026
     </footer>
 
     <script>
-        // Endpoint Google Apps Script Web App Aktif Anda
         const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzlYJ7O5FDseh0pxoGouw4yIx0fdDwlqxiYo6Xwn8LHd7pepKgZQBFq-9R6DNst0fgI/exec";
         let localStream = null;
 
-        // Manajemen State Aplikasi saat dimuat
         window.addEventListener('DOMContentLoaded', () => {
             const temaSimpanan = localStorage.getItem('aduan_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             muatUlangDataAduan(); 
         });
 
-        // Manajemen Penggantian Tema
         function toggleTema() {
             const currentTheme = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
-            const newTheme = (currentTheme === 'theme-dark') ? 'theme-light' : 'theme-dark';
-            setTemaAplikasi(newTheme);
+            setTemaAplikasi(currentTheme === 'theme-dark' ? 'theme-light' : 'theme-dark');
         }
 
         function setTemaAplikasi(tema) {
             const btnTema = document.getElementById('btn-tema');
             if (tema === 'theme-light') {
-                document.body.className = "theme-light min-h-screen flex flex-col justify-between antialiased";
-                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-blue-500"></i>`;
+                document.body.className = "theme-light min-h-screen flex flex-col justify-between antialiased pb-safe";
+                if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-moon text-indigo-500"></i>`;
                 localStorage.setItem('aduan_theme', 'theme-light');
             } else {
-                document.body.className = "theme-dark min-h-screen flex flex-col justify-between antialiased";
+                document.body.className = "theme-dark min-h-screen flex flex-col justify-between antialiased pb-safe";
                 if(btnTema) btnTema.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i>`;
                 localStorage.setItem('aduan_theme', 'theme-dark');
             }
         }
 
-        // Kontrol Modal Kamera
         function bukaModalKamera() {
             const modal = document.getElementById('modal-kamera');
             modal.classList.remove('hidden');
             
             navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment" } // Prioritaskan kamera belakang HP pengurus
+                video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
             })
             .then(stream => {
                 localStream = stream;
@@ -259,15 +255,13 @@
                 }
                 if(placeholder) placeholder.classList.add('hidden');
             }).catch(err => {
-                alert("Gagal mengakses kamera. Mohon izinkan hak akses kamera di browser Anda.");
-                console.error("Akses hardware kamera ditolak/tidak ditemukan:", err);
+                alert("Kamera terblokir. Izinkan akses kamera melalui setelan browser HP Anda!");
+                tutupModalKamera();
             });
         }
 
         function tutupModalKamera() {
-            const modal = document.getElementById('modal-kamera');
-            modal.classList.add('hidden');
-            
+            document.getElementById('modal-kamera').classList.add('hidden');
             if(localStream) {
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
@@ -277,146 +271,140 @@
                 video.srcObject = null;
                 video.classList.add('hidden');
             }
-            const placeholder = document.getElementById('camera-placeholder');
-            if(placeholder) placeholder.classList.remove('hidden');
+            document.getElementById('camera-placeholder').classList.remove('hidden');
         }
 
-        // Aksi Pemicu Ambil Foto & Transmit Kirim ke Google App Script
         function eksekusiAmbilDanAnalisis() {
             const video = document.getElementById('video-feed');
             const canvas = document.getElementById('capture-canvas');
             const btnSubmit = document.getElementById('btn-submit-foto');
             const textBtn = document.getElementById('text-btn-submit');
 
-            if (!localStream || video.classList.contains('hidden')) {
-                alert("Kamera aktif belum siap atau tidak terdeteksi!");
-                return;
-            }
+            if (!localStream || video.classList.contains('hidden')) return;
 
-            // Atur dimensi resolusi canvas penangkap gambar sesuai output video asli
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ekstrak berkas mentah biner menjadi string Base64 Data URL (JPEG format)
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            const base64Bytes = dataUrl.split(',')[1]; // Buang prefix meta-header string base64
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.80);
+            const base64Bytes = dataUrl.split(',')[1];
 
-            // Ubah UI menjadi status Loading/Memproses
             btnSubmit.disabled = true;
-            textBtn.innerText = "SEDANG MENGANALISIS & MENGUNGGAH...";
+            textBtn.innerText = "PROSES INTEGRASI ALGORITMA AI...";
 
-            // Lakukan pengiriman data asli via Fetch API Post CORS mode
             fetch(WEBAPP_URL, {
                 method: "POST",
-                mode: "no-cors", // Mode no-cors digunakan agar request web app Apps Script lancar lintas domain
-                headers: {
-                    "Content-Type": "text/plain"
-                },
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify({ imageBytes: base64Bytes })
             })
             .then(() => {
-                // Catatan: Karena menggunakan mode no-cors, respon balik dari google script terbaca buram (opaque). 
-                // Kita asumsikan sukses terkirim jika tidak masuk blok catch.
-                alert("Aduan diproses! Foto sukses masuk Google Drive & data dianalisis AI Gemini.");
+                alert("Sukses! Berkas terkirim & Log database diperbarui.");
                 tutupModalKamera();
-                // Kembalikan UI button semula
                 btnSubmit.disabled = false;
-                textBtn.innerText = "Ambil Foto & Kirim Dokumen";
-                
-                // Beri jeda 2 detik sebelum refresh otomatis agar database Google Sheet selesai menulis baris baru
-                setTimeout(muatUlangDataAduan, 2000);
+                textBtn.innerText = "Ambil & Pindai Dokumen";
+                setTimeout(muatUlangDataAduan, 1500);
             })
             .catch(error => {
-                alert("Terjadi kendala pengiriman berkas: " + error.message);
+                alert("Gangguan transmisi data: " + error.message);
                 btnSubmit.disabled = false;
-                textBtn.innerText = "Ambil Foto & Kirim Dokumen";
+                textBtn.innerText = "Ambil & Pindai Dokumen";
             });
         }
 
-        // Menarik Data Valid Asli dari Google Spreadsheet Backend (`doGet`)
         function muatUlangDataAduan() {
             const tblBody = document.getElementById('tbl-aduan-body');
-            tblBody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="py-12 text-center text-cyan-400/80 font-bold uppercase tracking-widest text-[10px]">
-                        <i class="fa-solid fa-circle-notch animate-spin text-lg text-cyan-400 block mb-2"></i>
-                        Sinkronisasi Berkas Aman Masuk...
-                    </td>
-                </tr>
+            const mobileList = document.getElementById('mobile-aduan-list');
+            
+            const loadingHtml = `
+                <div class="py-12 text-center text-indigo-400 font-bold uppercase tracking-widest text-[9px] w-full col-span-full">
+                    <i class="fa-solid fa-circle-notch animate-spin text-base block mb-2"></i>
+                    Sinkronisasi Enkripsi Node Database...
+                </div>
             `;
+            
+            tblBody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-indigo-400">${loadingHtml}</td></tr>`;
+            mobileList.innerHTML = loadingHtml;
             
             fetch(WEBAPP_URL)
             .then(res => res.json())
             .then(data => {
                 tblBody.innerHTML = "";
+                mobileList.innerHTML = "";
                 
                 if (!data || data.length === 0) {
-                    tblBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="py-16 text-center text-[var(--text-body)] uppercase font-bold tracking-widest text-xs italic">
-                                <i class="fa-solid fa-inbox text-2xl text-slate-600 block mb-3"></i>
-                                Belum ada data aduan masuk.
-                            </td>
-                        </tr>
+                    const emptyHtml = `
+                        <div class="py-12 text-center text-slate-500 uppercase tracking-widest text-xs italic w-full">
+                            <i class="fa-solid fa-inbox text-xl block mb-2"></i> Belum Ada Log Aspirasi
+                        </div>
                     `;
-                    document.getElementById('stat-total').innerText = "0";
-                    document.getElementById('stat-proses').innerText = "0";
-                    document.getElementById('stat-selesai').innerText = "0";
+                    tblBody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
+                    mobileList.innerHTML = emptyHtml;
                     return;
                 }
 
-                // Balik urutan array agar data aduan yang paling baru muncul di baris paling atas (Latest Entry First)
                 data.reverse();
-
                 let countProses = 0, countSelesai = 0;
 
                 data.forEach(item => {
                     const statusBersih = (item.status || "").trim().toUpperCase();
-                    if (statusBersih.includes("SELESAI")) {
-                        countSelesai++;
-                    } else {
-                        countProses++; // Masuk hitungan PROSES jika bertuliskan ⏳ PROSES atau kosong
-                    }
+                    if (statusBersih.includes("SELESAI")) countSelesai++; else countProses++;
 
                     let badgeColor = statusBersih.includes("SELESAI") 
                         ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" 
                         : "bg-amber-500/15 text-amber-400 border-amber-500/20";
                     
-                    // Format tampilan string tanggal agar lebih rapi dibaca manusia
                     let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
                     let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
 
+                    // Injection 1: Tampilan Desktop (Table Row)
                     let tr = document.createElement('tr');
-                    tr.className = "hover:bg-blue-500/5 transition-colors border-b border-[var(--border-color)]";
+                    tr.className = "hover:bg-indigo-500/5 transition-colors border-b border-[var(--border-color)]";
                     tr.innerHTML = `
                         <td class="py-3 px-4 font-mono font-bold opacity-70">${tglTampil}</td>
                         <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah || '-'}</td>
-                        <td class="py-3 px-4 text-slate-400 dark:text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
+                        <td class="py-3 px-4 text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
                         <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi || '-'}</td>
                         <td class="py-3 px-4 text-center">
                             <span class="px-2 py-0.5 border rounded-md text-[9px] font-black tracking-widest inline-block ${badgeColor}">${item.status || '⏳ PROSES'}</span>
                         </td>
                     `;
                     tblBody.appendChild(tr);
+
+                    // Injection 2: Tampilan Mobile Premium Layout (Card Stack)
+                    let card = document.createElement('div');
+                    card.className = "premium-card p-4 rounded-xl flex flex-col gap-2.5 text-left";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
+                            <span class="text-[10px] font-mono font-bold opacity-60">${tglTampil}</span>
+                            <span class="px-2 py-0.5 border rounded-md text-[8px] font-black tracking-widest ${badgeColor}">${item.status || '⏳ PROSES'}</span>
+                        </div>
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider text-indigo-400 font-black block">Masalah Utama</span>
+                            <p class="text-xs font-bold text-[var(--text-title)] mt-0.5">${item.masalah || '-'}</p>
+                        </div>
+                        <div class="bg-[var(--bg-inner)] p-2 rounded-lg border border-[var(--border-color)]">
+                            <span class="text-[8px] uppercase tracking-wider text-cyan-400 font-black block">Usulan Taktis</span>
+                            <p class="text-xs text-slate-300 font-medium italic mt-0.5"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</p>
+                        </div>
+                        <div>
+                            <span class="text-[8px] uppercase tracking-wider text-slate-500 font-black block">Strategi Jangka Panjang</span>
+                            <p class="text-xs text-[var(--text-body)] mt-0.5">${item.strategi || '-'}</p>
+                        </div>
+                    `;
+                    mobileList.appendChild(card);
                 });
 
-                // Update angka counter statistik di dashboard atas secara akurat
                 document.getElementById('stat-total').innerText = data.length;
                 document.getElementById('stat-proses').innerText = countProses;
                 document.getElementById('stat-selesai').innerText = countSelesai;
             })
             .catch(err => {
-                console.error("Gagal menarik log data:", err);
-                tblBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="py-12 text-center text-red-400 font-bold uppercase tracking-widest text-[10px]">
-                            <i class="fa-solid fa-triangle-exclamation text-lg text-red-500 block mb-2"></i>
-                            Gagal sinkronisasi data dari Google Sheets Server.
-                        </td>
-                    </tr>
-                `;
+                console.error(err);
+                const errorHtml = `<div class="py-6 text-center text-red-400 text-xs font-bold uppercase">Gagal sinkronisasi data!</div>`;
+                tblBody.innerHTML = `<tr><td colspan="5">${errorHtml}</td></tr>`;
+                mobileList.innerHTML = errorHtml;
             });
         }
     </script>
