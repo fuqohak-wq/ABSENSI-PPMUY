@@ -15,7 +15,6 @@
                         box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* PREMIUM CYBER DARK THEME */
         .theme-dark {
             --bg-main: #060814;
             --bg-header: #02040a;
@@ -27,7 +26,6 @@
             --accent-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* PREMIUM LIGHT THEME */
         .theme-light {
             --bg-main: #f4f6fa;
             --bg-header: #0f172a;
@@ -53,7 +51,6 @@
             backdrop-filter: blur(8px);
         }
 
-        /* Animasi Garis Laser Scanner */
         @keyframes laserMove {
             0% { top: 0%; opacity: 0.8; }
             50% { top: 100%; opacity: 0.8; }
@@ -68,7 +65,6 @@
             animation: laserMove 3s infinite linear;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
@@ -76,6 +72,7 @@
 </head>
 <body id="body-app" class="theme-dark min-h-screen flex flex-col justify-between antialiased pb-safe">
 
+    <!-- HEADER -->
     <header class="w-full bg-[var(--bg-header)] border-b border-indigo-500/20 px-4 sm:px-8 py-3.5 flex justify-between items-center shadow-2xl sticky top-0 z-40 backdrop-blur-md">
         <div class="flex items-center gap-3">
             <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-700/50 flex items-center justify-center text-indigo-400 shadow-md hover:text-white hover:border-indigo-400 active:scale-95 transition-all" title="Kembali">
@@ -94,8 +91,10 @@
         </div>
     </header>
 
+    <!-- MAIN CONSOLE -->
     <main class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-5 flex-1 justify-start">
         
+        <!-- DASHBOARD STATISTIK -->
         <section class="grid grid-cols-3 gap-3 w-full">
             <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
@@ -120,6 +119,7 @@
             </div>
         </section>
 
+        <!-- LOG DATA -->
         <section class="premium-card rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col flex-1">
             <div class="flex justify-between items-center pb-4 border-b border-dashed border-[var(--border-color)]">
                 <div>
@@ -131,7 +131,9 @@
                 </button>
             </div>
 
+            <!-- ADAPTIVE LOG DATA CONTAINER -->
             <div class="mt-4">
+                <!-- Desktop View -->
                 <div class="hidden md:block overflow-x-auto rounded-xl border border-[var(--border-color)]">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -144,39 +146,46 @@
                             </tr>
                         </thead>
                         <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
 
+                <!-- Mobile View (Card Stack) -->
                 <div id="mobile-aduan-list" class="block md:hidden flex flex-col gap-3">
-                    </div>
+                </div>
             </div>
         </section>
     </main>
 
+    <!-- FLOATING HUB PINDAI (HP JEMPOL-FRIENDLY) -->
     <div class="fixed bottom-5 right-5 z-40 md:bottom-8 md:right-8">
         <button onclick="bukaModalKamera()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer transition-all border border-white/20">
             <i class="fa-solid fa-camera text-xl animate-pulse"></i>
         </button>
     </div>
 
-    <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg hidden flex items-center justify-center p-0 sm:p-4">
+    <!-- MODAL INTEGRASI DOKUMEN -->
+    <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg hidden flex items-center justify-center p-0 sm:p-4">
         <div class="premium-card w-full h-full sm:h-auto sm:max-w-xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
             
-            <div class="bg-[var(--bg-header)] px-4 py-3 sm:py-4 border-b border-[var(--border-color)] flex justify-between items-center">
+            <!-- Modal Header -->
+            <div class="bg-[var(--bg-header)] px-4 py-3.5 border-b border-[var(--border-color)] flex justify-between items-center">
                 <div class="flex items-center gap-2 text-cyan-400">
-                    <i class="fa-solid fa-expand-arrows-alt text-xs animate-pulse"></i>
-                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Pindai Aduan Gemini AI</h3>
+                    <i class="fa-solid fa-expand-arrows-alt text-xs"></i>
+                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Dokumentasi Utama</h3>
                 </div>
                 <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-xs bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
+            <!-- Modal Body -->
             <div class="p-4 flex flex-col flex-1 sm:flex-initial gap-4 bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-main)] justify-between sm:justify-start">
                 
-                <div class="relative w-full flex-1 sm:flex-initial sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center min-h-[280px] sm:min-h-0">
-                    <div class="laser-line"></div>
+                <!-- CAMERA VIEWPORT -->
+                <div class="relative w-full flex-1 sm:flex-initial sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center min-h-[320px] sm:min-h-0">
+                    
+                    <div id="laser-scanner" class="laser-line"></div>
                     
                     <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-cyan-400 pointer-events-none"></div>
                     <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-cyan-400 pointer-events-none"></div>
@@ -185,27 +194,34 @@
 
                     <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2 px-4">
                         <i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-500"></i>
-                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Menghubungkan Sensor Kamera...</span>
+                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Sinkronisasi Sensor Optik...</span>
                     </div>
+                    
                     <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                    
+                    <!-- Preview Gambar Statis Saat Berhasil Dijepret -->
+                    <img id="freeze-preview" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="" alt="Captured Preview">
+                    
                     <canvas id="capture-canvas" class="hidden"></canvas>
                 </div>
 
                 <div class="w-full bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-3 flex gap-2.5 items-start text-left">
-                    <i class="fa-solid fa-cloud text-indigo-400 text-xs mt-0.5"></i>
+                    <i class="fa-solid fa-cloud-arrow-up text-indigo-400 text-xs mt-0.5"></i>
                     <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] leading-relaxed">
-                        Foto berkas otomatis masuk ke folder <span class="text-cyan-400 font-bold">"Sistem Aduan Santri - PPMUY"</span> di Google Drive utama Anda secara terstruktur.
+                        Arahkan lensa ke arah berkas teks, posisikan di tengah bidang, lalu ketuk tombol <span class="text-cyan-400 font-bold">"PROSES & KIRIM DOKUMEN"</span> di bawah ini.
                     </p>
                 </div>
 
-                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-3.5 sm:py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-98 transition-all uppercase disabled:opacity-40">
+                <!-- TRIGGER BUTTON (DITEMPATKAN DI BAWAH UNTUK LAYAR HP) -->
+                <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-4 sm:py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-95 transition-all uppercase disabled:opacity-50">
                     <i class="fa-solid fa-bolt text-xs"></i>
-                    <span id="text-btn-submit">Ambil & Pindai Dokumen</span>
+                    <span id="text-btn-submit">Proses & Kirim Dokumen</span>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- FOOTER -->
     <footer class="w-full text-center py-3.5 text-[8px] text-[var(--text-body)] font-bold tracking-widest border-t border-[var(--border-color)] bg-[var(--bg-header)] z-10">
         MANAGEMENT CONSOLE • DIVISION INTERNAL HUMAS PPMUY CENTRE @2026
     </footer>
@@ -242,6 +258,10 @@
             const modal = document.getElementById('modal-kamera');
             modal.classList.remove('hidden');
             
+            // Reset status tampilan gambar
+            document.getElementById('freeze-preview').classList.add('hidden');
+            document.getElementById('laser-scanner').classList.remove('hidden');
+
             navigator.mediaDevices.getUserMedia({ 
                 video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
             })
@@ -255,7 +275,7 @@
                 }
                 if(placeholder) placeholder.classList.add('hidden');
             }).catch(err => {
-                alert("Kamera terblokir. Izinkan akses kamera melalui setelan browser HP Anda!");
+                alert("Akses Sensor Gagal. Aktifkan perizinan kamera pada pengaturan privasi browser Anda.");
                 tutupModalKamera();
             });
         }
@@ -279,6 +299,8 @@
             const canvas = document.getElementById('capture-canvas');
             const btnSubmit = document.getElementById('btn-submit-foto');
             const textBtn = document.getElementById('text-btn-submit');
+            const preview = document.getElementById('freeze-preview');
+            const laser = document.getElementById('laser-scanner');
 
             if (!localStream || video.classList.contains('hidden')) return;
 
@@ -287,11 +309,16 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.80);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
             const base64Bytes = dataUrl.split(',')[1];
 
+            // Efek pembekuan layar (Buku petunjuk visual sukses jepret)
+            preview.src = dataUrl;
+            preview.classList.remove('hidden');
+            laser.classList.add('hidden'); // Sembunyikan laser animasi
+
             btnSubmit.disabled = true;
-            textBtn.innerText = "PROSES INTEGRASI ALGORITMA AI...";
+            textBtn.innerText = "TRANSMISI DATA KE SERVER...";
 
             fetch(WEBAPP_URL, {
                 method: "POST",
@@ -300,16 +327,19 @@
                 body: JSON.stringify({ imageBytes: base64Bytes })
             })
             .then(() => {
-                alert("Sukses! Berkas terkirim & Log database diperbarui.");
+                // Notifikasi instan berhasil dibuat di sini
+                alert("DOKUMEN BERHASIL DIUNGGAH!\n\nBerkas masuk antrean penyimpanan Cloud. Halaman utama akan diperbarui dalam beberapa detik.");
                 tutupModalKamera();
                 btnSubmit.disabled = false;
-                textBtn.innerText = "Ambil & Pindai Dokumen";
+                textBtn.innerText = "Proses & Kirim Dokumen";
                 setTimeout(muatUlangDataAduan, 1500);
             })
             .catch(error => {
-                alert("Gangguan transmisi data: " + error.message);
+                alert("Gangguan Transmisi: " + error.message);
+                preview.classList.add('hidden');
+                laser.classList.remove('hidden');
                 btnSubmit.disabled = false;
-                textBtn.innerText = "Ambil & Pindai Dokumen";
+                textBtn.innerText = "Proses & Kirim Dokumen";
             });
         }
 
@@ -320,7 +350,7 @@
             const loadingHtml = `
                 <div class="py-12 text-center text-indigo-400 font-bold uppercase tracking-widest text-[9px] w-full col-span-full">
                     <i class="fa-solid fa-circle-notch animate-spin text-base block mb-2"></i>
-                    Sinkronisasi Enkripsi Node Database...
+                    Singkronisasi Log Eksklusif Berjalan...
                 </div>
             `;
             
@@ -336,7 +366,7 @@
                 if (!data || data.length === 0) {
                     const emptyHtml = `
                         <div class="py-12 text-center text-slate-500 uppercase tracking-widest text-xs italic w-full">
-                            <i class="fa-solid fa-inbox text-xl block mb-2"></i> Belum Ada Log Aspirasi
+                            <i class="fa-solid fa-inbox text-xl block mb-2"></i> Belum Ada Log Arsip Masuk
                         </div>
                     `;
                     tblBody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
@@ -358,7 +388,6 @@
                     let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
                     let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
 
-                    // Injection 1: Tampilan Desktop (Table Row)
                     let tr = document.createElement('tr');
                     tr.className = "hover:bg-indigo-500/5 transition-colors border-b border-[var(--border-color)]";
                     tr.innerHTML = `
@@ -372,7 +401,6 @@
                     `;
                     tblBody.appendChild(tr);
 
-                    // Injection 2: Tampilan Mobile Premium Layout (Card Stack)
                     let card = document.createElement('div');
                     card.className = "premium-card p-4 rounded-xl flex flex-col gap-2.5 text-left";
                     card.innerHTML = `
