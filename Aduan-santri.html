@@ -339,15 +339,15 @@
     btnSubmit.disabled = true;
     textBtn.innerText = "TRANSMISI DATA KE SERVER...";
 
-    // --- PERBAIKAN DI SINI (Menghapus no-cors agar payload terbaca penuh) ---
     fetch(WEBAPP_URL, {
         method: "POST",
         body: JSON.stringify({ action: "insert", imageBytes: base64Bytes })
     })
-    .then(res => res.json()) // Membaca respon balik dari Google Apps Script
+    .then(res => res.json())
     .then(result => {
         if (result.status === "success") {
-            alert("BERKAS BERHASIL DIUNGGAH!\n\nAI berhasil membaca berkas & memperbarui basis data.");
+            // PERBAIKAN NOTIFIKASI RAMAH SESUAI DISKUSI
+            alert("KAMI SEDANG MEMPROSES...\n\nFoto berhasil diunggah ke Google Drive. Sistem AI PPMUY sedang menganalisis dokumen di belakang layar. Sembari menunggu, Anda bisa melanjutkan pendokumentasian berkas lainnya.");
             tutupModalKamera();
             setTimeout(muatUlangDataAduan, 1000);
         } else {
@@ -356,6 +356,12 @@
             laser.classList.remove('hidden');
         }
     })
+    .catch(error => {
+        alert("Gangguan Transmisi: " + error.message);
+        preview.classList.add('hidden');
+        laser.classList.remove('hidden');
+    })
+    
     .catch(error => {
         alert("Gangguan Transmisi: " + error.message);
         preview.classList.add('hidden');
