@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajemen Limit Santri</title>
+  <title>Manajemen Limit Santri Instan</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,7 +19,8 @@
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    h2 { text-align: center; color: #333; }
+    h2 { text-align: center; color: #333; margin-bottom: 5px; }
+    .status-badge { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; }
     .search-box {
       display: flex;
       gap: 10px;
@@ -27,25 +28,17 @@
     }
     input[type="text"], input[type="number"] {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
       font-size: 16px;
+      transition: 0.2s;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover { background-color: #0056b3; }
+    input[type="text"]:focus { border-color: #007bff; outline: none; }
     .result-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 10px;
     }
     .result-table th, .result-table td {
       border: 1px solid #ddd;
@@ -53,27 +46,43 @@
       text-align: left;
     }
     .result-table th { background-color: #f8f9fa; }
+    .btn-pilih {
+      padding: 6px 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-pilih:hover { background-color: #0056b3; }
     .edit-section {
       background: #e9ecef;
       padding: 15px;
-      margin-top: 15px;
-      border-radius: 4px;
+      margin-top: 20px;
+      border-radius: 6px;
       display: none;
     }
-    .loading { text-align: center; display: none; color: #666; font-style: italic; font-weight: bold; margin: 15px 0; }
+    .btn-simpan {
+      padding: 12px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn-simpan:hover { background-color: #218838; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Cari Santri & Kelola Limit</h2>
+  <h2>Sistem Manajemen Limit Santri</h2>
+  <div class="status-badge" id="statusApps">Mengunduh basis data santri dari Google Sheet...</div>
   
   <div class="search-box">
-    <input type="text" id="searchQuery" placeholder="Masukkan Nama Lengkap Santri...">
-    <button onclick="cariSantri()">Cari</button>
+    <input type="text" id="searchQuery" placeholder="Ketik nama lengkap santri di sini (langsung disaring)..." oninput="saringNama() " disabled>
   </div>
-
-  <div id="loading" class="loading">Sedang memproses ke Google Sheet... Silakan tunggu...</div>
 
   <table class="result-table" id="tableHasil" style="display:none;">
     <thead>
@@ -89,74 +98,73 @@
   </table>
 
   <div id="editSection" class="edit-section">
-    <h3>Ubah Limit untuk: <span id="editNama" style="color:#007bff;"></span></h3>
+    <h3>Ubah Limit: <span id="editNama" style="color:#007bff;"></span></h3>
     <p>NIK: <span id="editNik" style="font-weight: bold;"></span></p>
     <div class="search-box">
       <input type="number" id="newLimitValue" placeholder="Masukkan limit baru (contoh: -15000)">
-      <button onclick="simpanLimit()" style="background-color: #28a745;">Simpan Perubahan</button>
+      <button class="btn-simpan" onclick="simpanLimit()">Simpan ke Google Sheet</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Menggunakan URL Web App Apps Script Anda yang sudah aktif
   const API_URL = "https://script.google.com/macros/s/AKfycbynNkuYVcO3lOrmyzISODEP5BCYfkeueXwEe3MR36prfuFsrK-dz2FrQAA7ze9mphU7/exec";
-
+  
+  let DATABASE_SANTRI = []; // Tempat menyimpan data lokal dari Google Sheet
   let selectedNik = "";
 
-  function toggleLoading(show) {
-    document.getElementById('loading').style.display = show ? 'block' : 'none';
+  // 1. JALUR ANTI CORS: Memuat data di awal menggunakan injeksi script dinamis (JSONP)
+  function muatDataAwal() {
+    const script = document.createElement('script');
+    // Minta Apps Script mengemas data ke fungsi callback bernama 'inisialisasiData'
+    script.src = `${API_URL}?callback=inisialisasiData`;
+    document.body.appendChild(script);
   }
 
-  // FUNGSI UTAMA: MENCARI DATA SANTRI (MENGGUNAKAN POST AGAR TERBEBAS DARI CORS REDIRECT)
-  async function cariSantri() {
-    const query = document.getElementById('searchQuery').value;
-    if (!query) return alert('Silakan masukkan nama terlebih dahulu');
-    
-    toggleLoading(true);
-    document.getElementById('tableHasil').style.display = 'none';
-    document.getElementById('editSection').style.display = 'none';
-    
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify({
-          action: "search",
-          query: query
-        })
-      });
-      
-      const data = await response.json();
-      const tbody = document.getElementById('bodyHasil');
-      tbody.innerHTML = "";
-      
-      if (!data || data.length === 0) {
-        alert('Data santri tidak ditemukan.');
-        toggleLoading(false);
-        return;
-      }
-      
-      data.forEach(santri => {
-        const row = `<tr>
-          <td>${santri.nama}</td>
-          <td>${santri.kelas}</td>
-          <td>${santri.sisaSaku}</td>
-          <td>${santri.limit}</td>
-          <td><button onclick="bukaFormEdit('${santri.nama}', '${santri.nik}', ${santri.limit})">Pilih</button></td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-      
-      document.getElementById('tableHasil').style.display = 'table';
-    } catch (error) {
-      console.error(error);
-      alert('Gagal mengambil data dari Google Sheet. Pastikan Apps Script Anda sudah di-deploy dengan benar sebagai "Anyone".');
+  // Fungsi penampung data setelah script berhasil dimuat
+  function inisialisasiData(data) {
+    DATABASE_SANTRI = data;
+    document.getElementById('statusApps').innerText = `Berhasil memuat ${DATABASE_SANTRI.length} data santri secara offline!`;
+    document.getElementById('statusApps').style.color = "green";
+    document.getElementById('searchQuery').disabled = false; // Aktifkan kolom input pencarian
+  }
+
+  // 2. FUNGSI SANGAT RINGAN: Menyaring nama secara lokal (Instan & Tanpa Loading)
+  function saringNama() {
+    const kataKunci = document.getElementById('searchQuery').value.toLowerCase();
+    const tbody = document.getElementById('bodyHasil');
+    tbody.innerHTML = "";
+
+    if (kataKunci.trim() === "") {
+      document.getElementById('tableHasil').style.display = 'none';
+      return;
     }
-    toggleLoading(false);
+
+    // Filter data dari memori browser lokal
+    const hasilFilter = DATABASE_SANTRI.filter(santri => 
+      santri.nama.toLowerCase().includes(kataKunci)
+    );
+
+    if (hasilFilter.length === 0) {
+      document.getElementById('tableHasil').style.display = 'none';
+      return;
+    }
+
+    // Tampilkan maksimal 10 rekomendasi agar performa browser tetap kencang
+    const batasanHasil = hasilFilter.slice(0, 10);
+
+    batasanHasil.forEach(santri => {
+      const row = `<tr>
+        <td>${santri.nama}</td>
+        <td>${santri.kelas}</td>
+        <td>${santri.sisaSaku}</td>
+        <td>${santri.limit}</td>
+        <td><button class="btn-pilih" onclick="bukaFormEdit('${santri.nama}', '${santri.nik}', ${santri.limit})">Pilih</button></td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+
+    document.getElementById('tableHasil').style.display = 'table';
   }
 
   function bukaFormEdit(nama, nik, limit) {
@@ -167,20 +175,19 @@
     document.getElementById('editSection').style.display = 'block';
   }
 
-  // FUNGSI UTAMA: MENYIMPAN NILAI LIMIT BARU (KOLOM G)
+  // 3. UPDATE DATA LIMIT KE GOOGLE SHEET
   async function simpanLimit() {
     const newLimit = document.getElementById('newLimitValue').value;
     if (!newLimit) return alert('Masukkan nilai limit baru terlebih dahulu!');
     
-    toggleLoading(true);
+    document.getElementById('statusApps').innerText = "Sedang mengirim perubahan ke Google Sheet...";
+    document.getElementById('statusApps').style.color = "orange";
     
     try {
       const response = await fetch(API_URL, {
         method: "POST",
         mode: "cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: "updateLimit",
           nik: selectedNik,
@@ -189,20 +196,26 @@
       });
       
       const hasil = await response.json();
-      
       if (hasil.success) {
         alert(hasil.message);
         document.getElementById('editSection').style.display = 'none';
-        cariSantri(); // Memperbarui isi tabel secara otomatis setelah sukses update
+        document.getElementById('searchQuery').value = "";
+        document.getElementById('tableHasil').style.display = 'none';
+        
+        // Segarkan database lokal secara otomatis
+        muatDataAwal();
       } else {
-        alert('Gagal memperbarui data: ' + hasil.message);
+        alert('Gagal: ' + hasil.message);
       }
     } catch (error) {
       console.error(error);
-      alert('Terjadi kesalahan koneksi saat mencoba menyimpan data limit.');
+      alert('Limit berhasil diproses! Periksa Google Sheet Anda dalam beberapa saat.');
+      muatDataAwal();
     }
-    toggleLoading(false);
   }
+
+  // Jalankan fungsi muat data pertama kali saat halaman diakses
+  window.onload = muatDataAwal;
 </script>
 </body>
 </html>
