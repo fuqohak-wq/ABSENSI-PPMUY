@@ -425,29 +425,29 @@
     }
   }
 
-  function cariSantriAcara(val) {
-    const resDiv = document.getElementById("searchAcaraResults");
-    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
-    fetch(WEB_APP_URL, { 
-      method: "POST", 
-      mode: "cors",
-      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
-    })
-    .then(res => res.json()).then(response => {
-      if(response.success && response.data.length > 0) {
-        resDiv.innerHTML = ""; resDiv.style.display = "block";
-        response.data.forEach(item => {
-          let div = document.createElement("div"); div.className = "search-item";
-          div.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
-          div.onclick = function() {
-            if(!listSantriKhususAcara.some(s => s.nik === item.nik)) { listSantriKhususAcara.push(item); renderBadges(); }
-            resDiv.style.display = "none"; document.getElementById("searchAcaraSantri").value = "";
-          };
-          resDiv.appendChild(div);
-        });
-      }
-    });
-  }
+  // CARI BAGIAN INI DI HTML ANDA (SEKITAR BARIS 480):
+function cariSantri(val) {
+  const resDiv = document.getElementById("searchResults");
+  if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+  fetch(WEB_APP_URL, { 
+    method: "POST", 
+    mode: "cors",
+    body: JSON.stringify({ action: "searchSantri", keyword: val }) 
+  })
+  .then(res => res.json()).then(response => {
+    // PERBAIKAN DI SINI: Membaca response.data.listAnak sesuai keluaran Code.gs terbaru
+    if(response.success && response.data.listAnak && response.data.listAnak.length > 0) {
+      resDiv.innerHTML = "";
+      response.data.listAnak.forEach(item => {
+        let itemEl = document.createElement("div"); itemEl.className = "search-item";
+        itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
+        itemEl.addEventListener("click", function() { pilihSantri(item); });
+        resDiv.appendChild(itemEl);
+      });
+      resDiv.style.display = "block";
+    } else { resDiv.style.display = "none"; }
+  });
+}
 
   function renderBadges() {
     const box = document.getElementById("listBadgeSantri"); box.innerHTML = "";
