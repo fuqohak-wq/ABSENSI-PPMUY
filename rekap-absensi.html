@@ -21,7 +21,7 @@
 
     /* STYLE KHUSUS MODUL UJIAN (PSEUDO FULLSCREEN) */
     body.super-fullscreen-active { overflow: hidden !important; padding: 0 !important; margin: 0 !important; width: 100vw !important; height: 100vh !important; }
-    body.super-fullscreen-active aside, body.super-fullscreen-active .mobile-header { display: none !important; }
+    body.super-fullscreen-active aside, body.super-fullscreen-active .mobile-header, body.super-fullscreen-active .mobile-nav { display: none !important; }
     body.super-fullscreen-active main { padding: 0 !important; max-width: 100vw !important; width: 100vw !important; height: 100vh !important; }
     body.super-fullscreen-active #tab-ujian-santri { position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; max-width: 100vw !important; max-height: 100vh !important; overflow-y: auto !important; box-sizing: border-box !important; padding: 20px 15px 60px 15px !important; z-index: 9999999 !important; background: #f6f5f0 !important; color: #2d3748 !important; }
     .dark.super-fullscreen-active #tab-ujian-santri { background: #0f172a !important; color: #f1f5f9 !important; }
@@ -34,29 +34,29 @@
     .kunci { border: 2px solid #137333 !important; background-color: #e6f4ea !important; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 transition-theme min-h-screen flex">
+<body class="bg-gray-50 text-gray-800 transition-theme min-h-screen flex pb-16 md:pb-0">
 
-  <aside class="w-64 sidebar bg-white border-r border-gray-200 p-6 flex flex-col justify-between hidden md:flex transition-theme shrink-0">
+  <aside class="w-64 sidebar bg-white border-r border-gray-200 p-6 flex flex-col justify-between hidden md:flex shrink-0 transition-theme">
     <div>
       <div class="flex items-center space-x-3 mb-8">
         <div class="w-10 h-10 bg-green-700 rounded-xl flex items-center justify-center text-white text-xl font-bold">P</div>
         <span class="text-lg font-bold tracking-wider">PPMUY Portal</span>
       </div>
       <nav class="space-y-2">
-        <button onclick="switchTab('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-medium transition" id="btn-dashboard">
+        <button onclick="switchTab('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-medium transition sidebar-btn" id="sidebar-btn-dashboard">
           <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
         </button>
-        <button onclick="switchTab('ujian-santri')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-ujian-santri">
-          <i class="fa-solid fa-laptop-code"></i><span>Mulai Evaluasi Ujian</span>
+        <button onclick="switchTab('ujian-santri')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-ujian-santri">
+          <i class="fa-solid fa-laptop-code"></i><span>Mulai Ujian</span>
         </button>
-        <button onclick="switchTab('input-soal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-input-soal">
-          <i class="fa-solid fa-file-invoice"></i><span>Input Soal Baru</span>
+        <button onclick="switchTab('input-soal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-input-soal">
+          <i class="fa-solid fa-file-invoice"></i><span>Input Soal</span>
         </button>
-        <button onclick="switchTab('statistik')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-statistik">
-          <i class="fa-solid fa-graduation-cap"></i><span>Capaian Santri</span>
+        <button onclick="switchTab('statistik')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-statistik">
+          <i class="fa-solid fa-graduation-cap"></i><span>Capaian</span>
         </button>
-        <button onclick="switchTab('riwayat')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-riwayat">
-          <i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat Ujian</span>
+        <button onclick="switchTab('riwayat')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-riwayat">
+          <i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat Log</span>
         </button>
       </nav>
     </div>
@@ -71,12 +71,30 @@
     </div>
   </aside>
 
-  <main class="flex-1 p-6 md:p-10 overflow-y-auto max-w-7xl mx-auto w-full">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex justify-around items-center py-2 z-50 shadow-lg mobile-nav">
+    <button onclick="switchTab('dashboard')" class="flex flex-col items-center space-y-0.5 text-blue-600 mobile-btn" id="mobile-btn-dashboard">
+      <i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] font-semibold">Beranda</span>
+    </button>
+    <button onclick="switchTab('ujian-santri')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-ujian-santri">
+      <i class="fa-solid fa-laptop-code text-lg"></i><span class="text-[10px] font-medium">Ujian</span>
+    </button>
+    <button onclick="switchTab('input-soal')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-input-soal">
+      <i class="fa-solid fa-file-invoice text-lg"></i><span class="text-[10px] font-medium">Buat Soal</span>
+    </button>
+    <button onclick="switchTab('statistik')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-statistik">
+      <i class="fa-solid fa-graduation-cap text-lg"></i><span class="text-[10px] font-medium">Capaian</span>
+    </button>
+    <button onclick="switchTab('riwayat')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-riwayat">
+      <i class="fa-solid fa-clock-rotate-left text-lg"></i><span class="text-[10px] font-medium">Riwayat</span>
+    </button>
+  </nav>
+
+  <main class="flex-1 p-4 md:p-10 overflow-y-auto max-w-7xl mx-auto w-full">
     
     <div class="md:hidden flex justify-between items-center mb-6 card bg-white p-4 rounded-xl border border-gray-100 shadow-sm mobile-header">
-      <span class="font-bold">PPMUY Portal</span>
+      <span class="font-bold text-green-800 dark:text-white">PPMUY Portal</span>
       <div class="flex items-center space-x-2">
-        <button onclick="toggleTheme()" class="p-2 border rounded-lg"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button onclick="toggleTheme()" class="p-2 border rounded-lg dark:border-gray-700 text-gray-500"><i class="fa-solid fa-circle-half-stroke"></i></button>
         <a href="https://manajemen.ppmuy.com/dashboard.html" class="p-2 bg-red-500 text-white rounded-lg"><i class="fa-solid fa-home"></i></a>
       </div>
     </div>
@@ -87,7 +105,7 @@
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Selamat Datang, Asatidz/Guru</h2>
           <p class="text-sm text-gray-500">Analisis capaian santri dan panel unggulan ujian madrasah.</p>
         </div>
-        <button onclick="fetchDashboardData()" class="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+        <button onclick="fetchDashboardData()" class="mt-4 md:mt-0 w-full md:w-auto px-4 py-2.5 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition flex items-center justify-center">
           <i class="fa-solid fa-arrows-rotate mr-2"></i>Sinkronkan Data Sheet
         </button>
       </div>
@@ -120,7 +138,7 @@
     </section>
 
     <section id="tab-ujian-santri" class="space-y-6 hidden">
-      <div class="card bg-white p-6 md:p-8 rounded-2xl border-t-4 border-yellow-600 shadow-md max-w-3xl mx-auto relative transition-theme">
+      <div class="card bg-white p-5 md:p-8 rounded-2xl border-t-4 border-yellow-600 shadow-md max-w-3xl mx-auto relative transition-theme">
         
         <button class="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5 z-50 border" onclick="jalankanModeLayarPenuh()" id="fsBtn">
           <i class="fa-solid fa-expand"></i> <span id="fsText">Layar Penuh</span>
@@ -188,9 +206,9 @@
     </section>
 
     <section id="tab-input-soal" class="space-y-6 hidden">
-      <div class="card bg-white p-8 rounded-2xl border border-gray-100 shadow-md max-w-3xl mx-auto">
+      <div class="card bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-md max-w-3xl mx-auto">
         <h2 class="text-xl font-bold mb-2">Form Penyusunan Bank Soal</h2>
-        <p class="text-sm text-gray-400 mb-6">Salin atau ketik soal langsung ke panel ini. Sistem menyesuaikan otomatis dan tidak mengganggu rumus ID Soal otomatis.</p>
+        <p class="text-sm text-gray-400 mb-6">Salin atau ketik soal langsung ke panel ini. Rumus ID Soal otomatis di cloud tetap aman.</p>
         
         <form id="formSoal" onsubmit="submitSoal(event)" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -223,7 +241,7 @@
             <div><label class="block text-xs font-semibold mb-1 text-blue-500">Pilihan D</label><input type="text" id="inp-d" required class="w-full p-3 rounded-xl border bg-transparent"></div>
           </div>
 
-          <div class="w-1/2">
+          <div class="w-full md:w-1/2">
             <label class="block text-xs font-semibold mb-1 text-green-600">Jawaban Benar</label>
             <select id="inp-jawaban" required class="w-full p-3 rounded-xl border bg-transparent dark:bg-gray-800">
               <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
@@ -276,13 +294,10 @@
   </main>
 
   <script>
-    // URL DEPLOYMENT WEB APP GOOGLE APPS SCRIPT GABUNGAN
     const API_URL = "https://script.google.com/macros/s/AKfycbwhvPGD9cRHkkqBOJ6Q87Biaxv5excLbTVuWIypgT4n9G5xi0b1DEgDLeMAhhfzrpuU/exec";
 
     let charts = {};
     let opsiDropdownGlobal = { kelas: [], fan: [], level: [], gender: [] };
-
-    // Variable State Modul Ujian
     let dataBankUjian = {};
     let indexSantri = 0;
     let soalAktif = null;
@@ -290,20 +305,42 @@
     let isProcessingUjian = false;
     let isPseudoFullscreen = false;
 
-    // --- ENGINE ROUTING TAB & THEME ---
+    // NAVIGATION SWITCHER ENGINE GABUNGAN (LAPTOP & HP SINKRON)
     function switchTab(tabId) {
+      // 1. Sembunyikan semua section
       document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      // 2. Tampilkan section terpilih
       document.getElementById('tab-' + tabId).classList.remove('hidden');
-      document.querySelectorAll('aside nav button').forEach(b => b.classList.remove('bg-blue-50', 'text-blue-600'));
-      const activeBtn = document.getElementById('btn-' + tabId);
-      if(activeBtn) activeBtn.classList.add('bg-blue-50', 'text-blue-600');
+      
+      // 3. Reset warna tombol Sidebar (Laptop)
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('bg-blue-50', 'text-blue-600'));
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.add('text-gray-500'));
+      const activeSidebarBtn = document.getElementById('sidebar-btn-' + tabId);
+      if(activeSidebarBtn) {
+        activeSidebarBtn.classList.remove('text-gray-500');
+        activeSidebarBtn.classList.add('bg-blue-50', 'text-blue-600');
+      }
+
+      // 4. Reset warna tombol Bottom Nav (HP)
+      document.querySelectorAll('.mobile-btn').forEach(b => {
+        b.classList.remove('text-blue-600');
+        b.classList.add('text-gray-400');
+        b.querySelector('span').classList.remove('font-semibold');
+        b.querySelector('span').classList.add('font-medium');
+      });
+      const activeMobileBtn = document.getElementById('mobile-btn-' + tabId);
+      if(activeMobileBtn) {
+        activeMobileBtn.classList.remove('text-gray-400');
+        activeMobileBtn.classList.add('text-blue-600');
+        activeMobileBtn.querySelector('span').classList.remove('font-medium');
+        activeMobileBtn.querySelector('span').classList.add('font-semibold');
+      }
     }
 
     function toggleTheme() {
       document.documentElement.classList.toggle('dark');
     }
 
-    // --- CORE API CONSUMER (FETCH DATA ENGINE) ---
     async function fetchDashboardData() {
       try {
         const res = await fetch(`${API_URL}?action=getDashboardData`);
@@ -312,7 +349,6 @@
           updateDashboard(data);
           updateDropdownsFormInput(data.dropdowns);
           
-          // Sinkronkan data ke form dropdown modul ujian juga
           opsiDropdownGlobal = data.dropdowns;
           isiDropdownUjian('pilihKelas', opsiDropdownGlobal.kelas, '-- Pilih Kelas --');
           
@@ -392,7 +428,6 @@
       });
     }
 
-    // --- API ACTION POST: SIMPAN SOAL BARU ---
     async function submitSoal(e) {
       e.preventDefault();
       const payload = {
@@ -418,11 +453,9 @@
       } catch(err) { alert("Gagal koneksi ke server API."); }
     }
 
-
     // =======================================================
-    // LOGIC MODUL UJIAN EVALUASI (MIGRASI UTUH HTML 2)
+    // LOGIC MODUL UJIAN EVALUASI 
     // =======================================================
-    
     function jalankanModeLayarPenuh() {
       const container = document.documentElement;
       const isNativeFullscreen = document.fullscreenElement || window.webkitFullscreenElement;
@@ -430,12 +463,8 @@
       if (!isNativeFullscreen && !isPseudoFullscreen) {
         if (container.requestFullscreen) {
           container.requestFullscreen().catch(() => aktifkanPseudoFullscreen());
-        } else {
-          aktifkanPseudoFullscreen();
-        }
-      } else {
-        keluarDariSemuaModeFullscreen();
-      }
+        } else { aktifkanPseudoFullscreen(); }
+      } else { keluarDariSemuaModeFullscreen(); }
     }
 
     function aktifkanPseudoFullscreen() {
@@ -462,7 +491,6 @@
       }
     }
 
-    // Dropdown Chain Event Listeners
     document.getElementById('pilihKelas').addEventListener('change', function() {
       const kelas = this.value;
       const fan = document.getElementById('pilihFan');
@@ -516,7 +544,7 @@
           document.getElementById('lembar-ujian').style.display = 'block';
           tampilkanSantriDanSoal();
         } else {
-          alert("Tidak ada data santri aktif yang belum ujian ATAU bank soal kosong pada kriteria ini.");
+          alert("Tidak ada data santri aktif atau bank soal kosong pada kriteria ini.");
         }
       } catch (err) {
         document.getElementById('loading-ujian').style.display = 'none';
@@ -534,12 +562,10 @@
         return;
       }
 
-      // Reset style tombol pilihan ganda
       document.querySelectorAll('.btn-opsi').forEach(el => el.className = "btn-opsi p-4 border rounded-xl bg-white flex items-center shadow-sm");
       document.getElementById('feedback-text').innerHTML = "";
       isProcessingUjian = false;
 
-      // Render Info Profil Santri Aktif
       let santri = dataBankUjian.santri[indexSantri];
       document.getElementById('displayNama').innerText = santri.nama;
       document.getElementById('displayKelas').innerText = "(" + santri.kelas + ")";
@@ -548,10 +574,9 @@
       document.getElementById('displayGender').innerText = santri.gender;
       document.getElementById('fotoSantri').src = santri.foto ? santri.foto : "https://via.placeholder.com/100";
 
-      // Pilih Soal Acak yang Belum Terpakai
       let soalTersedia = dataBankUjian.soal.filter(s => soalSudahDipakai.indexOf(s[0]) === -1);
       if (soalTersedia.length === 0) {
-        soalSudahDipakai = []; // Reset jika bank soal habis agar bisa diputar ulang
+        soalSudahDipakai = [];
         soalTersedia = dataBankUjian.soal;
       }
 
@@ -559,7 +584,6 @@
       soalAktif = soalTersedia[acakIdx];
       soalSudahDipakai.push(soalAktif[0]);
 
-      // Pasang Text Konten Soal Ke Layar UI
       document.getElementById('displaySoal').innerText = soalAktif[4];
       document.getElementById('txt-A').innerText = soalAktif[5];
       document.getElementById('txt-B').innerText = soalAktif[6];
@@ -574,13 +598,11 @@
       let kunciJawaban = String(soalAktif[9]).trim().toUpperCase();
       let status = (pilihanUser === kunciJawaban) ? "BENAR" : "SALAH";
       
-      // Berikan kelas visual feedback warna
       document.getElementById('opt-' + pilihanUser).classList.add(status.toLowerCase());
       if (status === "SALAH") {
         document.getElementById('opt-' + kunciJawaban).classList.add('kunci');
       }
 
-      // Tampilkan feedback text teks singkat
       let fb = document.getElementById('feedback-text');
       fb.innerHTML = (status === "BENAR") 
         ? '<span class="text-green-600 text-lg"><i class="fa-solid fa-circle-check"></i> Mumtaz! Jawaban Benar (+100)</span>' 
@@ -599,18 +621,15 @@
       };
 
       try {
-        // Kirim skor hasil real-time ke spreadsheet cloud
         await fetch(API_URL, { method: 'POST', body: JSON.stringify(payloadSkor) });
-      } catch (e) { console.error("Skor gagal dicatat ke cloud, namun ujian dilanjutkan lokal."); }
+      } catch (e) { console.error("Skor gagal dicatat ke cloud."); }
 
-      // Geser antrean ke santri berikutnya dalam waktu delay 2.5 detik
       setTimeout(() => {
         indexSantri++;
         tampilkanSantriDanSoal();
       }, 2500);
     }
 
-    // Ambil data dashboard otomatis saat aplikasi pertama kali dimuat
     window.onload = fetchDashboardData;
   </script>
 </body>
