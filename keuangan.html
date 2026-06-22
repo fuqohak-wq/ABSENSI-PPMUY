@@ -1,167 +1,695 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Input Kegiatan & Tagihan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Dashboard Bendahara PPMUY</title>
   <style>
-    body { padding: 20px; background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .card { border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: none; margin-bottom: 20px; }
-    .card-header { background-color: #fff; border-bottom: 1px solid #edf2f7; font-weight: bold; color: #2d3748; }
-    .alert-infaq { background-color: #fffbeb; border-left: 5px solid #d97706; color: #92400e; border-radius: 8px; display: none; }
-    .alert-syahriyyah { background-color: #f0fdf4; border-left: 5px solid #16a34a; color: #166534; border-radius: 8px; display: none; }
-    .btn-orange { background-color: #d97706; color: white; font-weight: bold; }
-    .btn-orange:hover { background-color: #b45309; color: white; }
-    .btn-green { background-color: #16a34a; color: white; font-weight: bold; }
-    .btn-green:hover { background-color: #115e59; color: white; }
+    :root {
+      --primary: #1e3a8a;
+      --accent: #0d9488;
+      --bg: #f8fafc;
+      --text: #1e293b;
+      --card-bg: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; }
+    .container { max-width: 750px; margin: 0 auto; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header h1 { font-size: 20px; }
+    header p { font-size: 13px; opacity: 0.9; }
+    .header-buttons { display: flex; gap: 8px; align-items: center; }
+
+    .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
+    .alert-box.active { display: block; }
+    
+    /* MODIFIKASI TAMBAHAN: Style khusus untuk Kotak Alergi Hijau (Susulan Syahriyyah) */
+    .alert-box.alert-green { background: #f0fdf4; border-left-color: #16a34a; }
+    
+    .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; text-decoration: none; display: inline-block; text-align: center; }
+    .btn:hover { opacity: 0.9; }
+    .btn-orange { background: #d97706; }
+    .btn-green { background: #16a34a; }
+    .btn-blue { background: #2563eb; }
+    .btn-admin { background: #334155; border: 1px solid #475569; }
+    .btn-back { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
+    .btn-back:hover { background: #cbd5e1; }
+    
+    .card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .card h2 { margin-bottom: 12px; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; font-size: 16px; }
+    
+    .form-group { margin-bottom: 12px; position: relative; }
+    .form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; }
+    
+    .search-container { position: relative; }
+    .search-results { position: absolute; left: 0; right: 0; max-height: 150px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+    .search-item:hover { background: #f1f5f9; color: var(--primary); }
+    
+    .info-saldo { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; margin-top: 12px; display: none; font-size: 13px; }
+    .info-saldo.active { display: block; }
+    
+    .badge-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .badge { background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
+    .badge span { cursor: pointer; color: #dc2626; font-weight: bold; }
+
+    /* STYLE MODAL / POPUP WINDOW ADMIN */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; transform: scale(0.9); transition: 0.3s ease; }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #64748b; font-weight: bold; }
+    .close-modal:hover { color: #1e293b; }
+
+    table.rekap-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    table.rekap-table th, table.rekap-table td { padding: 10px; border: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+    table.rekap-table th { background: #f1f5f9; color: var(--primary); font-weight: bold; }
+    table.rekap-table tr.total-row { font-weight: bold; background: #eff6ff; }
+
+    /* Animasi Spinner Putar */
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Style tambahan saat tombol dikunci */
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container" style="max-width: 800px;">
-    
-    <div id="nyaiAlertInfaq" class="alert alert-infaq p-3 shadow-sm mb-3">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-          <span class="fw-bold">📢 Infaq Pendaftaran:</span> 
-          Terdeteksi <span id="jumlahInfaqText" class="fw-bold text-danger">0</span> santri baru angkatan 2026 yang belum sinkron ke Nyai. Total: <span id="totalInfaqText" class="fw-bold text-success">Rp 0</span>
-        </div>
-        <button id="btnSinkronInfaq" class="btn btn-orange btn-sm mt-2 mt-md-0" onclick="prosesSinkronInfaq()">Proses & Sinkron Ke Nyai</button>
-      </div>
+<div class="container">
+  <header>
+    <div>
+      <h1>DASHBOARD BENDAHARA PUSAT</h1>
+      <p>PPMUY • Integrasi Tabungan & Kegiatan Santri</p>
     </div>
-
-    <div id="nyaiAlertSyahriyyah" class="alert alert-syahriyyah p-3 shadow-sm mb-4">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-          <span class="fw-bold">🌙 Susulan Syahriyyah:</span> 
-          Terdeteksi <span id="jumlahSyahriyyahText" class="fw-bold text-danger">0</span> santri baru/susulan yang belum ditarik Syahriyyah bulan ini. Total: <span id="totalSyahriyyahText" class="fw-bold text-success">Rp 0</span>
-        </div>
-        <button id="btnSinkronSyahriyyah" class="btn btn-green btn-sm mt-2 mt-md-0" onclick="prosesSinkronSyahriyyah()">Tarik Syahriyyah Susulan</button>
-      </div>
+    <div class="header-buttons">
+      <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn btn-back">⬅️ Kembali</a>
+      <button class="btn btn-admin" onclick="bukaRuangAdmin()">🔐 Ruang Admin</button>
     </div>
+  </header>
 
-    <div class="card">
-      <div class="card-header p-3 d-flex align-items-center">
-        📅 Form Input Kegiatan & Tagihan Setor Nyai
-      </div>
-      <div class="card-body p-4">
-        <div class="mb-3">
-          <label class="form-label fw-bold">Jenis Setoran Nyai:</label>
-          <select class="form-select" id="jenisSetoran">
-            <option>Ketik Sendiri (Lainnya...)</option>
-          </select>
-        </div>
-        
-        <div class="mb-3">
-          <input type="text" class="form-control" id="kategoriBaru" placeholder="Tulis nama kategori setoran baru...">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label fw-bold">Cakupan Beban Santri:</label>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="radio" name="cakupan" id="semuaSantri" checked>
-            <label class="form-check-label" for="semuaSantri">Semua Santri</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="cakupan" id="santriKhusus">
-            <label class="form-check-label" for="santriKhusus">Santri Khusus (Manual)</label>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-bold">Nominal Per Santri (Rp):</label>
-          <input type="text" class="form-control" id="nominalInput" placeholder="Contoh: 10.000">
-        </div>
-
-        <button class="btn btn-primary w-100 fw-bold py-2" style="background-color: #1d4ed8;" onclick="simpanKePusat()">Simpan & Lempar Ke Pusat</button>
-      </div>
-    </div>
-
+  <div id="nyaiAlert" class="alert-box">
+    <h3 style="font-size:14px; margin-bottom: 3px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
+    <p style="font-size:13px; margin-bottom: 8px;" id="nyaiAlertText">Memeriksa antrean database...</p>
+    <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none; padding:6px 12px; font-size:12px;">Proses & Sinkron Ke Nyai</button>
   </div>
 
-  <script>
-    // URL WEBAPP ANDA SUDAH DIKUNCI PERMANEN DI SINI (Paling Aman untuk Netlify / GitHub Pages)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
+  <div id="syahriyyahAlert" class="alert-box alert-green">
+    <h3 style="font-size:14px; margin-bottom: 3px; color: #166534;">🟢 Notifikasi Otomatis Syahriyyah Susulan</h3>
+    <p style="font-size:13px; margin-bottom: 8px;" id="syahriyyahAlertText">Memeriksa tagihan berjalan santri aktif...</p>
+    <button id="btnProsesSyahriyyah" class="btn btn-green" onclick="prosesSyahriyyahSusulan()" style="display:none; padding:6px 12px; font-size:12px;">Sinkronisasikan Cicilan Syahriyyah</button>
+  </div>
 
-    // AUTO-RUN SAAT HALAMAN DIBUKA
-    window.onload = function() {
-      cekSemuaNotifikasi();
-    };
+  <div class="card">
+    <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
+    <div class="form-group">
+      <label for="searchKey">Cari Nama / Scan Barcode NIK Santri:</label>
+      <div class="search-container">
+        <input type="text" id="searchKey" placeholder="Ketik nama atau scan NIK..." oninput="cariSantri(this.value)">
+        <div id="searchResults" class="search-results" style="display:none;"></div>
+      </div>
+    </div>
+    <div id="infoSaldoBox" class="info-saldo">
+      <strong>📋 Profil Terpilih:</strong>
+      <p>NIK: <span id="viewNik">-</span> | Nama: <span id="viewNama">-</span> | Saldo Akhir: <b id="viewSaldo" style="color:#15803d;">Rp 0</b></p>
+    </div>
+    <div class="form-group" style="margin-top: 10px;">
+      <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
+      <input type="text" id="nominalTabungan" placeholder="Contoh: 5.000" onkeyup="this.value = formatRupiah(this.value)" disabled>
+    </div>
+    <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
+    <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
+  </div>
 
-    function cekSemuaNotifikasi() {
-      // A. Cek Notifikasi Jalur 1 (Infaq Pendaftaran)
-      panggilAPI({ action: "checkAndPreviewSantriBaru" }, function(res) {
-        if (res && res.jumlahSantriBaru > 0) {
-          document.getElementById("jumlahInfaqText").innerText = res.jumlahSantriBaru;
-          document.getElementById("totalInfaqText").innerText = "Rp " + res.totalSetoranNyai.toLocaleString('id-ID');
-          document.getElementById("nyaiAlertInfaq").style.display = "block";
+  <div class="card">
+    <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
+    <div class="form-group">
+      <label for="dropdownKategori">Jenis Setoran Nyai:</label>
+      <select id="dropdownKategori" onchange="handleDropdownKategori(this.value)">
+        <option value="ACARA BUBUR SYURO">ACARA BUBUR SYURO DI PPMUY</option>
+        <option value="TASYAKURAN IJAZAH RIYADHOH DI PPMUY (PERORANGAN)">TASYAKURAN IJAZAH RIYADHOH DI PPMUY (PERORANGAN)</option>
+        <option value="LAINNYA">Ketik Sendiri (Lainnya...)</option>
+      </select>
+      <input type="text" id="customKategori" placeholder="Tulis nama kategori setoran baru..." style="display:none; margin-top:8px;">
+    </div>
+
+    <div class="form-group">
+      <label>Cakupan Beban Santri:</label>
+      <label style="font-weight:normal; margin-right:20px; font-size:13px;"><input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri (<span id="countDbSantri">-</span> anak)</label>
+      <label style="font-weight:normal; font-size:13px;"><input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Manual)</label>
+    </div>
+
+    <div id="boxSantriKhusus" style="display:none; background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:12px;">
+      <input type="text" id="searchAcaraSantri" placeholder="Cari nama santri khusus..." oninput="cariSantriAcara(this.value)">
+      <div id="searchAcaraResults" class="search-results" style="display:none;"></div>
+      <div class="badge-list" id="listBadgeSantri"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="nominalPerAnak">Nominal Per Santri (Rp):</label>
+      <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
+    </div>
+
+    <button id="btnSimpanAcara" class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
+  </div>
+</div>
+
+<div id="adminModal" class="modal-overlay">
+  <div class="modal-content">
+    <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
+    <h2 style="color:var(--primary); font-size:18px; margin-bottom:15px; border-bottom:2px solid #f1f5f9; padding-bottom:8px;">🔐 Ruang Utama Kendali Admin & Setoran Nyai</h2>
+    
+    <h3 style="font-size: 14px; margin-bottom: 5px; color: #e11d48;">⚠️ Tagihan Belum Selesai (Aktif)</h3>
+    <table class="rekap-table" id="tableRekap">
+      <thead>
+        <tr>
+          <th>Jenis Pembayaran</th>
+          <th>Jml Santri</th>
+          <th>Nominal /Anak</th>
+          <th>Total Final (Tagihan)</th>
+          <th>Sudah Terbayar (Cash)</th>
+          <th>Belum Terbayar (Sisa)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align:center;">Memuat rekap...</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size: 14px; margin: 20px 0 5px 0; color: #16a34a;">✅ Riwayat Tagihan Lunas</h3>
+    <table class="rekap-table" id="tableRekapLunas">
+      <thead>
+        <tr>
+          <th>Jenis Pembayaran</th>
+          <th>Total Final (Tagihan)</th>
+          <th>Sudah Terbayar (Cash)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="4" style="text-align:center; color: #64748b;">Belum ada tagihan lunas.</td></tr>
+      </tbody>
+    </table>
+
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-top:20px;">
+      <h3 style="font-size:14px; margin-bottom:10px; color:#d97706;">💸 Catat Penyerahan Uang Tunai (Cash) ke Nyai</h3>
+      
+      <div class="form-group">
+        <label for="dropdownBayarNyai">Pilih Kategori Yang Dibayarkan:</label>
+        <select id="dropdownBayarNyai" onchange="handleDropdownBayarNyai(this.value)">
+          <option value="">-- Pilih Kategori --</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="inputKategoriManualContainer" style="display:none;">
+        <label for="customKategoriBayar" style="color:#b45309;">Ketik Nama Kategori Baru:</label>
+        <input type="text" id="customKategoriBayar" placeholder="Contoh: KEPERLUAN MENDADAK">
+      </div>
+
+      <div class="form-group">
+        <label for="cashNominal">Jumlah Cash yang Diserahkan (Rp):</label>
+        <input type="text" id="cashNominal" placeholder="Contoh: 1.000.000" onkeyup="this.value = formatRupiah(this.value)">
+      </div>
+      <button id="btnSimpanCash" class="btn btn-orange" onclick="simpanBayarCash()">Simpan & Perbarui Buku Kontrol</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
+  const PASSWORD_ADMIN = "12345"; 
+  
+  let santriTerpilih = null;
+  let listSantriKhususAcara = [];
+
+  // Fungsi Format Rupiah
+  function formatRupiah(angka) {
+    var number_string = angka.replace(/[^,\d]/g, '').toString(),
+    split = number_string.split(','),
+    sisa = split[0].length % 3,
+    rupiah = split[0].substr(0, sisa),
+    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      var separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
+    }
+    return rupiah;
+  }
+
+  window.onload = function() {
+    fetchNotification();
+    fetchSyahriyyahNotification(); // Memanggil deteksi otomatis syahriyyah susulan saat startup
+    loadTotalSantriCount();
+  };
+
+  function bukaRuangAdmin() {
+    const inputPass = prompt("Masukkan Password Ruang Admin:");
+    if (inputPass === PASSWORD_ADMIN) {
+      document.getElementById("adminModal").classList.add("active");
+      ambilDataRekapServer(); 
+    } else if (inputPass !== null) {
+      alert("⚠️ Password salah! Akses ditolak.");
+    }
+  }
+
+  function tutupRuangAdmin() {
+    document.getElementById("adminModal").classList.remove("active");
+  }
+
+  function loadTotalSantriCount() {
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "getDatabaseSantriCount" }) 
+    })
+    .then(res => res.json()).then(res => {
+      if(res.success) {
+        document.getElementById("countDbSantri").innerText = res.data.totalSantri;
+      } else {
+        console.log("Eror Server:", res.error);
+      }
+    }).catch(err => console.log("Gagal memuat total santri"));
+  }
+
+  function ambilDataRekapServer() {
+    const tbody = document.querySelector("#tableRekap tbody");
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat data terbaru...</td></tr>';
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "getRekapSetoranNyai" }) 
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res.success) {
+        renderTabelRekap(res.data);
+        loadDropdownKategoriBayar(res.data);
+      } else {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal: ${res.error}</td></tr>`;
+      }
+    }).catch(err => {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Koneksi Bermasalah!</td></tr>';
+    });
+  }
+
+  function renderTabelRekap(data) {
+    const tbodyAktif = document.querySelector("#tableRekap tbody");
+    const tbodyLunas = document.querySelector("#tableRekapLunas tbody");
+    
+    tbodyAktif.innerHTML = "";
+    tbodyLunas.innerHTML = "";
+    
+    let totalTagihan = 0;
+    let totalBayar = 0;
+    let totalSisa = 0;
+    let adaLunas = false;
+    
+    data.forEach(item => {
+      if (item.belumTerbayar > 0) {
+        totalTagihan += item.totalFinal;
+        totalBayar += item.sudahTerbayar;
+        totalSisa += item.belumTerbayar;
+
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b>${item.jenisPembayaran}</b></td>
+          <td>${item.jumlahSantri}</td>
+          <td>${item.nominalPerSantri !== "-" ? "Rp " + Number(item.nominalPerSantri).toLocaleString('id-ID') : "-"}</td>
+          <td>Rp ${Number(item.totalFinal).toLocaleString('id-ID')}</td>
+          <td style="color:#16a34a; font-weight:600;">Rp ${Number(item.sudahTerbayar).toLocaleString('id-ID')}</td>
+          <td style="color:#dc2626; font-weight:600; background:#fff1f2;">Rp ${Number(item.belumTerbayar).toLocaleString('id-ID')}</td>
+        `;
+        tbodyAktif.appendChild(tr);
+      } else {
+        adaLunas = true;
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span style="text-decoration: line-through; color: #94a3b8;">${item.jenisPembayaran}</span></td>
+          <td>Rp ${Number(item.totalFinal).toLocaleString('id-ID')}</td>
+          <td style="color:#16a34a; font-weight:600;">Rp ${Number(item.sudahTerbayar).toLocaleString('id-ID')}</td>
+          <td><span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:5px; font-size:11px; font-weight:bold;">LUNAS</span></td>
+        `;
+        tbodyLunas.appendChild(tr);
+      }
+    });
+
+    if (tbodyAktif.innerHTML === "") {
+      tbodyAktif.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#16a34a; font-weight:bold; padding:15px;">🎉 Semua tagihan telah lunas disetorkan ke Nyai!</td></tr>';
+    } else {
+      let trTotal = document.createElement("tr");
+      trTotal.className = "total-row";
+      trTotal.innerHTML = `
+        <td colspan="3" style="text-align:right; border-top: 2px solid #cbd5e1;"><b>TOTAL AKTIF</b></td>
+        <td style="border-top: 2px solid #cbd5e1;"><b>Rp ${totalTagihan.toLocaleString('id-ID')}</b></td>
+        <td style="color:#16a34a; border-top: 2px solid #cbd5e1;"><b>Rp ${totalBayar.toLocaleString('id-ID')}</b></td>
+        <td style="color:#dc2626; border-top: 2px solid #cbd5e1;"><b>Rp ${totalSisa.toLocaleString('id-ID')}</b></td>
+      `;
+      tbodyAktif.appendChild(trTotal);
+    }
+
+    if (!adaLunas) {
+      tbodyLunas.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #64748b; padding:10px;">Belum ada tagihan lunas.</td></tr>';
+    }
+  }
+
+  function loadDropdownKategoriBayar(data) {
+    const dropdownKategori = document.getElementById("dropdownBayarNyai");
+    dropdownKategori.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+
+    let opsiGlobal = document.createElement("option");
+    opsiGlobal.value = "GLOBAL";
+    opsiGlobal.textContent = "⭐️ POTONG SEMUA TAGIHAN (GLOBAL TOTAL)";
+    opsiGlobal.style.fontWeight = "bold";
+    opsiGlobal.style.color = "#2563eb";
+    dropdownKategori.appendChild(opsiGlobal);
+
+    data.forEach(item => {
+      if (item.belumTerbayar > 0) {
+        let optionText = item.jenisPembayaran;
+        if (item.jenisPembayaran === "Syahriyyah") {
+          optionText = "Syahriyyah (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
         } else {
-          document.getElementById("nyaiAlertInfaq").style.display = "none";
+          optionText = item.jenisPembayaran + " (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
         }
-      });
+        let option = document.createElement("option");
+        option.value = item.jenisPembayaran; 
+        option.textContent = optionText;
+        dropdownKategori.appendChild(option);
+      }
+    });
 
-      // B. Cek Notifikasi Jalur 2 (Susulan Syahriyyah Bulanan)
-      panggilAPI({ action: "checkAndPreviewSyahriyyahSusulan" }, function(res) {
-        if (res && res.count > 0) {
-          document.getElementById("jumlahSyahriyyahText").innerText = res.count;
-          document.getElementById("totalSyahriyyahText").innerText = "Rp " + res.totalNominal.toLocaleString('id-ID');
-          document.getElementById("nyaiAlertSyahriyyah").style.display = "block";
-        } else {
-          document.getElementById("nyaiAlertSyahriyyah").style.display = "none";
-        }
-      });
+    let opsiLain = document.createElement("option");
+    opsiLain.value = "LAIN-LAIN";
+    opsiLain.textContent = "Lain-lain (Tulis Sendiri)";
+    dropdownKategori.appendChild(opsiLain);
+  }
+
+  function handleDropdownBayarNyai(val) {
+    const containerManual = document.getElementById("inputKategoriManualContainer");
+    if (val === "LAIN-LAIN") {
+      containerManual.style.display = "block";
+    } else {
+      containerManual.style.display = "none";
+      document.getElementById("customKategoriBayar").value = "";
     }
+  }
 
-    // EKSEKUSI TOMBOL KUNING (INFAQ PENDAFTARAN)
-    function prosesSinkronInfaq() {
-      var btn = document.getElementById("btnSinkronInfaq");
-      btn.disabled = true;
-      btn.innerText = "Memproses...";
+  function handleDropdownKategori(val) {
+    document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
+  }
 
-      panggilAPI({ action: "executeSetoranSantriBaru" }, function(res) {
-        alert("Sukses! Berhasil menyinkronkan " + res.processedCount + " santri baru angkatan 2026.");
-        btn.innerText = "Proses & Sinkron Ke Nyai";
-        btn.disabled = false;
-        cekSemuaNotifikasi();
-      });
-    }
+  function toggleCakupanSantri(type) {
+    document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
+  }
 
-    // EKSEKUSI TOMBOL HIJAU (SUSULAN SYAHRIYYAH BULANAN)
-    function prosesSinkronSyahriyyah() {
-      var btn = document.getElementById("btnSinkronSyahriyyah");
-      btn.disabled = true;
-      btn.innerText = "Memproses...";
+  function cariSantriAcara(val) {
+    const resDiv = document.getElementById("searchAcaraResults");
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data.length > 0) {
+        resDiv.innerHTML = ""; resDiv.style.display = "block";
+        response.data.forEach(item => {
+          let div = document.createElement("div"); div.className = "search-item";
+          div.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
+          div.onclick = function() {
+            if(!listSantriKhususAcara.some(s => s.nik === item.nik)) { listSantriKhususAcara.push(item); renderBadges(); }
+            resDiv.style.display = "none"; document.getElementById("searchAcaraSantri").value = "";
+          };
+          resDiv.appendChild(div);
+        });
+      }
+    });
+  }
 
-      panggilAPI({ action: "executeSyahriyyahSusulan" }, function(res) {
-        alert(res);
-        btn.innerText = "Tarik Syahriyyah Susulan";
-        btn.disabled = false;
-        cekSemuaNotifikasi();
-      });
-    }
+  function renderBadges() {
+    const box = document.getElementById("listBadgeSantri"); box.innerHTML = "";
+    listSantriKhususAcara.forEach((s, idx) => {
+      let b = document.createElement("div"); b.className = "badge";
+      b.innerHTML = `${s.nama} <span onclick="listSantriKhususAcara.splice(${idx},1); renderBadges();">×</span>`;
+      box.appendChild(b);
+    });
+  }
 
-    // FUNGSI UTAMA UNTUK JEMBATAN KE GOOGLE SCRIPT POST (doPost)
-    function panggilAPI(payload, callback) {
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
+  function simpanAcaraBaru() {
+    let jenis = document.getElementById("dropdownKategori").value;
+    if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
+    const cakupan = document.querySelector('input[name="cakupan"]:checked').value;
+    const nominal = document.getElementById("nominalPerAnak").value.replace(/\./g, "");
+    const btn = document.getElementById("btnSimpanAcara");
+
+    if(!jenis || !nominal) { alert("Lengkapi seluruh formulir!"); return; }
+    if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama santri!"); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = "<span class='spinner'></span> Melempar Data...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({
+        action: "saveAcaraBaru", 
+        jenisSetorNyai: jenis, 
+        cakupan: cakupan, 
+        nominalPerAnak: nominal, 
+        santriList: listSantriKhususAcara
       })
-      .then(response => response.json())
-      .then(result => {
-        if (result.success) {
-          callback(result.data);
-        } else {
-          console.error("Gagal API:", result.error);
+    }).then(res => res.json()).then(res => {
+      btn.disabled = false;
+      btn.innerText = "Simpan & Lempar Ke Pusat";
+      if(res.success) {
+        alert(`Sukses! Data kegiatan berhasil dilempar ke transaksi induk.`);
+        document.getElementById("nominalPerAnak").value = "";
+        listSantriKhususAcara = []; renderBadges();
+        loadTotalSantriCount();
+        if (document.getElementById("adminModal").classList.contains("active")) {
+          ambilDataRekapServer();
         }
-      })
-      .catch(error => console.error("Error Koneksi:", error));
-    }
+      } else {
+        alert(`⚠️ Gagal Menyimpan: ${res.error}`);
+      }
+    }).catch(err => {
+      btn.disabled = false;
+      btn.innerText = "Simpan & Lempar Ke Pusat";
+      alert("Gangguan jaringan, gagal menghubungi server induk.");
+    });
+  }
 
-    function simpanKePusat() {
-      alert("Fitur simpan form utama berhasil dipanggil!");
+  function simpanBayarCash() {
+    let jenis = document.getElementById("dropdownBayarNyai").value;
+    if (jenis === "LAIN-LAIN") {
+      jenis = document.getElementById("customKategoriBayar").value.trim().toUpperCase();
     }
-  </script>
+    const nominal = document.getElementById("cashNominal").value.replace(/\./g, ""); 
+    const btn = document.getElementById("btnSimpanCash");
+    
+    if(!jenis || !nominal) { alert("Kategori dan nominal wajib diisi!"); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = "<span class='spinner'></span> Memproses Cash...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({ action: "saveBayarCashNyai", jenis: jenis, nominal: nominal })
+    }).then(res => res.json()).then(res => {
+      btn.disabled = false;
+      btn.innerText = "Simpan & Perbarui Buku Kontrol";
+      if(res.success) {
+        alert("Penyerahan uang tunai sukses dicatat!");
+        document.getElementById("cashNominal").value = "";
+        document.getElementById("inputKategoriManualContainer").style.display = "none";
+        ambilDataRekapServer(); 
+      } else {
+        alert(`⚠️ Gagal: ${res.error}`);
+      }
+    }).catch(err => {
+      btn.disabled = false;
+      btn.innerText = "Simpan & Perbarui Buku Kontrol";
+      alert("Gagal terhubung ke server.");
+    });
+  }
+
+  function fetchNotification() {
+    const alertBox = document.getElementById("nyaiAlert");
+    const alertText = document.getElementById("nyaiAlertText");
+    const btnProses = document.getElementById("btnProsesNyai");
+    alertBox.classList.add("active");
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "checkAndPreviewSantriBaru" }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success) {
+        const info = response.data;
+        if(info.jumlahSantriBaru > 0) {
+          alertText.innerHTML = `Terdeteksi <b>${info.jumlahSantriBaru} dari ${info.totalAngkatan} santri baru 2026</b> belum disetor ke Nyai. Total: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
+          btnProses.style.display = "inline-block";
+        } else {
+          alertText.innerHTML = `Semua data pendaftaran santri baru 2026 (${info.totalAngkatan} anak) sudah sinkron dengan Nyai.`;
+          btnProses.style.display = "none";
+        }
+      } else {
+        alertText.innerHTML = `Gagal memuat info: ${response.error}`;
+      }
+    }).catch(err => {
+      alertText.innerHTML = "Koneksi Bermasalah!";
+    });
+  }
+
+  // ======================================================================
+  // FUNGSI BARU JALUR 2: PREVIEW NOTIFIKASI SYAHRIYYAH SUSULAN (KOTAK HIJAU)
+  // ======================================================================
+  function fetchSyahriyyahNotification() {
+    const alertBox = document.getElementById("syahriyyahAlert");
+    const alertText = document.getElementById("syahriyyahAlertText");
+    const btnProses = document.getElementById("btnProsesSyahriyyah");
+    alertBox.classList.add("active");
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "checkAndPreviewSyahriyyahSusulan" }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success) {
+        const info = response.data;
+        if(info.count > 0) {
+          alertText.innerHTML = `Terdeteksi ada <b>${info.count} anak tertinggal</b> belum masuk siklus tagihan Syahriyyah bulan <b>${info.bulan} ${info.tahun} H</b>. Estimasi nilai: <b>Rp ${info.totalNominal.toLocaleString('id-ID')}</b>`;
+          btnProses.style.display = "inline-block";
+        } else {
+          alertText.innerHTML = `Semua santri aktif sudah sinkron dan memiliki catatan tagihan Syahriyyah untuk bulan berjalan.`;
+          btnProses.style.display = "none";
+        }
+      } else {
+        alertText.innerHTML = `Gagal memuat susulan: ${response.error}`;
+      }
+    }).catch(err => {
+      alertText.innerHTML = "Koneksi Bermasalah!";
+    });
+  }
+
+  // ======================================================================
+  // FUNGSI BARU JALUR 2: EKSEKUSI MULTI-CICILAN AUTOMATIC KOTAK HIJAU
+  // ======================================================================
+  function prosesSyahriyyahSusulan() {
+    const btn = document.getElementById("btnProsesSyahriyyah"); 
+    btn.innerHTML = "<span class='spinner'></span> Menyinkronkan..."; 
+    btn.disabled = true;
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "executeSyahriyyahSusulan" }) 
+    })
+    .then(res => res.json()).then(res => {
+      btn.innerText = "Sinkronisasikan Cicilan Syahriyyah";
+      btn.disabled = false;
+      if(res.success) { 
+        alert(res.data); // Menampilkan pesan sukses dari server Apps Script
+        fetchSyahriyyahNotification(); // Refresh kotak hijau
+        if (document.getElementById("adminModal").classList.contains("active")) {
+          ambilDataRekapServer(); // Refresh tabel admin jika sedang terbuka
+        }
+      } else {
+        alert(`⚠️ Gagal Eksekusi Susulan: ${res.error}`);
+      }
+    }).catch(err => {
+      btn.innerText = "Sinkronisasikan Cicilan Syahriyyah";
+      btn.disabled = false;
+      alert("Terjadi gangguan koneksi internet.");
+    });
+  }
+
+  function cariSantri(val) {
+    const resDiv = document.getElementById("searchResults");
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data.length > 0) {
+        resDiv.innerHTML = "";
+        response.data.forEach(item => {
+          let itemEl = document.createElement("div"); itemEl.className = "search-item";
+          itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
+          itemEl.addEventListener("click", function() { pilihSantri(item); });
+          resDiv.appendChild(itemEl);
+        });
+        resDiv.style.display = "block";
+      } else { resDiv.style.display = "none"; }
+    });
+  }
+
+  function pilihSantri(santri) {
+    santriTerpilih = santri;
+    document.getElementById("searchResults").style.display = "none";
+    document.getElementById("searchKey").value = santri.nama;
+    document.getElementById("viewNik").innerText = santri.nik;
+    document.getElementById("viewNama").innerText = santri.nama;
+    document.getElementById("viewSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
+    document.getElementById("infoSaldoBox").classList.add("active");
+    document.getElementById("nominalTabungan").disabled = false;
+    document.getElementById("btnSimpanTabungan").disabled = false;
+    document.getElementById("nominalTabungan").focus();
+  }
+
+  function simpanTabungan() {
+    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
+    const statusDiv = document.getElementById("tabunganStatus");
+    const btn = document.getElementById("btnSimpanTabungan");
+    if(!nominal || nominal <= 0) return;
+    
+    btn.disabled = true; 
+    btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
+    statusDiv.innerHTML = "";
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "saveTabunganSantri", nik: santriTerpilih.nik, nominalInput: nominal }) 
+    })
+    .then(res => res.json()).then(response => {
+      btn.disabled = false; 
+      btn.innerText = "Simpan Transaksi Tabungan";
+      if(response.success) {
+        statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
+        document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
+        document.getElementById("nominalTabungan").value = "";
+      } else {
+        statusDiv.innerHTML = `<span style='color:#dc2626'>⚠️ Gagal: ${response.error}</span>`;
+      }
+    }).catch(err => {
+      btn.disabled = false; 
+      btn.innerText = "Simpan Transaksi Tabungan";
+      statusDiv.innerHTML = "<span style='color:#dc2626'>⚠️ Gagal terhubung ke server cloud.</span>";
+    });
+  }
+</script>
 </body>
 </html>
