@@ -1,1 +1,312 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Manajemen Soal & Akademik Premium</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .dark body { background-color: #0f172a; color: #f1f5f9; }
+    .dark .card { background-color: #1e293b; border-color: #334155; }
+    .dark .sidebar { background-color: #1e293b; }
+    .transition-theme { transition: background-color 0.3s, color 0.3s; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-theme font-sans min-h-screen flex">
 
+  <aside class="w-64 sidebar bg-white border-r border-gray-200 p-6 flex flex-col justify-between hidden md:flex transition-theme">
+    <div>
+      <div class="flex items-center space-x-3 mb-8">
+        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">P</div>
+        <span class="text-lg font-bold tracking-wider">PPMUY Portal</span>
+      </div>
+      <nav class="space-y-2">
+        <button onclick="switchTab('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-medium transition" id="btn-dashboard">
+          <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('input-soal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-input-soal">
+          <i class="fa-solid fa-file-invoice"></i><span>Input Soal Baru</span>
+        </button>
+        <button onclick="switchTab('statistik')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-statistik">
+          <i class="fa-solid fa-graduation-cap"></i><span>Capaian Santri</span>
+        </button>
+        <button onclick="switchTab('riwayat')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition" id="btn-riwayat">
+          <i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat Ujian</span>
+        </button>
+      </nav>
+    </div>
+    <div class="space-y-4">
+      <button onclick="toggleTheme()" class="w-full flex items-center justify-center space-x-2 py-2 border rounded-xl hover:bg-gray-100 dark:border-gray-700">
+        <i class="fa-solid fa-moon dark:hidden"></i><i class="fa-solid fa-sun hidden dark:inline"></i>
+        <span>Mode Tema</span>
+      </button>
+      <a href="https://manajemen.ppmuy.com/dashboard.html" class="w-full flex items-center justify-center space-x-2 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl text-center shadow-md transition">
+        <i class="fa-solid fa-arrow-left-long"></i><span>Ke Dashboard Utama</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-6 md:p-10 overflow-y-auto max-w-7xl mx-auto">
+    
+    <div class="md:hidden flex justify-between items-center mb-6 card bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <span class="font-bold">PPMUY Portal</span>
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleTheme()" class="p-2 border rounded-lg"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <a href="https://manajemen.ppmuy.com/dashboard.html" class="p-2 bg-red-500 text-white rounded-lg"><i class="fa-solid fa-home"></i></a>
+      </div>
+    </div>
+
+    <section id="tab-dashboard" class="space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Selamat Datang, Asatidz/Guru</h2>
+          <p class="text-sm text-gray-500">Analisis capaian santri dan panel unggulan ujian madrasah.</p>
+        </div>
+        <button onclick="fetchData()" class="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+          <i class="fa-solid fa-arrows-rotate mr-2"></i>Sinkronkan Data Sheet
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+          <div class="p-4 bg-blue-100 text-blue-600 rounded-xl"><i class="fa-solid fa-chalkboard-user text-2xl"></i></div>
+          <div><h4 class="text-sm text-gray-400 font-medium">Rata-rata Teratas Kelas</h4><p class="text-2xl font-bold" id="top-class-stat">-</p></div>
+        </div>
+        <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+          <div class="p-4 bg-green-100 text-green-600 rounded-xl"><i class="fa-solid fa-award text-2xl"></i></div>
+          <div><h4 class="text-sm text-gray-400 font-medium">Mata Pelajaran Unggul</h4><p class="text-2xl font-bold" id="top-mapel-stat">-</p></div>
+        </div>
+        <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center space-x-4">
+          <div class="p-4 bg-amber-100 text-amber-600 rounded-xl"><i class="fa-solid fa-triangle-exclamation text-2xl"></i></div>
+          <div><h4 class="text-sm text-gray-400 font-medium">Perhatian / Butuh Remedi</h4><p class="text-2xl font-bold text-red-500" id="remedi-count">-</p></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <h3 class="text-base font-semibold mb-4">Rata-rata Nilai per Pelajaran (Madrasah)</h3>
+          <canvas id="chartMapel" class="w-full"></canvas>
+        </div>
+        <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <h3 class="text-base font-semibold mb-4">Rata-rata Akumulasi Per Kelas</h3>
+          <canvas id="chartKelas" class="w-full"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-input-soal" class="space-y-6 hidden">
+      <div class="card bg-white p-8 rounded-2xl border border-gray-100 shadow-md max-w-3xl mx-auto">
+        <h2 class="text-xl font-bold mb-2">Form Penyusunan Bank Soal</h2>
+        <p class="text-sm text-gray-400 mb-6">Salin atau ketik soal langsung ke panel ini. Sistem menyesuaikan otomatis dan tidak mengganggu rumus ID Soal otomatis.</p>
+        
+        <form id="formSoal" onsubmit="submitSoal(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1 uppercase tracking-wider">Kelas</label>
+              <input list="dl-kelas" id="inp-kelas" required class="w-full p-3 rounded-xl border bg-transparent" placeholder="Pilih/Ketik Kelas">
+              <datalist id="dl-kelas"></datalist>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1 uppercase tracking-wider">Fan (Mata Pelajaran)</label>
+              <input list="dl-fan" id="inp-fan" required class="w-full p-3 rounded-xl border bg-transparent" placeholder="Contoh: Nahwu">
+              <datalist id="dl-fan"></datalist>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1 uppercase tracking-wider">Level</label>
+              <input list="dl-level" id="inp-level" required class="w-full p-3 rounded-xl border bg-transparent" placeholder="Contoh: 1, A, dst">
+              <datalist id="dl-level"></datalist>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1 uppercase tracking-wider">Pertanyaan Soal</label>
+            <textarea id="inp-pertanyaan" required rows="4" class="w-full p-3 rounded-xl border bg-transparent" placeholder="Tuliskan teks pertanyaan lengkap..."></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-semibold mb-1 text-blue-500">Pilihan A</label><input type="text" id="inp-a" required class="w-full p-3 rounded-xl border bg-transparent"></div>
+            <div><label class="block text-xs font-semibold mb-1 text-blue-500">Pilihan B</label><input type="text" id="inp-b" required class="w-full p-3 rounded-xl border bg-transparent"></div>
+            <div><label class="block text-xs font-semibold mb-1 text-blue-500">Pilihan C</label><input type="text" id="inp-c" required class="w-full p-3 rounded-xl border bg-transparent"></div>
+            <div><label class="block text-xs font-semibold mb-1 text-blue-500">Pilihan D</label><input type="text" id="inp-d" required class="w-full p-3 rounded-xl border bg-transparent"></div>
+          </div>
+
+          <div class="w-1/2">
+            <label class="block text-xs font-semibold mb-1 text-green-600">Jawaban Benar</label>
+            <select id="inp-jawaban" required class="w-full p-3 rounded-xl border bg-transparent dark:bg-gray-800">
+              <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            </select>
+          </div>
+
+          <button type="submit" class="w-full py-4 bg-green-600 text-white font-bold rounded-xl shadow-md hover:bg-green-700 transition">
+            <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Simpan Soal Ke Google Sheets
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-statistik" class="space-y-6 hidden">
+      <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-bold mb-2">Leaderboard Santri Unggul Per Bidang Pelajaran</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left rounded-xl border border-gray-100">
+            <thead class="bg-gray-50 dark:bg-gray-800 text-xs font-semibold uppercase">
+              <tr>
+                <th class="p-4">Bidang Ilmu / Fan</th><th class="p-4">Nama Santri Pemuncak</th><th class="p-4">Kelas</th><th class="p-4">Skor Terbaik</th>
+              </tr>
+            </thead>
+            <tbody id="table-leaderboard" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
+              <tr><td colspan="4" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-riwayat" class="space-y-6 hidden">
+      <div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-bold mb-2">Log Aktivitas & Riwayat Hasil Ujian Terbaru</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left rounded-xl border border-gray-100">
+            <thead class="bg-gray-50 dark:bg-gray-800 text-xs font-semibold uppercase">
+              <tr>
+                <th class="p-4">Santri</th><th class="p-4">Kelas</th><th class="p-4">Fan / Mapel</th><th class="p-4">Jawaban</th><th class="p-4">Hasil Akhir</th>
+              </tr>
+            </thead>
+            <tbody id="table-riwayat" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
+              <tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data riwayat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script {nonce}>
+    // TEMPELKAN URL DEPLOYMENT WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+    const API_URL = "https://script.google.com/macros/s/AKfycbwhvPGD9cRHkkqBOJ6Q87Biaxv5excLbTVuWIypgT4n9G5xi0b1DEgDLeMAhhfzrpuU/exec";
+
+    let charts = {};
+
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      document.querySelectorAll('aside nav button').forEach(b => b.classList.remove('bg-blue-50', 'text-blue-600'));
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if(activeBtn) activeBtn.classList.add('bg-blue-50', 'text-blue-600');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        if(data.status === "success") {
+          updateDashboard(data);
+          updateDropdowns(data.dropdowns);
+          updateLeaderboard(data.topSantri);
+          updateRiwayatTable(data.riwayat);
+        }
+      } catch(err) { console.error("Gagal sinkronisasi data:", err); }
+    }
+
+    function updateDashboard(data) {
+      let highestClass = ""; let highestClassVal = 0;
+      for (let k in data.rerataKelas) {
+        if(parseFloat(data.rerataKelas[k]) > highestClassVal) {
+          highestClassVal = parseFloat(data.rerataKelas[k]); highestClass = k;
+        }
+      }
+      document.getElementById('top-class-stat').innerText = `${highestClass} (${highestClassVal})`;
+
+      let highestMapel = ""; let highestMapelVal = 0;
+      for (let m in data.mapelStats) {
+        if(parseFloat(data.mapelStats[m]) > highestMapelVal) {
+          highestMapelVal = parseFloat(data.mapelStats[m]); highestMapel = m;
+        }
+      }
+      document.getElementById('top-mapel-stat').innerText = highestMapel;
+      document.getElementById('remedi-count').innerText = data.remediCount + " Santri";
+
+      renderChart('chartMapel', Object.keys(data.mapelStats), Object.values(data.mapelStats), 'Bar', 'Rerata Pelajaran');
+      renderChart('chartKelas', Object.keys(data.rerataKelas), Object.values(data.rerataKelas), 'Line', 'Rerata Kelas');
+    }
+
+    function renderChart(canvasId, labels, dataValues, type, label) {
+      if(charts[canvasId]) charts[canvasId].destroy();
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      charts[canvasId] = new Chart(ctx, {
+        type: type.toLowerCase(),
+        data: {
+          labels: labels,
+          datasets: [{
+            label: label, data: dataValues, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 2, tension: 0.2
+          }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    }
+
+    function updateDropdowns(dlData) {
+      ['kelas', 'fan', 'level'].forEach(key => {
+        const dl = document.getElementById('dl-' + key);
+        dl.innerHTML = "";
+        dlData[key].forEach(val => {
+          let opt = document.createElement('option'); opt.value = val; dl.appendChild(opt);
+        });
+      });
+    }
+
+    function updateLeaderboard(topSantri) {
+      const tbody = document.getElementById('table-leaderboard');
+      tbody.innerHTML = "";
+      for(let mapel in topSantri) {
+        let item = topSantri[mapel];
+        tbody.innerHTML += `<tr class="border-b dark:border-gray-700">
+          <td class="p-4 font-medium">${mapel}</td><td>${item.nama}</td><td>${item.kelas}</td><td class="font-bold text-blue-600">${item.nilai}</td>
+        </tr>`;
+      }
+    }
+
+    function updateRiwayatTable(riwayat) {
+      const tbody = document.getElementById('table-riwayat');
+      tbody.innerHTML = "";
+      riwayat.forEach(r => {
+        tbody.innerHTML += `<tr class="border-b dark:border-gray-700">
+          <td class="p-4 font-medium">${r.nama}</td><td>${r.kelas}</td><td>${r.fan}</td><td>Pilihan ${r.jawaban}</td><td><span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-bold">${r.akhir}</span></td>
+        </tr>`;
+      });
+    }
+
+    async function submitSoal(e) {
+      e.preventDefault();
+      const payload = {
+        kelas: document.getElementById('inp-kelas').value,
+        fan: document.getElementById('inp-fan').value,
+        level: document.getElementById('inp-level').value,
+        pertanyaan: document.getElementById('inp-pertanyaan').value,
+        a: document.getElementById('inp-a').value,
+        b: document.getElementById('inp-b').value,
+        c: document.getElementById('inp-c').value,
+        d: document.getElementById('inp-d').value,
+        jawaban: document.getElementById('inp-jawaban').value
+      };
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        if(result.status === "success") {
+          alert("Soal berhasil disimpan!"); document.getElementById('formSoal').reset(); fetchData();
+        }
+      } catch(err) { alert("Gagal koneksi ke server API."); }
+    }
+
+    window.onload = fetchData;
+  </script>
+</body>
+</html>
