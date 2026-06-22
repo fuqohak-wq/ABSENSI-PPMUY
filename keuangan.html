@@ -23,8 +23,6 @@
 
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
     .alert-box.active { display: block; }
-    
-    /* MODIFIKASI TAMBAHAN: Style khusus untuk Kotak Alergi Hijau (Susulan Syahriyyah) */
     .alert-box.alert-green { background: #f0fdf4; border-left-color: #16a34a; }
     
     .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; text-decoration: none; display: inline-block; text-align: center; }
@@ -55,7 +53,6 @@
     .badge { background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
     .badge span { cursor: pointer; color: #dc2626; font-weight: bold; }
 
-    /* STYLE MODAL / POPUP WINDOW ADMIN */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s ease; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; transform: scale(0.9); transition: 0.3s ease; }
@@ -68,7 +65,6 @@
     table.rekap-table th { background: #f1f5f9; color: var(--primary); font-weight: bold; }
     table.rekap-table tr.total-row { font-weight: bold; background: #eff6ff; }
 
-    /* Animasi Spinner Putar */
     .spinner {
       display: inline-block;
       width: 12px;
@@ -83,11 +79,7 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    /* Style tambahan saat tombol dikunci */
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -104,12 +96,14 @@
     </div>
   </header>
 
+  <!-- JALUR 1: NOTIFIKASI INFAQ PENDAFTARAN BARU -->
   <div id="nyaiAlert" class="alert-box">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="nyaiAlertText">Memeriksa antrean database...</p>
     <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none; padding:6px 12px; font-size:12px;">Proses & Sinkron Ke Nyai</button>
   </div>
 
+  <!-- JALUR 2: NOTIFIKASI SUSULAN SYAHRIYYAH KOLEKTIF -->
   <div id="syahriyyahAlert" class="alert-box alert-green">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #166534;">🟢 Notifikasi Otomatis Syahriyyah Susulan</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="syahriyyahAlertText">Memeriksa tagihan berjalan santri aktif...</p>
@@ -137,6 +131,7 @@
     <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
   </div>
 
+  <!-- FORM KEGIATAN & TAGIHAN DENGAN OPSI NON-SANTRI -->
   <div class="card">
     <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
     <div class="form-group">
@@ -149,10 +144,20 @@
       <input type="text" id="customKategori" placeholder="Tulis nama kategori setoran baru..." style="display:none; margin-top:8px;">
     </div>
 
+    <!-- UPDATE PILIHAN: MENAMBAHKAN RADIO BUTTON NON SANTRI -->
     <div class="form-group">
-      <label>Cakupan Beban Santri:</label>
-      <label style="font-weight:normal; margin-right:20px; font-size:13px;"><input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri (<span id="countDbSantri">-</span> anak)</label>
-      <label style="font-weight:normal; font-size:13px;"><input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Manual)</label>
+      <label>Cakupan Beban:</label>
+      <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-weight:normal; font-size:13px;">
+          <input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri (<span id="countDbSantri">-</span> anak)
+        </label>
+        <label style="font-weight:normal; font-size:13px;">
+          <input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Manual)
+        </label>
+        <label style="font-weight:normal; font-size:13px; color: #b45309; font-weight: 600;">
+          <input type="radio" name="cakupan" value="NON_SANTRI" onclick="toggleCakupanSantri('NON_SANTRI')"> 🌟 Non Santri (Langsung ke Buku Kontrol Admin)
+        </label>
+      </div>
     </div>
 
     <div id="boxSantriKhusus" style="display:none; background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:12px;">
@@ -161,8 +166,9 @@
       <div class="badge-list" id="listBadgeSantri"></div>
     </div>
 
+    <!-- MEMPERJELAS LABEL NOMINAL JIKA PILIHAN ADALAH NON-SANTRI -->
     <div class="form-group">
-      <label for="nominalPerAnak">Nominal Per Santri (Rp):</label>
+      <label id="labelNominal">Nominal Per Santri (Rp):</label>
       <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
     </div>
 
@@ -170,6 +176,7 @@
   </div>
 </div>
 
+<!-- CONTAINER MODAL RUANG ADMIN -->
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
@@ -238,7 +245,6 @@
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
-  // Fungsi Format Rupiah
   function formatRupiah(angka) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
     split = number_string.split(','),
@@ -254,7 +260,7 @@
 
   window.onload = function() {
     fetchNotification();
-    fetchSyahriyyahNotification(); // Memanggil deteksi otomatis syahriyyah susulan saat startup
+    fetchSyahriyyahNotification();
     loadTotalSantriCount();
   };
 
@@ -281,8 +287,6 @@
     .then(res => res.json()).then(res => {
       if(res.success) {
         document.getElementById("countDbSantri").innerText = res.data.totalSantri;
-      } else {
-        console.log("Eror Server:", res.error);
       }
     }).catch(err => console.log("Gagal memuat total santri"));
   }
@@ -382,12 +386,7 @@
 
     data.forEach(item => {
       if (item.belumTerbayar > 0) {
-        let optionText = item.jenisPembayaran;
-        if (item.jenisPembayaran === "Syahriyyah") {
-          optionText = "Syahriyyah (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
-        } else {
-          optionText = item.jenisPembayaran + " (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
-        }
+        let optionText = item.jenisPembayaran + " (Sisa: Rp " + item.belumTerbayar.toLocaleString('id-ID') + ")";
         let option = document.createElement("option");
         option.value = item.jenisPembayaran; 
         option.textContent = optionText;
@@ -415,8 +414,15 @@
     document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
   }
 
+  // DINAMIS UNTUK MERUBAH LABEL DAN STRUKTUR JIKA DIPILIH NON-SANTRI
   function toggleCakupanSantri(type) {
     document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
+    const labelNominal = document.getElementById("labelNominal");
+    if (type === "NON_SANTRI") {
+      labelNominal.innerText = "Total Nominal Global Pembayaran (Rp):";
+    } else {
+      labelNominal.innerText = "Nominal Per Santri (Rp):";
+    }
   }
 
   function cariSantriAcara(val) {
@@ -454,7 +460,7 @@
 
   function simpanAcaraBaru() {
     let jenis = document.getElementById("dropdownKategori").value;
-    if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value;
+    if(jenis === "LAINNYA") jenis = document.getElementById("customKategori").value.trim();
     const cakupan = document.querySelector('input[name="cakupan"]:checked').value;
     const nominal = document.getElementById("nominalPerAnak").value.replace(/\./g, "");
     const btn = document.getElementById("btnSimpanAcara");
@@ -479,7 +485,7 @@
       btn.disabled = false;
       btn.innerText = "Simpan & Lempar Ke Pusat";
       if(res.success) {
-        alert(`Sukses! Data kegiatan berhasil dilempar ke transaksi induk.`);
+        alert(res.data);
         document.getElementById("nominalPerAnak").value = "";
         listSantriKhususAcara = []; renderBadges();
         loadTotalSantriCount();
@@ -547,22 +553,15 @@
         const info = response.data;
         if(info.jumlahSantriBaru > 0) {
           alertText.innerHTML = `Terdeteksi <b>${info.jumlahSantriBaru} dari ${info.totalAngkatan} santri baru 2026</b> belum disetor ke Nyai. Total: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
-          btnProses.style.display = "inline-block";
+          btnProses.style.display = "none"; // Disembunyikan karena dijalankan via tombol utama induk
         } else {
           alertText.innerHTML = `Semua data pendaftaran santri baru 2026 (${info.totalAngkatan} anak) sudah sinkron dengan Nyai.`;
           btnProses.style.display = "none";
         }
-      } else {
-        alertText.innerHTML = `Gagal memuat info: ${response.error}`;
       }
-    }).catch(err => {
-      alertText.innerHTML = "Koneksi Bermasalah!";
     });
   }
 
-  // ======================================================================
-  // FUNGSI BARU JALUR 2: PREVIEW NOTIFIKASI SYAHRIYYAH SUSULAN (KOTAK HIJAU)
-  // ======================================================================
   function fetchSyahriyyahNotification() {
     const alertBox = document.getElementById("syahriyyahAlert");
     const alertText = document.getElementById("syahriyyahAlertText");
@@ -584,17 +583,10 @@
           alertText.innerHTML = `Semua santri aktif sudah sinkron dan memiliki catatan tagihan Syahriyyah untuk bulan berjalan.`;
           btnProses.style.display = "none";
         }
-      } else {
-        alertText.innerHTML = `Gagal memuat susulan: ${response.error}`;
       }
-    }).catch(err => {
-      alertText.innerHTML = "Koneksi Bermasalah!";
     });
   }
 
-  // ======================================================================
-  // FUNGSI BARU JALUR 2: EKSEKUSI MULTI-CICILAN AUTOMATIC KOTAK HIJAU
-  // ======================================================================
   function prosesSyahriyyahSusulan() {
     const btn = document.getElementById("btnProsesSyahriyyah"); 
     btn.innerHTML = "<span class='spinner'></span> Menyinkronkan..."; 
@@ -609,18 +601,12 @@
       btn.innerText = "Sinkronisasikan Cicilan Syahriyyah";
       btn.disabled = false;
       if(res.success) { 
-        alert(res.data); // Menampilkan pesan sukses dari server Apps Script
-        fetchSyahriyyahNotification(); // Refresh kotak hijau
+        alert(res.data);
+        fetchSyahriyyahNotification();
         if (document.getElementById("adminModal").classList.contains("active")) {
-          ambilDataRekapServer(); // Refresh tabel admin jika sedang terbuka
+          ambilDataRekapServer();
         }
-      } else {
-        alert(`⚠️ Gagal Eksekusi Susulan: ${res.error}`);
       }
-    }).catch(err => {
-      btn.innerText = "Sinkronisasikan Cicilan Syahriyyah";
-      btn.disabled = false;
-      alert("Terjadi gangguan koneksi internet.");
     });
   }
 
@@ -667,7 +653,6 @@
     
     btn.disabled = true; 
     btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
-    statusDiv.innerHTML = "";
     
     fetch(WEB_APP_URL, { 
       method: "POST", 
@@ -681,13 +666,7 @@
         statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
         document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
         document.getElementById("nominalTabungan").value = "";
-      } else {
-        statusDiv.innerHTML = `<span style='color:#dc2626'>⚠️ Gagal: ${response.error}</span>`;
       }
-    }).catch(err => {
-      btn.disabled = false; 
-      btn.innerText = "Simpan Transaksi Tabungan";
-      statusDiv.innerHTML = "<span style='color:#dc2626'>⚠️ Gagal terhubung ke server cloud.</span>";
     });
   }
 </script>
