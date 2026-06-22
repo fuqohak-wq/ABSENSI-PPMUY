@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body, header, div, section, button, table, td, th, footer, tr {
+        body, header, div, section, button, table, td, th, footer, tr, textarea {
             transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                         color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
@@ -82,7 +82,6 @@
                 <span class="text-[8px] sm:text-[9px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-1.5 py-0.5 rounded font-bold tracking-widest block w-max uppercase mt-0.5">HUMAS INTERNAL • PPMUY</span>
             </div>
         </div>
-
         <div class="flex items-center gap-2">
             <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-center text-amber-400 active:scale-95 transition-all">
                 <i class="fa-solid fa-sun text-sm"></i>
@@ -91,7 +90,6 @@
     </header>
 
     <main class="w-full max-w-7xl mx-auto p-4 sm:p-6 flex flex-col gap-5 flex-1 justify-start">
-        
         <section class="grid grid-cols-3 gap-3 w-full">
             <div class="premium-card p-3 sm:p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
                 <div>
@@ -125,7 +123,6 @@
                     </div>
                     <p id="view-desc" class="text-[9px] sm:text-[10px] text-[var(--text-body)] mt-0.5">Menampilkan seluruh masalah santri yang belum tervalidasi selesai.</p>
                 </div>
-                
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                     <div class="bg-[var(--bg-inner)] p-1 rounded-xl border border-[var(--border-color)] flex gap-1 text-[10px] font-bold">
                         <button id="tab-aktif" onclick="gantiModeTampilan('aktif')" class="px-3 py-1.5 rounded-lg bg-indigo-500 text-white transition-all cursor-pointer shadow">Aktif</button>
@@ -149,69 +146,78 @@
                                 <th class="py-3 px-4 w-[14%] text-center">Aksi Operasional</th>
                             </tr>
                         </thead>
-                        <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium">
-                        </tbody>
+                        <tbody id="tbl-aduan-body" class="divide-y divide-[var(--border-color)] text-xs font-medium"></tbody>
                     </table>
                 </div>
-
-                <div id="mobile-aduan-list" class="block md:hidden flex flex-col gap-3">
-                </div>
+                <div id="mobile-aduan-list" class="block md:hidden flex flex-col gap-3"></div>
             </div>
         </section>
     </main>
 
     <div class="fixed bottom-5 right-5 z-40 md:bottom-8 md:right-8">
-        <button onclick="bukaModalKamera()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer transition-all border border-white/20">
-            <i class="fa-solid fa-camera text-xl animate-pulse"></i>
+        <button onclick="bukaModalUtamaInput()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/40 hover:scale-105 active:scale-95 cursor-pointer transition-all border border-white/20">
+            <i class="fa-solid fa-plus text-xl animate-pulse"></i>
         </button>
     </div>
 
     <div id="modal-kamera" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg hidden flex flex-col sm:items-center sm:justify-center p-0 sm:p-4">
         <div class="premium-card w-full h-full sm:h-auto sm:max-w-xl sm:rounded-3xl overflow-hidden flex flex-col shadow-2xl">
             
-            <div class="bg-[var(--bg-header)] px-4 py-3 border-b border-[var(--border-color)] flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-2 text-cyan-400">
-                    <i class="fa-solid fa-expand-arrows-alt text-xs"></i>
-                    <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Lensa Dokumentasi Berkas</h3>
+            <div class="bg-[var(--bg-header)] px-4 pt-3 pb-0 border-b border-[var(--border-color)] flex flex-col gap-3 shrink-0">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2 text-cyan-400">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                        <h3 class="text-[11px] sm:text-xs font-black tracking-wider uppercase">Hub Input Aduan Santri</h3>
+                    </div>
+                    <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-xs bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-                <button onclick="tutupModalKamera()" class="text-slate-400 hover:text-white text-xs bg-slate-900 border border-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                
+                <div class="flex border-b border-slate-800 text-[11px] font-bold">
+                    <button id="btn-tab-scan" onclick="switchSubTab('scan')" class="px-4 py-2 border-b-2 border-indigo-500 text-white uppercase tracking-wider">Opsi 1: Scan Berkas</button>
+                    <button id="btn-tab-ketik" onclick="switchSubTab('ketik')" class="px-4 py-2 text-slate-400 uppercase tracking-wider">Opsi 2: Ketik Manual</button>
+                </div>
             </div>
             
             <div class="p-4 flex flex-col flex-1 sm:flex-initial gap-4 bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-main)] overflow-y-auto">
                 
-                <div class="relative w-full h-48 sm:h-auto sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center shrink-0">
-                    
-                    <div id="laser-scanner" class="laser-line"></div>
-                    
-                    <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-cyan-400 pointer-events-none"></div>
-                    <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-cyan-400 pointer-events-none"></div>
-                    <div class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-cyan-400 pointer-events-none"></div>
-                    <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-cyan-400 pointer-events-none"></div>
+                <div id="panel-input-scan" class="flex flex-col gap-4">
+                    <div class="relative w-full h-48 sm:h-auto sm:aspect-video rounded-2xl bg-black border border-indigo-500/30 overflow-hidden shadow-inner flex items-center justify-center shrink-0">
+                        <div id="laser-scanner" class="laser-line"></div>
+                        <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-cyan-400 pointer-events-none"></div>
+                        <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-cyan-400 pointer-events-none"></div>
+                        <div class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-cyan-400 pointer-events-none"></div>
+                        <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-cyan-400 pointer-events-none"></div>
 
-                    <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2 px-4">
-                        <i class="fa-solid fa-circle-notch animate-spin text-xl text-indigo-500"></i>
-                        <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Menghubungkan Dokumen Optik...</span>
+                        <div id="camera-placeholder" class="text-center text-slate-600 flex flex-col items-center gap-2 px-4">
+                            <i class="fa-solid fa-circle-notch animate-spin text-xl text-indigo-500"></i>
+                            <span class="text-[9px] font-bold tracking-widest uppercase text-indigo-400">Menghubungkan Dokumen Optik...</span>
+                        </div>
+                        
+                        <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
+                        <img id="freeze-preview" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="" alt="Preview">
+                        <canvas id="capture-canvas" class="hidden"></canvas>
                     </div>
+                    <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[11px] font-black tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all uppercase">
+                        <i class="fa-solid fa-camera"></i> Ambil & Scan Foto
+                    </button>
+                </div>
+
+                <div id="panel-input-ketik" class="flex flex-col gap-3 hidden">
+                    <label class="text-[10px] font-black tracking-wider uppercase text-slate-400">Isi Ringkasan Keluhan Lisan Santri:</label>
+                    <textarea id="txt-aduan-manual" rows="6" class="w-full p-3.5 rounded-xl bg-[var(--bg-inner)] border border-slate-700/60 text-white text-xs font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" placeholder="Contoh: Santri kamar 4 melaporkan bahwa air kamar mandi lantai 2 mampet total sejak pagi dan genteng bocor..."></textarea>
                     
-                    <video id="video-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-                    <img id="freeze-preview" class="w-full h-full object-cover hidden absolute inset-0 z-10" src="" alt="Preview">
-                    <canvas id="capture-canvas" class="hidden"></canvas>
+                    <button id="btn-submit-teks" onclick="eksekusiKirimTeksManual()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-[11px] font-black tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all uppercase">
+                        <i class="fa-solid fa-paper-plane"></i> Kirim & Analisis Teks via AI
+                    </button>
                 </div>
 
                 <div class="w-full bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-3 flex gap-2.5 items-start text-left shrink-0">
-                    <i class="fa-solid fa-cloud-arrow-up text-indigo-400 text-xs mt-0.5"></i>
+                    <i class="fa-solid fa-brain text-indigo-400 text-xs mt-0.5"></i>
                     <p class="text-[9px] sm:text-[10px] text-[var(--text-body)] leading-relaxed">
-                        Posisikan dokumen aduan dengan tegak. Sistem akan memuat berkas gambar, membuat folder penyimpanan otomatis, dan memperbarui basis data penanganan secara dinamis.
+                        Kedua metode di atas akan diproses asinkronus oleh AI Gemini 2.5 Flash untuk divalidasi, dirangkum permasalahannya, serta dicarikan jalan keluar taktisnya.
                     </p>
-                </div>
-
-                <div class="w-full pt-2 sm:pt-0 shrink-0">
-                    <button id="btn-submit-foto" onclick="eksekusiAmbilDanAnalisis()" class="w-full py-4 sm:py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 text-white text-[11px] sm:text-xs font-black tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer active:scale-95 transition-all uppercase disabled:opacity-50">
-                        <i class="fa-solid fa-bolt text-xs"></i>
-                        <span id="text-btn-submit">Proses & Kirim Dokumen</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -226,6 +232,7 @@
         let localStream = null;
         let cacheDataMaster = [];
         let modeTampilanSaatIni = 'aktif';
+        let subTabAktif = 'scan';
 
         window.addEventListener('DOMContentLoaded', () => {
             const temaSimpanan = localStorage.getItem('aduan_theme') || 'theme-dark';
@@ -251,6 +258,145 @@
             }
         }
 
+        // LOGIKA SWITCH TAB DI ATAS MODAL
+        function switchSubTab(mode) {
+            subTabAktif = mode;
+            const btnScan = document.getElementById('btn-tab-scan');
+            const btnKetik = document.getElementById('btn-tab-ketik');
+            const panelScan = document.getElementById('panel-input-scan');
+            const panelKetik = document.getElementById('panel-input-ketik');
+
+            if (mode === 'scan') {
+                btnScan.className = "px-4 py-2 border-b-2 border-indigo-500 text-white uppercase tracking-wider";
+                btnKetik.className = "px-4 py-2 text-slate-400 uppercase tracking-wider";
+                panelScan.classList.remove('hidden');
+                panelKetik.classList.add('hidden');
+                aktifkanKameraHardware();
+            } else {
+                btnKetik.className = "px-4 py-2 border-b-2 border-indigo-500 text-white uppercase tracking-wider";
+                btnScan.className = "px-4 py-2 text-slate-400 uppercase tracking-wider";
+                panelKetik.classList.remove('hidden');
+                panelScan.classList.add('hidden');
+                matikanKameraHardware();
+            }
+        }
+
+        function bukaModalUtamaInput() {
+            document.getElementById('modal-kamera').classList.remove('hidden');
+            document.getElementById('txt-aduan-manual').value = "";
+            switchSubTab('scan'); // Default buka ke menu scan foto
+        }
+
+        function aktifkanKameraHardware() {
+            if(localStream) return;
+            document.getElementById('freeze-preview').classList.add('hidden');
+            document.getElementById('laser-scanner').classList.remove('hidden');
+
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
+            })
+            .then(stream => {
+                localStream = stream;
+                const video = document.getElementById('video-feed');
+                const placeholder = document.getElementById('camera-placeholder');
+                if(video) {
+                    video.srcObject = stream;
+                    video.classList.remove('hidden');
+                }
+                if(placeholder) placeholder.classList.add('hidden');
+            }).catch(err => {
+                console.log("Sensor optik tidak didukung / tidak diizinkan.");
+            });
+        }
+
+        function matikanKameraHardware() {
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            const video = document.getElementById('video-feed');
+            if(video) {
+                video.srcObject = null;
+                video.classList.add('hidden');
+            }
+            document.getElementById('camera-placeholder').classList.remove('hidden');
+        }
+
+        function tutupModalKamera() {
+            document.getElementById('modal-kamera').classList.add('hidden');
+            matikanKameraHardware();
+        }
+
+        // AKSI KIRIM OPSI 1: SCAN FOTO
+        function eksekusiAmbilDanAnalisis() {
+            const video = document.getElementById('video-feed');
+            const canvas = document.getElementById('capture-canvas');
+            const btnSubmit = document.getElementById('btn-submit-foto');
+            const preview = document.getElementById('freeze-preview');
+            const laser = document.getElementById('laser-scanner');
+
+            if (!localStream || video.classList.contains('hidden')) return;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64Bytes = dataUrl.split(',')[1];
+
+            preview.src = dataUrl;
+            preview.classList.remove('hidden');
+            laser.classList.add('hidden');
+            btnSubmit.disabled = true;
+
+            fetch(WEBAPP_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "insert", imageBytes: base64Bytes })
+            })
+            .then(() => {
+                alert("SUKSES MASUK ANTREAN SCAN!\n\nFoto berhasil diunggah. AI akan segera memproses.");
+                tutupModalKamera();
+                setTimeout(muatUlangDataAduan, 1000);
+            })
+            .catch(error => { alert("Gagal kirim: " + error.message); })
+            .finally(() => { btnSubmit.disabled = false; });
+        }
+
+        // AKSI KIRIM OPSI 2: KETIK TEKS MANUAL
+        function eksekusiKirimTeksManual() {
+            const teksAduan = document.getElementById('txt-aduan-manual').value;
+            const btnSubmit = document.getElementById('btn-submit-teks');
+
+            if (!teksAduan || teksAduan.trim() === "") {
+                alert("Silakan isi teks aduan terlebih dahulu!");
+                return;
+            }
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "MENGIRIM KELUHAN TEKS...";
+
+            fetch(WEBAPP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "insert", textAduan: teksAduan })
+            })
+            .then(() => {
+                alert("SUKSES MASUK ANTREAN KETIK!\n\nKeluhan teks tercatat. AI akan segera merumuskan analisis.");
+                tutupModalKamera();
+                setTimeout(muatUlangDataAduan, 1000);
+            })
+            .catch(error => { alert("Gagal kirim teks: " + error.message); })
+            .finally(() => { 
+                btnSubmit.disabled = false; 
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim & Analisis Teks via AI`;
+            });
+        }
+
+        // --- SISA SCRIPT DASHBOARD JANGAN DIUBAH (RENDER TABEL, DLL) ---
         function gantiModeTampilan(mode) {
             modeTampilanSaatIni = mode;
             const btnAktif = document.getElementById('tab-aktif');
@@ -277,241 +423,86 @@
             renderLogAduanSistem();
         }
 
-        function bukaModalKamera() {
-            document.getElementById('modal-kamera').classList.remove('hidden');
-            document.getElementById('freeze-preview').classList.add('hidden');
-            document.getElementById('laser-scanner').classList.remove('hidden');
-
-            navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
-            })
-            .then(stream => {
-                localStream = stream;
-                const video = document.getElementById('video-feed');
-                const placeholder = document.getElementById('camera-placeholder');
-                if(video) {
-                    video.srcObject = stream;
-                    video.classList.remove('hidden');
-                }
-                if(placeholder) placeholder.classList.add('hidden');
-            }).catch(err => {
-                alert("Gagal memuat sensor optik. Izinkan kamera pada browser Anda!");
-                tutupModalKamera();
-            });
-        }
-
-        function tutupModalKamera() {
-            document.getElementById('modal-kamera').classList.add('hidden');
-            if(localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            const video = document.getElementById('video-feed');
-            if(video) {
-                video.srcObject = null;
-                video.classList.add('hidden');
-            }
-            document.getElementById('camera-placeholder').classList.remove('hidden');
-        }
-
-        function eksekusiAmbilDanAnalisis() {
-            const video = document.getElementById('video-feed');
-            const canvas = document.getElementById('capture-canvas');
-            const btnSubmit = document.getElementById('btn-submit-foto');
-            const textBtn = document.getElementById('text-btn-submit');
-            const preview = document.getElementById('freeze-preview');
-            const laser = document.getElementById('laser-scanner');
-
-            if (!localStream || video.classList.contains('hidden')) return;
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            const base64Bytes = dataUrl.split(',')[1];
-
-            preview.src = dataUrl;
-            preview.classList.remove('hidden');
-            laser.classList.add('hidden');
-
-            btnSubmit.disabled = true;
-            textBtn.innerText = "TRANSMISI DATA KE SERVER...";
-
-            // MENGGUNAKAN MODE NO-CORS SUPAYA PASTI BERHASIL DAN TIDAK DI-BLOCK BROWSER
-            fetch(WEBAPP_URL, {
-                method: "POST",
-                mode: "no-cors", 
-                headers: {
-                    "Content-Type": "text/plain"
-                },
-                body: JSON.stringify({ action: "insert", imageBytes: base64Bytes })
-            })
-            .then(() => {
-                // Di mode no-cors, kita langsung anggap sukses karena Google Drive pasti menerima data secara asinkronus
-                alert("KAMI SEDANG MEMPROSES...\n\nFoto berhasil diunggah ke Google Drive. Lanjutkan..");
-                tutupModalKamera();
-                setTimeout(muatUlangDataAduan, 1500);
-            })
-            .catch(error => {
-                alert("Gangguan Transmisi: " + error.message);
-                preview.classList.add('hidden');
-                laser.classList.remove('hidden');
-            })
-            .finally(() => {
-                btnSubmit.disabled = false;
-                textBtn.innerText = "Proses & Kirim Dokumen";
-            });
-        }
-
         function muatUlangDataAduan() {
             const tblBody = document.getElementById('tbl-aduan-body');
-            const mobileList = document.getElementById('mobile-aduan-list');
-            
-            const loadingHtml = `
-                <div class="py-12 text-center text-indigo-400 font-bold uppercase tracking-widest text-[9px] w-full col-span-full">
-                    <i class="fa-solid fa-circle-notch animate-spin text-base block mb-2"></i>
-                    Sinkronisasi Log Eksklusif Berjalan...
-                </div>
-            `;
-            
-            tblBody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-indigo-400">${loadingHtml}</td></tr>`;
-            mobileList.innerHTML = loadingHtml;
+            if(tblBody) tblBody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-indigo-400 font-bold tracking-wider text-[10px]"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i>SINKRONISASI DATA SERVER...</td></tr>`;
             
             fetch(WEBAPP_URL)
             .then(res => res.json())
             .then(data => {
-                cacheDataMaster = data || [];
+                cacheDataMaster = data;
                 renderLogAduanSistem();
             })
-            .catch(err => {
-                console.error(err);
-                const errorHtml = `<div class="py-6 text-center text-red-400 text-xs font-bold uppercase">Gagal sinkronisasi data server!</div>`;
-                tblBody.innerHTML = `<tr><td colspan="5">${errorHtml}</td></tr>`;
-                mobileList.innerHTML = errorHtml;
-            });
+            .catch(err => { console.log("Gagal sinkron data: " + err.message); });
         }
 
         function renderLogAduanSistem() {
             const tblBody = document.getElementById('tbl-aduan-body');
             const mobileList = document.getElementById('mobile-aduan-list');
             
-            tblBody.innerHTML = "";
-            mobileList.innerHTML = "";
+            let htmlDesktop = "";
+            let htmlMobile = "";
+            let tTotal = 0, tProses = 0, tSelesai = 0;
 
-            let dataTerfilter = cacheDataMaster.filter(item => {
-                const statusClean = (item.status || "").trim().toUpperCase();
-                const isSelesai = statusClean.includes("SELESAI");
-                return modeTampilanSaatIni === 'aktif' ? !isSelesai : isSelesai;
-            });
+            cacheDataMaster.forEach(item => {
+                const isSelesai = item.status === "Selesai";
+                tTotal++;
+                if(isSelesai) tSelesai++; else tProses++;
 
-            let totalMasuk = cacheDataMaster.length;
-            let totalSelesai = cacheDataMaster.filter(i => (i.status || "").trim().toUpperCase().includes("SELESAI")).length;
-            let totalProses = totalMasuk - totalSelesai;
+                if((modeTampilanSaatIni === 'aktif' && !isSelesai) || (modeTampilanSaatIni === 'riwayat' && isSelesai)) {
+                    let badgeStatus = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${item.status}</span>`;
+                    if(item.status.includes("ANTREAN")) badgeStatus = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">${item.status}</span>`;
+                    if(item.status.includes("HABIS") || item.status.includes("ERROR")) badgeStatus = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-red-500/10 text-red-400 border border-red-500/20">${item.status}</span>`;
+                    if(isSelesai) badgeStatus = `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✅ SELESAI</span>`;
 
-            document.getElementById('stat-total').innerText = totalMasuk;
-            document.getElementById('stat-proses').innerText = totalProses;
-            document.getElementById('stat-selesai').innerText = totalSelesai;
+                    let tombolAksi = isSelesai ? 
+                        `<span class="text-[10px] text-emerald-400 font-bold"><i class="fa-solid fa-check-double mr-1"></i>Terarsip</span>` : 
+                        `<button onclick="eksekusiSelesaiAduan('${item.id}')" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow cursor-pointer transition-all active:scale-95">Selesai</button>`;
 
-            if (dataTerfilter.length === 0) {
-                const txtKosong = modeTampilanSaatIni === 'aktif' ? 'Tidak Ada Masalah Aktif Tersisa' : 'Belum Ada Arsip Riwayat Selesai';
-                const emptyHtml = `
-                    <div class="py-12 text-center text-slate-500 uppercase tracking-widest text-xs italic w-full">
-                        <i class="fa-solid fa-square-check text-xl block mb-2 text-indigo-500/40"></i> ${txtKosong}
-                    </div>
-                `;
-                tblBody.innerHTML = `<tr><td colspan="5">${emptyHtml}</td></tr>`;
-                mobileList.innerHTML = emptyHtml;
-                return;
-            }
+                    const tgl = item.tanggal ? item.tanggal.split("T")[0] : "-";
 
-            let dataRender = [...dataTerfilter].reverse();
+                    htmlDesktop += `<tr class="hover:bg-slate-500/5 transition-all">
+                        <td class="py-3 px-4 text-[var(--text-body)]">${tgl}<br>${badgeStatus}</td>
+                        <td class="py-3 px-4 font-bold text-[var(--text-title)]">${item.masalah}</td>
+                        <td class="py-3 px-4 text-[var(--text-body)]">${item.solusi}</td>
+                        <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi}</td>
+                        <td class="py-3 px-4 text-center">${tombolAksi}</td>
+                    </tr>`;
 
-            dataRender.forEach(item => {
-                let opsiWaktu = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                let tglTampil = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', opsiWaktu) : "-";
-                let rowId = item.id || "";
-
-                let actionBtnHtml = "";
-                if (modeTampilanSaatIni === 'aktif') {
-                    actionBtnHtml = `
-                        <button onclick="eksekusiSelesaikanMasalah('${rowId}')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 rounded-lg text-[10px] font-black tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1 w-full uppercase shadow-sm">
-                            <i class="fa-solid fa-check-double text-[9px]"></i> Selesai
-                        </button>
-                    `;
-                } else {
-                    actionBtnHtml = `
-                        <span class="px-2 py-1 border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 rounded-md text-[9px] font-black tracking-widest inline-block uppercase shadow-sm">
-                           <i class="fa-solid fa-circle-check mr-1"></i>Arsip Selesai
-                        </span>
-                    `;
+                    htmlMobile += `<div class="premium-card p-4 rounded-xl flex flex-col gap-2">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                            <span class="text-[10px] text-slate-500">${tgl}</span>
+                            ${badgeStatus}
+                        </div>
+                        <div class="text-xs font-bold text-[var(--text-title)]">${item.masalah}</div>
+                        <div class="text-[11px] text-[var(--text-body)]"><b>Solusi:</b> ${item.solusi}</div>
+                        <div class="text-[11px] text-[var(--text-body)]"><b>Strategi:</b> ${item.strategi}</div>
+                        <div class="pt-2 text-right border-t border-slate-800/40 mt-1">${tombolAksi}</div>
+                    </div>`;
                 }
-
-                let tr = document.createElement('tr');
-                tr.className = "hover:bg-indigo-500/5 transition-colors border-b border-[var(--border-color)]";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-mono font-bold opacity-70">${tglTampil}</td>
-                    <td class="py-3 px-4 font-semibold text-[var(--text-title)]">${item.masalah || '-'}</td>
-                    <td class="py-3 px-4 text-slate-400 font-medium italic"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</td>
-                    <td class="py-3 px-4 text-[var(--text-body)]">${item.strategi || '-'}</td>
-                    <td class="py-3 px-4 text-center">${actionBtnHtml}</td>
-                `;
-                tblBody.appendChild(tr);
-
-                let card = document.createElement('div');
-                card.className = "premium-card p-4 rounded-xl flex flex-col gap-2.5 text-left";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-2">
-                        <span class="text-[10px] font-mono font-bold opacity-60">${tglTampil}</span>
-                        <div class="w-28 text-right">${actionBtnHtml}</div>
-                    </div>
-                    <div>
-                        <span class="text-[8px] uppercase tracking-wider text-indigo-400 font-black block">Masalah Utama</span>
-                        <p class="text-xs font-bold text-[var(--text-title)] mt-0.5">${item.masalah || '-'}</p>
-                    </div>
-                    <div class="bg-[var(--bg-inner)] p-2 rounded-lg border border-[var(--border-color)]">
-                        <span class="text-[8px] uppercase tracking-wider text-cyan-400 font-black block">Usulan Taktis</span>
-                        <p class="text-xs text-slate-300 font-medium italic mt-0.5"><span class="text-cyan-400 mr-1">❯</span>${item.solusi || '-'}</p>
-                    </div>
-                    <div>
-                        <span class="text-[8px] uppercase tracking-wider text-slate-500 font-black block">Strategi Jangka Panjang</span>
-                        <p class="text-xs text-[var(--text-body)] mt-0.5">${item.strategi || '-'}</p>
-                    </div>
-                `;
-                mobileList.appendChild(card);
             });
+
+            document.getElementById('stat-total').innerText = tTotal;
+            document.getElementById('stat-proses').innerText = tProses;
+            document.getElementById('stat-selesai').innerText = tSelesai;
+
+            if(tblBody) tblBody.innerHTML = htmlDesktop || `<tr><td colspan="5" class="py-8 text-center text-slate-500 text-[10px]">TIDAK ADA DATA KELUHAN</td></tr>`;
+            if(mobileList) mobileList.innerHTML = htmlMobile || `<div class="text-center text-slate-500 text-[10px] py-6">TIDAK ADA DATA KELUHAN</div>`;
         }
 
-        function eksekusiSelesaikanMasalah(id) {
-            if(!id) {
-                alert("Gagal eksekusi: ID Log Data tidak valid atau tidak terstruktur di Google Sheets.");
-                return;
-            }
-            if(!confirm("Validasi Penanganan:\nApakah Anda yakin masalah ini sudah selesai diamalkan pengurus?")) return;
+        function eksekusiSelesaiAduan(idLog) {
+            if(!idLog) return;
+            if(!confirm("Validasi aduan ini telah selesai ditangani?")) return;
 
             fetch(WEBAPP_URL, {
                 method: "POST",
-                headers: { 
-                    "Content-Type": "text/plain" 
-                },
-                body: JSON.stringify({ 
-                    action: "updateStatus", 
-                    id: id, 
-                    status: "Selesai" 
-                })
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ action: "updateStatus", id: idLog, status: "Selesai" })
             })
-            .then(res => res.json())
-            .then(respons => {
-                if(respons.status === "success") {
-                    alert("STATUS BERHASIL DIPERBARUI!\n\nAduan telah resmi dipindahkan ke dalam Arsip Riwayat.");
-                    muatUlangDataAduan();
-                } else {
-                    alert("Gagal: " + respons.message);
-                }
-            })
-            .catch(err => {
-                alert("Gagal mengubah status: " + err.message);
+            .then(() => {
+                alert("Aduan berhasil diarsipkan ke riwayat Selesai.");
+                muatUlangDataAduan();
             });
         }
     </script>
