@@ -146,7 +146,21 @@
     </div>
 
     <div id="boxSantriKhusus" style="display:none; background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:12px;">
-      <input type="text" id="searchAcaraSantri" placeholder="Cari nama santri khusus..." oninput="cariSantriAcara(this.value)">
+      <div style="background: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px dashed var(--accent);">
+        <h4 style="font-size: 12px; color: var(--primary); margin-bottom: 6px;">🔍 Fitur Pindai Otomatis Tunggakan Syahriyyah:</h4>
+        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+          <select id="deteksiCicilan" style="padding: 6px; font-size: 12px; width: 30%; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <option value="1">Cicilan ke 1</option>
+            <option value="2">Cicilan ke 2</option>
+            <option value="3">Cicilan ke 3</option>
+          </select>
+          <input type="text" id="deteksiBulan" placeholder="Bulan Hijriah (cth: Muharam)" style="padding: 6px; font-size: 12px; width: 40%; border: 1px solid #cbd5e1; border-radius: 4px;">
+          <input type="text" id="deteksiTahun" placeholder="Tahun" value="1448 H" style="padding: 6px; font-size: 12px; width: 30%; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+        <button type="button" class="btn btn-orange" onclick="autoPindaiTunggakan()" style="padding: 6px 10px; font-size: 11px; width: 100%; border-radius: 4px;">Mulai Cari Santri Menunggak</button>
+      </div>
+
+      <input type="text" id="searchAcaraSantri" placeholder="Atau cari manual nama santri khusus..." oninput="cariSantriAcara(this.value)">
       <div id="searchAcaraResults" class="search-results" style="display:none;"></div>
       <div class="badge-list" id="listBadgeSantri"></div>
     </div>
@@ -642,6 +656,63 @@
       btn.disabled = false; 
       btn.innerText = "Simpan Transaksi Tabungan";
       statusDiv.innerHTML = "<span style='color:#dc2626'>⚠️ Gagal terhubung ke server cloud.</span>";
+    });
+  }
+
+  // FUNGSI JAVASCRIPT DETEKSI TUNGGAKAN OTOMATIS
+  function autoPindaiTunggakan() {
+    const cicilan = document.getElementById("deteksiCicilan").value;
+    const bulan = document.getElementById("deteksiBulan").value.trim();
+    const tahun = document.getElementById("deteksiTahun").value.trim();
+    
+    if (!bulan || !tahun) {
+      alert("Nama Bulan Hijriah dan Tahun wajib diisi!");
+      return;
+    }
+    
+    const targetBtn = document.querySelector("button[onclick='autoPindaiTunggakan()']");
+    const txtAsli = targetBtn.innerText;
+    targetBtn.disabled = true;
+    targetBtn.innerHTML = "<span class='spinner'></span> Menghitung Antrean...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({
+        action: "checkTunggakanSyahriyyah",
+        cicilan: cicilan,
+        bulan: bulan,
+        tahun: tahun
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      targetBtn.disabled = false;
+      targetBtn.innerText = txtAsli;
+      
+      if (res.success) {
+        if (res.data.length === 0) {
+          alert("🎉 Semua santri baru terdata sudah lunas membayar cicilan ke-" + cicilan + " untuk bulan " + bulan + " " + tahun);
+        } else {
+          listSantriKhususAcara = res.data;
+          renderBadges();
+          
+          // Set otomatis form isian agar bendahara tidak perlu menulis manual kembali
+          document.getElementById("dropdownKategori").value = "LAINNYA";
+          handleDropdownKategori("LAINNYA");
+          document.getElementById("customKategori").value = "Pembayaran cicilan Syahriyyah ke " + cicilan + " bulan " + bulan + " " + tahun;
+          document.getElementById("nominalPerAnak").value = "50.000"; 
+          
+          alert("✅ Berhasil menemukan " + res.data.length + " santri baru menunggak. List nama otomatis dimasukkan!");
+        }
+      } else {
+        alert("⚠️ Masalah Server: " + res.error);
+      }
+    })
+    .catch(err => {
+      targetBtn.disabled = false;
+      targetBtn.innerText = txtAsli;
+      alert("Gagal terhubung ke cloud server.");
     });
   }
 </script>
