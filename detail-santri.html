@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Manajemen Limit Santri</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; color: #333; }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="number"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background-color: #0056b3; }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .result-table th, .result-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    .result-table th { background-color: #f8f9fa; }
+    .edit-section {
+      background: #e9ecef;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+    .loading { text-align: center; display: none; color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Cari Santri & Kelola Limit</h2>
+  
+  <div class="search-box">
+    <input type="text" id="searchQuery" placeholder="Masukkan Nama Lengkap Santri...">
+    <button onclick="cariSantri()">Cari</button>
+  </div>
+
+  <div id="loading" class="loading">Sedang memproses...</div>
+
+  <table class="result-table" id="tableHasil" style="display:none;">
+    <thead>
+      <tr>
+        <th>Nama Lengkap</th>
+        <th>Kelas</th>
+        <th>Sisa Saku</th>
+        <th>Limit (Kolom G)</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="bodyHasil"></tbody>
+  </table>
+
+  <div id="editSection" class="edit-section">
+    <h3>Ubah Limit untuk: <span id="editNama" style="color:#007bff;"></span></h3>
+    <p>NIK: <span id="editNik"></span></p>
+    <div class="search-box">
+      <input type="number" id="newLimitValue" placeholder="Masukkan limit baru (ex: -15000)">
+      <button onclick="simpanLimit()" style="background-color: #28a745;">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // SILAHKAN GANTI DENGAN URL WEB APP DEPLOYMENT APPS SCRIPT ANDA
+  const API_URL = "https://script.google.com/macros/s/AKfycbynNkuYVcO3lOrmyzISODEP5BCYfkeueXwEe3MR36prfuFsrK-dz2FrQAA7ze9mphU7/exec";
+
+  let selectedNik = "";
+
+  function toggleLoading(show) {
+    document.getElementById('loading').style.display = show ? 'block' : 'none';
+  }
+
+  async function cariSantri() {
+    const query = document.getElementById('searchQuery').value;
+    if (!query) return alert('Silakan masukkan nama terlebih dahulu');
+    
+    toggleLoading(true);
+    document.getElementById('tableHasil').style.display = 'none';
+    document.getElementById('editSection').style.display = 'none';
+    
+    try {
+      const response = await fetch(`${API_URL}?action=search&query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      const tbody = document.getElementById('bodyHasil');
+      tbody.innerHTML = "";
+      
+      if (data.length === 0) {
+        alert('Data tidak ditemukan');
+        toggleLoading(false);
+        return;
+      }
+      
+      data.forEach(santri => {
+        const row = `<tr>
+          <td>${santri.nama}</td>
+          <td>${santri.kelas}</td>
+          <td>${santri.sisaSaku}</td>
+          <td>${santri.limit}</td>
+          <td><button onclick="bukaFormEdit('${santri.nama}', '${santri.nik}', ${santri.limit})">Pilih</button></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+      
+      document.getElementById('tableHasil').style.display = 'table';
+    } catch (error) {
+      console.error(error);
+      alert('Gagal mengambil data dari Google Sheet');
+    }
+    toggleLoading(false);
+  }
+
+  function bukaFormEdit(nama, nik, limit) {
+    selectedNik = nik;
+    document.getElementById('editNama').innerText = nama;
+    document.getElementById('editNik').innerText = nik;
+    document.getElementById('newLimitValue').value = limit;
+    document.getElementById('editSection').style.display = 'block';
+  }
+
+  async function simpanLimit() {
+    const newLimit = document.getElementById('newLimitValue').value;
+    if (!newLimit) return alert('Masukkan nilai limit baru!');
+    
+    toggleLoading(true);
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors", // Digunakan karena batasan bawaan pengalihan CORS Google Apps Script
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "updateLimit",
+          nik: selectedNik,
+          newLimit: newLimit
+        })
+      });
+      
+      alert('Perintah pembaruan dikirim! Silakan muat ulang atau cari kembali untuk melihat perubahan.');
+      document.getElementById('editSection').style.display = 'none';
+      cariSantri();
+    } catch (error) {
+      console.error(error);
+      alert('Terjadi kesalahan saat menyimpan limit baru');
+    }
+    toggleLoading(false);
+  }
+</script>
+</body>
+</html>
