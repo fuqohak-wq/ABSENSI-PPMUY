@@ -79,7 +79,6 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    /* Style tambahan saat tombol dikunci */
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -146,21 +145,7 @@
     </div>
 
     <div id="boxSantriKhusus" style="display:none; background:#f1f5f9; padding:12px; border-radius:6px; margin-bottom:12px;">
-      <div style="background: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px dashed var(--accent);">
-        <h4 style="font-size: 12px; color: var(--primary); margin-bottom: 6px;">🔍 Fitur Pindai Otomatis Tunggakan Syahriyyah:</h4>
-        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-          <select id="deteksiCicilan" style="padding: 6px; font-size: 12px; width: 30%; border: 1px solid #cbd5e1; border-radius: 4px;">
-            <option value="1">Cicilan ke 1</option>
-            <option value="2">Cicilan ke 2</option>
-            <option value="3">Cicilan ke 3</option>
-          </select>
-          <input type="text" id="deteksiBulan" placeholder="Bulan Hijriah (cth: Muharam)" style="padding: 6px; font-size: 12px; width: 40%; border: 1px solid #cbd5e1; border-radius: 4px;">
-          <input type="text" id="deteksiTahun" placeholder="Tahun" value="1448 H" style="padding: 6px; font-size: 12px; width: 30%; border: 1px solid #cbd5e1; border-radius: 4px;">
-        </div>
-        <button type="button" class="btn btn-orange" onclick="autoPindaiTunggakan()" style="padding: 6px 10px; font-size: 11px; width: 100%; border-radius: 4px;">Mulai Cari Santri Menunggak</button>
-      </div>
-
-      <input type="text" id="searchAcaraSantri" placeholder="Atau cari manual nama santri khusus..." oninput="cariSantriAcara(this.value)">
+      <input type="text" id="searchAcaraSantri" placeholder="Cari nama santri khusus..." oninput="cariSantriAcara(this.value)">
       <div id="searchAcaraResults" class="search-results" style="display:none;"></div>
       <div class="badge-list" id="listBadgeSantri"></div>
     </div>
@@ -242,7 +227,6 @@
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
-  // Fungsi Format Rupiah
   function formatRupiah(angka) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
     split = number_string.split(','),
@@ -259,6 +243,14 @@
   window.onload = function() {
     fetchNotification();
     loadTotalSantriCount();
+    
+    // Penanganan khusus untuk scanner barcode (jika melempar event Enter)
+    document.getElementById("searchKey").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        cariSantri(this.value);
+      }
+    });
   };
 
   function bukaRuangAdmin() {
@@ -273,6 +265,10 @@
 
   function tutupRuangAdmin() {
     document.getElementById("adminModal").classList.remove("active");
+    // Reset form cash saat ditutup
+    document.getElementById("dropdownBayarNyai").value = "";
+    document.getElementById("cashNominal").value = "";
+    document.getElementById("inputKategoriManualContainer").style.display = "none";
   }
 
   function loadTotalSantriCount() {
@@ -631,7 +627,11 @@
     const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
     const statusDiv = document.getElementById("tabunganStatus");
     const btn = document.getElementById("btnSimpanTabungan");
-    if(!nominal || nominal <= 0) return;
+    
+    if(!nominal || nominal <= 0) {
+      alert("Masukkan nominal tabungan valid!");
+      return;
+    }
     
     btn.disabled = true; 
     btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
@@ -647,8 +647,20 @@
       btn.innerText = "Simpan Transaksi Tabungan";
       if(response.success) {
         statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
-        document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
-        document.getElementById("nominalTabungan").value = "";
+        
+        // Reset Form ke keadaan semula
+        setTimeout(() => {
+          document.getElementById("searchKey").value = "";
+          document.getElementById("viewNik").innerText = "-";
+          document.getElementById("viewNama").innerText = "-";
+          document.getElementById("viewSaldo").innerText = "Rp 0";
+          document.getElementById("infoSaldoBox").classList.remove("active");
+          document.getElementById("nominalTabungan").value = "";
+          document.getElementById("nominalTabungan").disabled = true;
+          btn.disabled = true;
+          santriTerpilih = null;
+        }, 2000);
+
       } else {
         statusDiv.innerHTML = `<span style='color:#dc2626'>⚠️ Gagal: ${response.error}</span>`;
       }
@@ -656,63 +668,6 @@
       btn.disabled = false; 
       btn.innerText = "Simpan Transaksi Tabungan";
       statusDiv.innerHTML = "<span style='color:#dc2626'>⚠️ Gagal terhubung ke server cloud.</span>";
-    });
-  }
-
-  // FUNGSI JAVASCRIPT DETEKSI TUNGGAKAN OTOMATIS
-  function autoPindaiTunggakan() {
-    const cicilan = document.getElementById("deteksiCicilan").value;
-    const bulan = document.getElementById("deteksiBulan").value.trim();
-    const tahun = document.getElementById("deteksiTahun").value.trim();
-    
-    if (!bulan || !tahun) {
-      alert("Nama Bulan Hijriah dan Tahun wajib diisi!");
-      return;
-    }
-    
-    const targetBtn = document.querySelector("button[onclick='autoPindaiTunggakan()']");
-    const txtAsli = targetBtn.innerText;
-    targetBtn.disabled = true;
-    targetBtn.innerHTML = "<span class='spinner'></span> Menghitung Antrean...";
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify({
-        action: "checkTunggakanSyahriyyah",
-        cicilan: cicilan,
-        bulan: bulan,
-        tahun: tahun
-      })
-    })
-    .then(res => res.json())
-    .then(res => {
-      targetBtn.disabled = false;
-      targetBtn.innerText = txtAsli;
-      
-      if (res.success) {
-        if (res.data.length === 0) {
-          alert("🎉 Semua santri baru terdata sudah lunas membayar cicilan ke-" + cicilan + " untuk bulan " + bulan + " " + tahun);
-        } else {
-          listSantriKhususAcara = res.data;
-          renderBadges();
-          
-          // Set otomatis form isian agar bendahara tidak perlu menulis manual kembali
-          document.getElementById("dropdownKategori").value = "LAINNYA";
-          handleDropdownKategori("LAINNYA");
-          document.getElementById("customKategori").value = "Pembayaran cicilan Syahriyyah ke " + cicilan + " bulan " + bulan + " " + tahun;
-          document.getElementById("nominalPerAnak").value = "50.000"; 
-          
-          alert("✅ Berhasil menemukan " + res.data.length + " santri baru menunggak. List nama otomatis dimasukkan!");
-        }
-      } else {
-        alert("⚠️ Masalah Server: " + res.error);
-      }
-    })
-    .catch(err => {
-      targetBtn.disabled = false;
-      targetBtn.innerText = txtAsli;
-      alert("Gagal terhubung ke cloud server.");
     });
   }
 </script>
