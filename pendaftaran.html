@@ -155,9 +155,9 @@
           </div>
           <div>
             <label class="label-tegas">Referal / Rekomendasi Pengurus</label>
-            <select id="referal" class="w-full px-3 py-2 text-sm input-tegas bg-white dark:bg-slate-900">
-              <option value="-">-- Pilih Nama Santri Pemberi Referal (Jika Ada) --</option>
-              </select>
+            <input type="text" id="referal" list="data-santri-list" placeholder="Ketik nama untuk mencari..." class="w-full px-3 py-2 text-sm input-tegas" autocomplete="off">
+            <datalist id="data-santri-list">
+              </datalist>
           </div>
         </div>
 
@@ -232,22 +232,22 @@
       setInterval(updateJamTanggal, 1000);
       initThemeEngine();
       
-      // ===== LOGIKA AUTO-LOAD DATA SANTRI AKTIF KE DROPDOWN REFERAL =====
-      const referalSelect = document.getElementById("referal");
+      // ===== LOGIKA AMBIL DATA UNTUK SISTEM PENCARIAN OTOMATIS (AUTOCOMPLETE) =====
+      const dataListContainer = document.getElementById("data-santri-list");
       
       fetch(WEB_APP_URL)
         .then(response => response.json())
         .then(daftarSantri => {
           if (daftarSantri && daftarSantri.length > 0) {
+            dataListContainer.innerHTML = ""; // Bersihkan loading statis
             daftarSantri.forEach(nama => {
               const option = document.createElement("option");
-              option.value = nama;
-              option.textContent = nama;
-              referalSelect.appendChild(option);
+              option.value = nama; // Menyimpan nama sebagai value pencarian
+              dataListContainer.appendChild(option);
             });
           }
         })
-        .catch(err => console.error("Gagal memuat list data referal santri:", err));
+        .catch(err => console.error("Gagal memuat sistem pencarian santri aktif:", err));
     });
 
     function updateJamTanggal() {
@@ -311,6 +311,10 @@
       submitBtn.innerText = "Memproses berkas foto...";
       msgDiv.style.display = "none";
 
+      // Memastikan nilai kosong dikirim sebagai tanda strip standar (-)
+      let referalValue = document.getElementById('referal').value.trim();
+      if (!referalValue) referalValue = "-";
+
       const dataObj = {
         nama: document.getElementById('nama').value,
         nik: document.getElementById('nik').value,
@@ -322,7 +326,7 @@
         orang_tua: document.getElementById('orang_tua').value,
         kota: document.getElementById('kota').value,
         sekolah_asal: document.getElementById('sekolah_asal').value,
-        referal: document.getElementById('referal').value,
+        referal: referalValue,
         jenis_pembayaran: document.getElementById('jenis_pembayaran').value,
         nominal: nominalInput.value.replace(/\./g, ''),
         petugas: document.getElementById('petugas').value,
