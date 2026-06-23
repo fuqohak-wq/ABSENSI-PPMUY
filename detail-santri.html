@@ -3,219 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manajemen Limit Santri Instan</title>
+  <title>SantriMUY</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f9;
+    html, body {
       margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    h2 { text-align: center; color: #333; margin-bottom: 5px; }
-    .status-badge { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; }
-    .search-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    input[type="text"], input[type="number"] {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: 0.2s;
-    }
-    input[type="text"]:focus { border-color: #007bff; outline: none; }
-    .result-table {
+      padding: 0;
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+      height: 100%;
+      overflow: hidden;
     }
-    .result-table th, .result-table td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: left;
-    }
-    .result-table th { background-color: #f8f9fa; }
-    .btn-pilih {
-      padding: 6px 14px;
-      background-color: #007bff;
-      color: white;
+
+    iframe {
+      width: 100vw;
+      height: 100vh;
       border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      display: block;
     }
-    .btn-pilih:hover { background-color: #0056b3; }
-    .edit-section {
-      background: #e9ecef;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 6px;
-      display: none;
-    }
-    .btn-simpan {
-      padding: 12px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .btn-simpan:hover { background-color: #218838; }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <h2>Sistem Manajemen Limit Santri</h2>
-  <div class="status-badge" id="statusApps">Mengunduh basis data santri dari Google Sheet...</div>
-  
-  <div class="search-box">
-    <input type="text" id="searchQuery" placeholder="Ketik nama lengkap santri di sini (langsung disaring)..." oninput="saringNama() " disabled>
-  </div>
-
-  <table class="result-table" id="tableHasil" style="display:none;">
-    <thead>
-      <tr>
-        <th>Nama Lengkap</th>
-        <th>Kelas</th>
-        <th>Sisa Saku</th>
-        <th>Limit (Kolom G)</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="bodyHasil"></tbody>
-  </table>
-
-  <div id="editSection" class="edit-section">
-    <h3>Ubah Limit: <span id="editNama" style="color:#007bff;"></span></h3>
-    <p>NIK: <span id="editNik" style="font-weight: bold;"></span></p>
-    <div class="search-box">
-      <input type="number" id="newLimitValue" placeholder="Masukkan limit baru (contoh: -15000)">
-      <button class="btn-simpan" onclick="simpanLimit()">Simpan ke Google Sheet</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbynNkuYVcO3lOrmyzISODEP5BCYfkeueXwEe3MR36prfuFsrK-dz2FrQAA7ze9mphU7/exec";
-  
-  let DATABASE_SANTRI = []; // Tempat menyimpan data lokal dari Google Sheet
-  let selectedNik = "";
-
-  // 1. JALUR ANTI CORS: Memuat data di awal menggunakan injeksi script dinamis (JSONP)
-  function muatDataAwal() {
-    const script = document.createElement('script');
-    // Minta Apps Script mengemas data ke fungsi callback bernama 'inisialisasiData'
-    script.src = `${API_URL}?callback=inisialisasiData`;
-    document.body.appendChild(script);
-  }
-
-  // Fungsi penampung data setelah script berhasil dimuat
-  function inisialisasiData(data) {
-    DATABASE_SANTRI = data;
-    document.getElementById('statusApps').innerText = `Berhasil memuat ${DATABASE_SANTRI.length} data santri secara offline!`;
-    document.getElementById('statusApps').style.color = "green";
-    document.getElementById('searchQuery').disabled = false; // Aktifkan kolom input pencarian
-  }
-
-  // 2. FUNGSI SANGAT RINGAN: Menyaring nama secara lokal (Instan & Tanpa Loading)
-  function saringNama() {
-    const kataKunci = document.getElementById('searchQuery').value.toLowerCase();
-    const tbody = document.getElementById('bodyHasil');
-    tbody.innerHTML = "";
-
-    if (kataKunci.trim() === "") {
-      document.getElementById('tableHasil').style.display = 'none';
-      return;
-    }
-
-    // Filter data dari memori browser lokal
-    const hasilFilter = DATABASE_SANTRI.filter(santri => 
-      santri.nama.toLowerCase().includes(kataKunci)
-    );
-
-    if (hasilFilter.length === 0) {
-      document.getElementById('tableHasil').style.display = 'none';
-      return;
-    }
-
-    // Tampilkan maksimal 10 rekomendasi agar performa browser tetap kencang
-    const batasanHasil = hasilFilter.slice(0, 10);
-
-    batasanHasil.forEach(santri => {
-      const row = `<tr>
-        <td>${santri.nama}</td>
-        <td>${santri.kelas}</td>
-        <td>${santri.sisaSaku}</td>
-        <td>${santri.limit}</td>
-        <td><button class="btn-pilih" onclick="bukaFormEdit('${santri.nama}', '${santri.nik}', ${santri.limit})">Pilih</button></td>
-      </tr>`;
-      tbody.innerHTML += row;
-    });
-
-    document.getElementById('tableHasil').style.display = 'table';
-  }
-
-  function bukaFormEdit(nama, nik, limit) {
-    selectedNik = nik;
-    document.getElementById('editNama').innerText = nama;
-    document.getElementById('editNik').innerText = nik;
-    document.getElementById('newLimitValue').value = limit;
-    document.getElementById('editSection').style.display = 'block';
-  }
-
-  // 3. UPDATE DATA LIMIT KE GOOGLE SHEET
-  async function simpanLimit() {
-    const newLimit = document.getElementById('newLimitValue').value;
-    if (!newLimit) return alert('Masukkan nilai limit baru terlebih dahulu!');
-    
-    document.getElementById('statusApps').innerText = "Sedang mengirim perubahan ke Google Sheet...";
-    document.getElementById('statusApps').style.color = "orange";
-    
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "updateLimit",
-          nik: selectedNik,
-          newLimit: newLimit
-        })
-      });
-      
-      const hasil = await response.json();
-      if (hasil.success) {
-        alert(hasil.message);
-        document.getElementById('editSection').style.display = 'none';
-        document.getElementById('searchQuery').value = "";
-        document.getElementById('tableHasil').style.display = 'none';
-        
-        // Segarkan database lokal secara otomatis
-        muatDataAwal();
-      } else {
-        alert('Gagal: ' + hasil.message);
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Limit berhasil diproses! Periksa Google Sheet Anda dalam beberapa saat.');
-      muatDataAwal();
-    }
-  }
-
-  // Jalankan fungsi muat data pertama kali saat halaman diakses
-  window.onload = muatDataAwal;
-</script>
+  <iframe
+    src="https://modul-santri-muy-epesantren.vercel.app/"
+    allowfullscreen>
+  </iframe>
 </body>
 </html>
