@@ -96,12 +96,14 @@
     </div>
   </header>
 
+  <!-- JALUR 1: NOTIFIKASI INFAQ PENDAFTARAN BARU -->
   <div id="nyaiAlert" class="alert-box">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="nyaiAlertText">Memeriksa antrean database...</p>
     <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none; padding:6px 12px; font-size:12px;">Proses & Sinkron Ke Nyai</button>
   </div>
 
+  <!-- JALUR 2: NOTIFIKASI SUSULAN SYAHRIYYAH KOLEKTIF -->
   <div id="syahriyyahAlert" class="alert-box alert-green">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #166534;">🟢 Notifikasi Otomatis Syahriyyah Susulan</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="syahriyyahAlertText">Memeriksa tagihan berjalan santri aktif...</p>
@@ -129,6 +131,7 @@
     <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
   </div>
 
+  <!-- FORM KEGIATAN & TAGIHAN DENGAN OPSI NON-SANTRI -->
   <div class="card">
     <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
     <div class="form-group">
@@ -171,6 +174,7 @@
   </div>
 </div>
 
+<!-- CONTAINER MODAL RUANG ADMIN -->
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
@@ -418,7 +422,6 @@
     }
   }
 
-  // REKOMENDASI: Menggunakan pembacaan response.data.listAnak sesuai output Code.gs terbaru
   function cariSantri(val) {
     const resDiv = document.getElementById("searchResults");
     if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
@@ -446,7 +449,6 @@
     });
   }
 
-  // Fungsi Tambahan (Placeholder) untuk Pencarian Santri Acara Khusus agar tidak error
   function cariSantriAcara(val) {
     const resDiv = document.getElementById("searchAcaraResults");
     if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
@@ -623,7 +625,8 @@
         const info = response.data;
         if(info.jumlahSantriBaru > 0) {
           alertText.innerHTML = `Terdeteksi <b>${info.jumlahSantriBaru} dari ${info.totalAngkatan} santri baru 2026</b> belum disetor ke Nyai. Total: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
-          btnProses.style.display = "none";
+          // PERBAIKAN: Tombol dipastikan tampil ("inline-block") ketika jumlahSantriBaru > 0
+          btnProses.style.display = "inline-block";
         } else {
           alertText.innerHTML = `Semua data pendaftaran santri baru 2026 (${info.totalAngkatan} anak) sudah sinkron dengan Nyai.`;
           btnProses.style.display = "none";
@@ -632,9 +635,33 @@
     });
   }
 
-  // Fungsi Tambahan (Placeholder) untuk tombol Proses Setoran Nyai agar tidak error saat diklik
   function prosesSetoranNyai() {
-    alert("Fitur sinkronisasi utama dijalankan melalui sistem pusat.");
+    const btn = document.getElementById("btnProsesNyai");
+    btn.innerHTML = "<span class='spinner'></span> Memproses...";
+    btn.disabled = true;
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({ action: "executeSetoranNyaiBaru" })
+    })
+    .then(res => res.json()).then(res => {
+      btn.innerText = "Proses & Sinkron Ke Nyai";
+      btn.disabled = false;
+      if(res.success) {
+        alert(res.data || "Sukses menyinkronkan data santri baru ke Nyai!");
+        fetchNotification(); 
+        if (document.getElementById("adminModal").classList.contains("active")) {
+          ambilDataRekapServer();
+        }
+      } else {
+        alert("Gagal: " + res.error);
+      }
+    }).catch(err => {
+      btn.innerText = "Proses & Sinkron Ke Nyai";
+      btn.disabled = false;
+      alert("Terjadi gangguan jaringan.");
+    });
   }
 
   function fetchSyahriyyahNotification() {
