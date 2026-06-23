@@ -96,14 +96,12 @@
     </div>
   </header>
 
-  <!-- JALUR 1: NOTIFIKASI INFAQ PENDAFTARAN BARU -->
   <div id="nyaiAlert" class="alert-box">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="nyaiAlertText">Memeriksa antrean database...</p>
     <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none; padding:6px 12px; font-size:12px;">Proses & Sinkron Ke Nyai</button>
   </div>
 
-  <!-- JALUR 2: NOTIFIKASI SUSULAN SYAHRIYYAH KOLEKTIF -->
   <div id="syahriyyahAlert" class="alert-box alert-green">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #166534;">🟢 Notifikasi Otomatis Syahriyyah Susulan</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="syahriyyahAlertText">Memeriksa tagihan berjalan santri aktif...</p>
@@ -131,7 +129,6 @@
     <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
   </div>
 
-  <!-- FORM KEGIATAN & TAGIHAN DENGAN OPSI NON-SANTRI -->
   <div class="card">
     <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
     <div class="form-group">
@@ -145,16 +142,23 @@
     </div>
 
     <div class="form-group">
-      <label>Cakupan Beban:</label>
+      <label>Cakupan Beban Anggota:</label>
       <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 8px;">
         <label style="font-weight:normal; font-size:13px;">
-          <input type="radio" name="cakupan" value="SEMUA" checked onclick="toggleCakupanSantri('SEMUA')"> Semua Santri (<span id="countDbSantri">-</span> anak)
+          <input type="radio" name="cakupan" value="DATABASE3" checked onclick="toggleCakupanSantri('DATABASE3')"> 
+          Seluruh Santri (Syahriyyah + Non-Syahriyyah) [<span id="countDb3">-</span> jiwa dari Database3]
+        </label>
+        <label style="font-weight:normal; font-size:13px; color: #1e3a8a; font-weight:600;">
+          <input type="radio" name="cakupan" value="DATABASE2" onclick="toggleCakupanSantri('DATABASE2')"> 
+          Seluruh Personil (ASATIDZ + SANTRI) [<span id="countDb2">-</span> jiwa dari Database2]
         </label>
         <label style="font-weight:normal; font-size:13px;">
-          <input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> Santri Khusus (Manual)
+          <input type="radio" name="cakupan" value="KHUSUS" onclick="toggleCakupanSantri('KHUSUS')"> 
+          Santri Pilihan Khususan (Manual Anggota)
         </label>
         <label style="font-weight:normal; font-size:13px; color: #b45309; font-weight: 600;">
-          <input type="radio" name="cakupan" value="NON_SANTRI" onclick="toggleCakupanSantri('NON_SANTRI')"> 🌟 Non Santri (Langsung ke Buku Kontrol Admin)
+          <input type="radio" name="cakupan" value="NON_SANTRI" onclick="toggleCakupanSantri('NON_SANTRI')"> 
+          🌟 Non Santri (Langsung ke Buku Kontrol Rekap)
         </label>
       </div>
     </div>
@@ -166,7 +170,7 @@
     </div>
 
     <div class="form-group">
-      <label id="labelNominal">Nominal Per Santri (Rp):</label>
+      <label id="labelNominal">Nominal Per Kepala (Rp):</label>
       <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
     </div>
 
@@ -174,7 +178,6 @@
   </div>
 </div>
 
-<!-- CONTAINER MODAL RUANG ADMIN -->
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
@@ -259,7 +262,7 @@
   window.onload = function() {
     fetchNotification();
     fetchSyahriyyahNotification();
-    loadTotalSantriCount();
+    loadTotalSantriCounts();
   };
 
   function bukaRuangAdmin() {
@@ -276,17 +279,25 @@
     document.getElementById("adminModal").classList.remove("active");
   }
 
-  function loadTotalSantriCount() {
+  // Memuat total kuantitas baris data dari Database3 dan Database2 secara bersamaan
+  function loadTotalSantriCounts() {
     fetch(WEB_APP_URL, { 
       method: "POST", 
       mode: "cors",
-      body: JSON.stringify({ action: "getDatabaseSantriCount" }) 
+      body: JSON.stringify({ action: "getDatabaseSantriCount", sheetType: "Database3" }) 
     })
     .then(res => res.json()).then(res => {
-      if(res.success) {
-        document.getElementById("countDbSantri").innerText = res.data.totalSantri;
-      }
-    }).catch(err => console.log("Gagal memuat total santri"));
+      if(res.success) document.getElementById("countDb3").innerText = res.data.totalSantri;
+    }).catch(err => console.log("Gagal memuat count Database3"));
+
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "getDatabaseSantriCount", sheetType: "Database2" }) 
+    })
+    .then(res => res.json()).then(res => {
+      if(res.success) document.getElementById("countDb2").innerText = res.data.totalSantri;
+    }).catch(err => console.log("Gagal memuat count Database2"));
   }
 
   function ambilDataRekapServer() {
@@ -326,7 +337,7 @@
     data.forEach(item => {
       if (item.belumTerbayar > 0) {
         totalTagihan += item.totalFinal;
-        totalBayar += item.sudahTerbayar;
+        totalBayar += item.sudahBayar;
         totalSisa += item.belumTerbayar;
 
         let tr = document.createElement("tr");
@@ -418,7 +429,7 @@
     if (type === "NON_SANTRI") {
       labelNominal.innerText = "Total Nominal Global Pembayaran (Rp):";
     } else {
-      labelNominal.innerText = "Nominal Per Santri (Rp):";
+      labelNominal.innerText = "Nominal Per Kepala (Rp):";
     }
   }
 
@@ -437,7 +448,7 @@
           resDiv.innerHTML = "";
           list.forEach(item => {
             let itemEl = document.createElement("div"); itemEl.className = "search-item";
-            itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
+            itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
             itemEl.addEventListener("click", function() { pilihSantri(item); });
             resDiv.appendChild(itemEl);
           });
@@ -538,7 +549,7 @@
     const btn = document.getElementById("btnSimpanAcara");
 
     if(!jenis || !nominal) { alert("Lengkapi seluruh formulir!"); return; }
-    if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama santri!"); return; }
+    if(cakupan === "KHUSUS" && listSantriKhususAcara.length === 0) { alert("Pilih minimal 1 nama anggota!"); return; }
 
     btn.disabled = true;
     btn.innerHTML = "<span class='spinner'></span> Melempar Data...";
@@ -557,10 +568,10 @@
       btn.disabled = false;
       btn.innerText = "Simpan & Lempar Ke Pusat";
       if(res.success) {
-        alert(res.data);
+        alert("Sukses: " + (res.data.message || "Data tagihan massal berhasil disebarkan!"));
         document.getElementById("nominalPerAnak").value = "";
         listSantriKhususAcara = []; renderBadges();
-        loadTotalSantriCount();
+        loadTotalSantriCounts();
         if (document.getElementById("adminModal").classList.contains("active")) {
           ambilDataRekapServer();
         }
@@ -625,7 +636,6 @@
         const info = response.data;
         if(info.jumlahSantriBaru > 0) {
           alertText.innerHTML = `Terdeteksi <b>${info.jumlahSantriBaru} dari ${info.totalAngkatan} santri baru 2026</b> belum disetor ke Nyai. Total: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
-          // PERBAIKAN: Tombol dipastikan tampil ("inline-block") ketika jumlahSantriBaru > 0
           btnProses.style.display = "inline-block";
         } else {
           alertText.innerHTML = `Semua data pendaftaran santri baru 2026 (${info.totalAngkatan} anak) sudah sinkron dengan Nyai.`;
