@@ -96,14 +96,12 @@
     </div>
   </header>
 
-  <!-- JALUR 1: NOTIFIKASI INFAQ PENDAFTARAN BARU -->
   <div id="nyaiAlert" class="alert-box">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #92400e;">🔔 Notifikasi Infaq Pendaftaran Baru</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="nyaiAlertText">Memeriksa antrean database...</p>
     <button id="btnProsesNyai" class="btn btn-orange" onclick="prosesSetoranNyai()" style="display:none; padding:6px 12px; font-size:12px;">Proses & Sinkron Ke Nyai</button>
   </div>
 
-  <!-- JALUR 2: NOTIFIKASI SUSULAN SYAHRIYYAH KOLEKTIF -->
   <div id="syahriyyahAlert" class="alert-box alert-green">
     <h3 style="font-size:14px; margin-bottom: 3px; color: #166534;">🟢 Notifikasi Otomatis Syahriyyah Susulan</h3>
     <p style="font-size:13px; margin-bottom: 8px;" id="syahriyyahAlertText">Memeriksa tagihan berjalan santri aktif...</p>
@@ -131,7 +129,6 @@
     <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
   </div>
 
-  <!-- FORM KEGIATAN & TAGIHAN DENGAN OPSI NON-SANTRI -->
   <div class="card">
     <h2>📅 Form Input Kegiatan & Tagihan Setor Nyai</h2>
     <div class="form-group">
@@ -144,7 +141,6 @@
       <input type="text" id="customKategori" placeholder="Tulis nama kategori setoran baru..." style="display:none; margin-top:8px;">
     </div>
 
-    <!-- UPDATE PILIHAN: MENAMBAHKAN RADIO BUTTON NON SANTRI -->
     <div class="form-group">
       <label>Cakupan Beban:</label>
       <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 8px;">
@@ -166,7 +162,6 @@
       <div class="badge-list" id="listBadgeSantri"></div>
     </div>
 
-    <!-- MEMPERJELAS LABEL NOMINAL JIKA PILIHAN ADALAH NON-SANTRI -->
     <div class="form-group">
       <label id="labelNominal">Nominal Per Santri (Rp):</label>
       <input type="text" id="nominalPerAnak" placeholder="Contoh: 10.000" onkeyup="this.value = formatRupiah(this.value)">
@@ -176,7 +171,6 @@
   </div>
 </div>
 
-<!-- CONTAINER MODAL RUANG ADMIN -->
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
@@ -414,7 +408,6 @@
     document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
   }
 
-  // DINAMIS UNTUK MERUBAH LABEL DAN STRUKTUR JIKA DIPILIH NON-SANTRI
   function toggleCakupanSantri(type) {
     document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
     const labelNominal = document.getElementById("labelNominal");
@@ -425,29 +418,68 @@
     }
   }
 
-  // CARI BAGIAN INI DI HTML ANDA (SEKITAR BARIS 480):
-function cariSantri(val) {
-  const resDiv = document.getElementById("searchResults");
-  if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
-  fetch(WEB_APP_URL, { 
-    method: "POST", 
-    mode: "cors",
-    body: JSON.stringify({ action: "searchSantri", keyword: val }) 
-  })
-  .then(res => res.json()).then(response => {
-    // PERBAIKAN DI SINI: Membaca response.data.listAnak sesuai keluaran Code.gs terbaru
-    if(response.success && response.data.listAnak && response.data.listAnak.length > 0) {
-      resDiv.innerHTML = "";
-      response.data.listAnak.forEach(item => {
-        let itemEl = document.createElement("div"); itemEl.className = "search-item";
-        itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
-        itemEl.addEventListener("click", function() { pilihSantri(item); });
-        resDiv.appendChild(itemEl);
-      });
-      resDiv.style.display = "block";
-    } else { resDiv.style.display = "none"; }
-  });
-}
+  // REKOMENDASI: Menggunakan pembacaan response.data.listAnak sesuai output Code.gs terbaru
+  function cariSantri(val) {
+    const resDiv = document.getElementById("searchResults");
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data) {
+        let list = response.data.listAnak ? response.data.listAnak : response.data;
+        if (list && list.length > 0) {
+          resDiv.innerHTML = "";
+          list.forEach(item => {
+            let itemEl = document.createElement("div"); itemEl.className = "search-item";
+            itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
+            itemEl.addEventListener("click", function() { pilihSantri(item); });
+            resDiv.appendChild(itemEl);
+          });
+          resDiv.style.display = "block";
+          return;
+        }
+      }
+      resDiv.style.display = "none";
+    });
+  }
+
+  // Fungsi Tambahan (Placeholder) untuk Pencarian Santri Acara Khusus agar tidak error
+  function cariSantriAcara(val) {
+    const resDiv = document.getElementById("searchAcaraResults");
+    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
+    })
+    .then(res => res.json()).then(response => {
+      if(response.success && response.data) {
+        let list = response.data.listAnak ? response.data.listAnak : response.data;
+        if (list && list.length > 0) {
+          resDiv.innerHTML = "";
+          list.forEach(item => {
+            let itemEl = document.createElement("div"); itemEl.className = "search-item";
+            itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
+            itemEl.addEventListener("click", function() { 
+              if(!listSantriKhususAcara.some(s => s.nik === item.nik)) {
+                listSantriKhususAcara.push(item);
+                renderBadges();
+              }
+              resDiv.style.display = "none";
+              document.getElementById("searchAcaraSantri").value = "";
+            });
+            resDiv.appendChild(itemEl);
+          });
+          resDiv.style.display = "block";
+          return;
+        }
+      }
+      resDiv.style.display = "none";
+    });
+  }
 
   function renderBadges() {
     const box = document.getElementById("listBadgeSantri"); box.innerHTML = "";
@@ -455,6 +487,44 @@ function cariSantri(val) {
       let b = document.createElement("div"); b.className = "badge";
       b.innerHTML = `${s.nama} <span onclick="listSantriKhususAcara.splice(${idx},1); renderBadges();">×</span>`;
       box.appendChild(b);
+    });
+  }
+
+  function pilihSantri(santri) {
+    santriTerpilih = santri;
+    document.getElementById("searchResults").style.display = "none";
+    document.getElementById("searchKey").value = santri.nama;
+    document.getElementById("viewNik").innerText = santri.nik;
+    document.getElementById("viewNama").innerText = santri.nama;
+    document.getElementById("viewSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
+    document.getElementById("infoSaldoBox").classList.add("active");
+    document.getElementById("nominalTabungan").disabled = false;
+    document.getElementById("btnSimpanTabungan").disabled = false;
+    document.getElementById("nominalTabungan").focus();
+  }
+
+  function simpanTabungan() {
+    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
+    const statusDiv = document.getElementById("tabunganStatus");
+    const btn = document.getElementById("btnSimpanTabungan");
+    if(!nominal || nominal <= 0) return;
+    
+    btn.disabled = true; 
+    btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
+    
+    fetch(WEB_APP_URL, { 
+      method: "POST", 
+      mode: "cors",
+      body: JSON.stringify({ action: "saveTabunganSantri", nik: santriTerpilih.nik, nominalInput: nominal }) 
+    })
+    .then(res => res.json()).then(response => {
+      btn.disabled = false; 
+      btn.innerText = "Simpan Transaksi Tabungan";
+      if(response.success) {
+        statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
+        document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
+        document.getElementById("nominalTabungan").value = "";
+      }
     });
   }
 
@@ -553,13 +623,18 @@ function cariSantri(val) {
         const info = response.data;
         if(info.jumlahSantriBaru > 0) {
           alertText.innerHTML = `Terdeteksi <b>${info.jumlahSantriBaru} dari ${info.totalAngkatan} santri baru 2026</b> belum disetor ke Nyai. Total: <b>Rp ${info.totalSetoranNyai.toLocaleString('id-ID')}</b>`;
-          btnProses.style.display = "none"; // Disembunyikan karena dijalankan via tombol utama induk
+          btnProses.style.display = "none";
         } else {
           alertText.innerHTML = `Semua data pendaftaran santri baru 2026 (${info.totalAngkatan} anak) sudah sinkron dengan Nyai.`;
           btnProses.style.display = "none";
         }
       }
     });
+  }
+
+  // Fungsi Tambahan (Placeholder) untuk tombol Proses Setoran Nyai agar tidak error saat diklik
+  function prosesSetoranNyai() {
+    alert("Fitur sinkronisasi utama dijalankan melalui sistem pusat.");
   }
 
   function fetchSyahriyyahNotification() {
@@ -606,66 +681,6 @@ function cariSantri(val) {
         if (document.getElementById("adminModal").classList.contains("active")) {
           ambilDataRekapServer();
         }
-      }
-    });
-  }
-
-  function cariSantri(val) {
-    const resDiv = document.getElementById("searchResults");
-    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
-    fetch(WEB_APP_URL, { 
-      method: "POST", 
-      mode: "cors",
-      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
-    })
-    .then(res => res.json()).then(response => {
-      if(response.success && response.data.length > 0) {
-        resDiv.innerHTML = "";
-        response.data.forEach(item => {
-          let itemEl = document.createElement("div"); itemEl.className = "search-item";
-          itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik} (${item.gender})`;
-          itemEl.addEventListener("click", function() { pilihSantri(item); });
-          resDiv.appendChild(itemEl);
-        });
-        resDiv.style.display = "block";
-      } else { resDiv.style.display = "none"; }
-    });
-  }
-
-  function pilihSantri(santri) {
-    santriTerpilih = santri;
-    document.getElementById("searchResults").style.display = "none";
-    document.getElementById("searchKey").value = santri.nama;
-    document.getElementById("viewNik").innerText = santri.nik;
-    document.getElementById("viewNama").innerText = santri.nama;
-    document.getElementById("viewSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
-    document.getElementById("infoSaldoBox").classList.add("active");
-    document.getElementById("nominalTabungan").disabled = false;
-    document.getElementById("btnSimpanTabungan").disabled = false;
-    document.getElementById("nominalTabungan").focus();
-  }
-
-  function simpanTabungan() {
-    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
-    const statusDiv = document.getElementById("tabunganStatus");
-    const btn = document.getElementById("btnSimpanTabungan");
-    if(!nominal || nominal <= 0) return;
-    
-    btn.disabled = true; 
-    btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
-    
-    fetch(WEB_APP_URL, { 
-      method: "POST", 
-      mode: "cors",
-      body: JSON.stringify({ action: "saveTabunganSantri", nik: santriTerpilih.nik, nominalInput: nominal }) 
-    })
-    .then(res => res.json()).then(response => {
-      btn.disabled = false; 
-      btn.innerText = "Simpan Transaksi Tabungan";
-      if(response.success) {
-        statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
-        document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
-        document.getElementById("nominalTabungan").value = "";
       }
     });
   }
