@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulir Santri Baru - PPMUY</title>
   
-  <!-- Tailwind CSS & Font Awesome -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -55,7 +54,6 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
 
-  <!-- TOP STATUS BAR (FUNGSI KANAN) -->
   <div class="w-full bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
     <div class="max-w-4xl mx-auto px-6 py-2 flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-400">
       <div class="flex items-center gap-4">
@@ -72,27 +70,21 @@
     </div>
   </div>
 
-  <!-- CONTAINER UTAMA (GAYA BERSIH IMAGE KIRI) -->
   <main class="w-full max-w-4xl mx-auto px-4 py-8 flex-grow">
     
-    <!-- CARD BOX (PERSIS SEPERTI SEBELUMNYA DI IMAGE_45CCAE.PNG) -->
     <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 p-6 md:p-8">
       
-      <!-- JUDUL UTAMA -->
       <div class="border-b border-slate-300 dark:border-slate-600 pb-3 mb-6">
         <h1 class="text-xl font-bold text-slate-800 dark:text-white">Formulir Santri Baru</h1>
       </div>
 
-      <!-- MUTIARA KHIDMAH (FUNGSI DARI KANAN) -->
       <div class="mb-6 p-4 rounded-md border-l-4 border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 text-xs md:text-sm">
         <span class="block text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">Mutiara Khidmah:</span>
         <p id="quote-khidmah" class="italic text-slate-700 dark:text-slate-300">"Memuat pesan motivasi..."</p>
       </div>
 
-      <!-- FORMULIR INPUT -->
       <form id="pendaftaranForm" class="space-y-6">
         
-        <!-- BARIS 1: NAMA & NIK -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label-tegas">Nama Lengkap *</label>
@@ -104,7 +96,6 @@
           </div>
         </div>
 
-        <!-- BARIS 2: WHATSAPP & TANGGAL LAHIR -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label-tegas">No. WhatsApp *</label>
@@ -116,13 +107,11 @@
           </div>
         </div>
 
-        <!-- BARIS 3: ALAMAT LENGKAP -->
         <div>
           <label class="label-tegas">Alamat Lengkap *</label>
           <textarea id="alamat" rows="3" required placeholder="Nama jalan, nomor rumah, RT/RW, Dusun, Kelurahan, Kecamatan" class="w-full px-3 py-2 text-sm input-tegas"></textarea>
         </div>
 
-        <!-- BARIS 4: GENDER, KELAS, ASRAMA (DARI DATA KANAN + KELAS) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="label-tegas">Gender *</label>
@@ -151,7 +140,6 @@
           </div>
         </div>
 
-        <!-- BARIS 5: SEKOLAH ASAL, REFERAL, ORANG TUA, KOTA -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label-tegas">Nama Orang Tua / Wali *</label>
@@ -167,11 +155,12 @@
           </div>
           <div>
             <label class="label-tegas">Referal / Rekomendasi Pengurus</label>
-            <input type="text" id="referal" placeholder="Nama perekomendasi (jika ada)" class="w-full px-3 py-2 text-sm input-tegas">
+            <select id="referal" class="w-full px-3 py-2 text-sm input-tegas bg-white dark:bg-slate-900">
+              <option value="-">-- Pilih Nama Santri Pemberi Referal (Jika Ada) --</option>
+              </select>
           </div>
         </div>
 
-        <!-- BARIS 6: KEUANGAN & PETUGAS (FUNGSI INTEGRASI KANAN) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="label-tegas">Jenis Alokasi Pembayaran *</label>
@@ -193,7 +182,6 @@
           </div>
         </div>
 
-        <!-- BARIS 7: UPLOAD FOTO (BENTUK KOTAK DASHED DI BAWAH DARI IMAGE_45CCAE.PNG) -->
         <div class="border border-dashed border-slate-300 dark:border-slate-600 rounded p-4 bg-slate-50/50 dark:bg-slate-900/30">
           <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Foto Santri (Format PNG/JPG) *</label>
           <div class="flex items-center gap-3">
@@ -205,7 +193,6 @@
           </div>
         </div>
 
-        <!-- TOMBOL DAFTAR (HIJAU TEGAS FULL DARI IMAGE_45CCAE.PNG) -->
         <div>
           <button type="submit" id="submitBtn" class="w-full bg-institute-primary hover:bg-institute-primaryHover text-white font-bold py-2.5 px-4 rounded transition-colors text-sm tracking-wide">
             Daftarkan Santri
@@ -214,13 +201,11 @@
 
       </form>
 
-      <!-- NOTIFIKASI HANDLING -->
       <div id="message" class="mt-4 p-3 rounded text-xs font-semibold hidden border text-center"></div>
 
     </div>
   </main>
 
-  <!-- CSS SCRIPT UNTUK TEKS LABEL -->
   <style>
     .label-tegas {
       @apply block font-bold text-xs text-slate-800 dark:text-slate-200 mb-1.5;
@@ -229,7 +214,6 @@
     .error { @apply bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50; }
   </style>
 
-  <!-- LOGIC CONTROLLER PROGRAM -->
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxi6vWqEGsryGLcDIpEvRMgZ7st4bzaxebiaa_TqIgHDcfvSVMYBAHJwyhCE6GV6QET0g/exec";
 
@@ -247,12 +231,29 @@
       updateJamTanggal();
       setInterval(updateJamTanggal, 1000);
       initThemeEngine();
+      
+      // ===== LOGIKA AUTO-LOAD DATA SANTRI AKTIF KE DROPDOWN REFERAL =====
+      const referalSelect = document.getElementById("referal");
+      
+      fetch(WEB_APP_URL)
+        .then(response => response.json())
+        .then(daftarSantri => {
+          if (daftarSantri && daftarSantri.length > 0) {
+            daftarSantri.forEach(nama => {
+              const option = document.createElement("option");
+              option.value = nama;
+              option.textContent = nama;
+              referalSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(err => console.error("Gagal memuat list data referal santri:", err));
     });
 
     function updateJamTanggal() {
+      const { weekday, year, month, day } = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
       const skr = new Date();
-      const opsiTgl = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById("txt-tanggal").innerText = skr.toLocaleDateString('id-ID', opsiTgl);
+      document.getElementById("txt-tanggal").innerText = skr.toLocaleDateString('id-ID', { weekday, year, month, day });
       document.getElementById("txt-jam").innerText = skr.toLocaleTimeString('id-ID');
     }
 
@@ -355,7 +356,7 @@
       })
       .then(function() {
         msgDiv.className = "mt-4 p-3 rounded text-xs font-semibold block success";
-        msgDiv.innerText = "Data pendaftaran berhasil diverifikasi sistem & dikirim ke WhatsApp!";
+        msgDiv.innerText = "Pendaftaran sukses! Kwitansi digital & sertifikat apresiasi referal (jika valid) sedang diproses ke WhatsApp.";
         document.getElementById('pendaftaranForm').reset();
         document.getElementById('nama-file-terpilih').innerText = "No file chosen";
         submitBtn.disabled = false;
