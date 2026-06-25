@@ -20,7 +20,7 @@
     header h1 { font-size: 20px; }
     header p { font-size: 13px; opacity: 0.9; }
     
-    /* STYLE GRUP TOMBOL BIAR PAS SATU BARIS DI HP */
+    /* STYLE GRUP TOMBOL SATU BARIS DI HP */
     .header-buttons { display: flex; gap: 6px; align-items: center; width: 100%; justify-content: space-between; }
     .btn-hp { flex: 1; padding: 10px 4px !important; font-size: 11px !important; white-space: nowrap; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; border: none; transition: 0.2s; }
     .btn-hp:hover { opacity: 0.9; }
@@ -57,12 +57,21 @@
     .badge { background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
     .badge span { cursor: pointer; color: #dc2626; font-weight: bold; }
 
+    /* LAYAR MODAL UTMANA RUANG ADMIN */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s ease; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; transform: scale(0.9); transition: 0.3s ease; }
     .modal-overlay.active .modal-content { transform: scale(1); }
     .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #64748b; font-weight: bold; }
     .close-modal:hover { color: #1e293b; }
+
+    /* LAYAR TIRAI POPUP PENUH (FULLSCREEN) KHUSUS SANTRI MINUS BIAR KECE */
+    .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; z-index: 2000; display: none; flex-direction: column; }
+    .fullscreen-overlay.active { display: flex; }
+    .fullscreen-bar { background: #16a34a; color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .fullscreen-bar h3 { font-size: 14px; }
+    .btn-close-full { background: #dc2626; color: white; border: none; padding: 5px 12px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .fullscreen-body { flex: 1; width: 100%; height: 100%; border: none; }
 
     table.rekap-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
     table.rekap-table th, table.rekap-table td { padding: 10px; border: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
@@ -96,7 +105,7 @@
     </div>
     <div class="header-buttons">
       <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn-hp btn-back">⬅️ Kembali</a>
-      <button class="btn-hp btn-green" onclick="keAplikasiBlastWa()">📱 Santri Minus</button>
+      <button class="btn-hp btn-green" onclick="bukaLayarSantriMinus()">📱 Santri Minus</button>
       <button class="btn-hp btn-admin" onclick="bukaRuangAdmin()">🔐 Admin</button>
     </div>
   </header>
@@ -183,6 +192,14 @@
   </div>
 </div>
 
+<div id="layarFullBlastWa" class="fullscreen-overlay">
+  <div class="fullscreen-bar">
+    <h3>📱 Aplikasi Santri Minus (Full-page Terintegrasi)</h3>
+    <button class="btn-close-full" onclick="tutupLayarSantriMinus()">❌ TUTUP</button>
+  </div>
+  <iframe class="fullscreen-body" src="https://ujicoba-1.vercel.app/"></iframe>
+</div>
+
 <div id="adminModal" class="modal-overlay">
   <div class="modal-content">
     <span class="close-modal" onclick="tutupRuangAdmin()">&times;</span>
@@ -251,9 +268,13 @@
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
-  // MEMBUKA APLIKASI VERCEL DI HALAMAN FULL TAB BARU
-  function keAplikasiBlastWa() {
-    window.open("https://ujicoba-1.vercel.app/", "_blank");
+  // FUNGSI KHUSUS UNTUK MEMBUKA TIRAI FULLSCREEN DI WEB YANG SAMA
+  function bukaLayarSantriMinus() {
+    document.getElementById("layarFullBlastWa").classList.add("active");
+  }
+
+  function tutupLayarSantriMinus() {
+    document.getElementById("layarFullBlastWa").classList.remove("active");
   }
 
   function formatRupiah(angka) {
@@ -286,6 +307,7 @@
   }
 
   function tutupRuangAdmin() {
+    document.getElementById("adminModal").classList.remove("remove");
     document.getElementById("adminModal").classList.remove("active");
   }
 
@@ -432,7 +454,6 @@
     document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
   }
 
-  UX = window.UX || {};
   function toggleCakupanSantri(type) {
     document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
     const labelNominal = document.getElementById("labelNominal");
