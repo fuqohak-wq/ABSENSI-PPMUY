@@ -16,10 +16,14 @@
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     .container { max-width: 750px; margin: 0 auto; }
     
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 12px; }
+    header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     header h1 { font-size: 20px; }
     header p { font-size: 13px; opacity: 0.9; }
-    .header-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    
+    /* STYLE GRUP TOMBOL BIAR PAS SATU BARIS DI HP */
+    .header-buttons { display: flex; gap: 6px; align-items: center; width: 100%; justify-content: space-between; }
+    .btn-hp { flex: 1; padding: 10px 4px !important; font-size: 11px !important; white-space: nowrap; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; border: none; transition: 0.2s; }
+    .btn-hp:hover { opacity: 0.9; }
 
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
     .alert-box.active { display: block; }
@@ -28,9 +32,9 @@
     .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; text-decoration: none; display: inline-block; text-align: center; }
     .btn:hover { opacity: 0.9; }
     .btn-orange { background: #d97706; }
-    .btn-green { background: #16a34a; }
+    .btn-green { background: #16a34a; color: white; }
     .btn-blue { background: #2563eb; }
-    .btn-admin { background: #334155; border: 1px solid #475569; }
+    .btn-admin { background: #334155; border: 1px solid #475569; color: white; }
     .btn-back { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
     .btn-back:hover { background: #cbd5e1; }
     
@@ -80,11 +84,6 @@
       to { transform: rotate(360deg); }
     }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* STYLE KUSTOM BARU UNTUK IFRAME YANG MENARIK */
-    .iframe-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-    .iframe-wrapper iframe { width: 100%; height: 580px; border: none; display: block; }
-    .iframe-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b; }
   </style>
 </head>
 <body>
@@ -96,9 +95,9 @@
       <p>PPMUY • Integrasi Tabungan & Kegiatan Santri</p>
     </div>
     <div class="header-buttons">
-      <button class="btn btn-green" onclick="keAplikasiBlastWa()">📱 Blast WA Minus</button>
-      <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn btn-back">⬅️ Kembali</a>
-      <button class="btn btn-admin" onclick="bukaRuangAdmin()">🔐 Ruang Admin</button>
+      <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn-hp btn-back">⬅️ Kembali</a>
+      <button class="btn-hp btn-green" onclick="keAplikasiBlastWa()">📱 Santri Minus</button>
+      <button class="btn-hp btn-admin" onclick="bukaRuangAdmin()">🔐 Admin</button>
     </div>
   </header>
 
@@ -182,17 +181,6 @@
 
     <button id="btnSimpanAcara" class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
   </div>
-
-  <div class="card" id="cardBlastWa">
-    <h2>📱 Sistem Monitoring & WhatsApp Blast Saldo Minus</h2>
-    <div class="iframe-wrapper">
-      <iframe src="https://ujicoba-1.vercel.app/" title="Aplikasi Blast WA"></iframe>
-      <div class="iframe-footer">
-        <span>Sistem Terintegrasi Vercel & WA.me API</span>
-        <a href="https://ujicoba-1.vercel.app/" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">Buka Tab Baru ↗️</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div id="adminModal" class="modal-overlay">
@@ -263,12 +251,9 @@
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
-  // FUNGSI NAVIGASI SMOOTH SCROLL (KUSTOM BARU)
+  // MEMBUKA APLIKASI VERCEL DI HALAMAN FULL TAB BARU
   function keAplikasiBlastWa() {
-    const targetElement = document.getElementById("cardBlastWa");
-    if(targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    window.open("https://ujicoba-1.vercel.app/", "_blank");
   }
 
   function formatRupiah(angka) {
@@ -447,6 +432,7 @@
     document.getElementById("customKategori").style.display = (val === "LAINNYA") ? "block" : "none";
   }
 
+  UX = window.UX || {};
   function toggleCakupanSantri(type) {
     document.getElementById("boxSantriKhusus").style.display = (type === "KHUSUS") ? "block" : "none";
     const labelNominal = document.getElementById("labelNominal");
