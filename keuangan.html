@@ -16,10 +16,10 @@
     body { background-color: var(--bg); color: var(--text); padding: 20px; }
     .container { max-width: 750px; margin: 0 auto; }
     
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 20px; background: var(--primary); color: white; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 12px; }
     header h1 { font-size: 20px; }
     header p { font-size: 13px; opacity: 0.9; }
-    .header-buttons { display: flex; gap: 8px; align-items: center; }
+    .header-buttons { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
     .alert-box.active { display: block; }
@@ -80,6 +80,11 @@
       to { transform: rotate(360deg); }
     }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* STYLE KUSTOM BARU UNTUK IFRAME YANG MENARIK */
+    .iframe-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #f1f5f9; border: 1px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .iframe-wrapper iframe { width: 100%; height: 580px; border: none; display: block; }
+    .iframe-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 11px; color: #64748b; }
   </style>
 </head>
 <body>
@@ -91,6 +96,7 @@
       <p>PPMUY • Integrasi Tabungan & Kegiatan Santri</p>
     </div>
     <div class="header-buttons">
+      <button class="btn btn-green" onclick="keAplikasiBlastWa()">📱 Blast WA Minus</button>
       <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn btn-back">⬅️ Kembali</a>
       <button class="btn btn-admin" onclick="bukaRuangAdmin()">🔐 Ruang Admin</button>
     </div>
@@ -176,6 +182,17 @@
 
     <button id="btnSimpanAcara" class="btn btn-blue" onclick="simpanAcaraBaru()">Simpan & Lempar Ke Pusat</button>
   </div>
+
+  <div class="card" id="cardBlastWa">
+    <h2>📱 Sistem Monitoring & WhatsApp Blast Saldo Minus</h2>
+    <div class="iframe-wrapper">
+      <iframe src="https://ujicoba-1.vercel.app/" title="Aplikasi Blast WA"></iframe>
+      <div class="iframe-footer">
+        <span>Sistem Terintegrasi Vercel & WA.me API</span>
+        <a href="https://ujicoba-1.vercel.app/" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">Buka Tab Baru ↗️</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="adminModal" class="modal-overlay">
@@ -246,6 +263,14 @@
   let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
+  // FUNGSI NAVIGASI SMOOTH SCROLL (KUSTOM BARU)
+  function keAplikasiBlastWa() {
+    const targetElement = document.getElementById("cardBlastWa");
+    if(targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   function formatRupiah(angka) {
     var number_string = angka.replace(/[^,\d]/g, '').toString(),
     split = number_string.split(','),
@@ -279,7 +304,6 @@
     document.getElementById("adminModal").classList.remove("active");
   }
 
-  // Memuat total kuantitas baris data dari Database3 dan Database2 secara bersamaan
   function loadTotalSantriCounts() {
     fetch(WEB_APP_URL, { 
       method: "POST", 
@@ -715,10 +739,13 @@
       if(res.success) { 
         alert(res.data);
         fetchSyahriyyahNotification();
-        if (document.getElementById("adminModal").classList.contains("active")) {
-          ambilDataRekapServer();
-        }
+      } else {
+        alert("Gagal: " + res.error);
       }
+    }).catch(err => {
+      btn.innerText = "Sinkronisasikan Cicilan Syahriyyah";
+      btn.disabled = false;
+      alert("Gagal memproses data susulan.");
     });
   }
 </script>
