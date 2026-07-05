@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Digital PPMUY</title>
+    <style>
+        /* --- KONFIGURASI WARNA & DASAR --- */
+        :root {
+            --warna-bg: #fcfbf7;
+            --warna-emas: #d4af37;
+            --warna-hijau-tua: #064e3b;
+            --warna-hijau-emerald: #10b981;
+            --warna-teks: #1f2937;
+            --warna-kertas: #fffdf2;
+            --terminal-bg: #090d16;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--warna-bg);
+            /* Pola titik grid halus */
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--warna-teks);
+        }
+
+        /* --- CONTAINER UTAMA --- */
+        .main-card {
+            background: white;
+            max-width: 650px;
+            width: 100%;
+            border-radius: 24px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(6, 78, 59, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top Bar Gradasi */
+        .top-bar {
+            height: 10px;
+            background: linear-gradient(to right, var(--warna-emas), var(--warna-hijau-tua), var(--warna-hijau-emerald));
+        }
+
+        /* Menu Navigasi Kanan Atas */
+        .nav-link {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 10;
+        }
+
+        .nav-link button {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--warna-hijau-tua);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-link button:hover {
+            background: var(--warna-hijau-tua);
+            color: white;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 45px 40px 20px;
+            text-align: center;
+        }
+
+        .logo-box {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid var(--warna-hijau-tua);
+            overflow: hidden;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h2 {
+            margin: 0;
+            color: var(--warna-hijau-tua);
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* --- AREA FORM --- */
+        .content-section {
+            padding: 0 40px 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--warna-hijau-tua);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 18px;
+            border-radius: 16px;
+            border: 2px solid #e5e7eb;
+            background-color: var(--warna-kertas);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--warna-hijau-emerald);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        /* --- TOMBOL UTAMA (3D EFFECT) --- */
+        .btn-kirim {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--warna-hijau-tua), var(--warna-hijau-emerald));
+            color: white;
+            border: none;
+            border-bottom: 4px solid #04392b;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-kirim:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 78, 59, 0.2);
+        }
+
+        .btn-kirim:active {
+            transform: translateY(2px);
+            border-bottom-width: 0;
+            margin-bottom: 4px;
+        }
+
+        .btn-kirim:disabled {
+            background: #94a3b8;
+            border-bottom-color: #64748b;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- STATUS / LOG / BOX --- */
+        .status-area {
+            margin-top: 25px;
+        }
+
+        .status-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Gaya Terminal Gelap (Musyawarah) */
+        #log {
+            background: var(--terminal-bg);
+            color: #38bdf8;
+            padding: 18px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            min-height: 80px;
+            white-space: pre-wrap;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Gaya Status Box (Tarojumah) */
+        #statusBox {
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .bg-blue-50 { background-color: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+        .bg-emerald-50 { background-color: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
+        .bg-red-50 { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 20px 40px 40px;
+            text-align: center;
+            border-top: 1px dashed #d1d5db;
+        }
+
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--warna-hijau-tua);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .footer-link:hover { text-decoration: underline; }
+
+        /* --- ANIMASI LOADING --- */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- HALAMAN 1: MUSYAWARAH -->
+    <div id="pageMusyawarah" class="main-card">
+        <div class="top-bar"></div>
+        <div class="nav-link">
+            <button onclick="switchPage('pageTarojumah')">✍️ Beralih ke Tarojumah →</button>
+        </div>
+        <header>
+            <div class="logo-box">
+                <img src="https://raw.githubusercontent.com/fuqohak-wq/UJICOBA1/main/cover/logoppmuy.jpg" alt="Logo PPMUY">
+            </div>
+            <h2>Uji Coba Sistem Musyawarah</h2>
+            <p class="subtitle">Gunakan halaman ini untuk melacak di mana letak macetnya sistem.</p>
+        </header>
+
+        <div class="content-section">
+            <div class="input-group">
+                <label>Masukkan Teks Diskusi WA:</label>
+                <textarea id="teksInput" placeholder="Tempel naskah musyawarah di sini..."></textarea>
+            </div>
+            
+            <button id="btnKirim" class="btn-kirim" onclick="kirimData()">
+                Kirim ke Google Script 🚀
+            </button>
+
+            <div class="status-area">
+                <span class="status-label">STATUS / LOG PROSES</span>
+                <div id="log">Siap menerima perintah...</div>
+            </div>
+        </div>
+
+        <footer>
+            <a href="https://docs.google.com/document/u/0/" target="_blank" class="footer-link">
+                Buka Hasil Dokumen di Google Doc ↗
+            </a>
+        </footer>
+    </div>
+
+    <!-- HALAMAN 2: TAROJUMAH -->
+    <div id="pageTarojumah" class="main-card hidden">
+        <div class="top-bar"></div>
+        <div class="nav-link">
+            <button onclick="switchPage('pageMusyawarah')">🕌 Kembali ke Musyawarah →</button>
+        </div>
+        <header>
+            <div class="logo-box">
+                <img src="https://raw.githubusercontent.com/fuqohak-wq/UJICOBA1/main/cover/logoppmuy.jpg" alt="Logo PPMUY">
+            </div>
+            <h2>AI Turats & WA Formatter</h2>
+            <p class="subtitle">Merapikan catatan diskusi acak dari WhatsApp langsung ke Google Doc terkait.</p>
+        </header>
+
+        <div class="content-section">
+            <div class="input-group">
+                <label>Salinan Catatan Diskusi / Teks Mentah (WA)</label>
+                <textarea id="teksMentah" placeholder="Contoh: Majlis II: 11/05/2026. Soal: Khobar dibagi tiga itu..."></textarea>
+            </div>
+
+            <div id="statusBox" class="hidden"></div>
+            
+            <button id="btnKirimT" class="btn-kirim" onclick="prosesDanKirim()">
+                <span id="btnText">Rapikan & Kirim ke Google Doc</span>
+                <div id="loader" class="spinner"></div>
+            </button>
+        </div>
+
+        <footer>
+            <a href="https://docs.google.com/document/d/15GuWezToqZisBgRq5M5iN5ovgPa6ayImIoPsqYsy-KE/edit" target="_blank" class="footer-link">
+                Buka & Cek Hasil di Google Doc ↗
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        // FUNGSI NAVIGASI HALAMAN
+        function switchPage(pageId) {
+            document.getElementById('pageMusyawarah').classList.add('hidden');
+            document.getElementById('pageTarojumah').classList.add('hidden');
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // ========================================================
+        // LOGIKA 1: MUSYAWARAH (100% ASLI SESUAI PERMINTAAN)
+        // ========================================================
+        const WEB_APP_URL = "SALIN_URL_WEB_APP_MUSYAWARAH_ANDA_DI_SINI";
+
+        async function kirimData() {
+            const teks = document.getElementById("teksInput").value.trim();
+            const logDiv = document.getElementById("log");
+            const btn = document.getElementById("btnKirim");
+
+            if (!teks) {
+                logDiv.innerText = "⚠️ ERROR: Teks input tidak boleh kosong!";
+                logDiv.style.color = "#ef4444";
+                return;
+            }
+
+            if (WEB_APP_URL.includes("SALIN_URL_WEB_APP")) {
+                logDiv.innerText = "⚠️ ERROR: Anda belum mengganti WEB_APP_URL di dalam kode HTML ini!";
+                logDiv.style.color = "#ef4444";
+                return;
+            }
+
+            btn.disabled = true;
+            logDiv.style.color = "#38bdf8";
+            logDiv.innerText = "1. Menghubungkan ke Google Apps Script...\n(Menunggu antrean AI Gemini, mohon tunggu sekitar 10-30 detik)";
+
+            const payload = JSON.stringify({ teks: teks });
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: payload
+                });
+
+                logDiv.innerText += "\n\n2. Data BERHASIL dikirim ke Google Script!\n\n3. Silakan langsung buka & cek Google Doc Musyawarah Anda sekarang untuk melihat hasilnya.";
+                logDiv.style.color = "#4ade80";
+
+            } catch (error) {
+                logDiv.innerText += "\n\n❌ GAGAL DI SISI HTML: " + error.message;
+                logDiv.style.color = "#ef4444";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // ========================================================
+        // LOGIKA 2: TAROJUMAH (MODERNIZED INTEGRATION)
+        // ========================================================
+        function prosesDanKirim() {
+            const inputTeks = document.getElementById('teksMentah').value;
+            const btn = document.getElementById('btnKirimT'); // ID disesuaikan agar tidak bentrok
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+            const statusBox = document.getElementById('statusBox');
+
+            if (!inputTeks.trim()) {
+                alert("Silakan masukkan/tempel teks mentah diskusi terlebih dahulu!");
+                return;
+            }
+
+            const URL_WEB_APP_GOOGLE = "https://script.google.com/macros/s/AKfycbx54CnX4BhGzdPRdSB-QfuL6zpkFvblXfXJc8wZETi33OO9mS7HVA6G8-Sig20sg9ecyA/exec";
+
+            btn.disabled = true;
+            btnText.innerText = "Sedang Memproses Naskah...";
+            loader.style.display = 'block';
+            statusBox.classList.remove('hidden');
+            statusBox.innerHTML = 'AI sedang merapikan teks turats Anda...';
+            statusBox.className = "bg-blue-50";
+
+            fetch(URL_WEB_APP_GOOGLE, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ teks: inputTeks })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Koneksi jaringan bermasalah.");
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    statusBox.innerText = data.message || "Berhasil merapikan teks dan memperbarui Google Doc!";
+                    statusBox.className = "bg-emerald-50";
+                    document.getElementById('teksMentah').value = "";
+                } else {
+                    statusBox.innerText = "Gagal: " + data.message;
+                    statusBox.className = "bg-red-50";
+                }
+            })
+            .catch(error => {
+                statusBox.innerText = "Verifikasi Gagal: " + error.message;
+                statusBox.className = "bg-red-50";
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btnText.innerText = "Rapikan & Kirim ke Google Doc";
+                loader.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>
