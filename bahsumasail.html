@@ -238,11 +238,18 @@
         .bg-emerald-50 { background-color: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
         .bg-red-50 { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
 
-        /* --- FOOTER --- */
+        /* --- FOOTER & NAVIGASI DOKUMEN --- */
         footer {
-            padding: 20px 40px 40px;
+            padding: 25px 40px 40px;
             text-align: center;
             border-top: 1px dashed #d1d5db;
+        }
+
+        .footer-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
         }
 
         .footer-link {
@@ -256,6 +263,42 @@
         }
 
         .footer-link:hover { text-decoration: underline; }
+
+        .btn-view-doc {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-view-doc:hover {
+            background-color: #e5e7eb;
+            color: var(--warna-teks);
+        }
+
+        .doc-preview-container {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: 450px;
+        }
+
+        .doc-preview-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
         /* --- ANIMASI LOADING --- */
         .spinner {
@@ -305,9 +348,21 @@
         </div>
 
         <footer>
-            <a href="https://docs.google.com/document/u/0/" target="_blank" class="footer-link">
-                Buka Hasil Dokumen di Google Doc ↗
-            </a>
+            <div class="footer-menu">
+                <!-- Opsi Pertama: Terhubung Langsung ke Google Doc Musyawarah -->
+                <a href="https://docs.google.com/document/d/1vOa2hxFfJCaCfWvtvi6ryX4Mk903jHPa7eu9zY0uYCw/edit?tab=t.0" target="_blank" class="footer-link">
+                    Buka Hasil Dokumen di Google Doc (Musyawarah) ↗
+                </a>
+                
+                <!-- Opsi Kedua: Lihat Isi Doc langsung versi HTML -->
+                <button class="btn-view-doc" onclick="toggleDocPreview('previewMusyawarah', this)">
+                    👁️ Lihat Isi Doc Versi HTML 👇
+                </button>
+
+                <div id="previewMusyawarah" class="doc-preview-container hidden">
+                    <iframe src="https://docs.google.com/document/d/1vOa2hxFfJCaCfWvtvi6ryX4Mk903jHPa7eu9zY0uYCw/preview"></iframe>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -340,9 +395,21 @@
         </div>
 
         <footer>
-            <a href="https://docs.google.com/document/d/15GuWezToqZisBgRq5M5iN5ovgPa6ayImIoPsqYsy-KE/edit" target="_blank" class="footer-link">
-                Buka & Cek Hasil di Google Doc ↗
-            </a>
+            <div class="footer-menu">
+                <!-- Opsi Pertama: Terhubung Langsung ke Google Doc Kitab Tarojumah -->
+                <a href="https://docs.google.com/document/d/113A2HGg_nA8hIXjIQ38iUebB2IpUZ9YDev-uD91QVPI/edit?tab=t.0" target="_blank" class="footer-link">
+                    Buka Hasil Dokumen di Google Doc (Kitab Tarojumah) ↗
+                </a>
+
+                <!-- Opsi Kedua: Lihat Isi Doc langsung versi HTML -->
+                <button class="btn-view-doc" onclick="toggleDocPreview('previewTarojumah', this)">
+                    👁️ Lihat Isi Doc Versi HTML 👇
+                </button>
+
+                <div id="previewTarojumah" class="doc-preview-container hidden">
+                    <iframe src="https://docs.google.com/document/d/113A2HGg_nA8hIXjIQ38iUebB2IpUZ9YDev-uD91QVPI/preview"></iframe>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -352,6 +419,18 @@
             document.getElementById('pageMusyawarah').classList.add('hidden');
             document.getElementById('pageTarojumah').classList.add('hidden');
             document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // FUNGSI TOGGLE PRATINJAU DOKUMEN (PREVIEW IFRAME)
+        function toggleDocPreview(elementId, button) {
+            const previewBox = document.getElementById(elementId);
+            if (previewBox.classList.contains('hidden')) {
+                previewBox.classList.remove('hidden');
+                button.innerHTML = "👁️ Sembunyikan Isi Doc 👆";
+            } else {
+                previewBox.classList.add('hidden');
+                button.innerHTML = "👁️ Lihat Isi Doc Versi HTML 👇";
+            }
         }
 
         // ========================================================
