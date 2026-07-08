@@ -93,21 +93,30 @@
         }
 
         // Fungsi khusus penanganan penarikan database santri dengan sistem caching lokal murni
+// Fungsi baru: Tanpa batas waktu, load instan, sync di latar belakang
         async function ambilDatabaseSantri(paksaSinkron = false) {
             const cachedDb = localStorage.getItem(CACHE_DB_KEY);
-            const cachedTime = localStorage.getItem(CACHE_DB_TIME_KEY);
 
-            // Jika tidak dipaksa re-sync, dan cache masih valid, gunakan data lokal
-            if (!paksaSinkron && cachedDb && cachedTime && (Date.now() - cachedTime < DURASI_CACHE_DB)) {
-                console.log("Menggunakan database santri dari Local Storage (Instan)...");
+            // 1. JIKA ADA CACHE, LANGSUNG PAKAI (INSTAN 0 DETIK)
+            if (cachedDb && !paksaSinkron) {
+                console.log("Menggunakan database santri dari Local Storage (Tanpa Batas Waktu)...");
                 databaseSantri = JSON.parse(cachedDb);
-                dbStatus.innerText = `🟢 Kiosk Ready (Cache: ${databaseSantri.length} Santri)`;
+                dbStatus.innerText = `🟢 Kiosk Ready (Lokal: ${databaseSantri.length} Santri)`;
                 dbStatus.classList.remove('animate-pulse');
+                
+                // Jalankan sinkronisasi diam-diam di latar belakang agar data tetap update
+                sinkronisasiDiLatarBelakang();
                 return;
             }
 
+            // 2. JIKA CACHE KOSONG ATAU DI-KLIK RE-SYNC, BARU MENUNGGU LOADING UNTUK PERTAMA KALI
+            await jalankanFetchDatabase();
+        }
+
+        // Fungsi khusus mengambil data dari Google Sheets (Proses Berat)
+        async function jalankanFetchDatabase() {
             try {
-                dbStatus.innerText = "🔄 Menyelaraskan data...";
+                dbStatus.innerText = "🔄 Menyelaraskan data cloud...";
                 dbStatus.classList.add('animate-pulse');
                 
                 const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
@@ -116,58 +125,42 @@
                 if (json.status === "success") {
                     databaseSantri = json.data;
                     
-                    // Simpan data biometrik segar ke dalam Local Storage
+                    // Simpan di Local Storage SELAMANYA (tidak dihapus sebelum di-clear/logout)
                     localStorage.setItem(CACHE_DB_KEY, JSON.stringify(databaseSantri));
-                    localStorage.setItem(CACHE_DB_TIME_KEY, Date.now().toString());
                     
                     dbStatus.innerText = `🟢 Cloud Kiosk Ready (${databaseSantri.length} Santri)`;
                     dbStatus.classList.remove('animate-pulse');
-                    console.log("Database biometrik berhasil diperbarui langsung dari cloud.");
-                } else {
-                    throw new Error("Respon server gagal");
+                    console.log("Database biometrik berhasil diperbarui.");
                 }
             } catch (error) {
-                console.error("Gagal menyinkronkan database dari cloud:", error);
-                if (cachedDb) {
-                    databaseSantri = JSON.parse(cachedDb);
-                    dbStatus.innerText = `⚠️ Cloud Offline (Memakai Data Lokal)`;
-                    dbStatus.classList.remove('animate-pulse');
-                } else {
-                    dbStatus.innerText = "🔴 Cloud Putus & Cache Kosong";
-                }
+                console.error("Gagal ambil data:", error);
+                dbStatus.innerText = "⚠️ Cloud Putus / Offline";
             }
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
-            try {
-                label.innerText = "MEMUAT AI KIOSK...";
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
-                await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
-                await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
-                
-                // Panggil logika penanganan database berbasis cache murni
-                await ambilDatabaseSantri(false);
-                
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                video.srcObject = stream;
-                label.innerText = "HADAPKAN WAJAH KE KAMERA";
-                
-                setInterval(async () => {
-                    if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
-                    
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
-                    
-                    if (hasilKamera) {
-                        isProcessing = true;
-                        kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
-                        label.innerText = "MENCOCOKKAN BIOMETRIK...";
-                        
-                        verifikasiWajahLokal(hasilKamera.descriptor);
+        // Fungsi sinkronisasi otomatis tanpa mengganggu Kiosk Scan Wajah
+// Fungsi sinkronisasi otomatis tanpa mengganggu Kiosk Scan Wajah (Versi Proteksi Penuh)
+        function sinkronisasiDiLatarBelakang() {
+            console.log("Mengecek pembaruan data ke cloud di latar belakang...");
+            
+            fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.status === "success") {
+                        // Perbarui penyimpanan lokal secara diam-diam
+                        localStorage.setItem(CACHE_DB_KEY, JSON.stringify(json.data));
+                        databaseSantri = json.data;
+                        dbStatus.innerText = `🟢 Kiosk Ready (Terupdet: ${databaseSantri.length} Santri)`;
+                        console.log("Sinkronisasi latar belakang selesai. Data diselaraskan.");
                     }
-                }, 400);
-            } catch (e) { label.innerText = "AI OFFLINE"; }
-        });
+                })
+                .catch(err => {
+                    console.log("Gagal sync latar belakang (koneksi tidak stabil), menggunakan data lokal yang ada.");
+                    // Kembalikan teks status menjadi hijau lokal agar pengguna tidak panik melihat animasi loading berputar selamanya
+                    dbStatus.innerText = `🟢 Kiosk Ready (Lokal: ${databaseSantri.length} Santri)`;
+                    dbStatus.classList.remove('animate-pulse');
+                });
+        }
 
         async function verifikasiWajahLokal(descriptorKamera) {
             let santriDitemukan = null; 
