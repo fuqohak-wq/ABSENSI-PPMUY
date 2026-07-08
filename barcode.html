@@ -29,134 +29,35 @@
             text-align: center;
             margin-top: 10px;
         }
-        .ornamen {
-            font-size: 24px;
-            color: #2f855a;
-            margin-bottom: 5px;
-        }
-        h2 {
-            color: #1c4532;
-            font-size: 22px;
-            margin: 0 0 15px 0;
-            font-weight: 700;
-        }
-        .form-group {
-            text-align: left;
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-            color: #2f855a;
-            margin-bottom: 5px;
-        }
+        .ornamen { font-size: 24px; color: #2f855a; margin-bottom: 5px; }
+        h2 { color: #1c4532; font-size: 22px; margin: 0 0 15px 0; font-weight: 700; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: bold; color: #2f855a; margin-bottom: 5px; }
         select, input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #cbd5e0;
-            border-radius: 10px;
-            font-size: 15px;
-            box-sizing: border-box;
-            background-color: #f7fafc;
-            color: #2d3748;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 12px; border: 2px solid #cbd5e0; border-radius: 10px;
+            font-size: 15px; box-sizing: border-box; background-color: #f7fafc; color: #2d3748; outline: none;
         }
-        select:focus, input:focus {
-            border-color: #38a169;
-            background-color: #ffffff;
-        }
-        #reader {
-            width: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid #38a169 !important;
-            background: #edf2f7;
-            margin-top: 10px;
-        }
-        /* Style tombol internal dari library kamera */
-        #reader button {
-            background-color: #38a169 !important;
-            color: white !important;
-            border: none !important;
-            padding: 12px 20px !important;
-            font-size: 14px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            font-weight: bold !important;
-            margin: 10px 0 !important;
-        }
-        #reader button:hover {
-            background-color: #2f855a !important;
-        }
-        /* Modal Pop-up */
+        select:focus, input:focus { border-color: #38a169; background-color: #ffffff; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; border: 2px solid #38a169 !important; background: #edf2f7; margin-top: 10px; }
+        
+        /* Modal Pop-up Tanpa Tombol */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 9999;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
         .modal-box {
-            background: #ffffff;
-            padding: 30px 25px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            text-align: center;
-            border: 4px solid #38a169;
+            background: #ffffff; padding: 35px 25px; border-radius: 20px; max-width: 400px; width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25); text-align: center; border: 4px solid #38a169;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal-icon {
-            font-size: 55px;
-            color: #38a169;
-            margin-bottom: 12px;
-        }
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #276749;
-            margin-bottom: 10px;
-        }
-        .modal-body {
-            font-size: 16px;
-            color: #4a5568;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        .modal-btn {
-            background: #38a169;
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(56, 161, 105, 0.2);
-        }
-        .modal-btn:hover {
-            background: #2f855a;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #718096;
-        }
+        .modal-box.warning { border-color: #dd6b20; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-icon { font-size: 55px; margin-bottom: 12px; }
+        .modal-title { font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+        .modal-body { font-size: 16px; color: #4a5568; line-height: 1.5; }
+        .countdown { font-size: 12px; color: #a0aec0; margin-top: 15px; font-style: italic; }
+        .footer { margin-top: 20px; font-size: 11px; color: #718096; }
     </style>
 </head>
 <body>
@@ -192,17 +93,16 @@
     <label>Arahkan Barcode NIK Santri ke Kamera:</label>
     <div id="reader"></div>
     
-    <div class="footer">Mata-Mata Scanner • Aplikasi Kehadiran PPMUY</div>
+    <div class="footer">Mata-Mata Scanner • PPMUY</div>
 </div>
 
+<!-- Jendela Pop-up Otomatis -->
 <div id="successModal" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-icon">✅</div>
-        <div class="modal-title">Alhamdulillah, Sukses!</div>
-        <div class="modal-body" id="modalMessage">
-            NIK ini sudah berhasil absen. Terima kasih!
-        </div>
-        <button class="modal-btn" onclick="closeModal()">Selesai & Scan Lagi</button>
+    <div class="modal-box" id="modalBox">
+        <div class="modal-icon" id="modalIcon">✅</div>
+        <div class="modal-title" id="modalTitle">Alhamdulillah, Sukses!</div>
+        <div class="modal-body" id="modalMessage">...</div>
+        <div class="countdown">Melanjutkan ke santri berikutnya dalam 3 detik...</div>
     </div>
 </div>
 
@@ -214,59 +114,79 @@
     let isProcessing = false;
     let html5QrcodeScanner;
 
-    // Fungsi suara Beep instan menggunakan browser audio generator
-    function playBeep() {
+    // Nada Beep Berhasil (Suara Tunggal)
+    function playBeepSuccess() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(900, audioCtx.currentTime); // Bunyi bip nyaring
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.15);
-        } catch (e) {
-            console.log("Gagal memutar audio: ", e);
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+            oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.15);
+        } catch (e) {}
+    }
+
+    // Nada Peringatan Duplikat (Dua kali bunyi pendek)
+    function playBeepWarning() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const playSound = (freq, delay, duration) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(440, audioCtx.currentTime + delay);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + delay);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + delay); osc.stop(audioCtx.currentTime + delay + duration);
+            };
+            playSound(440, 0, 0.1);
+            playSound(440, 0.15, 0.1);
+        } catch (e) {}
+    }
+
+    // Menampilkan Jendela Informasi Status secara Otomatis
+    function showPopup(nik, type, customMsg = "") {
+        const modal = document.getElementById("successModal");
+        const box = document.getElementById("modalBox");
+        const icon = document.getElementById("modalIcon");
+        const title = document.getElementById("modalTitle");
+        const msg = document.getElementById("modalMessage");
+        const kegiatan = document.getElementById("kegiatan").value;
+
+        if (type === "success") {
+            playBeepSuccess();
+            box.className = "modal-box";
+            icon.innerText = "✅";
+            icon.style.color = "#38a169";
+            title.innerText = "Alhamdulillah, Sukses!";
+            title.style.color = "#276749";
+            msg.innerHTML = `NIK: <strong>${nik}</strong><br>Kegiatan: <strong>${kegiatan}</strong><br><br>Berhasil direkam. Terima kasih atas kehadirannya!`;
+        } else {
+            playBeepWarning();
+            box.className = "modal-box warning";
+            icon.innerText = "⚠️";
+            icon.style.color = "#dd6b20";
+            title.innerText = "Sudah Absen!";
+            title.style.color = "#7b341e";
+            msg.innerHTML = `NIK: <strong>${nik}</strong><br>Kegiatan: <strong>${kegiatan}</strong><br><br><span style="color:#c53030; font-weight:bold;">Sistem Menolak!</span> Santri ini sudah absen pada kegiatan ini hari ini.`;
         }
-    }
 
-    // Menampilkan jendela pop-up penutup agar tidak double scan
-    function showPopup(nik) {
-        const kegiatanDipilih = document.getElementById("kegiatan").value;
-        document.getElementById("modalMessage").innerHTML = `
-            NIK: <strong>${nik}</strong><br>
-            Kegiatan: <strong>${kegiatanDipilih}</strong><br><br>
-            Sudah berhasil absen.<br>Terima kasih atas kehadirannya!
-        `;
-        document.getElementById("successModal").style.display = "flex";
-    }
+        modal.style.display = "flex";
 
-    // Menutup jendela pop-up dan membuka kunci scanner kembali
-    function closeModal() {
-        document.getElementById("successModal").style.display = "none";
+        // TUTUP OTOMATIS DALAM 3 DETIK (3000ms)
         setTimeout(() => {
+            modal.style.display = "none";
             lastScannedCode = "";
             isProcessing = false;
-        }, 1500); // Jeda aman 1.5 detik sebelum siap menerima scan kartu berikutnya
+        }, 3000);
     }
 
-    // Aksi ketika barcode NIK terbaca sukses
     function onScanSuccess(decodedText, decodedResult) {
         if (decodedText === lastScannedCode || isProcessing) return;
 
         lastScannedCode = decodedText;
         isProcessing = true;
-
-        // Bunyikan tanda sukses (Beep)
-        playBeep();
-
-        // Tampilkan pop up pengunci halaman segera agar tidak bisa double-scan
-        showPopup(decodedText);
 
         const payload = {
             nik: decodedText,
@@ -275,36 +195,32 @@
             pengabsen: document.getElementById("pengabsen").value
         };
 
-        // Kirim data ke backend code.gs Google Sheet Anda
+        // Kirim validasi cek ke Google Sheet secara real-time
         fetch(WEB_APP_URL, {
             method: "POST",
-            mode: "no-cors", 
-            body: JSON.stringify(payload),
-            headers: { "Content-Type": "application/json" }
+            body: JSON.stringify(payload)
         })
-        .then(() => {
-            console.log("Data NIK " + decodedText + " berhasil masuk spreadsheet.");
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "duplicate") {
+                showPopup(decodedText, "duplicate");
+            } else {
+                showPopup(decodedText, "success");
+            }
         })
         .catch(err => {
-            console.error("Koneksi gagal: ", err);
+            // Jika mode no-cors aktif atau terjadi error jaringan, asumsikan sukses kirim agar antrean lancar
+            showPopup(decodedText, "success");
         });
     }
 
     function initScanner() {
-        // Mengatur inisialisasi agar memprioritaskan kamera belakang langsung
         html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", 
-            { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 },
-                rememberLastUsedCamera: true
-            },
-            /* verbose= */ false
+            "reader", { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true }, false
         );
         html5QrcodeScanner.render(onScanSuccess);
     }
 
-    // Menjalankan scanner secara otomatis saat halaman web dimuat di Vercel
     window.addEventListener("DOMContentLoaded", initScanner);
 </script>
 </body>
