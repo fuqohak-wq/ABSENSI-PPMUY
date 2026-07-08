@@ -327,7 +327,8 @@
                         <p class="text-[9px] text-slate-400 mt-0.5">Deteksi landmark koordinat struktur wajah Kiosk AI.</p>
                     </div>
                 </a>
-                <a href="scan-wajah.html?mode=barcode" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-emerald-400/50 transition-all cursor-pointer group">
+                <!-- DIARAHKAN LANGSUNG KE barcode.html -->
+                <a href="barcode.html" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-emerald-400/50 transition-all cursor-pointer group">
                     <div class="w-10 h-10 bg-emerald-400/10 group-hover:bg-emerald-400/20 rounded-lg flex items-center justify-center text-emerald-400 text-lg"><i class="fa-solid fa-barcode"></i></div>
                     <div class="text-left">
                         <h4 class="text-xs font-black text-slate-100 group-hover:text-emerald-400 uppercase tracking-wider">Scan Barcode (Kartu NIK)</h4>
@@ -511,55 +512,47 @@
             });
         }
 
-async function muatSeluruhRekapDashboard() {
+        async function muatSeluruhRekapDashboard() {
             const feedBox = document.getElementById('box-live-feed');
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
 
-            // --- PENGATURAN LOCAL STORAGE CACHE ---
             const CACHE_KEY = 'cache_rekap_dashboard';
-            const CACHE_TIME_KEY = 'cache_rekap_time';
-            const DURASI_CACHE = 5 * 60 * 1000; // 5 Menit dalam milidetik
-
             const dataCache = localStorage.getItem(CACHE_KEY);
-            const waktuCache = localStorage.getItem(CACHE_TIME_KEY);
 
-            // Cek apakah cache ada dan belum kedaluwarsa
-            if (dataCache && waktuCache && (Date.now() - waktuCache < DURASI_CACHE)) {
-                console.log("Mengambil data rekap dari Local Storage (Instan)...");
-                const r = JSON.parse(dataCache);
-                tampilkanDataKeUI(r, feedBox);
-                return; // Berhenti di sini, tidak perlu fetch ke server
+            // OPTIMALISASI KECEPATAN: Render data cache secara instan jika tersedia
+            if (dataCache) {
+                try {
+                    const r = JSON.parse(dataCache);
+                    tampilkanDataKeUI(r, feedBox);
+                } catch (e) {
+                    console.error("Gagal membaca format cache:", e);
+                }
             }
 
+            // Selalu lakukan pembaruan data di latar belakang (Background Validation)
             try {
-                console.log("Cache kosong/kedaluwarsa. Mengambil data baru dari server...");
                 let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`, { method: "GET" });
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    
                     if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
                         alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
                         prosesLogout();
                         return;
                     }
 
-                    // Simpan data terbaru ke dalam Local Storage
+                    // Perbarui penyimpanan lokal dengan data terbaru dari server
                     localStorage.setItem(CACHE_KEY, JSON.stringify(r));
-                    localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
 
-                    // Tampilkan data hasil fetch ke UI
+                    // Perbarui tampilan dengan data teranyar
                     tampilkanDataKeUI(r, feedBox);
                 }
             } catch (error) {
-                console.error("Gagal memuat rekap dari server:", error);
+                console.error("Gagal memperbarui data dari server:", error);
                 
-                // Jika server error, gunakan data cache lama sebagai cadangan (jika ada)
-                if (dataCache) {
-                    console.log("Menampilkan data cache lama karena server error.");
-                    tampilkanDataKeUI(JSON.parse(dataCache), feedBox);
-                } else if (feedBox) {
+                // Tampilkan fallback error hanya jika tidak ada data cache sama sekali
+                if (!dataCache && feedBox) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-rose-500 font-bold uppercase">Gagal memuat data dari server.</div>`;
                 }
             }
