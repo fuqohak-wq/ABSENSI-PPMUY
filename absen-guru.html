@@ -43,7 +43,7 @@
 
     <header class="w-full dynamic-bg-box border-b-4 border-yellow-400 px-4 sm:px-6 py-4 flex justify-between items-center shadow-md no-print">
         <div class="flex items-center gap-3">
-            <a href="dashboard.html" class="w-9 h-9 rounded-xl dynamic-bg-input hover:opacity-80 flex items-center justify-center border dynamic-border text-yellow-500 transition-all" title="Kembali ke Dashboard Utama">
+            <a href="#" class="w-9 h-9 rounded-xl dynamic-bg-input hover:opacity-80 flex items-center justify-center border dynamic-border text-yellow-500 transition-all" title="Kembali ke Dashboard Utama">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
             <div class="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shadow-sm">
@@ -92,6 +92,11 @@
                     </div>
                     <button onclick="sinkronisasikanSistem()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-indigo-950 font-black text-xs uppercase py-3.5 rounded-xl tracking-widest transition-all cursor-pointer shadow-md">
                         <i class="fa-solid fa-sync mr-1"></i> SINKRON DATA
+                    </button>
+                    
+                    <!-- TOMBOL KUNCI ABSENSI MASSAL -->
+                    <button onclick="kunciAbsensiSistem()" id="btn-kunci" class="w-full bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase py-3.5 rounded-xl tracking-widest transition-all cursor-pointer shadow-md mt-2">
+                        <i class="fa-solid fa-lock mr-1"></i> KUNCI ABSENSI (GHAIB)
                     </button>
                 </div>
             </section>
@@ -173,10 +178,12 @@
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-box no-print">E-PESANTREN CORE ECOSYSTEM</footer>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        // Memakai Webapp URL Anda yang benar
+        const API_URL = "https://script.google.com/macros/s/AKfycbyuV3kTyzeGSTvRgfiG6ZoPEUf8HOQkfr9MHSJMB7VlwWw1Xu-TtQcEAjQcn4DKVTc/exec";
 
         let masterJadwal = [];
         let logHadirHariIni = [];
+        let listBelumAbsen = []; // Untuk menyimpan daftar sisa guru yang akan dikunci sebagai Ghaib
 
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('id-ID') + " WIB";
@@ -218,12 +225,11 @@
                 distribusikanRekapData();
             } catch (error) {
                 console.error("Gagal sinkronisasi data portal:", error);
-            } finally {
+            } bits {
                 document.getElementById('loader-guru').classList.add('hidden');
             }
         }
 
-        // REALTIME CLOUD DETECTOR: Mengambil data langsung dari stampsheet absensi_sekolah hari ini
         async function tarikLiveFeedHadirDashboard() {
             logHadirHariIni = [];
             try {
@@ -274,6 +280,7 @@
             boxKartu.innerHTML = '';
             tbodyHadir.innerHTML = '';
             tbodyGaib.innerHTML = '';
+            listBelumAbsen = []; // Reset penampung ghaib
 
             if (logHadirHariIni.length === 0) {
                 tbodyHadir.innerHTML = `<tr><td colspan="3" class="py-8 text-center dynamic-text-muted italic">Belum ada guru terdata masuk kelas hari ini.</td></tr>`;
@@ -308,6 +315,7 @@
                 if (sudahAbsen) return;
 
                 sounterGaib++;
+                listBelumAbsen.push(guru); // Masukkan ke data sisa ghaib
                 
                 let divKartu = document.createElement('div');
                 divKartu.className = "dynamic-bg-box hover:opacity-90 p-4 rounded-2xl border dynamic-border text-xs flex flex-col justify-between items-center gap-2 cursor-pointer text-center duration-300 shadow-md transition-all hover:-translate-y-0.5 hover:border-yellow-500/50";
@@ -361,7 +369,7 @@
             paramsAbsen.append('mapel', guruData.mapel);
             paramsAbsen.append('kelas', guruData.kelas || "A");
             paramsAbsen.append('gender', gender);
-            paramsAbsen.append('jam', guruData.jam || "BEBAS"); // Mengirimkan jam aslinya (Jam 1, Jam 2, dst)
+            paramsAbsen.append('jam', guruData.jam || "BEBAS");
 
             try {
                 let resAbsen = await fetch(API_URL, { 
@@ -390,6 +398,60 @@
                 alert("Gangguan jaringan cloud, silakan coba lagi!");
                 cardElement.style.pointerEvents = "auto";
                 cardElement.innerHTML = originalHTML;
+            }
+        }
+
+        // FUNGSI BARU: Mengunci absensi massal untuk yang belum melakukan absen masuk
+        async function kunciAbsensiSistem() {
+            if (listBelumAbsen.length === 0) {
+                alert("Semua guru sudah melakukan absensi atau jadwal kosong!");
+                return;
+            }
+
+            var konfirmasi = confirm(`Apakah Anda yakin ingin KUNCI absensi? \nSebanyak ${listBelumAbsen.length} guru yang belum mengklik namanya akan otomatis tercatat sebagai "Ghaib".`);
+            if (!konfirmasi) return;
+
+            const btnKunci = document.getElementById('btn-kunci');
+            const originalBtnHTML = btnKunci.innerHTML;
+            btnKunci.disabled = true;
+            btnKunci.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> MEMPROSES...`;
+
+            const gender = document.getElementById('g-gender').value;
+            
+            // Map data yang dikirim agar menyertakan parameter gender saat ini
+            let payloadGhaib = listBelumAbsen.map(g => {
+                return {
+                    nama: g.nama,
+                    jam: g.jam || "BEBAS",
+                    mapel: g.mapel,
+                    kelas: g.kelas || "A",
+                    gender: gender
+                }
+            });
+
+            let paramsKunci = new URLSearchParams();
+            paramsKunci.append('aksi', 'kunci_absensi_ghaib');
+            paramsKunci.append('listGhaib', JSON.stringify(payloadGhaib));
+
+            try {
+                let res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: paramsKunci.toString()
+                });
+                let r = await res.json();
+
+                if (r.status === "success") {
+                    alert("Sistem berhasil dikunci! Guru yang tersisa telah tercatat 'Ghaib' di database.");
+                    await sinkronisasikanSistem(); // Muat ulang data terbaru dari spreadsheet
+                } else {
+                    alert("Gagal mengunci absensi: " + r.message);
+                }
+            } catch (e) {
+                alert("Gangguan jaringan saat mengunci sistem, silakan coba lagi!");
+            } finally {
+                btnKunci.disabled = false;
+                btnKunci.innerHTML = originalBtnHTML;
             }
         }
     </script>
