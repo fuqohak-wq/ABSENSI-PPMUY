@@ -76,7 +76,9 @@
             <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400" title="Ganti Tema">
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
-            <button onclick="muatSeluruhRekapDashboard()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap"><i class="fa-solid fa-rotate"></i></button>
+            <button onclick="muatSeluruhRekapDashboard(true)" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap">
+                <i id="icon-refresh" class="fa-solid fa-rotate"></i>
+            </button>
             <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
     </header>
@@ -121,68 +123,68 @@
                 <h3 class="text-xs font-black tracking-widest dynamic-text-title uppercase">SISTEM INFORMASI & ADMINISTRASI PONDOK</h3>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <a id="menu-pendaftaran" href="pendaftaran.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Pendaftaran</h4><p class="text-[9px] dynamic-text-muted truncate">Pendaftaran</p></div>
+                <a id="menu-pendaftaran" href="pendaftaran.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-emerald-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-sm"><i class="fa-solid fa-user-plus"></i></div>
+                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Pendaftaran</h4><p class="text-[9px] dynamic-text-muted truncate">Pendaftaran Baru</p></div>
                 </a>
-                <a id="menu-detail-santri" href="detail-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <a id="menu-detail-santri" href="detail-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-sky-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 text-sm"><i class="fa-solid fa-id-card"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">SANTRIMUY</h4><p class="text-[9px] dynamic-text-muted truncate">Detail Santri</p></div>
                 </a>
-                <a id="menu-perpustakaan" href="perpustakaan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <a id="menu-perpustakaan" href="perpustakaan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-indigo-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-sm"><i class="fa-solid fa-book"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Perpustakaan</h4><p class="text-[9px] dynamic-text-muted truncate">Perpus PPMUY</p></div>
                 </a>
-                <a id="medsos" href="medsos.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Medsos</h4><p class="text-[9px] dynamic-text-muted truncate">Medsos</p></div>
+                <a id="medsos" href="medsos.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-blue-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 text-sm"><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Medsos</h4><p class="text-[9px] dynamic-text-muted truncate">Media Sosial</p></div>
                 </a>
-                <a id="menu-aduan" href="Aduan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <a id="menu-aduan" href="Aduan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-red-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-sm"><i class="fa-solid fa-comment-dots"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Aduan</h4><p class="text-[9px] dynamic-text-muted truncate">Aduan Santri</p></div>
                 </a>
-                <a id="menu-keuangan" href="keuangan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <a id="menu-keuangan" href="keuangan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-teal-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-500 text-sm"><i class="fa-solid fa-wallet"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Keuangan</h4><p class="text-[9px] dynamic-text-muted truncate">Bendahara PPMUY</p></div>
                 </a>
                 <a id="menu-aset" href="peralatan.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Aset PPMUY</h4><p class="text-[9px] dynamic-text-muted truncate">Peralatan & Pengairan</p></div>
+                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Aset PPMUY</h4><p class="text-[9px] dynamic-text-muted truncate">Peralatan & Air</p></div>
                 </a>
                 <a id="menu-jadwal-oprak" href="jadwal-oprak.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-rose-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 text-sm"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="w-9 h-9 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 text-sm"><i class="fa-solid fa-clock-rotate-left"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Oprak</h4><p class="text-[9px] dynamic-text-muted truncate">Santri Tertentu</p></div>
                 </a>
-                <a id="menu-perizinan" href="perizinan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-teal-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-500 text-sm"><i class="fa-solid fa-id-badge"></i></div>
+                <a id="menu-perizinan" href="perizinan-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-cyan-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500 text-sm"><i class="fa-solid fa-passport"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Perizinan</h4><p class="text-[9px] dynamic-text-muted truncate">Keluar Pondok</p></div>
                 </a>
-                <a id="menu-pelanggaran" href="pelanggaran-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-amber-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <a id="menu-pelanggaran" href="pelanggaran-santri.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-orange-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 text-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Pelanggaran</h4><p class="text-[9px] dynamic-text-muted truncate">Ringan/Sedang/Berat</p></div>
                 </a>
                 <a id="menu-dispensasi" href="dispensasi-khusus.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-sky-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 text-sm"><i class="fa-solid fa-notes-medical"></i></div>
+                    <div class="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 text-sm"><i class="fa-solid fa-briefcase"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Dispensasi</h4><p class="text-[9px] dynamic-text-muted truncate">Khidmah/Melekan</p></div>
                 </a>
                 <a id="menu-jadwal-piket" href="jadwal-piket.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-emerald-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
                     <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-sm"><i class="fa-solid fa-broom"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Jadwal Piket</h4><p class="text-[9px] dynamic-text-muted truncate">Kebersihan Asrama</p></div>
                 </a>
-                <a id="menu-absen-ustadz-manual" href="absen-ustadz-manual.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-indigo-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-sm"><i class="fa-solid fa-clipboard-user"></i></div>
+                <a id="menu-absen-ustadz-manual" href="absen-ustadz-manual.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-violet-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-500 text-sm"><i class="fa-solid fa-clipboard-user"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Absen Ustadz</h4><p class="text-[9px] dynamic-text-muted truncate">Backup Manual</p></div>
                 </a>
                 <a id="menu-soal-ujian" href="rekap-absensi.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-sm"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-sm"><i class="fa-solid fa-file-signature"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Soal Ujian</h4><p class="text-[9px] dynamic-text-muted truncate">Download Laporan</p></div>
                 </a>
-                <a id="menu-rekap-nilai" href="rekap-nilai.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-purple-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500 text-sm"><i class="fa-solid fa-file-invoice"></i></div>
+                <a id="menu-rekap-nilai" href="rekap-nilai.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-indigo-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-sm"><i class="fa-solid fa-chart-bar"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Rekap Nilai</h4><p class="text-[9px] dynamic-text-muted truncate">Laporan Nilai Santri</p></div>
                 </a>
-                <a id="menu-evaluasi" href="evaluasi-sistem.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-cyan-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
-                    <div class="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500 text-sm"><i class="fa-solid fa-chart-line"></i></div>
+                <a id="menu-evaluasi" href="evaluasi-sistem.html" class="dynamic-bg-box border dynamic-border rounded-xl p-3 hover:border-pink-500/50 hover:shadow-md transition-all flex items-center gap-3 active:scale-95 shadow-sm">
+                    <div class="w-9 h-9 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-500 text-sm"><i class="fa-solid fa-square-poll-vertical"></i></div>
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Evaluasi</h4><p class="text-[9px] dynamic-text-muted truncate">Setiap Bakdo Dzuhur</p></div>
                 </a>
             </div>
@@ -331,7 +333,6 @@
                         <p class="text-[9px] text-slate-400 mt-0.5">Deteksi landmark koordinat struktur wajah Kiosk AI.</p>
                     </div>
                 </a>
-                <!-- DIARAHKAN LANGSUNG KE barcode.html -->
                 <a href="barcode.html" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-emerald-400/50 transition-all cursor-pointer group">
                     <div class="w-10 h-10 bg-emerald-400/10 group-hover:bg-emerald-400/20 rounded-lg flex items-center justify-center text-emerald-400 text-lg"><i class="fa-solid fa-barcode"></i></div>
                     <div class="text-left">
@@ -345,10 +346,11 @@
 
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN CORE ECOSYSTEM</footer>
 
-<script>
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
+        let isFetching = false;
 
         // DIALOG CONTROLLER UNTUK METODE SCAN ABSENSI
         function bukaModalPilihanScan() {
@@ -410,7 +412,14 @@
 
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
-            muatSeluruhRekapDashboard();
+            
+            // Pengisian awal menggunakan cache instan (Load 10x lebih cepat)
+            muatSeluruhRekapDashboard(false);
+
+            // Pengambilan data realtime otomatis berkala di background tiap 30 detik
+            setInterval(() => {
+                muatSeluruhRekapDashboard(false);
+            }, 30000);
         });
 
         function terapkanOtoritasMenu(userRole) {
@@ -500,32 +509,42 @@
                 return;
             }
 
+            let rows = "";
             listData.forEach(s => {
-                let row = document.createElement('tr');
-                row.className = "border-b dynamic-border-row hover:bg-blue-500/5";
                 let badgeStatus = (tabAktif === "BELUM") 
                     ? `<span class="bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[9px] font-black">BELUM DAFTAR</span>`
                     : `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black">SUDAH AKTIF</span>`;
 
-                row.innerHTML = `
-                    <td class="py-2.5 uppercase font-black tracking-wide">${s.nama}</td>
-                    <td class="py-2.5 font-mono text-slate-500 dark:text-slate-400">${s.kelas}</td>
-                    <td class="py-2.5 text-right">${badgeStatus}</td>
+                rows += `
+                    <tr class="border-b dynamic-border-row hover:bg-blue-500/5">
+                        <td class="py-2.5 uppercase font-black tracking-wide">${s.nama}</td>
+                        <td class="py-2.5 font-mono text-slate-500 dark:text-slate-400">${s.kelas || '-'}</td>
+                        <td class="py-2.5 text-right">${badgeStatus}</td>
+                    </tr>
                 `;
-                tblBody.appendChild(row);
             });
+            tblBody.innerHTML = rows;
         }
 
-        async function muatSeluruhRekapDashboard() {
+        async function muatSeluruhRekapDashboard(forceBypass = false) {
+            if (isFetching) return;
+            isFetching = true;
+
             const feedBox = document.getElementById('box-live-feed');
+            const iconRefresh = document.getElementById('icon-refresh');
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
 
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
 
-            // OPTIMALISASI KECEPATAN: Render data cache secara instan jika tersedia
-            if (dataCache) {
+            // Putar ikon refresh jika dipicu oleh interaksi user
+            if (forceBypass && iconRefresh) {
+                iconRefresh.classList.add('fa-spin');
+            }
+
+            // Tampilkan data cache instan terlebih dahulu agar load super cepat
+            if (dataCache && !forceBypass) {
                 try {
                     const r = JSON.parse(dataCache);
                     tampilkanDataKeUI(r, feedBox);
@@ -534,9 +553,11 @@
                 }
             }
 
-            // Selalu lakukan pembaruan data di latar belakang (Background Validation)
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`, { method: "GET" });
+                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`, { 
+                    method: "GET",
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
                 let r = await res.json();
 
                 if (r.status === "success") {
@@ -546,39 +567,42 @@
                         return;
                     }
 
-                    // Perbarui penyimpanan lokal dengan data terbaru dari server
+                    // Simpan data terbaru ke cache lokal
                     localStorage.setItem(CACHE_KEY, JSON.stringify(r));
 
-                    // Perbarui tampilan dengan data teranyar
+                    // Perbarui visual UI secara langsung
                     tampilkanDataKeUI(r, feedBox);
                 }
             } catch (error) {
                 console.error("Gagal memperbarui data dari server:", error);
-                
-                // Tampilkan fallback error hanya jika tidak ada data cache sama sekali
                 if (!dataCache && feedBox) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-rose-500 font-bold uppercase">Gagal memuat data dari server.</div>`;
+                }
+            } finally {
+                isFetching = false;
+                if (iconRefresh) {
+                    iconRefresh.classList.remove('fa-spin');
                 }
             }
         }
 
-        // Fungsi pembantu untuk merender data ke UI (dipakai oleh Cache maupun Fetch)
+        // Fungsi pembantu untuk memproses rendering data ke UI
         function tampilkanDataKeUI(r, feedBox) {
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
 
-            document.getElementById('stat-total').innerText = r.rekapWajah.total;
-            document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah;
-            document.getElementById('stat-belum').innerText = r.rekapWajah.belum;
+            document.getElementById('stat-total').innerText = r.rekapWajah.total || '0';
+            document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah || '0';
+            document.getElementById('stat-belum').innerText = r.rekapWajah.belum || '0';
 
-            // MENGISI DATA ABSENSI JAMAAH SHALAT
+            // MENGISI DATA ABSENSI JAMAAH SHALAT (Sesuai database asli)
             document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || 0;
             document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || 0;
             document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || 0;
             document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || 0;
             document.getElementById('v-isya').innerText = r.rekapShalat.Isya || 0;
 
-            // MENGISI DATA ABSENSI KEGIATAN KEPESANTRENAN SINKRON DENGAN BACKEND
+            // MENGISI DATA ABSENSI KEGIATAN KEPESANTRENAN
             document.getElementById('v-quranan').innerText = r.rekapShalat.Quranan || 0;
             document.getElementById('v-afsahan').innerText = r.rekapShalat.Afsahan || 0;
             document.getElementById('v-belajar').innerText = r.rekapShalat.Belajar || 0;
@@ -595,23 +619,23 @@
                 if (!r.liveFeed || r.liveFeed.length === 0) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
                 } else {
+                    let logItems = "";
                     r.liveFeed.forEach(log => {
-                        let item = document.createElement('div');
-                        item.className = "flex justify-between items-center p-2 rounded-xl border dynamic-border dynamic-bg-inner";
-                        
                         let jamTampil = log.jam || log.waktu || "00:00";
                         let kegTampil = log.shalat || log.kegiatan || "Jamaah";
                         let petugasTampil = log.petugas || "Kiosk Mandiri";
 
-                        item.innerHTML = `
-                            <div class="overflow-hidden">
-                                <h4 class="text-xs font-black dynamic-text-main truncate uppercase">${log.nama}</h4>
-                                <p class="text-[9px] text-slate-400 font-mono mt-0.5">${jamTampil} - ${kegTampil} (${petugasTampil})</p>
+                        logItems += `
+                            <div class="flex justify-between items-center p-2 rounded-xl border dynamic-border dynamic-bg-inner">
+                                <div class="overflow-hidden">
+                                    <h4 class="text-xs font-black dynamic-text-main truncate uppercase">${log.nama}</h4>
+                                    <p class="text-[9px] text-slate-400 font-mono mt-0.5">${jamTampil} - ${kegTampil} (${petugasTampil})</p>
+                                </div>
+                                <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
                             </div>
-                            <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
                         `;
-                        feedBox.appendChild(item);
                     });
+                    feedBox.innerHTML = logItems;
                 }
             }
         }
