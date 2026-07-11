@@ -85,9 +85,12 @@
                 <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Studio AI <span class="text-emerald-600">Premium</span></h1>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pesantren Edition v3</p>
             </div>
-            <div class="flex gap-2">
-                <input type="text" id="loadId" placeholder="ID" class="w-16 p-2 rounded-xl text-center text-xs font-bold shadow-sm">
-                <button id="btnLoad" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-black transition">LOAD</button>
+            <!-- PERBAIKAN DROPDOWN: Input teks ID manual diganti menjadi Dropdown otomatis -->
+            <div class="flex gap-2 w-48 justify-end">
+                <select id="loadId" class="w-full p-2 rounded-xl text-[10px] font-bold shadow-sm border border-slate-300 bg-white">
+                    <option value="">Pilih Project...</option>
+                </select>
+                <button id="btnLoad" class="bg-slate-800 text-white px-3 py-2 rounded-xl text-[10px] font-bold hover:bg-black transition">LOAD</button>
             </div>
         </div>
  
@@ -112,7 +115,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Kombinasi Bahasa (Baru)</label>
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Kombinasi Bahasa</label>
                     <select id="opsiBahasa" class="w-full p-3 rounded-xl text-[10px] font-bold border-emerald-500">
                         <option value="id-only">Indonesia Saja</option>
                         <option value="ar-id">Arab - Indonesia</option>
@@ -130,13 +133,13 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Tema Warna</label>
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Tema Warna (Termasuk Background)</label>
                     <select id="modelBrosur" class="w-full p-3 rounded-xl text-[10px] font-bold">
-                        <option value="Emerald Gold">Emerald Luxury</option>
-                        <option value="Black Gold">Midnight Premium</option>
-                        <option value="Royal Blue">Blue Ocean</option>
-                        <option value="Tradisional">Classic Cream</option>
-                        <option value="Ceria">Warm Pastel</option>
+                        <option value="Emerald Gold">Emerald Luxury (Hijau Tua)</option>
+                        <option value="Black Gold">Midnight Premium (Hitam Mewah)</option>
+                        <option value="Royal Blue">Blue Ocean (Biru Safir)</option>
+                        <option value="Tradisional">Classic Cream (Krem Klasik)</option>
+                        <option value="Ceria">Warm Pastel (Kuning Ceria)</option>
                     </select>
                 </div>
             </div>
@@ -155,7 +158,7 @@
  
         <div id="saveArea" class="hidden p-6 bg-emerald-50 rounded-[2.5rem] border border-emerald-100 flex flex-col items-center gap-2">
             <button id="btnSave" class="bg-emerald-600 text-white px-10 py-3 rounded-2xl text-[10px] font-black shadow-lg uppercase tracking-widest">SIMPAN KE CLOUD ☁️</button>
-            <div id="resultId" class="mt-2 text-xl font-black text-emerald-700 hidden tracking-[0.2em]">ID: <span id="displayId" class="underline"></span></div>
+            <div id="resultId" class="mt-2 text-xl font-black text-emerald-700 hidden tracking-[0.2em]">ID BARU: <span id="displayId" class="underline"></span></div>
         </div>
     </div>
  
@@ -177,6 +180,8 @@
         </button>
     </div>
 </div>
+
+<div id="hiddenRenderArea" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden;"></div>
  
 <script>
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwiLTj8sh6t9Zc6Znh1sdH_Y6u9TjOvMbo20jSRuhMRFOavsyHgkMnJr92ZTE_qEgJa/exec";
@@ -255,7 +260,7 @@
                     infoTeks: info,
                     catatanTambahan: materi,
                     formatBrosur: format,
-                    opsiBahasa: bahasa, // Mengirim pilihan bahasa ke backend
+                    opsiBahasa: bahasa,
                     jumlahGambar: document.getElementById('jumlahGambar').value,
                     modelBrosur: document.getElementById('modelBrosur').value,
                     listFotoBase64: listFotoBase64
@@ -299,23 +304,25 @@
         if(slides.length === 0) return;
         
         setLoading(true, "MENSINKRONISASI & GENERATING PNG...");
-        const formatBrosur = document.getElementById('formatBrosur').value;
+        const hiddenArea = document.getElementById('hiddenRenderArea');
 
         for (let i = 0; i < slides.length; i++) {
-            const slide = slides[i];
-            const wrapper = slide.parentElement; 
+            const originalSlide = slides[i];
+            const clonedSlide = originalSlide.cloneNode(true);
+            hiddenArea.appendChild(clonedSlide);
+            
+            await new Promise(r => setTimeout(r, 200));
 
-            wrapper.classList.remove(formatBrosur);
-            await new Promise(r => setTimeout(r, 150));
-
-            const canvas = await html2canvas(slide, { 
+            const canvas = await html2canvas(clonedSlide, { 
                 scale: 2, 
                 useCORS: true, 
                 logging: false,
-                backgroundColor: null
+                backgroundColor: null,
+                width: clonedSlide.offsetWidth,
+                height: clonedSlide.offsetHeight
             });
 
-            wrapper.classList.add(formatBrosur);
+            hiddenArea.removeChild(clonedSlide);
 
             const link = document.createElement('a');
             link.download = `Slide-${i+1}.png`;
@@ -336,13 +343,16 @@
         if (data.success) {
             document.getElementById('resultId').classList.remove('hidden');
             document.getElementById('displayId').innerText = data.projectId;
+            // Perbarui list dropdown setelah sukses menyimpan
+            await fetchProjectList();
         }
         setLoading(false);
     };
  
     document.getElementById('btnLoad').onclick = async () => {
         const id = document.getElementById('loadId').value;
-        if(!id) return;
+        if(!id) return alert("Silakan pilih project dari dropdown terlebih dahulu!");
+        
         setLoading(true, "MEMUAT DATA...");
         const res = await fetch(BACKEND_URL, { method: 'POST', body: JSON.stringify({ action: 'load', projectId: id }) });
         const data = await res.json();
@@ -356,11 +366,38 @@
         }
         setLoading(false);
     };
+
+    // FUNGSI OTO-LOAD BARU: Mengambil seluruh list project dari cloud saat web dibuka
+    async function fetchProjectList() {
+        try {
+            const res = await fetch(BACKEND_URL, { method: 'POST', body: JSON.stringify({ action: 'get_projects' }) });
+            const data = await res.json();
+            if (data.success && data.projects) {
+                const selectElement = document.getElementById('loadId');
+                // Sisakan hanya option pertama ("Pilih Project...")
+                selectElement.innerHTML = '<option value="">Pilih Project...</option>';
+                
+                data.projects.forEach(proj => {
+                    let opt = document.createElement('option');
+                    opt.value = proj.id;
+                    opt.innerHTML = `[${proj.id}] ${proj.title}`;
+                    selectElement.appendChild(opt);
+                });
+            }
+        } catch(e) {
+            console.log("Gagal memuat daftar project:", e);
+        }
+    }
  
     function setLoading(s, t) { 
         document.getElementById('loading').classList.toggle('hidden', !s); 
         document.getElementById('loadingText').innerText = t; 
     }
+
+    // Jalankan penarikan data dropdown otomatis saat aplikasi pertama kali dimuat
+    window.onload = () => {
+        fetchProjectList();
+    };
 </script>
 </body>
 </html>
