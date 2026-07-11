@@ -73,19 +73,19 @@
                 <div class="space-y-4">
                     <div>
                         <label class="text-[10px] font-black dynamic-text-muted uppercase block mb-1">Pilih Hari:</label>
-                        <select id="g-hari" class="w-full dynamic-bg-input border dynamic-border rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-yellow-400">
+                        <select id="g-hari" onchange="sinkronisasikanSistem()" class="w-full dynamic-bg-input border dynamic-border rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-yellow-400">
                             <option value="Senin">Senin</option>
-                            <option value="Selasa" selected>Selasa</option>
+                            <option value="Selasa">Selasa</option>
                             <option value="Rabu">Rabu</option>
                             <option value="Kamis">Kamis</option>
                             <option value="Jumat">Jumat</option>
-                            <option value="Sabtu">Sabtu</option>
+                            <option value="Sabtu" selected>Sabtu</option>
                             <option value="Minggu">Minggu</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-[10px] font-black dynamic-text-muted uppercase block mb-1">Kompleks / Gender:</label>
-                        <select id="g-gender" class="w-full dynamic-bg-input border dynamic-border rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-yellow-400">
+                        <select id="g-gender" onchange="sinkronisasikanSistem()" class="w-full dynamic-bg-input border dynamic-border rounded-xl px-3 py-2.5 text-xs font-bold outline-none focus:border-yellow-400">
                             <option value="Laki-laki">Putra (Laki-laki)</option>
                             <option value="Perempuan">Putri (Perempuan)</option>
                         </select>
@@ -237,12 +237,16 @@
                 if (r.status === "success" && r.liveFeedGuru) {
                     r.liveFeedGuru.forEach(log => {
                         let namaClean = log.nama.toUpperCase().trim();
-                        let labelJamDanMapel = `${log.shalat || "Mengajar"} - ${log.petugas || "Mapel"}`;
+                        // Ambil data jam dan mapel asli dari response jika ada, 
+                        // atau parse jika formatnya digabung di 'petugas'
+                        let jamClean = String(log.jam_mengajar || log.jam || "").toUpperCase().trim();
+                        let mapelClean = String(log.petugas || log.shalat || "").toUpperCase().trim();
 
                         logHadirHariIni.push({
                             jamLog: log.jam || "Hari Ini",
                             nama: namaClean,
-                            mapel: labelJamDanMapel
+                            jamMengajar: jamClean,
+                            mapel: mapelClean
                         });
                     });
                 }
@@ -288,10 +292,14 @@
                 [...logHadirHariIni].reverse().forEach(h => {
                     let trH = document.createElement('tr');
                     trH.className = "border-b dynamic-border-row bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors";
+                    
+                    // Menampilkan informasi jam mengajar dan mapel yang jelas di tabel log hadir
+                    let displayJadwal = h.jamMengajar ? `${h.jamMengajar} - ${h.mapel}` : h.mapel;
+                    
                     trH.innerHTML = `
                         <td class="py-2.5 pl-2 font-mono text-emerald-500">${h.jamLog} WIB</td>
                         <td class="py-2.5 uppercase font-black tracking-wide"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> ${h.nama}</td>
-                        <td class="py-2.5 dynamic-text-muted italic text-[10px]">${h.mapel}</td>
+                        <td class="py-2.5 dynamic-text-muted italic text-[10px]">${displayJadwal}</td>
                     `;
                     tbodyHadir.appendChild(trH);
                 });
@@ -308,7 +316,15 @@
 
             masterJadwal.forEach(guru => {
                 let namaClean = guru.nama.toUpperCase().trim();
-                let sudahAbsen = logHadirHariIni.some(h => h.nama === namaClean);
+                let jamClean = String(guru.jam || "").toUpperCase().trim();
+                let mapelClean = String(guru.mapel || "").toUpperCase().trim();
+
+                // PERBAIKAN UTAMA: Pengecekan status absen menggunakan kombinasi Nama + Jam + Mapel secara spesifik!
+                let sudahAbsen = logHadirHariIni.some(h => 
+                    h.nama === namaClean && 
+                    (h.jamMengajar === jamClean || h.mapel.includes(jamClean)) && 
+                    (h.mapel.includes(mapelClean))
+                );
 
                 if (sudahAbsen) return;
 
@@ -379,12 +395,13 @@
                 
                 if(rAbsen.status === "success") {
                     let jamKlik = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-                    let labelJamDanMapel = `${guruData.jam || "Mengajar"} - ${guruData.mapel}`;
                     
+                    // Simpan data jam mengajar & mapel secara terpisah agar filter pencocokan berfungsi dengan sempurna
                     logHadirHariIni.push({
                         jamLog: jamKlik,
                         nama: guruData.nama.toUpperCase().trim(),
-                        mapel: labelJamDanMapel
+                        jamMengajar: String(guruData.jam || "").toUpperCase().trim(),
+                        mapel: String(guruData.mapel || "").toUpperCase().trim()
                     });
                     distribusikanRekapData();
                 } else {
@@ -405,7 +422,7 @@
                 return;
             }
 
-            var konfirmasi = confirm(`Apakah Anda yakin ingin KUNCI absensi? \nSebanyak ${listBelumAbsen.length} guru yang belum mengklik namanya akan otomatis tercatat sebagai "Ghaib".`);
+            var konfirmasi = confirm(`Apakah Anda yakin ingin KUNCI absensi? \nSebanyak ${listBelumAbsen.length} jadwal guru yang belum mengklik namanya akan otomatis tercatat sebagai "Ghaib".`);
             if (!konfirmasi) return;
 
             const btnKunci = document.getElementById('btn-kunci');
@@ -438,7 +455,7 @@
                 let r = await res.json();
 
                 if (r.status === "success") {
-                    alert("Sistem berhasil dikunci! Guru yang tersisa telah tercatat 'Ghaib' di database.");
+                    alert("Sistem berhasil dikunci! Jadwal yang tersisa telah tercatat 'Ghaib' di database.");
                     await sinkronisasikanSistem();
                 } else {
                     alert("Gagal mengunci absensi: " + r.message);
