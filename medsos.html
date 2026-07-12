@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Pesantren Premium Studio - Perfection Edition</title>
+    <title>AI Pesantren Premium Studio - Perfection Edition v3</title>
     <script src="https://cdn.tailwindcss.com/3.4.15"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        /* Mengimpor Font Google Kelas Dunia */
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc; 
+            background-color: #f1f5f9; 
             color: #0f172a; 
         }
             
-        /* DIMENSI DESAIN ASLI */
+        /* DIMENSI DESAIN ASLI HIGH QUALITY */
         .ratio-square .instagram-slide { width: 1080px !important; height: 1080px !important; }
         .ratio-story .instagram-slide { width: 1080px !important; height: 1920px !important; }
         .ratio-a4 .instagram-slide { width: 1240px !important; height: 1754px !important; }
 
-        /* SKALA VISUAL PREVIEW SCREEN */
+        /* SKALA VISUAL PREVIEW DI LAYAR HP/LAPTOP */
         .ratio-square { transform: scale(0.38); transform-origin: top center; height: 410px; }
         .ratio-story { transform: scale(0.22); transform-origin: top center; height: 423px; }
         .ratio-a4 { transform: scale(0.24); transform-origin: top center; height: 422px; }
  
         #canvasOuter {
             width: 100%;
-            padding: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            gap: 36px;
             justify-content: flex-start;
             align-items: center;
-            min-height: 500px;
+            min-height: 550px;
         }
 
         .slide-container {
@@ -47,7 +48,7 @@
         .form-card { 
             background: white; 
             border: 1px solid #e2e8f0; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.04); 
         }
  
         input, textarea, select { 
@@ -61,31 +62,33 @@
         input:focus, textarea:focus, select:focus { 
             border-color: #059669 !important; 
             background: white !important;
-            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
         }
  
         .font-arabic { font-family: 'Amiri', serif !important; }
         .font-heading { font-family: 'Cinzel', serif !important; }
     </style>
 </head>
-<body class="p-4 md:p-8 lg:p-12 bg-slate-50">
+<body class="p-4 md:p-8 lg:p-12">
  
-<!-- Loading UI -->
-<div id="loading" class="hidden fixed inset-0 bg-slate-900/60 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
-    <div class="w-16 h-16 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p id="loadingText" class="text-sm font-black tracking-widest uppercase text-white animate-pulse">Memproses Sinkronisasi Gambar...</p>
+<!-- Premium Glassmorphism Loading UI -->
+<div id="loading" class="hidden fixed inset-0 bg-slate-950/70 z-[100] flex flex-col items-center justify-center backdrop-blur-xl">
+    <div class="relative flex items-center justify-center mb-6">
+        <div class="w-20 h-20 border-4 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin"></div>
+        <div class="absolute w-12 h-12 border-4 border-amber-500/20 border-b-amber-400 rounded-full animate-spin [animation-duration:1.5s]"></div>
+    </div>
+    <p id="loadingText" class="text-xs font-black tracking-[0.3em] uppercase text-amber-200 animate-pulse text-center max-w-xs px-4 leading-relaxed">Merancang Estetika Seni Digital Premium...</p>
 </div>
  
 <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
     
-    <!-- PANEL KONTROL -->
+    <!-- PANEL KONTROL KIRI -->
     <div class="lg:col-span-5 form-card p-8 rounded-[2.5rem] space-y-6 h-fit">
         <div class="flex justify-between items-center border-b border-slate-100 pb-5">
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Studio AI <span class="text-emerald-600">Premium</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pesantren Edition v3</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pesantren Edition v3.5 - Luxury</p>
             </div>
-            <!-- PERBAIKAN DROPDOWN: Input teks ID manual diganti menjadi Dropdown otomatis -->
             <div class="flex gap-2 w-48 justify-end">
                 <select id="loadId" class="w-full p-2 rounded-xl text-[10px] font-bold shadow-sm border border-slate-300 bg-white">
                     <option value="">Pilih Project...</option>
@@ -116,7 +119,7 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Kombinasi Bahasa</label>
-                    <select id="opsiBahasa" class="w-full p-3 rounded-xl text-[10px] font-bold border-emerald-500">
+                    <select id="opsiBahasa" class="w-full p-3 rounded-xl text-[10px] font-bold">
                         <option value="id-only">Indonesia Saja</option>
                         <option value="ar-id">Arab - Indonesia</option>
                         <option value="id-en">Indonesia - Inggris</option>
@@ -133,10 +136,10 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Tema Warna (Termasuk Background)</label>
+                    <label class="text-[10px] font-black uppercase text-slate-400 mb-1 block">Tema Warna Luxury</label>
                     <select id="modelBrosur" class="w-full p-3 rounded-xl text-[10px] font-bold">
-                        <option value="Emerald Gold">Emerald Luxury (Hijau Tua)</option>
-                        <option value="Black Gold">Midnight Premium (Hitam Mewah)</option>
+                        <option value="Emerald Gold">Emerald Luxury (Hijau Tua & Emas)</option>
+                        <option value="Black Gold">Midnight Premium (Hitam Mewah & Emas)</option>
                         <option value="Royal Blue">Blue Ocean (Biru Safir)</option>
                         <option value="Tradisional">Classic Cream (Krem Klasik)</option>
                         <option value="Ceria">Warm Pastel (Kuning Ceria)</option>
@@ -162,16 +165,16 @@
         </div>
     </div>
  
-    <!-- PANEL PREVIEW -->
+    <!-- PANEL PREVIEW KANAN -->
     <div class="lg:col-span-7 flex flex-col items-center">
         <div class="w-full flex justify-between items-end mb-4 px-2">
-            <h2 class="text-xs font-black tracking-[0.2em] text-slate-400 uppercase">Live Slide Preview (Urutan Kebawah)</h2>
+            <h2 class="text-xs font-black tracking-[0.2em] text-slate-400 uppercase">Live Slide Preview Studio</h2>
             <div class="h-2 w-2 bg-emerald-500 rounded-full animate-ping"></div>
         </div>
  
-        <div id="canvasOuter" class="bg-slate-200 border border-slate-300 rounded-[2rem] shadow-inner">
-            <div class="w-full text-center text-slate-400 my-auto text-xs font-bold uppercase tracking-wider py-20">
-                Belum Ada Desain Generated.
+        <div id="canvasOuter" class="bg-slate-300 border border-slate-400/50 rounded-[2rem] shadow-inner">
+            <div class="w-full text-center text-slate-500 my-auto text-xs font-bold uppercase tracking-wider py-20">
+                Belum Ada Desain Studio Generated.
             </div>
         </div>
  
@@ -215,12 +218,12 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX = 800; 
+                    const MAX = 1200; // Ditingkatkan ke 1200px untuk resolusi cetak dan layar yang lebih tajam
                     const scale = MAX / Math.max(img.width, img.height);
                     canvas.width = img.width * scale; 
                     canvas.height = img.height * scale;
                     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.75).split(',')[1]);
+                    resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]); // Kualitas kompresi dinaikkan ke 0.85
                 };
             };
         });
@@ -248,7 +251,7 @@
         const materi = document.getElementById('catatanTambahan').value;
         if (!info || !materi) return alert("Harap isi Nama/Judul dan Materi terlebih dahulu!");
  
-        setLoading(true, "AI SEDANG MERANCANG DESAIN PREMIUM...");
+        setLoading(true, "AI SEDANG MERANCANG STRUKTUR VISUAL MEWAH...");
         const format = document.getElementById('formatBrosur').value;
         const bahasa = document.getElementById('opsiBahasa').value;
  
@@ -303,7 +306,7 @@
         const slides = document.querySelectorAll('#canvasOuter .instagram-slide');
         if(slides.length === 0) return;
         
-        setLoading(true, "MENSINKRONISASI & GENERATING PNG...");
+        setLoading(true, "RENDERING ULTRA HIGH-QUALITY PNG STUDIO...");
         const hiddenArea = document.getElementById('hiddenRenderArea');
 
         for (let i = 0; i < slides.length; i++) {
@@ -314,7 +317,7 @@
             await new Promise(r => setTimeout(r, 200));
 
             const canvas = await html2canvas(clonedSlide, { 
-                scale: 2, 
+                scale: 2.5, // Menaikkan resolusi export agar gambar tulisan pecah terhindari total
                 useCORS: true, 
                 logging: false,
                 backgroundColor: null,
@@ -325,7 +328,7 @@
             hiddenArea.removeChild(clonedSlide);
 
             const link = document.createElement('a');
-            link.download = `Slide-${i+1}.png`;
+            link.download = `SlidePremium-${i+1}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
             await new Promise(r => setTimeout(r, 300));
@@ -343,7 +346,6 @@
         if (data.success) {
             document.getElementById('resultId').classList.remove('hidden');
             document.getElementById('displayId').innerText = data.projectId;
-            // Perbarui list dropdown setelah sukses menyimpan
             await fetchProjectList();
         }
         setLoading(false);
@@ -353,7 +355,7 @@
         const id = document.getElementById('loadId').value;
         if(!id) return alert("Silakan pilih project dari dropdown terlebih dahulu!");
         
-        setLoading(true, "MEMUAT DATA...");
+        setLoading(true, "MEMUAT DARI CLOUD...");
         const res = await fetch(BACKEND_URL, { method: 'POST', body: JSON.stringify({ action: 'load', projectId: id }) });
         const data = await res.json();
         if (data.success) {
@@ -367,14 +369,12 @@
         setLoading(false);
     };
 
-    // FUNGSI OTO-LOAD BARU: Mengambil seluruh list project dari cloud saat web dibuka
     async function fetchProjectList() {
         try {
             const res = await fetch(BACKEND_URL, { method: 'POST', body: JSON.stringify({ action: 'get_projects' }) });
             const data = await res.json();
             if (data.success && data.projects) {
                 const selectElement = document.getElementById('loadId');
-                // Sisakan hanya option pertama ("Pilih Project...")
                 selectElement.innerHTML = '<option value="">Pilih Project...</option>';
                 
                 data.projects.forEach(proj => {
@@ -394,7 +394,6 @@
         document.getElementById('loadingText').innerText = t; 
     }
 
-    // Jalankan penarikan data dropdown otomatis saat aplikasi pertama kali dimuat
     window.onload = () => {
         fetchProjectList();
     };
