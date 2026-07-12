@@ -71,6 +71,24 @@
         let isProcessing = false;
         let databaseSantri = [];
 
+        // =========================================================================
+        // PENGATURAN DAN PARAMETER AKURASI SCAN WAJAH (DAPAT DISESUAIKAN)
+        // =========================================================================
+        const AMBANG_BATAS_KETAT = 0.42;    // Diperketat dari 0.50 ke 0.42 untuk mencegah tertukar dengan wajah lain
+        const DETECTOR_INPUT_SIZE = 320;    // Diperbesar dari 160 ke 320 agar akurasi pemetaan titik wajah lebih presisi
+        const DETECTOR_SCORE_THRESH = 0.6;  // Skor minimal keyakinan model terhadap objek wajah (rentang 0.0 - 1.0)
+        
+        // PENGATURAN GENDER KIOSK (Penyaringan berdasarkan penempatan fisik Kiosk)
+        // ""  = Mode Campur (AI membandingkan ke semua santri Putra & Putri)
+        // "L" = Kiosk diletakkan di area Putra (AI hanya mencocokkan dengan santri Laki-laki saja)
+        // "P" = Kiosk diletakkan di area Putri (AI hanya mencocokkan dengan santri Perempuan saja)
+        const GENDER_KIOSK = ""; 
+
+        // Penanganan Validasi Konsistensi Multi-Frame (mencegah salah deteksi instan)
+        let deteksiTerakhir = null;
+        let hitungKonsistensi = 0;
+        const TARGET_KONSISTENSI = 2; // Harus terdeteksi sebagai orang yang sama selama 2 frame berturut-turut
+
         // Konfigurasi Kunci & Durasi Cache Database Biometrik
         const CACHE_DB_KEY = 'cache_database_santri';
         const CACHE_DB_TIME_KEY = 'cache_database_time';
@@ -81,7 +99,7 @@
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                 oscillator.connect(gainNode);
+                oscillator.connect(gainNode);
                 gainNode.connect(audioCtx.destination);
                 oscillator.type = 'sine';
                 oscillator.frequency.value = frekuensi;
@@ -156,14 +174,18 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
+                    // Menggunakan parameter deteksi yang lebih presisi
+                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ 
+                        inputSize: DETECTOR_INPUT_SIZE, 
+                        scoreThreshold: DETECTOR_SCORE_THRESH 
+                    })).withFaceLandmarks().withFaceDescriptor();
                     
                     if (hasilKamera) {
-                        isProcessing = true;
-                        kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
-                        label.innerText = "MENCOCOKKAN BIOMETRIK...";
-                        
                         verifikasiWajahLokal(hasilKamera.descriptor);
+                    } else {
+                        // Reset hitungan jika wajah keluar dari frame kamera
+                        hitungKonsistensi = 0;
+                        deteksiTerakhir = null;
                     }
                 }, 400);
             } catch (e) { label.innerText = "AI OFFLINE"; }
@@ -175,6 +197,14 @@
 
             for (let santri of databaseSantri) {
                 try {
+                    // Penyaringan Gender Kiosk untuk menghilangkan kemungkinan tertukar antar-gender
+                    if (GENDER_KIOSK !== "") {
+                        let genderSantri = santri.gender ? santri.gender.toString().trim().toUpperCase() : "";
+                        let matchesL = (GENDER_KIOSK === "L" && (genderSantri === "L" || genderSantri === "LAKI-LAKI"));
+                        let matchesP = (GENDER_KIOSK === "P" && (genderSantri === "P" || genderSantri === "PEREMPUAN"));
+                        if (!matchesL && !matchesP) continue;
+                    }
+
                     let dataVektorRaw = santri.vektor;
                     if(!dataVektorRaw) continue;
                     
@@ -185,7 +215,8 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    if (jarakSains < jarakTerkecil && jarakSains < 0.50) { 
+                    // Membandingkan dengan ambang batas yang diperketat
+                    if (jarakSains < jarakTerkecil && jarakSains < AMBANG_BATAS_KETAT) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
                     }
@@ -193,59 +224,83 @@
             }
 
             if (santriDitemukan) {
-                const kegiatan = document.getElementById('pilihan-kegiatan').value;
-                const hariIni = new Date().toISOString().split('T')[0]; 
-                const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
-
-                if (localStorage.getItem(storageKey)) {
-                    document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
-                    document.getElementById('pop-warning').classList.remove('hidden');
-                    label.innerText = "SUDAH ABSEN SEBELUMNYA";
-                    kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
-                    
-                    bunyikanBeep(440, 0.08);
-                    setTimeout(() => bunyikanBeep(440, 0.08), 120);
-
-                    setTimeout(() => {
-                        document.getElementById('pop-warning').classList.add('hidden');
-                        isProcessing = false;
-                        label.innerText = "HADAPKAN WAJAH KE KAMERA";
-                        kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                    }, 2500);
-                    return;
+                // Validasi Konsistensi Multi-Frame
+                if (deteksiTerakhir === santriDitemukan.nik) {
+                    hitungKonsistensi++;
+                } else {
+                    deteksiTerakhir = santriDitemukan.nik;
+                    hitungKonsistensi = 1;
+                    return; // Lewati pemrosesan pada frame ini, tunggu frame konfirmasi berikutnya
                 }
 
-                const fp = new URLSearchParams();
-                fp.append('aksi', 'absen_santri');
-                fp.append('nik', santriDitemukan.nik);
-                fp.append('kegiatan', kegiatan);
-                fp.append('petugas', localStorage.getItem('session_nama'));
+                // Melakukan pencatatan hanya jika hasil deteksi konsisten sebanyak target yang diatur
+                if (hitungKonsistensi >= TARGET_KONSISTENSI) {
+                    isProcessing = true;
+                    hitungKonsistensi = 0;
+                    deteksiTerakhir = null;
 
-                try {
-                    let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
-                    let r = await res.json();
-                    if(r.status === "success") {
-                        localStorage.setItem(storageKey, "TERCATAT");
-                        document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
-                        document.getElementById('pop-success').classList.remove('hidden');
-                        bunyikanBeep(1000, 0.25);
+                    kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
+                    label.innerText = "MENCOCOKKAN BIOMETRIK...";
+
+                    const kegiatan = document.getElementById('pilihan-kegiatan').value;
+                    const hariIni = new Date().toISOString().split('T')[0]; 
+                    const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
+
+                    if (localStorage.getItem(storageKey)) {
+                        document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
+                        document.getElementById('pop-warning').classList.remove('hidden');
+                        label.innerText = "SUDAH ABSEN SEBELUMNYA";
+                        kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
+                        
+                        bunyikanBeep(440, 0.08);
+                        setTimeout(() => bunyikanBeep(440, 0.08), 120);
+
+                        setTimeout(() => {
+                            document.getElementById('pop-warning').classList.add('hidden');
+                            isProcessing = false;
+                            label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                            kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
+                        }, 2500);
+                        return;
                     }
-                } catch(e){}
-                
-                setTimeout(() => {
-                    document.getElementById('pop-success').classList.add('hidden');
-                    isProcessing = false; 
-                    label.innerText = "HADAPKAN WAJAH KE KAMERA";
-                    kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                }, 2000);
+
+                    const fp = new URLSearchParams();
+                    fp.append('aksi', 'absen_santri');
+                    fp.append('nik', santriDitemukan.nik);
+                    fp.append('kegiatan', kegiatan);
+                    fp.append('petugas', localStorage.getItem('session_nama'));
+
+                    try {
+                        let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
+                        let r = await res.json();
+                        if(r.status === "success") {
+                            localStorage.setItem(storageKey, "TERCATAT");
+                            document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
+                            document.getElementById('pop-success').classList.remove('hidden');
+                            bunyikanBeep(1000, 0.25);
+                        }
+                    } catch(e){}
+                    
+                    setTimeout(() => {
+                        document.getElementById('pop-success').classList.add('hidden');
+                        isProcessing = false; 
+                        label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                        kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
+                    }, 2000);
+                }
 
             } else {
-                isProcessing = false; 
+                // Jika tidak ada data biometrik yang cocok sama sekali
+                hitungKonsistensi = 0;
+                deteksiTerakhir = null;
+                
+                isProcessing = true; 
                 label.innerText = "WAJAH TIDAK DIKENAL";
                 kotakScan.className = "w-64 h-64 border-4 border-solid border-red-500 rounded-3xl flex items-center justify-center bg-red-500/10";
                 bunyikanBeep(220, 0.4);
 
                 setTimeout(() => { 
+                    isProcessing = false;
                     label.innerText = "HADAPKAN WAJAH KE KAMERA"; 
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                 }, 1200);
