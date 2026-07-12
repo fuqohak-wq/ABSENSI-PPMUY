@@ -438,7 +438,8 @@
                 return;
             }
 
-            semuaIdMenu.forEach(id => {
+            allIdMenu = semuaIdMenu;
+            allIdMenu.forEach(id => {
                 const elemen = document.getElementById(id);
                 if (elemen) {
                     if (menuDiizinkan.includes("*") || menuDiizinkan.includes(id)) {
@@ -456,6 +457,7 @@
             setTemaAplikasi(newTheme);
         }
 
+        // PERBAIKAN: setTemaAplikasi sekarang lebih stabil mengurusi transisi tema
         function setTemaAplikasi(tema) {
             const btnTema = document.getElementById('btn-tema');
             const isLight = (tema === 'theme-light');
@@ -526,6 +528,7 @@
             tblBody.innerHTML = rows;
         }
 
+        // REVISI TOTAL: Menghilangkan headers 'Cache-Control' yang menyebabkan CORS preflight error di browser
         async function muatSeluruhRekapDashboard(forceBypass = false) {
             if (isFetching) return;
             isFetching = true;
@@ -554,10 +557,13 @@
             }
 
             try {
-                let res = await fetch(`${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`, { 
-                    method: "GET",
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
+                // Menghilangkan headers custom untuk mencegah CORS block, menggunakan cache-buster timestamp
+                let targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`;
+                if (forceBypass) {
+                    targetUrl += `&_ts=${Date.now()}`;
+                }
+
+                let res = await fetch(targetUrl, { method: "GET" });
                 let r = await res.json();
 
                 if (r.status === "success") {
