@@ -413,7 +413,7 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Pengisian awal menggunakan cache instan (Load 10x lebih cepat)
+            // Pengisian awal menggunakan cache instan (Load cepat di awal)
             muatSeluruhRekapDashboard(false);
 
             // Pengambilan data realtime otomatis berkala di background tiap 30 detik
@@ -457,7 +457,6 @@
             setTemaAplikasi(newTheme);
         }
 
-        // PERBAIKAN: setTemaAplikasi sekarang lebih stabil mengurusi transisi tema
         function setTemaAplikasi(tema) {
             const btnTema = document.getElementById('btn-tema');
             const isLight = (tema === 'theme-light');
@@ -528,7 +527,7 @@
             tblBody.innerHTML = rows;
         }
 
-        // REVISI TOTAL: Menghilangkan headers 'Cache-Control' yang menyebabkan CORS preflight error di browser
+        // PERBAIKAN: Selalu menambahkan penanda waktu unik (_ts) ke url fetch agar browser tidak mengambil data lama dari cache
         async function muatSeluruhRekapDashboard(forceBypass = false) {
             if (isFetching) return;
             isFetching = true;
@@ -541,12 +540,12 @@
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
 
-            // Putar ikon refresh jika dipicu oleh interaksi user
+            // Putar ikon refresh jika dipicu oleh klik manual pengguna
             if (forceBypass && iconRefresh) {
                 iconRefresh.classList.add('fa-spin');
             }
 
-            // Tampilkan data cache instan terlebih dahulu agar load super cepat
+            // Tampilkan data cache instan terlebih dahulu hanya untuk loading awal agar terasa instan
             if (dataCache && !forceBypass) {
                 try {
                     const r = JSON.parse(dataCache);
@@ -557,11 +556,8 @@
             }
 
             try {
-                // Menghilangkan headers custom untuk mencegah CORS block, menggunakan cache-buster timestamp
-                let targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}`;
-                if (forceBypass) {
-                    targetUrl += `&_ts=${Date.now()}`;
-                }
+                // Selalu sertakan parameter timestamp (_ts) agar server merespons dengan data terbaru
+                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&_ts=${Date.now()}`;
 
                 let res = await fetch(targetUrl, { method: "GET" });
                 let r = await res.json();
@@ -576,7 +572,7 @@
                     // Simpan data terbaru ke cache lokal
                     localStorage.setItem(CACHE_KEY, JSON.stringify(r));
 
-                    // Perbarui visual UI secara langsung
+                    // Perbarui visual UI secara langsung dengan data realtime
                     tampilkanDataKeUI(r, feedBox);
                 }
             } catch (error) {
