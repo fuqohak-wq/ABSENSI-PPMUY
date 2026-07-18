@@ -72,11 +72,11 @@
         let databaseSantri = [];
 
         // =========================================================================
-        // PENGATURAN DAN PARAMETER AKURASI SCAN WAJAH (DAPAT DISESUAIKAN)
+        // PENGATURAN DAN PARAMETER AKURASI SCAN WAJAH (DIOPTIMALKAN SEIMBANG)
         // =========================================================================
-        const AMBANG_BATAS_KETAT = 0.42;    // Diperketat dari 0.50 ke 0.42 untuk mencegah tertukar dengan wajah lain
-        const DETECTOR_INPUT_SIZE = 320;    // Diperbesar dari 160 ke 320 agar akurasi pemetaan titik wajah lebih presisi
-        const DETECTOR_SCORE_THRESH = 0.6;  // Skor minimal keyakinan model terhadap objek wajah (rentang 0.0 - 1.0)
+        const AMBANG_BATAS_KETAT = 0.48;    // Diubah dari 0.42 ke 0.48 agar lebih toleran pada sudut miring/bawah tanpa tertukar
+        const DETECTOR_INPUT_SIZE = 416;    // Diperbesar dari 320 ke 416 agar analisis landmark wajah pada sudut ekstrem lebih terbaca
+        const DETECTOR_SCORE_THRESH = 0.5;  // Diturunkan sedikit dari 0.6 ke 0.5 agar deteksi wajah pada kondisi cahaya bawah tetap responsif
         
         // PENGATURAN GENDER KIOSK (Penyaringan berdasarkan penempatan fisik Kiosk)
         // ""  = Mode Campur (AI membandingkan ke semua santri Putra & Putri)
@@ -174,7 +174,7 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Menggunakan parameter deteksi yang lebih presisi
+                    // Menggunakan parameter deteksi yang dioptimalkan
                     const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ 
                         inputSize: DETECTOR_INPUT_SIZE, 
                         scoreThreshold: DETECTOR_SCORE_THRESH 
@@ -215,7 +215,7 @@
 
                     let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    // Membandingkan dengan ambang batas yang diperketat
+                    // Membandingkan dengan ambang batas seimbang yang diperbarui
                     if (jarakSains < jarakTerkecil && jarakSains < AMBANG_BATAS_KETAT) { 
                         jarakTerkecil = jarakSains; 
                         santriDitemukan = santri; 
