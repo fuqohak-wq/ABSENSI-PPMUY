@@ -74,11 +74,14 @@
         // =========================================================================
         // PENGATURAN DAN PARAMETER AKURASI SCAN WAJAH (DIOPTIMALKAN SEIMBANG)
         // =========================================================================
-        const AMBANG_BATAS_KETAT = 0.48;    // Diatur seimbang agar lebih toleran pada sudut miring/bawah tanpa tertukar
-        const DETECTOR_INPUT_SIZE = 416;    // Diperbesar agar analisis landmark wajah pada sudut ekstrem lebih terbaca
-        const DETECTOR_SCORE_THRESH = 0.5;  // Deteksi wajah pada kondisi cahaya bawah tetap responsif
+        const AMBANG_BATAS_KETAT = 0.48;    // Diubah dari 0.42 ke 0.48 agar lebih toleran pada sudut miring/bawah tanpa tertukar
+        const DETECTOR_INPUT_SIZE = 416;    // Diperbesar dari 320 ke 416 agar analisis landmark wajah pada sudut ekstrem lebih terbaca
+        const DETECTOR_SCORE_THRESH = 0.5;  // Diturunkan sedikit dari 0.6 ke 0.5 agar deteksi wajah pada kondisi cahaya bawah tetap responsif
         
         // PENGATURAN GENDER KIOSK (Penyaringan berdasarkan penempatan fisik Kiosk)
+        // ""  = Mode Campur (AI membandingkan ke semua santri Putra & Putri)
+        // "L" = Kiosk diletakkan di area Putra (AI hanya mencocokkan dengan santri Laki-laki saja)
+        // "P" = Kiosk diletakkan di area Putri (AI hanya mencocokkan dengan santri Perempuan saja)
         const GENDER_KIOSK = ""; 
 
         // Penanganan Validasi Konsistensi Multi-Frame (mencegah salah deteksi instan)
@@ -261,31 +264,11 @@
                         return;
                     }
 
-                    // TANGKAP FOTO OTOMATIS SAAT MAKSIMAL VERIFIKASI SEBELUM KIRIM API
-                    let fotoBase64 = "";
-                    try {
-                        const canvasTmp = document.createElement('canvas');
-                        canvasTmp.width = 200; // Ukuran resolusi efisien untuk Google Sheets
-                        canvasTmp.height = 200;
-                        const ctxTmp = canvasTmp.getContext('2d');
-                        
-                        // Pembalikan sumbu horizontal agar hasil foto tidak terbalik (mirroring)
-                        ctxTmp.translate(canvasTmp.width, 0);
-                        ctxTmp.scale(-1, 1);
-                        ctxTmp.drawImage(video, 0, 0, canvasTmp.width, canvasTmp.height);
-                        
-                        // Ambil representasi Base64 berformat JPEG medium
-                        fotoBase64 = canvasTmp.toDataURL('image/jpeg', 0.5);
-                    } catch (errFoto) {
-                        console.error("Gagal menangkap foto wajah:", errFoto);
-                    }
-
                     const fp = new URLSearchParams();
                     fp.append('aksi', 'absen_santri');
                     fp.append('nik', santriDitemukan.nik);
                     fp.append('kegiatan', kegiatan);
                     fp.append('petugas', localStorage.getItem('session_nama'));
-                    fp.append('foto', fotoBase64); // Kirim data foto base64 ke code.gs
 
                     try {
                         let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
