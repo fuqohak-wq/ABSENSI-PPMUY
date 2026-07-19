@@ -29,8 +29,8 @@
             <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
             <option value="Sorogan">Sorogan Kitab</option>
             <option value="Belajar">Jam Belajar</option>
-            <option value="Belajar">Jumatan</option>
-            <option value="Belajar">Ziarah Kubur</option>
+            <option value="Jumatan">Jumatan</option>
+            <option value="Ziarah">Ziarah Kubur</option>
         </select>
     </div>
 
@@ -44,6 +44,9 @@
             </div>
         </div>
     </div>
+
+    <!-- CANVAS TERSEMBUNYI UNTUK PENGAMBILAN DATA ELEKTRONIK JPG -->
+    <canvas id="canvas-capture" class="hidden"></canvas>
 
     <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali ke Dashboard</a></div>
 
@@ -63,36 +66,30 @@
     </div>
 
     <script>
+        // MASUKKAN URL DEPLOYMENT BARU ANDA DISINI
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        
         let video = document.getElementById('video-selfie');
         let label = document.getElementById('instruksi');
         let kotakScan = document.getElementById('kotak-scan');
         let dbStatus = document.getElementById('txt-db-status');
+        let canvasCap = document.getElementById('canvas-capture');
+        
         let isProcessing = false;
         let databaseSantri = [];
 
-        // =========================================================================
-        // PENGATURAN DAN PARAMETER AKURASI SCAN WAJAH (DIOPTIMALKAN SEIMBANG)
-        // =========================================================================
-        const AMBANG_BATAS_KETAT = 0.48;    // Diubah dari 0.42 ke 0.48 agar lebih toleran pada sudut miring/bawah tanpa tertukar
-        const DETECTOR_INPUT_SIZE = 416;    // Diperbesar dari 320 ke 416 agar analisis landmark wajah pada sudut ekstrem lebih terbaca
-        const DETECTOR_SCORE_THRESH = 0.5;  // Diturunkan sedikit dari 0.6 ke 0.5 agar deteksi wajah pada kondisi cahaya bawah tetap responsif
-        
-        // PENGATURAN GENDER KIOSK (Penyaringan berdasarkan penempatan fisik Kiosk)
-        // ""  = Mode Campur (AI membandingkan ke semua santri Putra & Putri)
-        // "L" = Kiosk diletakkan di area Putra (AI hanya mencocokkan dengan santri Laki-laki saja)
-        // "P" = Kiosk diletakkan di area Putri (AI hanya mencocokkan dengan santri Perempuan saja)
+        const AMBANG_BATAS_KETAT = 0.48;    
+        const DETECTOR_INPUT_SIZE = 416;    
+        const DETECTOR_SCORE_THRESH = 0.5;  
         const GENDER_KIOSK = ""; 
 
-        // Penanganan Validasi Konsistensi Multi-Frame (mencegah salah deteksi instan)
         let deteksiTerakhir = null;
         let hitungKonsistensi = 0;
-        const TARGET_KONSISTENSI = 2; // Harus terdeteksi sebagai orang yang sama selama 2 frame berturut-turut
+        const TARGET_KONSISTENSI = 2; 
 
-        // Konfigurasi Kunci & Durasi Cache Database Biometrik
         const CACHE_DB_KEY = 'cache_database_santri';
         const CACHE_DB_TIME_KEY = 'cache_database_time';
-        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; // 6 Jam dalam milidetik
+        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; 
 
         function bunyikanBeep(frekuensi, durasi) {
             try {
@@ -110,14 +107,11 @@
             } catch (e) {}
         }
 
-        // Fungsi khusus penanganan penarikan database santri dengan sistem caching lokal murni
         async function ambilDatabaseSantri(paksaSinkron = false) {
             const cachedDb = localStorage.getItem(CACHE_DB_KEY);
             const cachedTime = localStorage.getItem(CACHE_DB_TIME_KEY);
 
-            // Jika tidak dipaksa re-sync, dan cache masih valid, gunakan data lokal
             if (!paksaSinkron && cachedDb && cachedTime && (Date.now() - cachedTime < DURASI_CACHE_DB)) {
-                console.log("Menggunakan database santri dari Local Storage (Instan)...");
                 databaseSantri = JSON.parse(cachedDb);
                 dbStatus.innerText = `🟢 Kiosk Ready (Cache: ${databaseSantri.length} Santri)`;
                 dbStatus.classList.remove('animate-pulse');
@@ -128,24 +122,19 @@
                 dbStatus.innerText = "🔄 Menyelaraskan data...";
                 dbStatus.classList.add('animate-pulse');
                 
-                const res = await fetch(`${API_URL}?aksi=ambil_database`, { method: "GET" });
+                const urlFetch = paksaSinkron ? `${API_URL}?aksi=ambil_database&_=${Date.now()}` : `${API_URL}?aksi=ambil_database`;
+                const res = await fetch(urlFetch, { method: "GET" });
                 const json = await res.json();
                 
                 if (json.status === "success") {
                     databaseSantri = json.data;
-                    
-                    // Simpan data biometrik segar ke dalam Local Storage
                     localStorage.setItem(CACHE_DB_KEY, JSON.stringify(databaseSantri));
                     localStorage.setItem(CACHE_DB_TIME_KEY, Date.now().toString());
                     
                     dbStatus.innerText = `🟢 Cloud Kiosk Ready (${databaseSantri.length} Santri)`;
                     dbStatus.classList.remove('animate-pulse');
-                    console.log("Database biometrik berhasil diperbarui langsung dari cloud.");
-                } else {
-                    throw new Error("Respon server gagal");
                 }
             } catch (error) {
-                console.error("Gagal menyinkronkan database dari cloud:", error);
                 if (cachedDb) {
                     databaseSantri = JSON.parse(cachedDb);
                     dbStatus.innerText = `⚠️ Cloud Offline (Memakai Data Lokal)`;
@@ -157,14 +146,13 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            if (!localStorage.getItem('session_nama')) { window.location.href = "index.html"; return; }
+            if (!localStorage.getItem('session_nama')) { localStorage.setItem('session_nama', 'KIOSK_MANDIRI'); }
             try {
                 label.innerText = "MEMUAT AI KIOSK...";
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 
-                // Panggil logika penanganan database berbasis cache murni
                 await ambilDatabaseSantri(false);
                 
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
@@ -174,7 +162,6 @@
                 setInterval(async () => {
                     if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
                     
-                    // Menggunakan parameter deteksi yang dioptimalkan
                     const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ 
                         inputSize: DETECTOR_INPUT_SIZE, 
                         scoreThreshold: DETECTOR_SCORE_THRESH 
@@ -183,11 +170,11 @@
                     if (hasilKamera) {
                         verifikasiWajahLokal(hasilKamera.descriptor);
                     } else {
-                        // Reset hitungan jika wajah keluar dari frame kamera
                         hitungKonsistensi = 0;
                         deteksiTerakhir = null;
+                        kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                     }
-                }, 400);
+                }, 300);
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
@@ -197,7 +184,6 @@
 
             for (let santri of databaseSantri) {
                 try {
-                    // Penyaringan Gender Kiosk untuk menghilangkan kemungkinan tertukar antar-gender
                     if (GENDER_KIOSK !== "") {
                         let genderSantri = santri.gender ? santri.gender.toString().trim().toUpperCase() : "";
                         let matchesL = (GENDER_KIOSK === "L" && (genderSantri === "L" || genderSantri === "LAKI-LAKI"));
@@ -205,82 +191,73 @@
                         if (!matchesL && !matchesP) continue;
                     }
 
-                    let dataVektorRaw = santri.vektor;
-                    if(!dataVektorRaw) continue;
-                    
-                    let dataVektorArr = JSON.parse(dataVektorRaw);
-                    let arrayVektorDb = Array.isArray(dataVektorArr) ? dataVektorArr : Object.values(dataVektorArr);
-                    
-                    if(arrayVektorDb.length !== 128) continue; 
+                    let arrayVektorDb = Object.values(JSON.parse(santri.vektor));
+                    let jarak = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
-                    let jarakSains = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
-
-                    // Membandingkan dengan ambang batas seimbang yang diperbarui
-                    if (jarakSains < jarakTerkecil && jarakSains < AMBANG_BATAS_KETAT) { 
-                        jarakTerkecil = jarakSains; 
+                    if (jarak < jarakTerkecil && jarak < AMBANG_BATAS_KETAT) { 
+                        jarakTerkecil = jarak; 
                         santriDitemukan = santri; 
                     }
                 } catch(e){}
             }
 
             if (santriDitemukan) {
-                // Validasi Konsistensi Multi-Frame
                 if (deteksiTerakhir === santriDitemukan.nik) {
                     hitungKonsistensi++;
                 } else {
                     deteksiTerakhir = santriDitemukan.nik;
                     hitungKonsistensi = 1;
-                    return; // Lewati pemrosesan pada frame ini, tunggu frame konfirmasi berikutnya
+                    return; 
                 }
 
-                // Melakukan pencatatan hanya jika hasil deteksi konsisten sebanyak target yang diatur
                 if (hitungKonsistensi >= TARGET_KONSISTENSI) {
                     isProcessing = true;
                     hitungKonsistensi = 0;
                     deteksiTerakhir = null;
 
-                    kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
-                    label.innerText = "MENCOCOKKAN BIOMETRIK...";
-
                     const kegiatan = document.getElementById('pilihan-kegiatan').value;
                     const hariIni = new Date().toISOString().split('T')[0]; 
                     const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
-                    if (localStorage.getItem(storageKey)) {
+                    if (localStorage.getItem(storageKey) === "TERCATAT") {
                         document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
                         document.getElementById('pop-warning').classList.remove('hidden');
-                        label.innerText = "SUDAH ABSEN SEBELUMNYA";
-                        kotakScan.className = "w-64 h-64 border-4 border-solid border-amber-500 rounded-3xl flex items-center justify-center bg-amber-500/10";
-                        
-                        bunyikanBeep(440, 0.08);
-                        setTimeout(() => bunyikanBeep(440, 0.08), 120);
-
-                        setTimeout(() => {
-                            document.getElementById('pop-warning').classList.add('hidden');
-                            isProcessing = false;
-                            label.innerText = "HADAPKAN WAJAH KE KAMERA";
-                            kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
+                        bunyikanBeep(440, 0.1);
+                        setTimeout(() => { 
+                            document.getElementById('pop-warning').classList.add('hidden'); 
+                            isProcessing = false; 
                         }, 2500);
                         return;
                     }
 
-                    const fp = new URLSearchParams();
-                    fp.append('aksi', 'absen_santri');
-                    fp.append('nik', santriDitemukan.nik);
-                    fp.append('kegiatan', kegiatan);
-                    fp.append('petugas', localStorage.getItem('session_nama'));
+                    // 1. Eksekusi UI Sukses Instan Secara Lokal
+                    localStorage.setItem(storageKey, "TERCATAT");
+                    document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
+                    document.getElementById('pop-success').classList.remove('hidden');
+                    kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
+                    bunyikanBeep(1000, 0.25);
 
-                    try {
-                        let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: fp.toString() });
-                        let r = await res.json();
-                        if(r.status === "success") {
-                            localStorage.setItem(storageKey, "TERCATAT");
-                            document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
-                            document.getElementById('pop-success').classList.remove('hidden');
-                            bunyikanBeep(1000, 0.25);
-                        }
-                    } catch(e){}
-                    
+                    // 2. Ambil Foto Snapshot Wajah Balik Cermin (Mirror-corrected)
+                    canvasCap.width = video.videoWidth; canvasCap.height = video.videoHeight;
+                    const ctx = canvasCap.getContext('2d');
+                    ctx.translate(canvasCap.width, 0); ctx.scale(-1, 1);
+                    ctx.drawImage(video, 0, 0, canvasCap.width, canvasCap.height);
+                    const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.35);
+
+                    // 3. Tembak Data secara Asinkron (Background process tanpa memblokir UI pop-up sukses)
+                    fetch(API_URL, { 
+                        method: "POST", 
+                        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                        body: JSON.stringify({
+                            aksi: "absen_santri",
+                            nik: santriDitemukan.nik,
+                            kegiatan: kegiatan,
+                            petugas: localStorage.getItem('session_nama'),
+                            foto: dataFotoBase64
+                        }) 
+                    }).catch(e => console.log("Gagal sinkron latar belakang:", e));
+
+                    // 4. Auto-reset untuk kembali siap memindai santri berikutnya
                     setTimeout(() => {
                         document.getElementById('pop-success').classList.add('hidden');
                         isProcessing = false; 
@@ -290,20 +267,8 @@
                 }
 
             } else {
-                // Jika tidak ada data biometrik yang cocok sama sekali
                 hitungKonsistensi = 0;
                 deteksiTerakhir = null;
-                
-                isProcessing = true; 
-                label.innerText = "WAJAH TIDAK DIKENAL";
-                kotakScan.className = "w-64 h-64 border-4 border-solid border-red-500 rounded-3xl flex items-center justify-center bg-red-500/10";
-                bunyikanBeep(220, 0.4);
-
-                setTimeout(() => { 
-                    isProcessing = false;
-                    label.innerText = "HADAPKAN WAJAH KE KAMERA"; 
-                    kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-                }, 1200);
             }
         }
     </script>
