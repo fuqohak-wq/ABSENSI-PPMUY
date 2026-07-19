@@ -333,6 +333,16 @@
                         <p class="text-[9px] text-slate-400 mt-0.5">Deteksi landmark koordinat struktur wajah Kiosk AI.</p>
                     </div>
                 </a>
+                
+                <!-- OPSI KETIGA BARU: SCAN WAJAH & INTIP TABUNGAN -->
+                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full">
+                    <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
+                    <div class="text-left">
+                        <h4 class="text-xs font-black text-slate-100 group-hover:text-yellow-400 uppercase tracking-wider">Scan Wajah & Intip Tabungan</h4>
+                        <p class="text-[9px] text-slate-400 mt-0.5">Pemindaian biometrik terintegrasi sistem pengecekan tabungan.</p>
+                    </div>
+                </button>
+
                 <a href="barcode.html" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-emerald-400/50 transition-all cursor-pointer group">
                     <div class="w-10 h-10 bg-emerald-400/10 group-hover:bg-emerald-400/20 rounded-lg flex items-center justify-center text-emerald-400 text-lg"><i class="fa-solid fa-barcode"></i></div>
                     <div class="text-left">
@@ -340,6 +350,28 @@
                         <p class="text-[9px] text-slate-400 mt-0.5">Pemindaian cepat dengan laser barcode reader atau ketik nomor NIK.</p>
                     </div>
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP IFRAME UNTUK SCAN WAJAH & INTIP TABUNGAN -->
+    <div id="modal-iframe-tabungan" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex-col p-4 sm:p-6">
+        <div class="w-full max-w-5xl mx-auto bg-slate-900 border-2 border-yellow-400 rounded-2xl flex flex-col h-full overflow-hidden shadow-2xl">
+            <div class="p-4 bg-slate-950 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-400/10 flex items-center justify-center text-yellow-400"><i class="fa-solid fa-piggy-bank"></i></div>
+                    <div>
+                        <h3 class="text-xs font-black text-yellow-400 tracking-wider uppercase">Scan Wajah & Intip Tabungan</h3>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">Terminal Terintegrasi - nasehat.vercel.app</p>
+                    </div>
+                </div>
+                <button onclick="tutupIframeTabungan()" class="text-slate-400 hover:text-white transition-all bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex-1 bg-white relative">
+                <!-- allow="camera" disematkan agar webapp di dalam iframe dapat memanggil kamera perangkat secara langsung -->
+                <iframe id="iframe-tabungan" src="https://nasehat.vercel.app" class="w-full h-full border-0" allow="camera; microphone; clipboard-write"></iframe>
             </div>
         </div>
     </div>
@@ -366,6 +398,29 @@
             if(modal) {
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
+            }
+        }
+
+        // CONTROLLER UNTUK IFRAME SCAN WAJAH & TABUNGAN
+        function bukaIframeTabungan() {
+            tutupModalPilihanScan();
+            const modalIframe = document.getElementById('modal-iframe-tabungan');
+            if(modalIframe) {
+                modalIframe.classList.remove('hidden');
+                modalIframe.classList.add('flex');
+            }
+        }
+
+        function tutupIframeTabungan() {
+            const modalIframe = document.getElementById('modal-iframe-tabungan');
+            if(modalIframe) {
+                modalIframe.classList.remove('flex');
+                modalIframe.classList.add('hidden');
+                // Me-refresh/reset kembali kondisi iframe saat ditutup
+                const iframe = document.getElementById('iframe-tabungan');
+                if (iframe) {
+                    iframe.src = "https://nasehat.vercel.app";
+                }
             }
         }
 
