@@ -90,7 +90,6 @@
     </div>
 
     <script>
-        // MASUKKAN URL DEPLOYMENT WEB APP SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         let video = document.getElementById('video-selfie');
@@ -113,7 +112,7 @@
 
         const CACHE_DB_KEY = 'cache_database_santri';
         const CACHE_DB_TIME_KEY = 'cache_database_time';
-        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; // 6 jam cache lokal
+        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; 
 
         function bunyikanBeep(frekuensi, durasi) {
             try {
@@ -247,19 +246,17 @@
                         return;
                     }
 
-                    // Tampilkan Spinner Overlay Latar Belakang
                     loadingOverlay.classList.remove('hidden');
 
-                    // Ambil Snapshot Foto (Mirror-corrected)
+                    // Kompresi kualitas JPG diatur rendah ke tingkat 0.3 untuk meminimalkan beban kirim data
                     canvasCap.width = video.videoWidth; 
                     canvasCap.height = video.videoHeight;
                     const ctx = canvasCap.getContext('2d');
                     ctx.translate(canvasCap.width, 0); 
                     ctx.scale(-1, 1);
                     ctx.drawImage(video, 0, 0, canvasCap.width, canvasCap.height);
-                    const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.35);
+                    const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.3);
 
-                    // Kirim Data Absensi & Snapshot Foto ke Server
                     try {
                         const response = await fetch(API_URL, { 
                             method: "POST", 
@@ -283,14 +280,13 @@
                             kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
                             bunyikanBeep(1000, 0.25);
                         } else {
-                            alert("Gagal mencatat kehadiran: " + hasilJson.message);
+                            alert("Gagal mencatat presensi: " + hasilJson.message);
                         }
                     } catch (err) {
                         loadingOverlay.classList.add('hidden');
                         alert("Gagal terhubung dengan server.");
                     }
 
-                    // Auto-reset agar siap mendeteksi santri berikutnya
                     setTimeout(() => {
                         document.getElementById('pop-success').classList.add('hidden');
                         isProcessing = false; 
