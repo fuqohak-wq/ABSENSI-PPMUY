@@ -21,8 +21,8 @@
     header p { font-size: 13px; opacity: 0.9; }
     
     /* STYLE GRUP TOMBOL SATU BARIS DI HP */
-    .header-buttons { display: flex; gap: 6px; align-items: center; width: 100%; justify-content: space-between; }
-    .btn-hp { flex: 1; padding: 10px 4px !important; font-size: 11px !important; white-space: nowrap; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; border: none; transition: 0.2s; }
+    .header-buttons { display: flex; gap: 6px; align-items: center; width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .btn-hp { flex: 1; padding: 10px 4px !important; font-size: 11px !important; white-space: nowrap; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; border: none; transition: 0.2s; min-width: 80px; }
     .btn-hp:hover { opacity: 0.9; }
 
     .alert-box { background: #fef3c7; border-left: 5px solid #d97706; padding: 15px; border-radius: 6px; margin-bottom: 20px; display: none; }
@@ -49,9 +49,6 @@
     .search-results { position: absolute; left: 0; right: 0; max-height: 150px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 5px; background: white; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
     .search-item:hover { background: #f1f5f9; color: var(--primary); }
-    
-    .info-saldo { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; margin-top: 12px; display: none; font-size: 13px; }
-    .info-saldo.active { display: block; }
     
     .badge-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
     .badge { background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
@@ -105,6 +102,7 @@
     </div>
     <div class="header-buttons">
       <a href="https://manajemen.ppmuy.com/dashboard.html" class="btn-hp btn-back">⬅️ Kembali</a>
+      <a href="tabungan.html" class="btn-hp btn-orange">💰 Tabungan</a>
       <button class="btn-hp btn-green" onclick="bukaLayarSantriMinus()">📱 Santri Minus</button>
       <a href="tfwalsan.html" class="btn-hp btn-blue">💸 TF Walsan</a>
       <button class="btn-hp btn-admin" onclick="bukaRuangAdmin()">🔐 Admin</button>
@@ -123,25 +121,13 @@
     <button id="btnProsesSyahriyyah" class="btn btn-green" onclick="prosesSyahriyyahSusulan()" style="display:none; padding:6px 12px; font-size:12px;">Sinkronisasikan Cicilan Syahriyyah</button>
   </div>
 
-  <div class="card">
-    <h2>✍️ Input Tabungan & Cek Saldo Santri</h2>
-    <div class="form-group">
-      <label for="searchKey">Cari Nama / Scan Barcode NIK Santri:</label>
-      <div class="search-container">
-        <input type="text" id="searchKey" placeholder="Ketik nama atau scan NIK..." oninput="cariSantri(this.value)">
-        <div id="searchResults" class="search-results" style="display:none;"></div>
-      </div>
-    </div>
-    <div id="infoSaldoBox" class="info-saldo">
-      <strong>📋 Profil Terpilih:</strong>
-      <p>NIK: <span id="viewNik">-</span> | Nama: <span id="viewNama">-</span> | Saldo Akhir: <b id="viewSaldo" style="color:#15803d;">Rp 0</b></p>
-    </div>
-    <div class="form-group" style="margin-top: 10px;">
-      <label for="nominalTabungan">Nominal Tabungan Baru (Rp):</label>
-      <input type="text" id="nominalTabungan" placeholder="Contoh: 5.000" onkeyup="this.value = formatRupiah(this.value)" disabled>
-    </div>
-    <button id="btnSimpanTabungan" class="btn" onclick="simpanTabungan()" disabled>Simpan Transaksi Tabungan</button>
-    <div id="tabunganStatus" style="margin-top:8px; font-size:13px; font-weight:600;"></div>
+  <!-- MENU UTAMA DIARAHKAN KE TABUNGAN.HTML -->
+  <div class="card" style="text-align: center; padding: 25px 20px;">
+    <h2 style="border-bottom: none; margin-bottom: 8px;">💰 Layanan Tabungan Santri</h2>
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 18px; line-height: 1.5;">
+      Untuk melakukan penginputan tabungan baru, memeriksa saldo akhir, ataupun melihat riwayat transaksi tabungan santri, silakan gunakan sistem tabungan khusus melalui tautan di bawah ini.
+    </p>
+    <a href="tabungan.html" class="btn btn-blue" style="width: 100%; padding: 12px; font-size: 14px;">Buka Halaman Tabungan Santri ➡️</a>
   </div>
 
   <div class="card">
@@ -266,7 +252,6 @@
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
   const PASSWORD_ADMIN = "12345"; 
   
-  let santriTerpilih = null;
   let listSantriKhususAcara = [];
 
   // FUNGSI KHUSUS UNTUK MEMBUKA TIRAI FULLSCREEN DI WEB YANG SAMA
@@ -465,33 +450,6 @@
     }
   }
 
-  function cariSantri(val) {
-    const resDiv = document.getElementById("searchResults");
-    if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
-    fetch(WEB_APP_URL, { 
-      method: "POST", 
-      mode: "cors",
-      body: JSON.stringify({ action: "searchSantri", keyword: val }) 
-    })
-    .then(res => res.json()).then(response => {
-      if(response.success && response.data) {
-        let list = response.data.listAnak ? response.data.listAnak : response.data;
-        if (list && list.length > 0) {
-          resDiv.innerHTML = "";
-          list.forEach(item => {
-            let itemEl = document.createElement("div"); itemEl.className = "search-item";
-            itemEl.innerHTML = `<b>${item.nama}</b> - ${item.nik}`;
-            itemEl.addEventListener("click", function() { pilihSantri(item); });
-            resDiv.appendChild(itemEl);
-          });
-          resDiv.style.display = "block";
-          return;
-        }
-      }
-      resDiv.style.display = "none";
-    });
-  }
-
   function cariSantriAcara(val) {
     const resDiv = document.getElementById("searchAcaraResults");
     if(!val || val.trim().length < 2) { resDiv.style.display = "none"; return; }
@@ -532,44 +490,6 @@
       let b = document.createElement("div"); b.className = "badge";
       b.innerHTML = `${s.nama} <span onclick="listSantriKhususAcara.splice(${idx},1); renderBadges();">×</span>`;
       box.appendChild(b);
-    });
-  }
-
-  function pilihSantri(santri) {
-    santriTerpilih = santri;
-    document.getElementById("searchResults").style.display = "none";
-    document.getElementById("searchKey").value = santri.nama;
-    document.getElementById("viewNik").innerText = santri.nik;
-    document.getElementById("viewNama").innerText = santri.nama;
-    document.getElementById("viewSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
-    document.getElementById("infoSaldoBox").classList.add("active");
-    document.getElementById("nominalTabungan").disabled = false;
-    document.getElementById("btnSimpanTabungan").disabled = false;
-    document.getElementById("nominalTabungan").focus();
-  }
-
-  function simpanTabungan() {
-    const nominal = document.getElementById("nominalTabungan").value.replace(/\./g, "");
-    const statusDiv = document.getElementById("tabunganStatus");
-    const btn = document.getElementById("btnSimpanTabungan");
-    if(!nominal || nominal <= 0) return;
-    
-    btn.disabled = true; 
-    btn.innerHTML = "<span class='spinner'></span> Menyimpan...";
-    
-    fetch(WEB_APP_URL, { 
-      method: "POST", 
-      mode: "cors",
-      body: JSON.stringify({ action: "saveTabunganSantri", nik: santriTerpilih.nik, nominalInput: nominal }) 
-    })
-    .then(res => res.json()).then(response => {
-      btn.disabled = false; 
-      btn.innerText = "Simpan Transaksi Tabungan";
-      if(response.success) {
-        statusDiv.innerHTML = `<span style='color:#16a34a'>Sukses! Saldo terbaru: Rp ${Number(response.data.saldoAkhir).toLocaleString('id-ID')}</span>`;
-        document.getElementById("viewSaldo").innerText = "Rp " + Number(response.data.saldoAkhir).toLocaleString('id-ID');
-        document.getElementById("nominalTabungan").value = "";
-      }
     });
   }
 
