@@ -10,11 +10,12 @@
   <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   <style>
     :root {
-      --m-blue: #003882;
-      --m-blue-dark: #002254;
-      --m-yellow: #FFC400;
-      --m-yellow-hover: #e6b000;
-      --bg: #F0F4F8;
+      /* Tema Utama: Jingga Emas Perbankan Modern */
+      --brand-orange: #EA580C;
+      --brand-orange-dark: #C2410C;
+      --brand-yellow: #F59E0B;
+      --brand-yellow-light: #FEF3C7;
+      --bg-orange-gradient: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
       --card-bg: #FFFFFF;
       --text-dark: #1E293B;
       --text-muted: #64748B;
@@ -23,38 +24,50 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text-dark); padding: 8px; font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    
+    body { 
+      background: var(--bg-orange-gradient); 
+      color: var(--text-dark); 
+      padding: 8px; 
+      font-size: 13px; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-start;
+    }
+    
     .app-container { max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
-    /* HEADER STYLE MBANKING */
+    /* HEADER MBANKING JINGGA */
     .mbanking-header {
-      background: linear-gradient(135deg, var(--m-blue), var(--m-blue-dark));
+      background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-dark));
       color: white;
-      padding: 12px;
+      padding: 10px 14px;
       border-radius: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(0, 56, 130, 0.15);
-      border-bottom: 3px solid var(--m-yellow);
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+      border-bottom: 3px solid var(--brand-yellow);
     }
     .mbanking-header h1 { font-size: 15px; font-weight: 800; color: white; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
-    .mbanking-header h1 span { color: var(--m-yellow); }
-    .live-badge { background: rgba(255, 255, 255, 0.15); font-size: 10px; padding: 3px 8px; border-radius: 12px; color: var(--m-yellow); font-weight: 600; border: 1px solid rgba(255, 196, 0, 0.4); }
+    .mbanking-header h1 span { color: var(--brand-yellow-light); }
+    .live-badge { background: rgba(255, 255, 255, 0.2); font-size: 10px; padding: 3px 8px; border-radius: 12px; color: #FFF; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.4); }
 
     /* CARD COMPONENT */
     .m-card {
       background: var(--card-bg);
       border-radius: 12px;
       padding: 10px 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      border: 1px solid #E2E8F0;
+      box-shadow: 0 3px 10px rgba(194, 65, 12, 0.08);
+      border: 1px solid #FFEDD5;
+      position: relative;
     }
 
-    /* SEARCH METHOD TABS */
+    /* TAB NAVIGATION */
     .search-pills {
       display: flex;
-      background: #E2E8F0;
+      background: #FFEDD5;
       padding: 3px;
       border-radius: 8px;
       gap: 3px;
@@ -68,101 +81,103 @@
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
-      color: var(--text-muted);
+      color: var(--brand-orange-dark);
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
     }
     .pill-btn.active {
-      background: var(--m-blue);
+      background: var(--brand-orange);
       color: white;
-      box-shadow: 0 2px 4px rgba(0, 56, 130, 0.2);
+      box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
     }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* INPUT STYLES */
+    /* INPUTS & SEARCH RESULTS */
     .input-group { position: relative; }
-    .input-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; }
+    .input-group label { font-size: 10px; font-weight: 800; color: var(--brand-orange-dark); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
     .m-input {
       width: 100%;
       padding: 9px 12px;
-      border: 1.5px solid #CBD5E1;
+      border: 1.5px solid #FDBA74;
       border-radius: 8px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       outline: none;
-      background: #F8FAFC;
+      background: #FFF7ED;
       transition: 0.2s;
+      color: var(--text-dark);
     }
-    .m-input:focus { border-color: var(--m-blue); background: white; box-shadow: 0 0 0 3px rgba(0, 56, 130, 0.1); }
+    .m-input:focus { border-color: var(--brand-orange); background: white; box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15); }
 
     .search-results {
-      position: absolute; left: 0; right: 0; max-height: 160px; overflow-y: auto;
-      border: 1px solid #CBD5E1; border-radius: 8px; margin-top: 3px; background: white;
-      z-index: 999; box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      position: absolute; left: 0; right: 0; top: 100%; max-height: 180px; overflow-y: auto;
+      border: 1.5px solid var(--brand-orange); border-radius: 8px; margin-top: 4px; background: white;
+      z-index: 9999; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
-    .search-item { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #F1F5F9; font-size: 12px; }
-    .search-item:hover { background: #EFF6FF; color: var(--m-blue); }
+    .search-item { padding: 9px 12px; cursor: pointer; border-bottom: 1px solid #FFEDD5; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .search-item:hover { background: #FFF7ED; color: var(--brand-orange-dark); }
+    .search-item strong { color: var(--brand-orange-dark); }
 
-    /* SCANNER AREA */
-    #reader { width: 100%; max-width: 280px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
-    video { width: 100%; max-width: 280px; border-radius: 8px; background: #000; }
+    /* SCANNER CONTAINER */
+    #reader { width: 100%; max-width: 260px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
+    video { width: 100%; max-width: 260px; border-radius: 8px; background: #000; }
 
-    /* BANK CARD PROFILE DISPLAY */
+    /* PASSPBOOK / ATM CARD DISPLAY */
     .atm-card {
-      background: linear-gradient(135deg, var(--m-blue-dark), var(--m-blue));
+      background: linear-gradient(135deg, #C2410C 0%, #EA580C 100%);
       color: white;
       border-radius: 12px;
-      padding: 12px;
-      margin-top: 6px;
+      padding: 10px 14px;
+      margin-top: 8px;
       display: none;
       position: relative;
       overflow: hidden;
-      border-right: 4px solid var(--m-yellow);
+      border-right: 5px solid var(--brand-yellow);
+      box-shadow: 0 4px 10px rgba(194, 65, 12, 0.25);
     }
     .atm-card.active { display: block; }
     .atm-card::after {
-      content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px;
-      background: rgba(255, 196, 0, 0.15); border-radius: 50%;
+      content: ''; position: absolute; top: -15px; right: -15px; width: 70px; height: 70px;
+      background: rgba(255, 255, 255, 0.12); border-radius: 50%;
     }
-    .atm-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .atm-chip { width: 28px; height: 20px; background: var(--m-yellow); border-radius: 4px; opacity: 0.9; }
-    .atm-nama { font-size: 14px; font-weight: 800; color: white; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
-    .atm-nik { font-size: 10px; color: #93C5FD; font-family: monospace; letter-spacing: 1px; }
-    .atm-saldo-box { text-align: right; margin-top: 4px; }
-    .atm-saldo-label { font-size: 9px; color: var(--m-yellow); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-    .atm-saldo-value { font-size: 18px; font-weight: 900; color: white; letter-spacing: -0.5px; }
+    .atm-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .atm-chip { width: 26px; height: 18px; background: #FCD34D; border-radius: 3px; border: 1px solid #F59E0B; }
+    .atm-nama { font-size: 13px; font-weight: 800; color: white; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
+    .atm-nik { font-size: 10px; color: #FFEDD5; font-family: monospace; letter-spacing: 1px; }
+    .atm-saldo-box { text-align: right; margin-top: 2px; }
+    .atm-saldo-label { font-size: 9px; color: #FEF3C7; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    .atm-saldo-value { font-size: 17px; font-weight: 900; color: white; letter-spacing: -0.5px; }
 
-    /* TRANSACTION FORM */
+    /* FORM TRANSAKSI */
     .tx-type-selector { display: flex; gap: 6px; margin-bottom: 8px; }
     .btn-tx-type {
-      flex: 1; padding: 8px; border: 1.5px solid #CBD5E1; background: white;
+      flex: 1; padding: 7px; border: 1.5px solid #FDBA74; background: #FFF7ED;
       border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text-muted); text-align: center;
     }
     .btn-tx-type.active-add { background: #ECFDF5; border-color: var(--success); color: var(--success); }
     .btn-tx-type.active-sub { background: #FEF2F2; border-color: var(--danger); color: var(--danger); }
 
     .calc-banner {
-      background: #FFFBEB; border: 1px dashed var(--m-yellow); padding: 8px; border-radius: 8px;
+      background: #FFF7ED; border: 1px dashed var(--brand-orange); padding: 6px 10px; border-radius: 8px;
       display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 8px;
     }
-    .calc-banner strong { font-size: 13px; color: var(--m-blue-dark); font-weight: 800; }
+    .calc-banner strong { font-size: 13px; color: var(--brand-orange-dark); font-weight: 800; }
 
     /* BUTTONS */
     .m-btn {
-      width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 13px;
+      width: 100%; padding: 10px; border: none; border-radius: 8px; font-weight: 800; font-size: 12px;
       cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; transition: 0.2s;
     }
-    .btn-yellow { background: var(--m-yellow); color: var(--m-blue-dark); box-shadow: 0 3px 8px rgba(255, 196, 0, 0.3); }
-    .btn-yellow:active { background: var(--m-yellow-hover); transform: scale(0.98); }
-    .btn-blue { background: var(--m-blue); color: white; }
-    .btn-outline { background: transparent; border: 1px solid #CBD5E1; color: var(--text-muted); }
+    .btn-orange { background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-dark)); color: white; box-shadow: 0 3px 8px rgba(234, 88, 12, 0.3); }
+    .btn-orange:active { transform: scale(0.98); }
+    .btn-outline { background: transparent; border: 1.5px solid #FDBA74; color: var(--brand-orange-dark); }
 
     .spinner {
-      width: 12px; height: 12px; border: 2px solid rgba(0, 34, 84, 0.3);
-      border-radius: 50%; border-top-color: var(--m-blue-dark); animation: spin 0.8s linear infinite;
+      width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%; border-top-color: #FFF; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -172,14 +187,14 @@
 <div class="app-container">
   <!-- TOP HEADER -->
   <div class="mbanking-header">
-    <h1>💳 M-TABUNGAN <span>PPMUY</span></h1>
+    <h1>📙 M-TABUNGAN <span>PPMUY</span></h1>
     <div class="live-badge">● ONLINE</div>
   </div>
 
   <!-- SEARCH CARD -->
   <div class="m-card">
     <div class="search-pills">
-      <button class="pill-btn active" onclick="switchTab(this, 'manual')">✏️ MANUALLY</button>
+      <button class="pill-btn active" onclick="switchTab(this, 'manual')">✏️ NAMA / NIK</button>
       <button class="pill-btn" onclick="switchTab(this, 'barcode')">📷 BARCODE</button>
       <button class="pill-btn" onclick="switchTab(this, 'face')">👤 FACE AI</button>
     </div>
@@ -187,7 +202,7 @@
     <!-- TAB MANUAL -->
     <div id="tab-manual" class="tab-content active">
       <div class="input-group">
-        <input type="text" id="inputSearchManual" class="m-input" placeholder="Ketik Nama / NIK Santri..." oninput="searchSantriManual(this.value)">
+        <input type="text" id="inputSearchManual" class="m-input" placeholder="Ketik Nama / NIK Santri..." oninput="searchSantriManual(this.value)" autocomplete="off">
         <div id="searchResultsManual" class="search-results" style="display:none;"></div>
       </div>
     </div>
@@ -195,17 +210,17 @@
     <!-- TAB BARCODE -->
     <div id="tab-barcode" class="tab-content">
       <div id="reader"></div>
-      <button class="m-btn btn-yellow" id="btnToggleBarcode" onclick="toggleBarcodeScanner()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Barcode</button>
+      <button class="m-btn btn-orange" id="btnToggleBarcode" onclick="toggleBarcodeScanner()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Barcode</button>
     </div>
 
     <!-- TAB FACE AI -->
     <div id="tab-face" class="tab-content" style="text-align: center;">
       <video id="videoFace" autoplay muted playsinline></video>
-      <button class="m-btn btn-yellow" id="btnStartFace" onclick="initFaceRecognition()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Wajah</button>
-      <p id="faceStatus" style="font-size:10px; color:var(--m-blue); font-weight:700; margin-top:3px;"></p>
+      <button class="m-btn btn-orange" id="btnStartFace" onclick="initFaceRecognition()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Wajah</button>
+      <p id="faceStatus" style="font-size:10px; color:var(--brand-orange-dark); font-weight:700; margin-top:3px;"></p>
     </div>
 
-    <!-- ATM DIGITAL PROFIL SANTRI -->
+    <!-- ATM / PASSPBOOK CARD PROFILE -->
     <div id="profileCard" class="atm-card">
       <div class="atm-header">
         <div class="atm-chip"></div>
@@ -215,14 +230,14 @@
         </div>
       </div>
       <div class="atm-saldo-box">
-        <div class="atm-saldo-label">Total Saldo Tabungan</div>
+        <div class="atm-saldo-label">Saldo Tabungan Santri</div>
         <div class="atm-saldo-value" id="dispSaldo">Rp 0</div>
       </div>
     </div>
   </div>
 
-  <!-- FORM TRANSAKSI REALTIME -->
-  <div class="m-card" id="cardAksi" style="opacity:0.5; pointer-events:none;">
+  <!-- FORM TRANSAKSI -->
+  <div class="m-card" id="cardAksi" style="opacity:0.4; pointer-events:none; transition: 0.3s;">
     <div class="tx-type-selector">
       <button type="button" class="btn-tx-type active-add" id="btnTypeAdd" onclick="setTxType('TAMBAH')">➕ SETOR</button>
       <button type="button" class="btn-tx-type" id="btnTypeSub" onclick="setTxType('TARIK')">➖ TARIK</button>
@@ -230,7 +245,7 @@
 
     <div class="input-group" style="margin-bottom:8px;">
       <label>Nominal Transaksi (Rp)</label>
-      <input type="text" id="nominalInput" class="m-input" placeholder="0" style="font-size:16px; color:var(--m-blue-dark);" onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
+      <input type="text" id="nominalInput" class="m-input" placeholder="0" style="font-size:16px; color:var(--brand-orange-dark);" onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
     </div>
 
     <div class="calc-banner">
@@ -239,7 +254,7 @@
     </div>
 
     <div style="display:flex; gap:6px;">
-      <button class="m-btn btn-yellow" id="btnProses" onclick="simpanTransaksiTabungan()" style="flex:2;">
+      <button class="m-btn btn-orange" id="btnProses" onclick="simpanTransaksiTabungan()" style="flex:2;">
         💾 OK - PROSES
       </button>
       <button class="m-btn btn-outline" onclick="resetForm()" style="flex:1;">
@@ -299,14 +314,19 @@
     hitungTotalSisa();
   }
 
+  // FUNGSIONALITAS PENCARIAN MANUAL (TERINTEGRASI SINKRON DENGAN CODE.GS)
   function searchSantriManual(keyword) {
     const resDiv = document.getElementById("searchResultsManual");
-    if (!keyword || keyword.trim().length < 2) { resDiv.style.display = "none"; return; }
+    if (!keyword || keyword.trim().length < 2) { 
+      resDiv.style.display = "none"; 
+      return; 
+    }
 
+    // Menggunakan text/plain agar terhindar dari isu CORS pre-flight di Google Apps Script
     fetch(WEB_APP_URL, {
       method: "POST",
-      mode: "cors",
-      body: JSON.stringify({ action: "searchSantriTabungan", keyword: keyword })
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "searchSantriTabungan", keyword: keyword.trim() })
     })
     .then(res => res.json())
     .then(res => {
@@ -315,14 +335,18 @@
         res.data.forEach(santri => {
           let item = document.createElement("div");
           item.className = "search-item";
-          item.innerHTML = `<b>${santri.nama}</b> (NIK: ${santri.nik})`;
+          item.innerHTML = `<div><strong>${santri.nama}</strong><br><small style='color:var(--text-muted);'>NIK: ${santri.nik}</small></div> <span style='font-size:11px; font-weight:700; color:var(--brand-orange-dark);'>Rp ${Number(santri.saldo).toLocaleString('id-ID')}</span>`;
           item.onclick = () => pilihSantri(santri);
           resDiv.appendChild(item);
         });
         resDiv.style.display = "block";
       } else {
-        resDiv.style.display = "none";
+        resDiv.innerHTML = "<div class='search-item' style='color:var(--text-muted);'>Data tidak ditemukan</div>";
+        resDiv.style.display = "block";
       }
+    })
+    .catch(err => {
+      console.error("Error search:", err);
     });
   }
 
@@ -344,7 +368,7 @@
     hitungTotalSisa();
   }
 
-  // BARCODE SCANNER
+  // SCAN BARCODE (BY NIK)
   function toggleBarcodeScanner() {
     if (isScanningBarcode) { stopBarcodeScanner(); } else { startBarcodeScanner(); }
   }
@@ -377,7 +401,8 @@
 
   function cariByNik(nik) {
     fetch(WEB_APP_URL, {
-      method: "POST", mode: "cors",
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: "getSantriByNik", nik: nik })
     })
     .then(res => res.json())
@@ -390,7 +415,7 @@
   // FACE RECOGNITION AI
   async function initFaceRecognition() {
     const statusText = document.getElementById("faceStatus");
-    statusText.innerText = "Memuat AI Wajah...";
+    statusText.innerText = "Memuat Model AI...";
 
     try {
       if (!faceModelsLoaded) {
@@ -405,15 +430,16 @@
       videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = videoStream;
 
-      statusText.innerText = "Pindai Wajah...";
+      statusText.innerText = "Memindai Wajah...";
       
       fetch(WEB_APP_URL, {
-        method: "POST", mode: "cors",
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: "getAllFaceVectors" })
       })
       .then(res => res.json())
       .then(async (res) => {
-        if (!res.success || !res.data) { statusText.innerText = "Gagal memuat DB Wajah."; return; }
+        if (!res.success || !res.data) { statusText.innerText = "Gagal memuat Vektor DB."; return; }
 
         const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
         if (detection) {
@@ -432,14 +458,14 @@
           });
 
           if (bestMatch) {
-            statusText.innerText = "✅ Cocok: " + bestMatch.nama;
+            statusText.innerText = "✅ Wajah Cocok: " + bestMatch.nama;
             stopFaceScanner();
             pilihSantri(bestMatch);
           } else {
-            statusText.innerText = "❌ Wajah tidak ditemukan.";
+            statusText.innerText = "❌ Wajah tidak cocok dengan DB.";
           }
         } else {
-          statusText.innerText = "⚠️ Posisikan wajah di kamera.";
+          statusText.innerText = "⚠️ Dekatkan wajah ke kamera.";
         }
       });
     } catch (err) {
@@ -463,23 +489,24 @@
     let estimasi = (tipeTransaksi === "TAMBAH") ? (currentSaldo + nominal) : (currentSaldo - nominal);
     const preview = document.getElementById("previewSaldoAkhir");
     preview.innerText = "Rp " + estimasi.toLocaleString('id-ID');
-    preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--m-blue-dark)";
+    preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--brand-orange-dark)";
   }
 
   function simpanTransaksiTabungan() {
     if (!santriTerpilih) return;
     const nominalRaw = document.getElementById("nominalInput").value.replace(/\./g, "");
     const nominal = Number(nominalRaw);
-    if (!nominal || nominal <= 0) { alert("Masukkan nominal!"); return; }
+    if (!nominal || nominal <= 0) { alert("Masukkan nominal transaksi!"); return; }
 
     const btn = document.getElementById("btnProses");
     const statusDiv = document.getElementById("statusProses");
 
     btn.disabled = true;
-    btn.innerHTML = "<span class='spinner'></span> MENYIMPAN...";
+    btn.innerHTML = "<span class='spinner'></span> MEMPROSES...";
 
     fetch(WEB_APP_URL, {
-      method: "POST", mode: "cors",
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         action: "updateSaldoTabunganSantri",
         nik: santriTerpilih.nik,
@@ -493,7 +520,7 @@
       btn.innerText = "💾 OK - PROSES";
 
       if (res.success) {
-        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ BERHASIL! Saldo: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ BERHASIL! Saldo Baru: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
         santriTerpilih.saldo = res.saldoBaru;
         document.getElementById("dispSaldo").innerText = "Rp " + Number(res.saldoBaru).toLocaleString('id-ID');
         document.getElementById("nominalInput").value = "";
@@ -505,7 +532,7 @@
     .catch(() => {
       btn.disabled = false;
       btn.innerText = "💾 OK - PROSES";
-      statusDiv.innerHTML = "<span style='color:var(--danger);'>Koneksi Bermasalah!</span>";
+      statusDiv.innerHTML = "<span style='color:var(--danger);'>Gagal Menghubungkan Server!</span>";
     });
   }
 
@@ -515,9 +542,10 @@
     document.getElementById("inputSearchManual").value = "";
     document.getElementById("nominalInput").value = "";
     document.getElementById("statusProses").innerText = "";
+    document.getElementById("searchResultsManual").style.display = "none";
     
     const cardAksi = document.getElementById("cardAksi");
-    cardAksi.style.opacity = "0.5";
+    cardAksi.style.opacity = "0.4";
     cardAksi.style.pointerEvents = "none";
     document.getElementById("previewSaldoAkhir").innerText = "Rp 0";
   }
