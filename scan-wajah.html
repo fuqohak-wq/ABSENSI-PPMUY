@@ -10,52 +10,57 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
 
-    <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
-        <div class="flex justify-between items-center">
-            <h1 class="text-xs font-black text-cyan-400 uppercase tracking-wider"><i class="fa-solid fa-face-viewfinder mr-1"></i> TERMINAL KIOSK SCAN WAJAH</h1>
-            <p id="txt-db-status" onclick="ambilDatabaseSantri()" class="text-[11px] text-amber-400 font-bold animate-pulse cursor-pointer">Menghubungkan cloud...</p>
+    <!-- HEADER & NAVIGASI ATAS -->
+    <div class="w-full max-w-md mx-auto flex flex-col gap-2">
+        <div class="flex justify-between items-center bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-lg">
+            <h1 class="text-[11px] font-black text-cyan-400 uppercase tracking-wider">
+                <i class="fa-solid fa-face-viewfinder mr-1"></i> KIOSK SCAN WAJAH
+            </h1>
+            <a href="dashboard.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-black px-3 py-2 rounded-xl uppercase tracking-wider border border-slate-700 transition-colors">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Dashboard
+            </a>
         </div>
 
-        <select id="pilihan-kegiatan" class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-3 py-3 text-xs font-black text-white outline-none cursor-pointer">
-            <option value="Subuh">Jamaah Subuh</option>
-            <option value="Dzuhur">Jamaah Dzuhur</option>
-            <option value="Ashar">Jamaah Ashar</option>
-            <option value="Maghrib">Jamaah Maghrib</option>
-            <option value="Isya">Jamaah Isya</option>
-            <option value="Quranan">Ngaji al-Qur'an Bakdo Subuh</option>
-            <option value="Afsahan">Ngafsahi/Kursus Bakdo al-Qur'an</option>
-            <option value="PDF 1">Sekolah PDF Jam Pertama</option>
-            <option value="PDF 2">Sekolah PDF Jam Kedua</option>
-            <option value="PDF 3">Sekolah PDF Jam Ketiga</option>
-            <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
-            <option value="Sorogan">Sorogan Kitab</option>
-            <option value="Belajar">Jam Belajar</option>
-            <option value="Jumatan">Jumatan</option>
-            <option value="Ziarah">Ziarah Kubur</option>
-        </select>
+        <!-- PILIHAN KEGIATAN & STATUS KONEKSI -->
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pilih Kegiatan</span>
+                <p id="txt-db-status" onclick="ambilDatabaseSantri()" class="text-[10px] text-amber-400 font-bold animate-pulse cursor-pointer">Menghubungkan cloud...</p>
+            </div>
+            <select id="pilihan-kegiatan" class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-3 py-3 text-xs font-black text-white outline-none cursor-pointer">
+                <option value="Subuh">Jamaah Subuh</option>
+                <option value="Dzuhur">Jamaah Dzuhur</option>
+                <option value="Ashar">Jamaah Ashar</option>
+                <option value="Maghrib">Jamaah Maghrib</option>
+                <option value="Isya">Jamaah Isya</option>
+                <option value="Quranan">Ngaji al-Qur'an Bakdo Subuh</option>
+                <option value="Afsahan">Ngafsahi/Kursus Bakdo al-Qur'an</option>
+                <option value="PDF 1">Sekolah PDF Jam Pertama</option>
+                <option value="PDF 2">Sekolah PDF Jam Kedua</option>
+                <option value="PDF 3">Sekolah PDF Jam Ketiga</option>
+                <option value="Ndalem">Ngaji Ndalem Bakdo Ashar</option>
+                <option value="Sorogan">Sorogan Kitab</option>
+                <option value="Belajar">Jam Belajar</option>
+                <option value="Jumatan">Jumatan</option>
+                <option value="Ziarah">Ziarah Kubur</option>
+            </select>
+        </div>
     </div>
 
-    <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center items-center">
+    <!-- AREA VIEWPORT VIDEO -->
+    <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center items-center py-4">
         <div class="relative w-full aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-            <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
+            <!-- Ditambahkan CSS rendering optimization untuk HP -->
+            <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1] [image-rendering:auto] [will-change:transform]"></video>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div id="kotak-scan" class="w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300">
-                    <span id="instruksi" class="text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center">Memasang AI...</span>
+                    <span id="instruksi" class="text-[10px] bg-slate-950/90 text-cyan-400 px-4 py-2.5 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center max-w-[85%]">Memasang AI...</span>
                 </div>
             </div>
         </div>
     </div>
 
     <canvas id="canvas-capture" class="hidden"></canvas>
-
-    <div class="w-full max-w-md mx-auto flex flex-col gap-2 mt-4">
-        <a href="orangtua.html" class="w-full bg-rose-950 border border-rose-800 text-rose-300 font-black py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider shadow-md hover:bg-rose-900 transition-colors">
-            <i class="fa-solid fa-heart animate-pulse mr-1"></i> Mode Orang Tua - Cek Foto Anak
-        </a>
-        <a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">
-            Kembali ke Dashboard
-        </a>
-    </div>
 
     <!-- POP-UP WARNING (ABSENSI GANDA) -->
     <div id="pop-warning" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-6 hidden z-[110]">
@@ -104,6 +109,32 @@
             } catch (e) {}
         }
 
+        // FUNGSI DETEKSI LOOP OPTIMAL UNTUK PERFORMA HANDPHONE (ANTI-LAG)
+        async function mulaiDeteksiWajah() {
+            if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) {
+                // Jeda iterasi berikutnya jika sedang sibuk memproses atau database kosong
+                setTimeout(mulaiDeteksiWajah, 200); 
+                return;
+            }
+
+            try {
+                // Menggunakan inputSize: 224 (jauh lebih ringan & lancar pada CPU handphone daripada 416)
+                const hasilKamera = await faceapi.detectSingleFace(
+                    video, 
+                    new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.6 })
+                ).withFaceLandmarks().withFaceDescriptor();
+
+                if (hasilKamera) {
+                    await verifikasiWajahLokal(hasilKamera.descriptor);
+                }
+            } catch (err) {
+                console.error("Kesalahan deteksi:", err);
+            }
+
+            // Menjadwalkan deteksi berikutnya secara asinkron tanpa menumpuk antrean memori
+            setTimeout(mulaiDeteksiWajah, 100); 
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             if (!localStorage.getItem('session_nama')) { localStorage.setItem('session_nama', 'KIOSK_MANDIRI'); }
             try {
@@ -112,35 +143,43 @@
                 await faceapi.nets.faceLandmark68Net.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await faceapi.nets.faceRecognitionNet.loadFromUri('https://unpkg.com/@vladmandic/face-api/model');
                 await ambilDatabaseSantri();
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", frameRate: { ideal: 30 } }, 
+                    audio: false 
+                });
                 video.srcObject = stream;
                 label.innerText = "HADAPKAN WAJAH KE KAMERA";
                 
-                setInterval(async () => {
-                    if (isProcessing || video.paused || video.ended || databaseSantri.length === 0) return;
-                    const hasilKamera = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptor();
-                    if (hasilKamera) verifikasiWajahLokal(hasilKamera.descriptor);
-                }, 150);
+                // Memulai loop deteksi performa tinggi
+                mulaiDeteksiWajah();
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
         async function verifikasiWajahLokal(descriptorKamera) {
-            let santriDitemukan = null; let jarakTerkecil = 0.48;
+            let santriDitemukan = null; 
+            
+            // Ambang batas kesamaan diturunkan ke 0.40 demi presisi tinggi dan mencegah salah orang (anti-swap)
+            let jarakTerkecil = 0.40; 
+
             for (let santri of databaseSantri) {
                 try {
                     let arrayVektorDb = Object.values(JSON.parse(santri.vektor));
                     let jarak = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
-                    if (jarak < jarakTerkecil) { jarakTerkecil = jarak; santriDitemukan = santri; }
+                    if (jarak < jarakTerkecil) { 
+                        jarakTerkecil = jarak; 
+                        santriDitemukan = santri; 
+                    }
                 } catch(e){}
             }
 
             if (santriDitemukan) {
-                isProcessing = true; // Kunci proses agar tidak mendeteksi ganda dalam milidetik yang sama
+                isProcessing = true; 
                 const kegiatan = document.getElementById('pilihan-kegiatan').value;
                 const hariIni = new Date().toISOString().split('T')[0];
                 const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
-                // Cegah absensi ganda secara lokal
+                // Deteksi absensi ganda lokal secara cepat
                 if (localStorage.getItem(storageKey) === "TERCATAT") {
                     document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
                     document.getElementById('pop-warning').classList.remove('hidden');
@@ -152,23 +191,23 @@
                     return;
                 }
 
-                // Tandai sudah absen di penyimpanan lokal segera
+                // Kunci status absen lokal instan
                 localStorage.setItem(storageKey, "TERCATAT");
 
-                // Berikan tanda visual & audio sukses instan
+                // Umpan balik visual sukses langsung di layar utama
                 bunyikanBeep(1000, 0.2);
                 label.innerText = `✔️ ${santriDitemukan.nama.toUpperCase()}`;
-                label.className = "text-xs bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-emerald-400 text-center";
+                label.className = "text-[11px] bg-emerald-500 text-slate-950 px-4 py-2.5 rounded-xl font-black uppercase tracking-widest border border-emerald-400 text-center max-w-[85%]";
                 kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl bg-emerald-500/10 scale-105 transition-all duration-150";
 
-                // Tangkap gambar dari kamera
+                // Ambil frame gambar
                 canvasCap.width = video.videoWidth; canvasCap.height = video.videoHeight;
                 const ctx = canvasCap.getContext('2d');
                 ctx.translate(canvasCap.width, 0); ctx.scale(-1, 1);
                 ctx.drawImage(video, 0, 0, canvasCap.width, canvasCap.height);
-                const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.3);
+                const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.25); // Kualitas diturunkan sedikit agar transmisi data HP lebih gesit
 
-                // KIRIM DATA DI LATAR BELAKANG (Asynchronous, Non-Blocking)
+                // Kirim data secara asinkron di latar belakang
                 fetch(URL_AKURAT, { 
                     method: "POST", 
                     headers: { "Content-Type": "text/plain;charset=utf-8" }, 
@@ -181,16 +220,16 @@
                     }) 
                 }).then(response => response.json())
                   .then(data => {
-                      console.log("Database update:", data);
+                      console.log("Database synced:", data);
                   })
                   .catch(err => {
                       console.error("Gagal sinkronisasi cloud:", err);
                   });
 
-                // Reset scanner otomatis dalam 1.5 detik untuk santri berikutnya
+                // Reset posisi scanner secara otomatis untuk antrean santri berikutnya
                 setTimeout(() => {
                     label.innerText = "HADAPKAN WAJAH KE KAMERA";
-                    label.className = "text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center";
+                    label.className = "text-[11px] bg-slate-950/90 text-cyan-400 px-4 py-2.5 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center max-w-[85%]";
                     kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300";
                     isProcessing = false; 
                 }, 1500);
