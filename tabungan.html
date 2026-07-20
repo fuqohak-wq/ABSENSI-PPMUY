@@ -2,352 +2,525 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manajemen Tabungan Santri</title>
-  <!-- Google Font Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>M-Tabungan PPMUY</title>
+  <!-- HTML5 QR Code Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- Face-api.js for AI Face Recognition -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #0b192c 0%, #1e3e62 50%, #000000 100%);
-      --glass-bg: rgba(255, 255, 255, 0.07);
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-card: rgba(15, 23, 42, 0.65);
-      --accent-blue: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.35);
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --m-blue: #003882;
+      --m-blue-dark: #002254;
+      --m-yellow: #FFC400;
+      --m-yellow-hover: #e6b000;
+      --bg: #F0F4F8;
+      --card-bg: #FFFFFF;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --danger: #EF4444;
+      --success: #10B981;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text-dark); padding: 8px; font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    .app-container { max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
-    body {
-      background: var(--bg-gradient);
-      background-attachment: fixed;
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 520px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Header Banner Premium */
-    .header-card {
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(30, 64, 175, 0.4);
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .header-card::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 180px;
-      height: 180px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      filter: blur(20px);
-    }
-
-    .header-card h2 {
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-card p {
-      font-size: 0.8rem;
-      color: #bfdbfe;
-      margin-top: 4px;
-    }
-
-    /* Main Glass Card Structure */
-    .glass-card {
-      background: var(--glass-card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--accent-blue);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Tab Switcher */
-    .tab-group {
-      display: flex;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 4px;
+    /* HEADER STYLE MBANKING */
+    .mbanking-header {
+      background: linear-gradient(135deg, var(--m-blue), var(--m-blue-dark));
+      color: white;
+      padding: 12px;
       border-radius: 12px;
-      margin-bottom: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .tab-btn.active {
-      background: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Form & Input Elements */
-    .input-group {
-      margin-bottom: 16px;
-    }
-
-    .input-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-      display: block;
-      font-weight: 500;
-    }
-
-    .custom-input, .custom-select {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      color: #ffffff;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .custom-input:focus, .custom-select:focus {
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
-
-    /* Info Badge / Result Display */
-    .santri-info-box {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 95, 70, 0.2) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 14px;
-      padding: 16px;
-      margin-top: 12px;
-    }
-
-    .info-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
-      margin-bottom: 6px;
-      color: #cbd5e1;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 56, 130, 0.15);
+      border-bottom: 3px solid var(--m-yellow);
+    }
+    .mbanking-header h1 { font-size: 15px; font-weight: 800; color: white; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
+    .mbanking-header h1 span { color: var(--m-yellow); }
+    .live-badge { background: rgba(255, 255, 255, 0.15); font-size: 10px; padding: 3px 8px; border-radius: 12px; color: var(--m-yellow); font-weight: 600; border: 1px solid rgba(255, 196, 0, 0.4); }
+
+    /* CARD COMPONENT */
+    .m-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      border: 1px solid #E2E8F0;
     }
 
-    .info-row strong {
-      color: #ffffff;
+    /* SEARCH METHOD TABS */
+    .search-pills {
+      display: flex;
+      background: #E2E8F0;
+      padding: 3px;
+      border-radius: 8px;
+      gap: 3px;
+      margin-bottom: 8px;
+    }
+    .pill-btn {
+      flex: 1;
+      padding: 6px 4px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .pill-btn.active {
+      background: var(--m-blue);
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 56, 130, 0.2);
     }
 
-    .saldo-badge {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #34d399;
-      text-align: right;
-      margin-top: 8px;
-      text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    /* Estimasi Box */
-    .estimasi-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px dashed var(--glass-border);
+    /* INPUT STYLES */
+    .input-group { position: relative; }
+    .input-group label { font-size: 11px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; }
+    .m-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      background: #F8FAFC;
+      transition: 0.2s;
+    }
+    .m-input:focus { border-color: var(--m-blue); background: white; box-shadow: 0 0 0 3px rgba(0, 56, 130, 0.1); }
+
+    .search-results {
+      position: absolute; left: 0; right: 0; max-height: 160px; overflow-y: auto;
+      border: 1px solid #CBD5E1; border-radius: 8px; margin-top: 3px; background: white;
+      z-index: 999; box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .search-item { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #F1F5F9; font-size: 12px; }
+    .search-item:hover { background: #EFF6FF; color: var(--m-blue); }
+
+    /* SCANNER AREA */
+    #reader { width: 100%; max-width: 280px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
+    video { width: 100%; max-width: 280px; border-radius: 8px; background: #000; }
+
+    /* BANK CARD PROFILE DISPLAY */
+    .atm-card {
+      background: linear-gradient(135deg, var(--m-blue-dark), var(--m-blue));
+      color: white;
       border-radius: 12px;
       padding: 12px;
-      text-align: center;
-      margin: 16px 0;
+      margin-top: 6px;
+      display: none;
+      position: relative;
+      overflow: hidden;
+      border-right: 4px solid var(--m-yellow);
     }
+    .atm-card.active { display: block; }
+    .atm-card::after {
+      content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px;
+      background: rgba(255, 196, 0, 0.15); border-radius: 50%;
+    }
+    .atm-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .atm-chip { width: 28px; height: 20px; background: var(--m-yellow); border-radius: 4px; opacity: 0.9; }
+    .atm-nama { font-size: 14px; font-weight: 800; color: white; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px; }
+    .atm-nik { font-size: 10px; color: #93C5FD; font-family: monospace; letter-spacing: 1px; }
+    .atm-saldo-box { text-align: right; margin-top: 4px; }
+    .atm-saldo-label { font-size: 9px; color: var(--m-yellow); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+    .atm-saldo-value { font-size: 18px; font-weight: 900; color: white; letter-spacing: -0.5px; }
 
-    .estimasi-box span {
-      font-size: 0.75rem;
-      color: var(--text-muted);
+    /* TRANSACTION FORM */
+    .tx-type-selector { display: flex; gap: 6px; margin-bottom: 8px; }
+    .btn-tx-type {
+      flex: 1; padding: 8px; border: 1.5px solid #CBD5E1; background: white;
+      border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text-muted); text-align: center;
     }
+    .btn-tx-type.active-add { background: #ECFDF5; border-color: var(--success); color: var(--success); }
+    .btn-tx-type.active-sub { background: #FEF2F2; border-color: var(--danger); color: var(--danger); }
 
-    .estimasi-box h3 {
-      font-size: 1.2rem;
-      color: var(--accent-blue);
-      margin-top: 4px;
+    .calc-banner {
+      background: #FFFBEB; border: 1px dashed var(--m-yellow); padding: 8px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 8px;
     }
+    .calc-banner strong { font-size: 13px; color: var(--m-blue-dark); font-weight: 800; }
 
-    /* Action Buttons */
-    .btn-group {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 12px;
+    /* BUTTONS */
+    .m-btn {
+      width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: 800; font-size: 13px;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; transition: 0.2s;
     }
+    .btn-yellow { background: var(--m-yellow); color: var(--m-blue-dark); box-shadow: 0 3px 8px rgba(255, 196, 0, 0.3); }
+    .btn-yellow:active { background: var(--m-yellow-hover); transform: scale(0.98); }
+    .btn-blue { background: var(--m-blue); color: white; }
+    .btn-outline { background: transparent; border: 1px solid #CBD5E1; color: var(--text-muted); }
 
-    .btn {
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    .spinner {
+      width: 12px; height: 12px; border: 2px solid rgba(0, 34, 84, 0.3);
+      border-radius: 50%; border-top-color: var(--m-blue-dark); animation: spin 0.8s linear infinite;
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      color: white;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.5);
-    }
-
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-danger:hover {
-      background: #ef4444;
-      color: white;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
-
-    <!-- Header -->
-    <div class="header-card">
-      <h2><i class="fa-solid => fa-wallet"></i> Tabungan Santri</h2>
-      <p>System Realtime Database Sync</p>
-    </div>
-
-    <!-- Cari Data Santri -->
-    <div class="glass-card">
-      <div class="section-title">
-        <i class="fa-solid fa-magnifying-glass"></i> Cari Data Santri
-      </div>
-
-      <!-- Tab Navigasi Pencarian -->
-      <div class="tab-group">
-        <button class="tab-btn active"><i class="fa-solid fa-keyboard"></i> Manual</button>
-        <button class="tab-btn"><i class="fa-solid fa-barcode"></i> Barcode</button>
-        <button class="tab-btn"><i class="fa-solid fa-face-smile"></i> AI Wajah</button>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Ketik Nama / NIK Santri:</label>
-        <input type="text" class="custom-input" value="Asyrofil Mursalin" placeholder="Masukkan Nama / NIK...">
-      </div>
-
-      <!-- Hasil Pencarian Card -->
-      <div class="santri-info-box">
-        <div class="info-row">
-          <span>NIK:</span>
-          <strong>3324130502070001</strong>
-        </div>
-        <div class="info-row">
-          <span>Gender:</span>
-          <strong>LAKI-LAKI</strong>
-        </div>
-        <div class="info-row" style="margin-top: 10px; align-items: flex-end;">
-          <span style="color: #a7f3d0; font-weight: 600;">Saldo Tabungan:</span>
-          <div class="saldo-badge">Rp 3.391</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Menu Aksi Transaksi -->
-    <div class="glass-card">
-      <div class="section-title">
-        <i class="fa-solid fa-bolt"></i> Aksi Transaksi
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Pilih Jenis Transaksi:</label>
-        <select class="custom-select">
-          <option>— Tarik / Ambil Tabungan</option>
-          <option>+ Setor / Simpan Tabungan</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Nominal (Rp):</label>
-        <input type="text" class="custom-input" value="3.000" placeholder="0">
-      </div>
-
-      <div class="estimasi-box">
-        <span>Estimasi Saldo Akhir Setelah Transaksi</span>
-        <h3>Rp 391</h3>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn btn-primary">
-          <i class="fa-solid fa-paper-plane"></i> Simpan
-        </button>
-        <button class="btn btn-danger">
-          <i class="fa-solid fa-rotate-left"></i> Reset
-        </button>
-      </div>
-    </div>
-
+<div class="app-container">
+  <!-- TOP HEADER -->
+  <div class="mbanking-header">
+    <h1>💳 M-TABUNGAN <span>PPMUY</span></h1>
+    <div class="live-badge">● ONLINE</div>
   </div>
 
+  <!-- SEARCH CARD -->
+  <div class="m-card">
+    <div class="search-pills">
+      <button class="pill-btn active" onclick="switchTab(this, 'manual')">✏️ MANUALLY</button>
+      <button class="pill-btn" onclick="switchTab(this, 'barcode')">📷 BARCODE</button>
+      <button class="pill-btn" onclick="switchTab(this, 'face')">👤 FACE AI</button>
+    </div>
+
+    <!-- TAB MANUAL -->
+    <div id="tab-manual" class="tab-content active">
+      <div class="input-group">
+        <input type="text" id="inputSearchManual" class="m-input" placeholder="Ketik Nama / NIK Santri..." oninput="searchSantriManual(this.value)">
+        <div id="searchResultsManual" class="search-results" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- TAB BARCODE -->
+    <div id="tab-barcode" class="tab-content">
+      <div id="reader"></div>
+      <button class="m-btn btn-yellow" id="btnToggleBarcode" onclick="toggleBarcodeScanner()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Barcode</button>
+    </div>
+
+    <!-- TAB FACE AI -->
+    <div id="tab-face" class="tab-content" style="text-align: center;">
+      <video id="videoFace" autoplay muted playsinline></video>
+      <button class="m-btn btn-yellow" id="btnStartFace" onclick="initFaceRecognition()" style="margin-top:4px; padding:7px; font-size:11px;">Mulai Scan Wajah</button>
+      <p id="faceStatus" style="font-size:10px; color:var(--m-blue); font-weight:700; margin-top:3px;"></p>
+    </div>
+
+    <!-- ATM DIGITAL PROFIL SANTRI -->
+    <div id="profileCard" class="atm-card">
+      <div class="atm-header">
+        <div class="atm-chip"></div>
+        <div style="text-align:right;">
+          <div class="atm-nama" id="dispNama">-</div>
+          <div class="atm-nik" id="dispNik">-</div>
+        </div>
+      </div>
+      <div class="atm-saldo-box">
+        <div class="atm-saldo-label">Total Saldo Tabungan</div>
+        <div class="atm-saldo-value" id="dispSaldo">Rp 0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM TRANSAKSI REALTIME -->
+  <div class="m-card" id="cardAksi" style="opacity:0.5; pointer-events:none;">
+    <div class="tx-type-selector">
+      <button type="button" class="btn-tx-type active-add" id="btnTypeAdd" onclick="setTxType('TAMBAH')">➕ SETOR</button>
+      <button type="button" class="btn-tx-type" id="btnTypeSub" onclick="setTxType('TARIK')">➖ TARIK</button>
+    </div>
+
+    <div class="input-group" style="margin-bottom:8px;">
+      <label>Nominal Transaksi (Rp)</label>
+      <input type="text" id="nominalInput" class="m-input" placeholder="0" style="font-size:16px; color:var(--m-blue-dark);" onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
+    </div>
+
+    <div class="calc-banner">
+      <span>Estimasi Saldo Akhir:</span>
+      <strong id="previewSaldoAkhir">Rp 0</strong>
+    </div>
+
+    <div style="display:flex; gap:6px;">
+      <button class="m-btn btn-yellow" id="btnProses" onclick="simpanTransaksiTabungan()" style="flex:2;">
+        💾 OK - PROSES
+      </button>
+      <button class="m-btn btn-outline" onclick="resetForm()" style="flex:1;">
+        🔄 RESET
+      </button>
+    </div>
+    <div id="statusProses" style="margin-top:6px; font-size:11px; font-weight:700; text-align:center;"></div>
+  </div>
+</div>
+
+<script>
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydgX_DYVHmJUtNPxdryj_sbo2miXRyvC3jU_IPHogludeVPMPK4iPAnWbWu0dHU_dS/exec";
+
+  let santriTerpilih = null;
+  let tipeTransaksi = "TAMBAH";
+  let html5QrCode = null;
+  let isScanningBarcode = false;
+  let faceModelsLoaded = false;
+  let videoStream = null;
+
+  function switchTab(btn, tabName) {
+    document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    btn.classList.add('active');
+    document.getElementById('tab-' + tabName).classList.add('active');
+
+    stopBarcodeScanner();
+    stopFaceScanner();
+  }
+
+  function formatRupiah(angka) {
+    let number_string = angka.replace(/[^,\d]/g, '').toString(),
+        split = number_string.split(','),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+      let separator = sisa ? '.' : '';
+      rupiah += separator + ribuan.join('.');
+    }
+    return rupiah;
+  }
+
+  function setTxType(type) {
+    tipeTransaksi = type;
+    const btnAdd = document.getElementById("btnTypeAdd");
+    const btnSub = document.getElementById("btnTypeSub");
+
+    if (type === "TAMBAH") {
+      btnAdd.className = "btn-tx-type active-add";
+      btnSub.className = "btn-tx-type";
+    } else {
+      btnAdd.className = "btn-tx-type";
+      btnSub.className = "btn-tx-type active-sub";
+    }
+    hitungTotalSisa();
+  }
+
+  function searchSantriManual(keyword) {
+    const resDiv = document.getElementById("searchResultsManual");
+    if (!keyword || keyword.trim().length < 2) { resDiv.style.display = "none"; return; }
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({ action: "searchSantriTabungan", keyword: keyword })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success && res.data && res.data.length > 0) {
+        resDiv.innerHTML = "";
+        res.data.forEach(santri => {
+          let item = document.createElement("div");
+          item.className = "search-item";
+          item.innerHTML = `<b>${santri.nama}</b> (NIK: ${santri.nik})`;
+          item.onclick = () => pilihSantri(santri);
+          resDiv.appendChild(item);
+        });
+        resDiv.style.display = "block";
+      } else {
+        resDiv.style.display = "none";
+      }
+    });
+  }
+
+  function pilihSantri(santri) {
+    santriTerpilih = santri;
+    document.getElementById("searchResultsManual").style.display = "none";
+    document.getElementById("inputSearchManual").value = santri.nama;
+
+    document.getElementById("dispNama").innerText = santri.nama;
+    document.getElementById("dispNik").innerText = "NIK: " + santri.nik;
+    document.getElementById("dispSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
+
+    document.getElementById("profileCard").classList.add("active");
+    
+    const cardAksi = document.getElementById("cardAksi");
+    cardAksi.style.opacity = "1";
+    cardAksi.style.pointerEvents = "auto";
+
+    hitungTotalSisa();
+  }
+
+  // BARCODE SCANNER
+  function toggleBarcodeScanner() {
+    if (isScanningBarcode) { stopBarcodeScanner(); } else { startBarcodeScanner(); }
+  }
+
+  function startBarcodeScanner() {
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 200, height: 200 } },
+      (decodedText) => {
+        stopBarcodeScanner();
+        cariByNik(decodedText);
+      },
+      () => { }
+    ).then(() => {
+      isScanningBarcode = true;
+      document.getElementById("btnToggleBarcode").innerText = "⏹️ Stop Scan";
+    }).catch(err => alert("Kamera tidak diizinkan: " + err));
+  }
+
+  function stopBarcodeScanner() {
+    if (html5QrCode && isScanningBarcode) {
+      html5QrCode.stop().then(() => {
+        html5QrCode.clear();
+        isScanningBarcode = false;
+        document.getElementById("btnToggleBarcode").innerText = "Mulai Scan Barcode";
+      });
+    }
+  }
+
+  function cariByNik(nik) {
+    fetch(WEB_APP_URL, {
+      method: "POST", mode: "cors",
+      body: JSON.stringify({ action: "getSantriByNik", nik: nik })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success && res.data) { pilihSantri(res.data); }
+      else { alert("NIK " + nik + " tidak ditemukan!"); }
+    });
+  }
+
+  // FACE RECOGNITION AI
+  async function initFaceRecognition() {
+    const statusText = document.getElementById("faceStatus");
+    statusText.innerText = "Memuat AI Wajah...";
+
+    try {
+      if (!faceModelsLoaded) {
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+        faceModelsLoaded = true;
+      }
+
+      statusText.innerText = "Membuka Kamera...";
+      const video = document.getElementById("videoFace");
+      videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = videoStream;
+
+      statusText.innerText = "Pindai Wajah...";
+      
+      fetch(WEB_APP_URL, {
+        method: "POST", mode: "cors",
+        body: JSON.stringify({ action: "getAllFaceVectors" })
+      })
+      .then(res => res.json())
+      .then(async (res) => {
+        if (!res.success || !res.data) { statusText.innerText = "Gagal memuat DB Wajah."; return; }
+
+        const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+        if (detection) {
+          const currentDescriptor = detection.descriptor;
+          let bestMatch = null;
+          let minDistance = 0.6;
+
+          res.data.forEach(item => {
+            if (item.vector && item.vector.length === 128) {
+              const distance = faceapi.euclidDistance(currentDescriptor, item.vector);
+              if (distance < minDistance) {
+                minDistance = distance;
+                bestMatch = item;
+              }
+            }
+          });
+
+          if (bestMatch) {
+            statusText.innerText = "✅ Cocok: " + bestMatch.nama;
+            stopFaceScanner();
+            pilihSantri(bestMatch);
+          } else {
+            statusText.innerText = "❌ Wajah tidak ditemukan.";
+          }
+        } else {
+          statusText.innerText = "⚠️ Posisikan wajah di kamera.";
+        }
+      });
+    } catch (err) {
+      statusText.innerText = "Err: " + err.message;
+    }
+  }
+
+  function stopFaceScanner() {
+    if (videoStream) {
+      videoStream.getTracks().forEach(track => track.stop());
+      videoStream = null;
+    }
+  }
+
+  function hitungTotalSisa() {
+    if (!santriTerpilih) return;
+    const currentSaldo = Number(santriTerpilih.saldo) || 0;
+    const nominalRaw = document.getElementById("nominalInput").value.replace(/\./g, "");
+    const nominal = Number(nominalRaw) || 0;
+
+    let estimasi = (tipeTransaksi === "TAMBAH") ? (currentSaldo + nominal) : (currentSaldo - nominal);
+    const preview = document.getElementById("previewSaldoAkhir");
+    preview.innerText = "Rp " + estimasi.toLocaleString('id-ID');
+    preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--m-blue-dark)";
+  }
+
+  function simpanTransaksiTabungan() {
+    if (!santriTerpilih) return;
+    const nominalRaw = document.getElementById("nominalInput").value.replace(/\./g, "");
+    const nominal = Number(nominalRaw);
+    if (!nominal || nominal <= 0) { alert("Masukkan nominal!"); return; }
+
+    const btn = document.getElementById("btnProses");
+    const statusDiv = document.getElementById("statusProses");
+
+    btn.disabled = true;
+    btn.innerHTML = "<span class='spinner'></span> MENYIMPAN...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST", mode: "cors",
+      body: JSON.stringify({
+        action: "updateSaldoTabunganSantri",
+        nik: santriTerpilih.nik,
+        tipe: tipeTransaksi,
+        nominal: nominal
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      btn.disabled = false;
+      btn.innerText = "💾 OK - PROSES";
+
+      if (res.success) {
+        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ BERHASIL! Saldo: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        santriTerpilih.saldo = res.saldoBaru;
+        document.getElementById("dispSaldo").innerText = "Rp " + Number(res.saldoBaru).toLocaleString('id-ID');
+        document.getElementById("nominalInput").value = "";
+        hitungTotalSisa();
+      } else {
+        statusDiv.innerHTML = `<span style='color:var(--danger);'>⚠️ Gagal: ${res.error}</span>`;
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerText = "💾 OK - PROSES";
+      statusDiv.innerHTML = "<span style='color:var(--danger);'>Koneksi Bermasalah!</span>";
+    });
+  }
+
+  function resetForm() {
+    santriTerpilih = null;
+    document.getElementById("profileCard").classList.remove("active");
+    document.getElementById("inputSearchManual").value = "";
+    document.getElementById("nominalInput").value = "";
+    document.getElementById("statusProses").innerText = "";
+    
+    const cardAksi = document.getElementById("cardAksi");
+    cardAksi.style.opacity = "0.5";
+    cardAksi.style.pointerEvents = "none";
+    document.getElementById("previewSaldoAkhir").innerText = "Rp 0";
+  }
+</script>
 </body>
 </html>
