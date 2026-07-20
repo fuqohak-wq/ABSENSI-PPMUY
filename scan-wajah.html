@@ -3,17 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Terminal Kiosk Wajah AI - Core Pakem Standar Industri</title>
+    <title>Terminal Kiosk Wajah AI - Core System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .spinner-kiosk { border-top-color: #22d3ee; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
 
+    <!-- OVERLAY PROSES SINKRONISASI LATAR BELAKANG -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-[100] hidden">
+        <div class="w-16 h-16 border-4 border-slate-800 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_20px_rgba(6,182,212,0.3)]"></div>
+        <p class="mt-6 text-cyan-400 font-bold text-xs tracking-widest uppercase animate-pulse">Memproses Presensi & Snapshot...</p>
+    </div>
+
+    <!-- PANEL ATAS KIOSK -->
     <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
         <div class="flex justify-between items-center">
-            <h1 class="text-xs font-black text-cyan-400 uppercase tracking-wider"><i class="fa-solid fa-face-viewfinder mr-1"></i> TERMINAL KIOSK SCAN WAJAH</h1>
-            <p id="txt-db-status" onclick="ambilDatabaseSantri(true)" title="Klik untuk paksa sinkronisasi ulang data" class="text-[11px] text-amber-400 font-bold animate-pulse cursor-pointer hover:text-cyan-400 transition-colors">Menghubungkan cloud...</p>
+            <h1 class="text-xs font-black text-cyan-400 uppercase tracking-wider">
+                <i class="fa-solid fa-face-viewfinder mr-1"></i> TERMINAL KIOSK SCAN WAJAH
+            </h1>
+            <p id="txt-db-status" onclick="ambilDatabaseSantri(true)" title="Klik untuk paksa sinkronisasi" class="text-[11px] text-amber-400 font-bold animate-pulse cursor-pointer hover:text-cyan-400 transition-colors">
+                Menghubungkan cloud...
+            </p>
         </div>
         <select id="pilihan-kegiatan" class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-3 py-3 text-xs font-black text-white outline-none focus:border-cyan-500 cursor-pointer">
             <option value="Subuh">Jamaah Subuh</option>
@@ -34,6 +49,7 @@
         </select>
     </div>
 
+    <!-- VIEWPORT CAMERA -->
     <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center items-center">
         <div class="relative w-full aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
             <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
@@ -45,28 +61,36 @@
         </div>
     </div>
 
-    <!-- CANVAS TERSEMBUNYI UNTUK PENGAMBILAN DATA ELEKTRONIK JPG -->
+    <!-- CANVAS TERSEMBUNYI UNTUK CAPTURE IMAGE -->
     <canvas id="canvas-capture" class="hidden"></canvas>
 
-    <div class="w-full max-w-md mx-auto"><a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider">Kembali ke Dashboard</a></div>
+    <!-- TOMBOL NAVIGASI -->
+    <div class="w-full max-w-md mx-auto flex flex-col gap-2 mt-4">
+        <a href="dashboard.html" class="w-full bg-slate-900 text-slate-400 font-bold py-3.5 rounded-2xl text-xs uppercase text-center block tracking-wider hover:bg-slate-850 transition-colors">
+            Kembali ke Dashboard
+        </a>
+    </div>
 
-    <div id="pop-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
-        <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400 animate-bounce">
+    <!-- POP-UP SUKSES -->
+    <div id="pop-success" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
+        <div class="bg-emerald-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400">
             <span class="text-xs font-black tracking-widest block opacity-75">🔊 LOG JAMAAH DICATAT</span>
-            <span class="font-black text-xl block mt-1 tracking-wide" id="txt-nama-sukses">Nama Santri</span>
+            <span class="font-black text-xl block mt-2 tracking-wide uppercase" id="txt-nama-sukses">Nama Santri</span>
+            <span class="text-[11px] font-bold block mt-2 bg-slate-950/20 py-1.5 rounded-lg uppercase tracking-wider">Hadir Tepat Waktu</span>
         </div>
     </div>
 
+    <!-- POP-UP WARNING -->
     <div id="pop-warning" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-50">
         <div class="bg-amber-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-amber-400">
             <span class="text-xs font-black tracking-widest block opacity-75"><i class="fa-solid fa-triangle-exclamation mr-1"></i> AKSES DITOLAK</span>
-            <span class="font-black text-base block mt-1 tracking-wide" id="txt-nama-peringatan">NAMA SANTRI</span>
+            <span class="font-black text-base block mt-1 tracking-wide uppercase" id="txt-nama-peringatan">NAMA SANTRI</span>
             <span class="text-[11px] font-bold block mt-1 bg-slate-950/20 py-1 rounded-lg uppercase tracking-wider">Sudah Absen Pada Kegiatan Ini!</span>
         </div>
     </div>
 
     <script>
-        // MASUKKAN URL DEPLOYMENT BARU ANDA DISINI
+        // MASUKKAN URL DEPLOYMENT WEB APP SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         let video = document.getElementById('video-selfie');
@@ -74,6 +98,7 @@
         let kotakScan = document.getElementById('kotak-scan');
         let dbStatus = document.getElementById('txt-db-status');
         let canvasCap = document.getElementById('canvas-capture');
+        let loadingOverlay = document.getElementById('loading-overlay');
         
         let isProcessing = false;
         let databaseSantri = [];
@@ -81,7 +106,6 @@
         const AMBANG_BATAS_KETAT = 0.48;    
         const DETECTOR_INPUT_SIZE = 416;    
         const DETECTOR_SCORE_THRESH = 0.5;  
-        const GENDER_KIOSK = ""; 
 
         let deteksiTerakhir = null;
         let hitungKonsistensi = 0;
@@ -89,7 +113,7 @@
 
         const CACHE_DB_KEY = 'cache_database_santri';
         const CACHE_DB_TIME_KEY = 'cache_database_time';
-        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; 
+        const DURASI_CACHE_DB = 6 * 60 * 60 * 1000; // 6 jam cache lokal
 
         function bunyikanBeep(frekuensi, durasi) {
             try {
@@ -184,13 +208,6 @@
 
             for (let santri of databaseSantri) {
                 try {
-                    if (GENDER_KIOSK !== "") {
-                        let genderSantri = santri.gender ? santri.gender.toString().trim().toUpperCase() : "";
-                        let matchesL = (GENDER_KIOSK === "L" && (genderSantri === "L" || genderSantri === "LAKI-LAKI"));
-                        let matchesP = (GENDER_KIOSK === "P" && (genderSantri === "P" || genderSantri === "PEREMPUAN"));
-                        if (!matchesL && !matchesP) continue;
-                    }
-
                     let arrayVektorDb = Object.values(JSON.parse(santri.vektor));
                     let jarak = faceapi.euclideanDistance(descriptorKamera, arrayVektorDb);
 
@@ -230,34 +247,50 @@
                         return;
                     }
 
-                    // 1. Eksekusi UI Sukses Instan Secara Lokal
-                    localStorage.setItem(storageKey, "TERCATAT");
-                    document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
-                    document.getElementById('pop-success').classList.remove('hidden');
-                    kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
-                    bunyikanBeep(1000, 0.25);
+                    // Tampilkan Spinner Overlay Latar Belakang
+                    loadingOverlay.classList.remove('hidden');
 
-                    // 2. Ambil Foto Snapshot Wajah Balik Cermin (Mirror-corrected)
-                    canvasCap.width = video.videoWidth; canvasCap.height = video.videoHeight;
+                    // Ambil Snapshot Foto (Mirror-corrected)
+                    canvasCap.width = video.videoWidth; 
+                    canvasCap.height = video.videoHeight;
                     const ctx = canvasCap.getContext('2d');
-                    ctx.translate(canvasCap.width, 0); ctx.scale(-1, 1);
+                    ctx.translate(canvasCap.width, 0); 
+                    ctx.scale(-1, 1);
                     ctx.drawImage(video, 0, 0, canvasCap.width, canvasCap.height);
                     const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.35);
 
-                    // 3. Tembak Data secara Asinkron (Background process tanpa memblokir UI pop-up sukses)
-                    fetch(API_URL, { 
-                        method: "POST", 
-                        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                        body: JSON.stringify({
-                            aksi: "absen_santri",
-                            nik: santriDitemukan.nik,
-                            kegiatan: kegiatan,
-                            petugas: localStorage.getItem('session_nama'),
-                            foto: dataFotoBase64
-                        }) 
-                    }).catch(e => console.log("Gagal sinkron latar belakang:", e));
+                    // Kirim Data Absensi & Snapshot Foto ke Server
+                    try {
+                        const response = await fetch(API_URL, { 
+                            method: "POST", 
+                            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                            body: JSON.stringify({
+                                aksi: "absen_santri",
+                                nik: santriDitemukan.nik,
+                                kegiatan: kegiatan,
+                                petugas: localStorage.getItem('session_nama'),
+                                foto: dataFotoBase64
+                            }) 
+                        });
+                        const hasilJson = await response.json();
 
-                    // 4. Auto-reset untuk kembali siap memindai santri berikutnya
+                        loadingOverlay.classList.add('hidden');
+
+                        if (hasilJson.status === "success") {
+                            localStorage.setItem(storageKey, "TERCATAT");
+                            document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
+                            document.getElementById('pop-success').classList.remove('hidden');
+                            kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl flex items-center justify-center bg-emerald-500/10 scale-105";
+                            bunyikanBeep(1000, 0.25);
+                        } else {
+                            alert("Gagal mencatat kehadiran: " + hasilJson.message);
+                        }
+                    } catch (err) {
+                        loadingOverlay.classList.add('hidden');
+                        alert("Gagal terhubung dengan server.");
+                    }
+
+                    // Auto-reset agar siap mendeteksi santri berikutnya
                     setTimeout(() => {
                         document.getElementById('pop-success').classList.add('hidden');
                         isProcessing = false; 
@@ -265,7 +298,6 @@
                         kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
                     }, 2000);
                 }
-
             } else {
                 hitungKonsistensi = 0;
                 deteksiTerakhir = null;
