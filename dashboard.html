@@ -335,7 +335,7 @@
                 </a>
                 
                 <!-- OPSI KETIGA: SCAN WAJAH & INTIP TABUNGAN -->
-                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full">
+                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full cursor-pointer">
                     <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                     <div class="text-left">
                         <h4 class="text-xs font-black text-slate-100 group-hover:text-yellow-400 uppercase tracking-wider">Scan Wajah & Intip Tabungan</h4>
@@ -363,7 +363,7 @@
         
         <!-- Frame yang diisi penuh 100% tanpa sela -->
         <div class="w-full h-full bg-white">
-            <iframe id="iframe-tabungan" src="https://nasehat.vercel.app" class="w-full h-full border-0 m-0 p-0 block" allow="camera; microphone; clipboard-write"></iframe>
+            <iframe id="iframe-tabungan" src="about:blank" class="w-full h-full border-0 m-0 p-0 block" allow="camera; microphone; clipboard-write"></iframe>
         </div>
     </div>
 
@@ -392,9 +392,13 @@
             }
         }
 
-        // CONTROLLER UNTUK IFRAME SCAN WAJAH & TABUNGAN
+        // CONTROLLER UNTUK IFRAME SCAN WAJAH & TABUNGAN (Kamera hanya menyala saat dibuka)
         function bukaIframeTabungan() {
             tutupModalPilihanScan();
+            const iframe = document.getElementById('iframe-tabungan');
+            if (iframe) {
+                iframe.src = "https://nasehat.vercel.app";
+            }
             const modalIframe = document.getElementById('modal-iframe-tabungan');
             if(modalIframe) {
                 modalIframe.classList.remove('hidden');
@@ -407,10 +411,10 @@
             if(modalIframe) {
                 modalIframe.classList.remove('flex');
                 modalIframe.classList.add('hidden');
-                // Me-refresh/reset kembali kondisi iframe saat ditutup
+                // Hentikan aktivitas kamera dengan mereset src ke halaman kosong
                 const iframe = document.getElementById('iframe-tabungan');
                 if (iframe) {
-                    iframe.src = "https://nasehat.vercel.app";
+                    iframe.src = "about:blank";
                 }
             }
         }
@@ -459,10 +463,13 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Pengisian awal menggunakan cache instan (Load cepat di awal)
+            // Memuat data dari cache secepat mungkin tanpa menunggu request server selesai
+            muatDariCacheLokal();
+
+            // Jalankan request ke server secara background
             muatSeluruhRekapDashboard(false);
 
-            // Pengambilan data realtime otomatis berkala di background tiap 30 detik
+            // Interval penarikan data berkala di latar belakang
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 30000);
@@ -484,8 +491,7 @@
                 return;
             }
 
-            allIdMenu = semuaIdMenu;
-            allIdMenu.forEach(id => {
+            semuaIdMenu.forEach(id => {
                 const elemen = document.getElementById(id);
                 if (elemen) {
                     if (menuDiizinkan.includes("*") || menuDiizinkan.includes(id)) {
@@ -548,7 +554,6 @@
         function renderTabelWajah() {
             const tblBody = document.getElementById('tbl-wajah-body');
             if(!tblBody) return;
-            tblBody.innerHTML = '';
             
             let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
             if (!listData || listData.length === 0) {
@@ -556,9 +561,12 @@
                 return;
             }
 
+            // Gunakan metode string assembly untuk rendering cepat
             let rows = "";
-            listData.forEach(s => {
-                let badgeStatus = (tabAktif === "BELUM") 
+            const totalData = listData.length;
+            for (let i = 0; i < totalData; i++) {
+                const s = listData[i];
+                const badgeStatus = (tabAktif === "BELUM") 
                     ? `<span class="bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded text-[9px] font-black">BELUM DAFTAR</span>`
                     : `<span class="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded text-[9px] font-black">SUDAH AKTIF</span>`;
 
@@ -569,11 +577,26 @@
                         <td class="py-2.5 text-right">${badgeStatus}</td>
                     </tr>
                 `;
-            });
+            }
             tblBody.innerHTML = rows;
         }
 
-        // PERBAIKAN: Selalu menambahkan penanda waktu unik (_ts) ke url fetch agar browser tidak mengambil data lama dari cache
+        // PENGAMBILAN DATA CACHE SECARA INSTAN (< 1 DETIK SAAT LOAD AWAL)
+        function muatDariCacheLokal() {
+            const CACHE_KEY = 'cache_rekap_dashboard';
+            const dataCache = localStorage.getItem(CACHE_KEY);
+            if (dataCache) {
+                try {
+                    const r = JSON.parse(dataCache);
+                    const feedBox = document.getElementById('box-live-feed');
+                    tampilkanDataKeUI(r, feedBox);
+                } catch (e) {
+                    console.warn("Gagal membaca cache lokal:", e);
+                }
+            }
+        }
+
+        // AMBIL DATA REALTIME DARI SERVER SECARA EFISIEN
         async function muatSeluruhRekapDashboard(forceBypass = false) {
             if (isFetching) return;
             isFetching = true;
@@ -583,30 +606,16 @@
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
 
-            const CACHE_KEY = 'cache_rekap_dashboard';
-            const dataCache = localStorage.getItem(CACHE_KEY);
-
-            // Putar ikon refresh jika dipicu oleh klik manual pengguna
             if (forceBypass && iconRefresh) {
                 iconRefresh.classList.add('fa-spin');
             }
 
-            // Tampilkan data cache instan terlebih dahulu hanya untuk loading awal agar terasa instan
-            if (dataCache && !forceBypass) {
-                try {
-                    const r = JSON.parse(dataCache);
-                    tampilkanDataKeUI(r, feedBox);
-                } catch (e) {
-                    console.error("Gagal membaca format cache:", e);
-                }
-            }
-
             try {
-                // Selalu sertakan parameter timestamp (_ts) agar server merespons dengan data terbaru
+                // Gunakan cache buster timestamp agar data selalu yang terbaru dari Google Sheets
                 const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&_ts=${Date.now()}`;
 
-                let res = await fetch(targetUrl, { method: "GET" });
-                let r = await res.json();
+                const res = await fetch(targetUrl, { method: "GET" });
+                const r = await res.json();
 
                 if (r.status === "success") {
                     if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
@@ -615,15 +624,15 @@
                         return;
                     }
 
-                    // Simpan data terbaru ke cache lokal
-                    localStorage.setItem(CACHE_KEY, JSON.stringify(r));
+                    // Tulis ke cache local storage agar load berikutnya instan
+                    localStorage.setItem('cache_rekap_dashboard', JSON.stringify(r));
 
-                    // Perbarui visual UI secara langsung dengan data realtime
+                    // Perbarui interface web
                     tampilkanDataKeUI(r, feedBox);
                 }
             } catch (error) {
-                console.error("Gagal memperbarui data dari server:", error);
-                if (!dataCache && feedBox) {
+                console.error("Gagal sinkronisasi data dari server:", error);
+                if (!localStorage.getItem('cache_rekap_dashboard') && feedBox) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-rose-500 font-bold uppercase">Gagal memuat data dari server.</div>`;
                 }
             } finally {
@@ -634,7 +643,7 @@
             }
         }
 
-        // Fungsi pembantu untuk memproses rendering data ke UI
+        // Fungsi bantu untuk memproses rendering data ke UI secara optimal
         function tampilkanDataKeUI(r, feedBox) {
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
@@ -643,7 +652,7 @@
             document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah || '0';
             document.getElementById('stat-belum').innerText = r.rekapWajah.belum || '0';
 
-            // MENGISI DATA ABSENSI JAMAAH SHALAT (Sesuai database asli)
+            // MENGISI DATA ABSENSI JAMAAH SHALAT
             document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || 0;
             document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || 0;
             document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || 0;
@@ -663,15 +672,16 @@
             renderTabelWajah();
             
             if(feedBox) {
-                feedBox.innerHTML = '';
                 if (!r.liveFeed || r.liveFeed.length === 0) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
                 } else {
                     let logItems = "";
-                    r.liveFeed.forEach(log => {
-                        let jamTampil = log.jam || log.waktu || "00:00";
-                        let kegTampil = log.shalat || log.kegiatan || "Jamaah";
-                        let petugasTampil = log.petugas || "Kiosk Mandiri";
+                    const totalLog = r.liveFeed.length;
+                    for (let i = 0; i < totalLog; i++) {
+                        const log = r.liveFeed[i];
+                        const jamTampil = log.jam || log.waktu || "00:00";
+                        const kegTampil = log.shalat || log.kegiatan || "Jamaah";
+                        const petugasTampil = log.petugas || "Kiosk Mandiri";
 
                         logItems += `
                             <div class="flex justify-between items-center p-2 rounded-xl border dynamic-border dynamic-bg-inner">
@@ -682,7 +692,7 @@
                                 <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
                             </div>
                         `;
-                    });
+                    }
                     feedBox.innerHTML = logItems;
                 }
             }
