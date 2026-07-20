@@ -77,7 +77,7 @@
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
             <button onclick="muatSeluruhRekapDashboard(true)" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap">
-                <i id="icon-refresh" class="fa-solid fa-rotate"></i>
+                <i id="icon-refresh" class="fa-solid fa-rotate animate-duration-500"></i>
             </button>
             <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -335,7 +335,7 @@
                 </a>
                 
                 <!-- OPSI KETIGA: SCAN WAJAH & INTIP TABUNGAN -->
-                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full cursor-pointer">
+                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full">
                     <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                     <div class="text-left">
                         <h4 class="text-xs font-black text-slate-100 group-hover:text-yellow-400 uppercase tracking-wider">Scan Wajah & Intip Tabungan</h4>
@@ -374,6 +374,7 @@
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
+        let controllerAktif = null; // Controller pembatalan request
 
         // DIALOG CONTROLLER UNTUK METODE SCAN ABSENSI
         function bukaModalPilihanScan() {
@@ -411,10 +412,9 @@
             if(modalIframe) {
                 modalIframe.classList.remove('flex');
                 modalIframe.classList.add('hidden');
-                // Hentikan aktivitas kamera dengan mereset src ke halaman kosong
                 const iframe = document.getElementById('iframe-tabungan');
                 if (iframe) {
-                    iframe.src = "about:blank";
+                    iframe.src = "about:blank"; // Hentikan kamera seketika
                 }
             }
         }
@@ -463,13 +463,13 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Memuat data dari cache secepat mungkin tanpa menunggu request server selesai
+            // Muat data cache secara instan di awal agar performa responsif (< 1 detik)
             muatDariCacheLokal();
 
-            // Jalankan request ke server secara background
+            // Jalankan request pembaruan data secara background
             muatSeluruhRekapDashboard(false);
 
-            // Interval penarikan data berkala di latar belakang
+            // Perbarui background data setiap 30 detik secara otomatis
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 30000);
@@ -561,7 +561,6 @@
                 return;
             }
 
-            // Gunakan metode string assembly untuk rendering cepat
             let rows = "";
             const totalData = listData.length;
             for (let i = 0; i < totalData; i++) {
@@ -581,7 +580,6 @@
             tblBody.innerHTML = rows;
         }
 
-        // PENGAMBILAN DATA CACHE SECARA INSTAN (< 1 DETIK SAAT LOAD AWAL)
         function muatDariCacheLokal() {
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
@@ -596,25 +594,37 @@
             }
         }
 
-        // AMBIL DATA REALTIME DARI SERVER SECARA EFISIEN
         async function muatSeluruhRekapDashboard(forceBypass = false) {
-            if (isFetching) return;
+            // Jika request manual ditekan saat request sebelumnya masih loading, gagalkan request sebelumnya secara paksa
+            if (isFetching) {
+                if (forceBypass && controllerAktif) {
+                    controllerAktif.abort(); 
+                    isFetching = false; 
+                } else {
+                    return; 
+                }
+            }
+
             isFetching = true;
+            controllerAktif = new AbortController();
+            const signal = controllerAktif.signal;
 
             const feedBox = document.getElementById('box-live-feed');
             const iconRefresh = document.getElementById('icon-refresh');
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
 
-            if (forceBypass && iconRefresh) {
-                iconRefresh.classList.add('fa-spin');
+            if (iconRefresh) {
+                iconRefresh.classList.add('fa-spin', 'animate-spin');
             }
 
             try {
-                // Gunakan cache buster timestamp agar data selalu yang terbaru dari Google Sheets
-                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&_ts=${Date.now()}`;
+                // Optimalisasi: Mengirimkan parameter tanggal hari ini di WIB (Asia/Jakarta)
+                // agar server Google Apps Script hanya memproses data historis hari ini (bukan ribuan baris keseluruhan)
+                const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // format YYYY-MM-DD
+                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
 
-                const res = await fetch(targetUrl, { method: "GET" });
+                const res = await fetch(targetUrl, { method: "GET", signal: signal });
                 const r = await res.json();
 
                 if (r.status === "success") {
@@ -624,27 +634,27 @@
                         return;
                     }
 
-                    // Tulis ke cache local storage agar load berikutnya instan
                     localStorage.setItem('cache_rekap_dashboard', JSON.stringify(r));
-
-                    // Perbarui interface web
                     tampilkanDataKeUI(r, feedBox);
                 }
             } catch (error) {
-                console.error("Gagal sinkronisasi data dari server:", error);
-                if (!localStorage.getItem('cache_rekap_dashboard') && feedBox) {
-                    feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-rose-500 font-bold uppercase">Gagal memuat data dari server.</div>`;
+                if (error.name === 'AbortError') {
+                    console.log("Sinkronisasi sebelumnya berhasil dihentikan oleh pengguna.");
+                } else {
+                    console.error("Gagal sinkronisasi data dari server:", error);
                 }
             } finally {
                 isFetching = false;
                 if (iconRefresh) {
-                    iconRefresh.classList.remove('fa-spin');
+                    iconRefresh.classList.remove('fa-spin', 'animate-spin');
                 }
             }
         }
 
-        // Fungsi bantu untuk memproses rendering data ke UI secara optimal
         function tampilkanDataKeUI(r, feedBox) {
+            if (!r) return;
+            
+            r.rekapWajah = r.rekapWajah || {};
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
 
@@ -652,14 +662,13 @@
             document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah || '0';
             document.getElementById('stat-belum').innerText = r.rekapWajah.belum || '0';
 
-            // MENGISI DATA ABSENSI JAMAAH SHALAT
+            r.rekapShalat = r.rekapShalat || {};
             document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || 0;
             document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || 0;
             document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || 0;
             document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || 0;
             document.getElementById('v-isya').innerText = r.rekapShalat.Isya || 0;
 
-            // MENGISI DATA ABSENSI KEGIATAN KEPESANTRENAN
             document.getElementById('v-quranan').innerText = r.rekapShalat.Quranan || 0;
             document.getElementById('v-afsahan').innerText = r.rekapShalat.Afsahan || 0;
             document.getElementById('v-belajar').innerText = r.rekapShalat.Belajar || 0;
