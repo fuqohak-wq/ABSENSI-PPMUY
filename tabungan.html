@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Sistem Tabungan Santri PPMUY</title>
   <!-- HTML5 QR Code Scanner Library for Barcode/QR Scanning -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -10,185 +10,372 @@
   <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
   <style>
     :root {
-      --primary: #1e3a8a;
-      --accent: #0d9488;
-      --bg: #f8fafc;
-      --text: #1e293b;
+      --primary-brimo: #0b56a4;
+      --primary-dark: #073b75;
+      --bg-brimo: #f4f7fa;
       --card-bg: #ffffff;
-      --danger: #dc2626;
-      --success: #16a34a;
-      --warning: #d97706;
+      --text-dark: #1e293b;
+      --text-light: #64748b;
+      --accent-teal: #14b8a6;
+      --danger: #ef4444;
+      --success: #22c55e;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 15px; }
-    .container { max-width: 800px; margin: 0 auto; }
-    
-    .header-box {
-      background: linear-gradient(135deg, #1e3a8a, #0d9488);
-      color: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .header-box h1 { font-size: 22px; margin-bottom: 5px; }
-    .header-box p { font-size: 13px; opacity: 0.9; }
 
-    .card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-      border: 1px solid #e2e8f0;
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
     }
-    .card h2 {
-      font-size: 16px;
-      color: var(--primary);
-      margin-bottom: 15px;
-      border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 8px;
+
+    body { 
+      background-color: var(--bg-brimo); 
+      color: var(--text-dark); 
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container { 
+      width: 100%;
+      max-width: 412px; /* Standar lebar layar HP */
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    /* Header Ala BRImo */
+    .header-brimo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 4px;
+    }
+    .header-left .logo {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--primary-brimo);
+      letter-spacing: -0.5px;
+    }
+    .header-left .logo span {
+      color: #f59e0b;
+    }
+    .header-left .greeting {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-top: -2px;
+    }
+    .header-left .user-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .header-right {
+      display: flex;
+      gap: 12px;
+    }
+    .icon-btn {
+      position: relative;
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .icon-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--danger);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* Card Saldo Utama Ala BRImo */
+    .brimo-card {
+      background: linear-gradient(135deg, #0b56a4, #1e3a8a);
+      color: white;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(11, 86, 164, 0.2);
+    }
+    .card-label {
+      font-size: 11px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+    .card-balance-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .card-balance {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .eye-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.9;
+    }
+    .card-footer-link {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 8px;
+      margin-top: 6px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      opacity: 0.9;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
     }
 
-    /* Tabs Search Method */
-    .search-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
-      background: #f1f5f9;
-      padding: 5px;
-      border-radius: 8px;
+    /* Grid Fitur Utama Ala BRImo */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: var(--card-bg);
+      padding: 12px 10px;
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
+    .menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: none;
       border: none;
-      background: transparent;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 12px;
       cursor: pointer;
-      color: #64748b;
+      outline: none;
+      width: 100%;
+    }
+    .menu-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background-color: #eff6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      margin-bottom: 6px;
       transition: all 0.2s;
+    }
+    .menu-item.active .menu-icon {
+      background-color: #dbeafe;
+      border: 1px solid #93c5fd;
+    }
+    .menu-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-dark);
       text-align: center;
     }
-    .tab-btn.active {
-      background: white;
-      color: var(--primary);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+
+    /* Dynamic Tab Area */
+    .tab-content { 
+      display: none; 
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .tab-content.active { 
+      display: block; 
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .form-group { margin-bottom: 15px; position: relative; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
-    .form-group input, .form-group select {
+    /* Form Fields */
+    .form-group { 
+      margin-bottom: 0; 
+      position: relative; 
+    }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 4px; 
+      font-weight: 700; 
+      font-size: 11px; 
+      color: var(--text-light);
+    }
+    
+    /* Search Bar Input Style similar to "Cari Fitur" */
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-input-wrapper input {
       width: 100%;
-      padding: 11px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 14px;
+      padding: 9px 12px;
+      padding-left: 32px;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      font-size: 12px;
+      background: #f8fafc;
       outline: none;
     }
-    .form-group input:focus { border-color: var(--primary); }
+    .search-input-wrapper::before {
+      content: "🔍";
+      position: absolute;
+      left: 12px;
+      font-size: 11px;
+      color: var(--text-light);
+    }
 
     .search-results {
       position: absolute;
       left: 0; right: 0;
-      max-height: 200px;
+      max-height: 150px;
       overflow-y: auto;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      border-radius: 12px;
       margin-top: 4px;
       background: white;
       z-index: 999;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
     .search-item {
-      padding: 10px 14px;
+      padding: 8px 12px;
       cursor: pointer;
       border-bottom: 1px solid #f1f5f9;
-      font-size: 13px;
+      font-size: 11px;
     }
-    .search-item:hover { background: #eff6ff; color: var(--primary); }
+    .search-item:hover { background: #f0f7ff; color: var(--primary-brimo); }
 
-    /* Scanner Containers */
-    #reader { width: 100%; max-width: 400px; margin: 0 auto; border-radius: 8px; overflow: hidden; }
+    /* Camera / Video Containers */
+    #reader { 
+      width: 100%; 
+      max-width: 220px; 
+      margin: 0 auto; 
+      border-radius: 12px; 
+      overflow: hidden; 
+    }
     .webcam-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
-    video { width: 100%; max-width: 400px; border-radius: 8px; background: #000; }
+    video { 
+      width: 100%; 
+      max-width: 200px; 
+      height: 140px; 
+      object-fit: cover;
+      border-radius: 12px; 
+      background: #000; 
+    }
 
-    /* Profile Box */
-    .profile-card {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      padding: 16px;
-      border-radius: 10px;
-      margin-top: 15px;
-      display: none;
-    }
-    .profile-card.active { display: block; }
-    .profile-row {
+    /* Banner "Qita" representation */
+    .promo-banner {
+      background: linear-gradient(90deg, #e0f2fe, #bae6fd);
+      border-radius: 12px;
+      padding: 8px 12px;
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 13px;
+      align-items: center;
+      font-size: 10px;
+      color: #0369a1;
+      font-weight: 600;
     }
-    .profile-row:last-child { margin-bottom: 0; }
-    .profile-label { color: #475569; font-weight: 500; }
-    .profile-value { font-weight: 700; color: #0f172a; }
-    .saldo-highlight { font-size: 18px; color: var(--success); font-weight: 800; }
+    .promo-banner span {
+      font-weight: 800;
+      color: var(--primary-brimo);
+    }
 
-    /* Action Buttons */
-    .btn {
-      width: 100%;
+    /* Action Transaction Area (Miniaturized) */
+    .card-action {
+      background: var(--card-bg);
+      border-radius: 16px;
       padding: 12px;
-      border: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .card-action h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    
+    .transaction-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .form-control-compact {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
+      font-size: 11px;
+      outline: none;
+    }
+    .form-control-compact:focus {
+      border-color: var(--primary-brimo);
+    }
+
+    .calc-preview-compact {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+    }
+    .calc-preview-compact span { 
+      font-weight: 800; 
+      font-size: 11px; 
+    }
+
+    /* Action Buttons Area */
+    .action-grid-compact {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 6px;
+    }
+    .btn-compact {
+      padding: 8px;
+      border: none;
+      border-radius: 20px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 11px;
       cursor: pointer;
-      transition: all 0.2s;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
     }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-warning { background: var(--warning); color: white; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .action-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 15px;
+    .btn-brimo-primary { 
+      background: var(--primary-brimo); 
+      color: white; 
     }
-
-    .calc-preview {
-      background: #f8fafc;
-      border: 1px dashed #cbd5e1;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 12px;
-      text-align: center;
-      font-size: 13px;
+    .btn-brimo-danger { 
+      background: #fee2e2; 
+      color: var(--danger); 
     }
-    .calc-preview span { font-weight: bold; font-size: 15px; }
+    .btn-compact:disabled { 
+      opacity: 0.5; 
+      cursor: not-allowed; 
+    }
 
     /* Spinner */
     .spinner {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       border-top-color: #fff;
@@ -200,98 +387,126 @@
 <body>
 
 <div class="container">
-  <div class="header-box">
-    <h1>💰 Manajemen Tabungan Santri</h1>
-    <p>Database: Sheet Daftar_Santri_Saldo (Kolom D Edit Realtime)</p>
+  
+  <!-- HEADER ALA BRIMO -->
+  <header class="header-brimo">
+    <div class="header-left">
+      <div class="logo">BRI<span>mo</span></div>
+      <div class="greeting">Selamat Datang,</div>
+      <div class="user-name" id="dispNamaHeader">Santri PPMUY</div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn">🔔<span class="icon-badge"></span></button>
+      <button class="icon-btn">🎧</button>
+    </div>
+  </header>
+
+  <!-- CARD SALDO UTAMA ALA BRIMO (DIGUNAKAN UNTUK DETAIL PROFIL & SALDO) -->
+  <div class="brimo-card">
+    <div class="card-label">Saldo Rekening Utama</div>
+    <div class="card-balance-row">
+      <!-- Element ID dipertahankan untuk manipulasi logic Javascript asli -->
+      <span class="card-balance" id="dispSaldo">Rp ••••••</span>
+      <button class="eye-toggle" onclick="toggleBalanceMask()">👁️</button>
+    </div>
+    <div style="font-size: 11px; opacity: 0.9; margin-top: 4px; display: flex; flex-direction: column; gap: 1px;">
+      <div>Nama: <span id="dispNama" style="font-weight: 700;">-</span></div>
+      <div>NIK: <span id="dispNik" style="font-weight: 700;">-</span> <span style="opacity: 0.5;">|</span> Gender: <span id="dispGender" style="font-weight: 700;">-</span></div>
+    </div>
+    <!-- Elemen tersembunyi untuk mempertahankan profil card agar active class bekerja -->
+    <div id="profileCard" style="display: none;"></div>
+    <a href="#" class="card-footer-link">
+      <span>Semua Rekeningmu</span>
+      <span>&gt;</span>
+    </a>
   </div>
 
-  <!-- SECTION PENCARIAN -->
-  <div class="card">
-    <h2>🔍 Cari Data Santri</h2>
-    <div class="search-tabs">
-      <button class="tab-btn active" onclick="switchTab('manual')">✏️ Manual Nama/NIK</button>
-      <button class="tab-btn" onclick="switchTab('barcode')">📷 Scan Barcode NIK</button>
-      <button class="tab-btn" onclick="switchTab('face')">👤 Scan Wajah (AI)</button>
-    </div>
+  <!-- GRID MENU UTAMA / TAB SEARCH ALA BRIMO -->
+  <div class="menu-grid">
+    <button class="menu-item active tab-btn" onclick="switchTab('manual', this)">
+      <div class="menu-icon">✏️</div>
+      <div class="menu-label">Manual</div>
+    </button>
+    <button class="menu-item tab-btn" onclick="switchTab('barcode', this)">
+      <div class="menu-icon">📷</div>
+      <div class="menu-label">Barcode NIK</div>
+    </button>
+    <button class="menu-item tab-btn" onclick="switchTab('face', this)">
+      <div class="menu-icon">👤</div>
+      <div class="menu-label">Scan Wajah</div>
+    </button>
+    <button class="menu-item" onclick="resetForm()">
+      <div class="menu-icon" style="background-color: #fef2f2; color: var(--danger);">🔄</div>
+      <div class="menu-label" style="color: var(--danger);">Reset</div>
+    </button>
+  </div>
 
+  <!-- DYNAMIC TAB CONTENT AREA -->
+  <div class="tab-area">
     <!-- TAB 1: MANUAL -->
     <div id="tab-manual" class="tab-content active">
       <div class="form-group">
-        <label>Ketik Nama / NIK Santri:</label>
-        <input type="text" id="inputSearchManual" placeholder="Contoh: Aqila Bilqist / 330707..." oninput="searchSantriManual(this.value)">
+        <div class="search-input-wrapper">
+          <input type="text" id="inputSearchManual" placeholder="Cari Nama / NIK Santri..." oninput="searchSantriManual(this.value)">
+        </div>
         <div id="searchResultsManual" class="search-results" style="display:none;"></div>
       </div>
     </div>
 
     <!-- TAB 2: BARCODE NIK -->
     <div id="tab-barcode" class="tab-content">
-      <p style="font-size:12px; color:#64748b; margin-bottom:10px; text-align:center;">Arahkan kamera ke Barcode / QR Code NIK Santri</p>
       <div id="reader"></div>
-      <button class="btn btn-warning" id="btnToggleBarcode" onclick="toggleBarcodeScanner()" style="margin-top:10px;">Mulai Scan Barcode</button>
+      <button class="btn-compact btn-brimo-primary" id="btnToggleBarcode" onclick="toggleBarcodeScanner()" style="margin: 6px auto 0 auto; width: auto; padding: 6px 14px;">Mulai Scan Barcode</button>
     </div>
 
     <!-- TAB 3: FACIAL RECOGNITION -->
     <div id="tab-face" class="tab-content">
       <div class="webcam-box">
         <video id="videoFace" autoplay muted playsinline></video>
-        <button class="btn btn-warning" id="btnStartFace" onclick="initFaceRecognition()">Mulai Kamera Face Recognition</button>
-        <p id="faceStatus" style="font-size:12px; color:#0d9488; font-weight:600; text-align:center;"></p>
-      </div>
-    </div>
-
-    <!-- PROFIL SANTRI TERPILIH -->
-    <div id="profileCard" class="profile-card">
-      <div class="profile-row">
-        <span class="profile-label">Nama Santri:</span>
-        <span class="profile-value" id="dispNama">-</span>
-      </div>
-      <div class="profile-row">
-        <span class="profile-label">NIK:</span>
-        <span class="profile-value" id="dispNik">-</span>
-      </div>
-      <div class="profile-row">
-        <span class="profile-label">Gender:</span>
-        <span class="profile-value" id="dispGender">-</span>
-      </div>
-      <div class="profile-row" style="margin-top:10px; border-top:1px dashed #bbf7d0; padding-top:8px;">
-        <span class="profile-label" style="align-self:center;">Saldo Tabungan Saat Ini:</span>
-        <span class="saldo-highlight" id="dispSaldo">Rp 0</span>
+        <button class="btn-compact btn-brimo-primary" id="btnStartFace" onclick="initFaceRecognition()" style="padding: 6px 12px; font-size: 10px;">Mulai Kamera</button>
+        <p id="faceStatus" style="font-size:10px; color:#0d9488; font-weight:600; text-align:center;"></p>
       </div>
     </div>
   </div>
 
-  <!-- SECTION AKSI TABUNGAN -->
-  <div class="card" id="cardAksi" style="opacity: 0.6; pointer-events: none;">
-    <h2>⚡ Menu Aksi Transaksi Tabungan</h2>
+  <!-- BANNER PROMO ALA BRIMO -->
+  <div class="promo-banner">
+    <div>Database: <span>Sheet Daftar_Santri_Saldo</span> (Realtime)</div>
+    <div style="font-size: 12px;">Qita ↗</div>
+  </div>
+
+  <!-- SECTION AKSI TABUNGAN (DIPADATKAN) -->
+  <div class="card-action" id="cardAksi" style="opacity: 0.5; pointer-events: none;">
+    <h2>Menu Transaksi Tabungan</h2>
     
-    <div class="form-group">
-      <label>Pilih Jenis Transaksi:</label>
-      <select id="tipeTransaksi" onchange="hitungTotalSisa()">
-        <option value="TAMBAH">➕ Tambah Tabungan (Setoran Non-Sistem)</option>
-        <option value="TARIK">➖ Tarik / Ambil Tabungan</option>
-      </select>
+    <div class="transaction-inputs">
+      <div>
+        <select id="tipeTransaksi" class="form-control-compact" onchange="hitungTotalSisa()">
+          <option value="TAMBAH">➕ Tambah</option>
+          <option value="TARIK">➖ Tarik</option>
+        </select>
+      </div>
+      <div>
+        <input type="text" id="nominalInput" class="form-control-compact" placeholder="Nominal (Rp)..." onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Nominal (Rp):</label>
-      <input type="text" id="nominalInput" placeholder="Masukkan nominal..." onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
+    <div class="calc-preview-compact">
+      <div>Estimasi Saldo Akhir:</div>
+      <span id="previewSaldoAkhir" style="color:var(--primary-brimo);">Rp 0</span>
     </div>
 
-    <div class="calc-preview">
-      <div>Estimasi Saldo Akhir Setelah Transaksi:</div>
-      <span id="previewSaldoAkhir" style="color:var(--primary);">Rp 0</span>
-    </div>
-
-    <div class="action-grid">
-      <button class="btn btn-primary" id="btnProses" onclick="simpanTransaksiTabungan()">
+    <div class="action-grid-compact">
+      <button class="btn-compact btn-brimo-primary" id="btnProses" onclick="simpanTransaksiTabungan()">
         💾 OK - Simpan Ke Sheet
       </button>
-      <button class="btn btn-danger" onclick="resetForm()">
-        🔄 Batal / Reset
+      <button class="btn-compact btn-brimo-danger" onclick="resetForm()">
+        Batal
       </button>
     </div>
-    <div id="statusProses" style="margin-top:10px; font-size:13px; font-weight:600; text-align:center;"></div>
+    <div id="statusProses" style="margin-top:6px; font-size:10px; font-weight:600; text-align:center;"></div>
   </div>
+
 </div>
 
 <script>
@@ -302,12 +517,14 @@
   let isScanningBarcode = false;
   let faceModelsLoaded = false;
   let videoStream = null;
+  let realSaldoValue = 0;
+  let isMasked = true;
 
-  function switchTab(tabName) {
+  function switchTab(tabName, element) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    event.target.classList.add('active');
+    element.classList.add('active');
     document.getElementById('tab-' + tabName).classList.add('active');
 
     stopBarcodeScanner();
@@ -325,6 +542,24 @@
       rupiah += separator + ribuan.join('.');
     }
     return rupiah;
+  }
+
+  function toggleBalanceMask() {
+    isMasked = !isMasked;
+    renderSaldo();
+  }
+
+  function renderSaldo() {
+    const el = document.getElementById("dispSaldo");
+    if (!santriTerpilih) {
+      el.innerText = "Rp ••••••";
+      return;
+    }
+    if (isMasked) {
+      el.innerText = "Rp ••••••";
+    } else {
+      el.innerText = "Rp " + Number(realSaldoValue).toLocaleString('id-ID');
+    }
   }
 
   // --- MODEL 1: PENCARIAN MANUAL ---
@@ -357,13 +592,18 @@
 
   function pilihSantri(santri) {
     santriTerpilih = santri;
+    realSaldoValue = santri.saldo;
+    isMasked = false; // Tampilkan otomatis saat terpilih
+
     document.getElementById("searchResultsManual").style.display = "none";
     document.getElementById("inputSearchManual").value = santri.nama;
 
+    document.getElementById("dispNamaHeader").innerText = santri.nama;
     document.getElementById("dispNama").innerText = santri.nama;
     document.getElementById("dispNik").innerText = santri.nik;
     document.getElementById("dispGender").innerText = santri.gender || "-";
-    document.getElementById("dispSaldo").innerText = "Rp " + Number(santri.saldo).toLocaleString('id-ID');
+    
+    renderSaldo();
 
     document.getElementById("profileCard").classList.add("active");
     
@@ -383,7 +623,7 @@
     html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
+      { fps: 10, qrbox: { width: 150, height: 150 } },
       (decodedText) => {
         stopBarcodeScanner();
         cariByNik(decodedText);
@@ -391,7 +631,7 @@
       (errorMessage) => { }
     ).then(() => {
       isScanningBarcode = true;
-      document.getElementById("btnToggleBarcode").innerText = "⏹️ Hentikan Scan";
+      document.getElementById("btnToggleBarcode").innerText = "⏹️ Stop";
     }).catch(err => alert("Kamera tidak dapat diakses: " + err));
   }
 
@@ -476,15 +716,15 @@
             stopFaceScanner();
             pilihSantri(bestMatch);
           } else {
-            statusText.innerText = "❌ Wajah tidak cocok dengan database santri.";
+            statusText.innerText = "❌ Wajah tidak cocok.";
           }
         } else {
-          statusText.innerText = "⚠️ Wajah tidak terlihat jelas di kamera.";
+          statusText.innerText = "⚠️ Dekatkan wajah ke kamera.";
         }
       });
 
     } catch (err) {
-      statusText.innerText = "Gagal menginisiasi AI Wajah: " + err.message;
+      statusText.innerText = "Gagal menginisiasi AI: " + err.message;
     }
   }
 
@@ -499,7 +739,7 @@
   function hitungTotalSisa() {
     if (!santriTerpilih) return;
 
-    const currentSaldo = Number(santriTerpilih.saldo) || 0;
+    const currentSaldo = Number(realSaldoValue) || 0;
     const nominalRaw = document.getElementById("nominalInput").value.replace(/\./g, "");
     const nominal = Number(nominalRaw) || 0;
     const tipe = document.getElementById("tipeTransaksi").value;
@@ -508,7 +748,7 @@
 
     const preview = document.getElementById("previewSaldoAkhir");
     preview.innerText = "Rp " + estimasi.toLocaleString('id-ID');
-    preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--primary)";
+    preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--primary-brimo)";
   }
 
   // --- SIMPAN KE GOOGLE SHEET REALTIME ---
@@ -524,7 +764,7 @@
     const statusDiv = document.getElementById("statusProses");
 
     btn.disabled = true;
-    btn.innerHTML = "<span class='spinner'></span> Mengubah Sheet Realtime...";
+    btn.innerHTML = "<span class='spinner'></span> Mengirim...";
 
     fetch(WEB_APP_URL, {
       method: "POST",
@@ -542,9 +782,11 @@
       btn.innerText = "💾 OK - Simpan Ke Sheet";
 
       if (res.success) {
-        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ Transaksi Berhasil! Saldo Baru: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ Sukses! Saldo: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        realSaldoValue = res.saldoBaru;
         santriTerpilih.saldo = res.saldoBaru;
-        document.getElementById("dispSaldo").innerText = "Rp " + Number(res.saldoBaru).toLocaleString('id-ID');
+        isMasked = false;
+        renderSaldo();
         document.getElementById("nominalInput").value = "";
         hitungTotalSisa();
       } else {
@@ -560,13 +802,23 @@
 
   function resetForm() {
     santriTerpilih = null;
+    realSaldoValue = 0;
+    isMasked = true;
+    
     document.getElementById("profileCard").classList.remove("active");
+    document.getElementById("dispNamaHeader").innerText = "Santri PPMUY";
+    document.getElementById("dispNama").innerText = "-";
+    document.getElementById("dispNik").innerText = "-";
+    document.getElementById("dispGender").innerText = "-";
+    
+    renderSaldo();
+    
     document.getElementById("inputSearchManual").value = "";
     document.getElementById("nominalInput").value = "";
     document.getElementById("statusProses").innerText = "";
     
     const cardAksi = document.getElementById("cardAksi");
-    cardAksi.style.opacity = "0.6";
+    cardAksi.style.opacity = "0.5";
     cardAksi.style.pointerEvents = "none";
     document.getElementById("previewSaldoAkhir").innerText = "Rp 0";
   }
