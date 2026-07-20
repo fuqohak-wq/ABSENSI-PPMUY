@@ -7,18 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .spinner-kiosk { border-top-color: #22d3ee; animation: spin 0.8s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4">
-
-    <!-- SPINNER OVERLAY -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-[100] hidden">
-        <div class="w-20 h-20 border-4 border-slate-800 border-t-cyan-500 rounded-full animate-spin shadow-[0_0_20px_rgba(6,182,212,0.5)]"></div>
-        <p class="mt-6 text-cyan-400 font-black text-sm tracking-[0.2em] uppercase animate-pulse">MENYIMPAN DATA ABSENSI...</p>
-    </div>
 
     <div class="w-full max-w-md mx-auto bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2 shadow-lg">
         <div class="flex justify-between items-center">
@@ -50,7 +40,7 @@
             <video id="video-selfie" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]"></video>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div id="kotak-scan" class="w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300">
-                    <span id="instruksi" class="text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30">Memasang AI...</span>
+                    <span id="instruksi" class="text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center">Memasang AI...</span>
                 </div>
             </div>
         </div>
@@ -67,32 +57,11 @@
         </a>
     </div>
 
-    <!-- POP-UP UTAMA HASIL -->
-    <div id="pop-success" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-6 hidden z-[110]">
-        <div class="bg-gradient-to-b from-emerald-500 to-teal-600 text-slate-950 w-full max-w-md p-6 rounded-3xl text-center shadow-2xl border-2 border-emerald-400">
-            <span class="text-xs font-black tracking-widest block opacity-85 uppercase"><i class="fa-solid fa-circle-check animate-pulse mr-1"></i> LOG ABSENSI DICATAT</span>
-            <span class="font-black text-2xl block mt-1 tracking-wide uppercase border-b border-slate-950/20 pb-3" id="txt-nama-sukses">Nama Santri</span>
-            
-            <div class="mt-4 bg-slate-950/20 rounded-2xl p-4 flex flex-col gap-3 text-center text-white">
-                <div class="flex flex-col gap-1 border-b border-white/10 pb-2">
-                    <span class="text-[9px] font-black tracking-widest text-slate-900 opacity-75 uppercase text-slate-950">KEGIATAN</span>
-                    <span id="pop-kegiatan-sukses" class="text-lg font-black uppercase">Kegiatan</span>
-                </div>
-
-                <div class="flex flex-col gap-1 pt-1">
-                    <span class="text-[10px] font-black tracking-widest text-slate-900 opacity-90 uppercase text-slate-950">WAKTU SCANNED</span>
-                    <span id="pop-waktu-sukses" class="text-2xl font-black tracking-wide">00:00 WIB</span>
-                </div>
-            </div>
-            <button onclick="tutupPopup()" class="mt-5 w-full bg-slate-950 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-transform">LANJUTKAN SCAN</button>
-        </div>
-    </div>
-
-    <!-- POP-UP WARNING -->
-    <div id="pop-warning" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6 hidden z-[110]">
+    <!-- POP-UP WARNING (ABSENSI GANDA) -->
+    <div id="pop-warning" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-6 hidden z-[110]">
         <div class="bg-amber-500 text-slate-950 w-full max-w-sm p-6 rounded-3xl text-center shadow-2xl border-2 border-amber-400">
             <span class="text-xs font-black tracking-widest block opacity-75"><i class="fa-solid fa-triangle-exclamation mr-1"></i> AKSES DITOLAK</span>
-            <span class="font-black text-base block mt-1 tracking-wide" id="txt-nama-peringatan">NAMA SANTRI</span>
+            <span class="font-black text-base block mt-1 tracking-wide uppercase" id="txt-nama-peringatan">NAMA SANTRI</span>
             <span class="text-[11px] font-bold block mt-1 bg-slate-950/20 py-1 rounded-lg uppercase tracking-wider">Sudah Absen Pada Kegiatan Ini!</span>
         </div>
     </div>
@@ -105,7 +74,6 @@
         let kotakScan = document.getElementById('kotak-scan');
         let dbStatus = document.getElementById('txt-db-status');
         let canvasCap = document.getElementById('canvas-capture');
-        let loadingOverlay = document.getElementById('loading-overlay');
 
         let isProcessing = false;
         let databaseSantri = [];
@@ -156,13 +124,6 @@
             } catch (e) { label.innerText = "AI OFFLINE"; }
         });
 
-        function tutupPopup() {
-            document.getElementById('pop-success').classList.add('hidden');
-            isProcessing = false;
-            label.innerText = "HADAPKAN WAJAH KE KAMERA";
-            kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center";
-        }
-
         async function verifikasiWajahLokal(descriptorKamera) {
             let santriDitemukan = null; let jarakTerkecil = 0.48;
             for (let santri of databaseSantri) {
@@ -174,62 +135,65 @@
             }
 
             if (santriDitemukan) {
-                isProcessing = true;
+                isProcessing = true; // Kunci proses agar tidak mendeteksi ganda dalam milidetik yang sama
                 const kegiatan = document.getElementById('pilihan-kegiatan').value;
                 const hariIni = new Date().toISOString().split('T')[0];
                 const storageKey = `absen_${hariIni}_${santriDitemukan.nik}_${kegiatan}`;
 
+                // Cegah absensi ganda secara lokal
                 if (localStorage.getItem(storageKey) === "TERCATAT") {
                     document.getElementById('txt-nama-peringatan').innerText = santriDitemukan.nama.toUpperCase();
                     document.getElementById('pop-warning').classList.remove('hidden');
-                    bunyikanBeep(440, 0.1);
-                    setTimeout(() => { document.getElementById('pop-warning').classList.add('hidden'); isProcessing = false; }, 2500);
+                    bunyikanBeep(440, 0.15);
+                    setTimeout(() => { 
+                        document.getElementById('pop-warning').classList.add('hidden'); 
+                        isProcessing = false; 
+                    }, 1500);
                     return;
                 }
 
-                // AKTIFKAN SPINNER SEGERA
-                loadingOverlay.classList.remove('hidden');
-                
+                // Tandai sudah absen di penyimpanan lokal segera
                 localStorage.setItem(storageKey, "TERCATAT");
-                document.getElementById('txt-nama-sukses').innerText = santriDitemukan.nama.toUpperCase();
-                document.getElementById('pop-kegiatan-sukses').innerText = kegiatan;
-                
-                const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
-                document.getElementById('pop-waktu-sukses').innerText = waktuSekarang;
 
-                kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl bg-emerald-500/10 scale-105";
-                bunyikanBeep(1000, 0.25);
+                // Berikan tanda visual & audio sukses instan
+                bunyikanBeep(1000, 0.2);
+                label.innerText = `✔️ ${santriDitemukan.nama.toUpperCase()}`;
+                label.className = "text-xs bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-emerald-400 text-center";
+                kotakScan.className = "w-64 h-64 border-4 border-solid border-emerald-400 rounded-3xl bg-emerald-500/10 scale-105 transition-all duration-150";
 
+                // Tangkap gambar dari kamera
                 canvasCap.width = video.videoWidth; canvasCap.height = video.videoHeight;
                 const ctx = canvasCap.getContext('2d');
                 ctx.translate(canvasCap.width, 0); ctx.scale(-1, 1);
                 ctx.drawImage(video, 0, 0, canvasCap.width, canvasCap.height);
                 const dataFotoBase64 = canvasCap.toDataURL('image/jpeg', 0.3);
 
-                try {
-                    const responseCloud = await fetch(URL_AKURAT, { 
-                        method: "POST", 
-                        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                        body: JSON.stringify({
-                            aksi: "absen_santri",
-                            nik: santriDitemukan.nik,
-                            kegiatan: kegiatan,
-                            petugas: localStorage.getItem('session_nama'),
-                            foto: dataFotoBase64
-                        }) 
-                    });
-                    const hasilJson = await responseCloud.json();
-                    
-                    loadingOverlay.classList.add('hidden');
-                    if (hasilJson.status === "success") {
-                        document.getElementById('pop-success').classList.remove('hidden');
-                    } else {
-                        isProcessing = false;
-                    }
-                } catch (e) {
-                    loadingOverlay.classList.add('hidden');
-                    isProcessing = false;
-                }
+                // KIRIM DATA DI LATAR BELAKANG (Asynchronous, Non-Blocking)
+                fetch(URL_AKURAT, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify({
+                        aksi: "absen_santri",
+                        nik: santriDitemukan.nik,
+                        kegiatan: kegiatan,
+                        petugas: localStorage.getItem('session_nama'),
+                        foto: dataFotoBase64
+                    }) 
+                }).then(response => response.json())
+                  .then(data => {
+                      console.log("Database update:", data);
+                  })
+                  .catch(err => {
+                      console.error("Gagal sinkronisasi cloud:", err);
+                  });
+
+                // Reset scanner otomatis dalam 1.5 detik untuk santri berikutnya
+                setTimeout(() => {
+                    label.innerText = "HADAPKAN WAJAH KE KAMERA";
+                    label.className = "text-xs bg-slate-950/90 text-cyan-400 px-4 py-2 rounded-xl font-black uppercase tracking-widest border border-cyan-500/30 text-center";
+                    kotakScan.className = "w-64 h-64 border-4 border-dashed border-cyan-500/40 rounded-3xl flex items-center justify-center transition-all duration-300";
+                    isProcessing = false; 
+                }, 1500);
             }
         }
     </script>
