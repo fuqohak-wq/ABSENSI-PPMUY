@@ -311,7 +311,7 @@
     
     .transaction-inputs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.2fr;
       gap: 8px;
       margin-bottom: 8px;
     }
@@ -385,6 +385,20 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Button "Semua" for shortcut transfer */
+    .btn-max-saldo {
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: var(--primary-brimo);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      cursor: pointer;
+      margin-top: 4px;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -484,19 +498,21 @@
     <div style="font-size: 12px;">Qita ↗</div>
   </div>
 
-  <!-- SECTION AKSI TABUNGAN (DIPADATKAN) -->
+  <!-- SECTION AKSI TABUNGAN -->
   <div class="card-action" id="cardAksi" style="opacity: 0.5; pointer-events: none;">
     <h2>Menu Transaksi Tabungan</h2>
     
     <div class="transaction-inputs">
       <div>
-        <select id="tipeTransaksi" class="form-control-compact" onchange="hitungTotalSisa()">
+        <select id="tipeTransaksi" class="form-control-compact" onchange="handleTipeTransaksiChange()">
           <option value="TAMBAH">➕ Tambah</option>
           <option value="TARIK">➖ Tarik</option>
+          <option value="ALIHKAN">🔄 Alihkan ke Harian</option>
         </select>
       </div>
       <div>
         <input type="text" id="nominalInput" class="form-control-compact" placeholder="Nominal (Rp)..." onkeyup="this.value = formatRupiah(this.value); hitungTotalSisa();">
+        <span id="btnSemua" class="btn-max-saldo" style="display: none;" onclick="isiNominalMaksimal()">Pindahkan Semua Saldo</span>
       </div>
     </div>
 
@@ -535,7 +551,7 @@
   let realSaldoHarianValue = 0;
   let isMasked = true;
 
-  // Unduh seluruh data santri di awal untuk pencarian instan (0,0 Detik)
+  // Unduh seluruh data santri di awal untuk pencarian instan
   document.addEventListener("DOMContentLoaded", () => {
     preloadSantriData();
   });
@@ -661,7 +677,7 @@
     cardAksi.style.opacity = "1";
     cardAksi.style.pointerEvents = "auto";
 
-    hitungTotalSisa();
+    handleTipeTransaksiChange();
   }
 
   // --- MODEL 2: BARCODE SCANNER (INSTAN CLIENT-SIDE COCOK) ---
@@ -815,6 +831,27 @@
     preview.style.color = (estimasi < 0) ? "var(--danger)" : "var(--primary-brimo)";
   }
 
+  // Menangani Perubahan Jenis Transaksi (Tambah/Tarik/Alihkan)
+  function handleTipeTransaksiChange() {
+    const tipe = document.getElementById("tipeTransaksi").value;
+    const btnSemua = document.getElementById("btnSemua");
+    
+    if (tipe === "ALIHKAN") {
+      btnSemua.style.display = "inline-block";
+    } else {
+      btnSemua.style.display = "none";
+    }
+    
+    hitungTotalSisa();
+  }
+
+  // Isi nominal dengan seluruh saldo tabungan utama saat ini
+  function isiNominalMaksimal() {
+    if (!santriTerpilih) return;
+    document.getElementById("nominalInput").value = formatRupiah(realSaldoValue.toString());
+    hitungTotalSisa();
+  }
+
   // --- SIMPAN KE GOOGLE SHEET REALTIME ---
   function simpanTransaksiTabungan() {
     if (!santriTerpilih) { alert("Pilih santri terlebih dahulu!"); return; }
@@ -827,18 +864,30 @@
     const btn = document.getElementById("btnProses");
     const statusDiv = document.getElementById("statusProses");
 
+    if ((tipe === "TARIK" || tipe === "ALIHKAN") && nominal > realSaldoValue) {
+      alert("Saldo tidak mencukupi untuk melakukan transaksi ini.");
+      return;
+    }
+
     btn.disabled = true;
     btn.innerHTML = "<span class='spinner'></span> Mengirim...";
+
+    let payload = {
+      nik: santriTerpilih.nik,
+      nominal: nominal
+    };
+
+    if (tipe === "ALIHKAN") {
+      payload.action = "alihkanSaldoKeHarian";
+    } else {
+      payload.action = "updateSaldoTabunganSantri";
+      payload.tipe = tipe;
+    }
 
     fetch(WEB_APP_URL, {
       method: "POST",
       mode: "cors",
-      body: JSON.stringify({
-        action: "updateSaldoTabunganSantri",
-        nik: santriTerpilih.nik,
-        tipe: tipe,
-        nominal: nominal
-      })
+      body: JSON.stringify(payload)
     })
     .then(res => res.json())
     .then(res => {
@@ -851,11 +900,19 @@
         // Perbarui nilai lokal
         realSaldoValue = res.saldoBaru;
         santriTerpilih.saldo = res.saldoBaru;
+
+        if (tipe === "ALIHKAN" && res.saldoHarianBaru !== undefined) {
+          realSaldoHarianValue = res.saldoHarianBaru;
+          santriTerpilih.saldoHarian = res.saldoHarianBaru;
+        }
         
         // Sinkronisasi data di cache array lokal
         const index = allSantriData.findIndex(s => s.nik === santriTerpilih.nik);
         if (index !== -1) {
           allSantriData[index].saldo = res.saldoBaru;
+          if (tipe === "ALIHKAN" && res.saldoHarianBaru !== undefined) {
+            allSantriData[index].saldoHarian = res.saldoHarianBaru;
+          }
         }
 
         isMasked = false;
@@ -890,6 +947,8 @@
     document.getElementById("inputSearchManual").value = "";
     document.getElementById("nominalInput").value = "";
     document.getElementById("statusProses").innerText = "";
+    document.getElementById("tipeTransaksi").value = "TAMBAH";
+    document.getElementById("btnSemua").style.display = "none";
     
     const cardAksi = document.getElementById("cardAksi");
     cardAksi.style.opacity = "0.5";
