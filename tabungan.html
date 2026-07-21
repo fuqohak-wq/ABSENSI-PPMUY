@@ -109,14 +109,24 @@
     }
     .card-balance-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 8px;
     }
+    .card-balance-col {
+      display: flex;
+      flex-direction: column;
+    }
     .card-balance {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: 0.5px;
+    }
+    .eye-toggle-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -6px;
+      margin-bottom: 6px;
     }
     .eye-toggle {
       background: none;
@@ -198,13 +208,6 @@
     .form-group { 
       margin-bottom: 0; 
       position: relative; 
-    }
-    .form-group label { 
-      display: block; 
-      margin-bottom: 4px; 
-      font-weight: 700; 
-      font-size: 11px; 
-      color: var(--text-light);
     }
     
     /* Search Bar Input Style similar to "Cari Fitur" */
@@ -401,19 +404,25 @@
     </div>
   </header>
 
-  <!-- CARD SALDO UTAMA ALA BRIMO (DIGUNAKAN UNTUK DETAIL PROFIL & SALDO) -->
+  <!-- CARD SALDO UTAMA & SALDO HARIAN -->
   <div class="brimo-card">
-    <div class="card-label">Saldo Rekening Utama</div>
     <div class="card-balance-row">
-      <!-- Element ID dipertahankan untuk manipulasi logic Javascript asli -->
-      <span class="card-balance" id="dispSaldo">Rp ••••••</span>
+      <div class="card-balance-col">
+        <div class="card-label">Saldo Rekening Utama</div>
+        <span class="card-balance" id="dispSaldo">Rp ••••••</span>
+      </div>
+      <div class="card-balance-col" style="text-align: right;">
+        <div class="card-label">Saldo Harian</div>
+        <span class="card-balance" id="dispSaldoHarian">Rp ••••••</span>
+      </div>
+    </div>
+    <div class="eye-toggle-container">
       <button class="eye-toggle" onclick="toggleBalanceMask()">👁️</button>
     </div>
     <div style="font-size: 11px; opacity: 0.9; margin-top: 4px; display: flex; flex-direction: column; gap: 1px;">
       <div>Nama: <span id="dispNama" style="font-weight: 700;">-</span></div>
       <div>NIK: <span id="dispNik" style="font-weight: 700;">-</span> <span style="opacity: 0.5;">|</span> Gender: <span id="dispGender" style="font-weight: 700;">-</span></div>
     </div>
-    <!-- Elemen tersembunyi untuk mempertahankan profil card agar active class bekerja -->
     <div id="profileCard" style="display: none;"></div>
     <a href="#" class="card-footer-link">
       <span>Semua Rekeningmu</span>
@@ -464,7 +473,7 @@
       <div class="webcam-box">
         <video id="videoFace" autoplay muted playsinline></video>
         <button class="btn-compact btn-brimo-primary" id="btnStartFace" onclick="initFaceRecognition()" style="padding: 6px 12px; font-size: 10px;">Mulai Kamera</button>
-        <p id="faceStatus" style="font-size:10px; color:#0d9488; font-weight:600; text-align:center;"></p>
+        <p id="faceStatus" style="font-size:10px; color:#0d9488; font-weight:600; text-align:center; margin-top:4px;"></p>
       </div>
     </div>
   </div>
@@ -512,13 +521,49 @@
 <script>
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzzCmU6_6vVNl8eglTr9kzg3EwFpiEki40Jc_sBay8AlKsMip8p3y7lb9HM61FaKBOo/exec";
 
+  let allSantriData = [];
+  let isDataLoaded = false;
   let santriTerpilih = null;
+  
   let html5QrCode = null;
   let isScanningBarcode = false;
   let faceModelsLoaded = false;
   let videoStream = null;
+  let faceInterval = null;
+  
   let realSaldoValue = 0;
+  let realSaldoHarianValue = 0;
   let isMasked = true;
+
+  // Unduh seluruh data santri di awal untuk pencarian instan (0,0 Detik)
+  document.addEventListener("DOMContentLoaded", () => {
+    preloadSantriData();
+  });
+
+  function preloadSantriData() {
+    const headerTitle = document.getElementById("dispNamaHeader");
+    headerTitle.innerText = "Sinkronisasi data database...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify({ action: "getAllSantri" })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success && res.data) {
+        allSantriData = res.data;
+        isDataLoaded = true;
+        headerTitle.innerText = "di Menu Tabungan, Wahai Santri PPMUY";
+      } else {
+        headerTitle.innerText = "Gagal memproses data server";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      headerTitle.innerText = "Koneksi database bermasalah!";
+    });
+  }
 
   function switchTab(tabName, element) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -550,49 +595,54 @@
   }
 
   function renderSaldo() {
-    const el = document.getElementById("dispSaldo");
+    const elSaldo = document.getElementById("dispSaldo");
+    const elSaldoHarian = document.getElementById("dispSaldoHarian");
+    
     if (!santriTerpilih) {
-      el.innerText = "Rp ••••••";
+      elSaldo.innerText = "Rp ••••••";
+      elSaldoHarian.innerText = "Rp ••••••";
       return;
     }
     if (isMasked) {
-      el.innerText = "Rp ••••••";
+      elSaldo.innerText = "Rp ••••••";
+      elSaldoHarian.innerText = "Rp ••••••";
     } else {
-      el.innerText = "Rp " + Number(realSaldoValue).toLocaleString('id-ID');
+      elSaldo.innerText = "Rp " + Number(realSaldoValue).toLocaleString('id-ID');
+      elSaldoHarian.innerText = "Rp " + Number(realSaldoHarianValue).toLocaleString('id-ID');
     }
   }
 
-  // --- MODEL 1: PENCARIAN MANUAL ---
+  // --- MODEL 1: PENCARIAN MANUAL INSTAN (CLIENT-SIDE) ---
   function searchSantriManual(keyword) {
     const resDiv = document.getElementById("searchResultsManual");
     if (!keyword || keyword.trim().length < 2) { resDiv.style.display = "none"; return; }
+    if (!isDataLoaded) return;
 
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify({ action: "searchSantriTabungan", keyword: keyword })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success && res.data && res.data.length > 0) {
-        resDiv.innerHTML = "";
-        res.data.forEach(santri => {
-          let item = document.createElement("div");
-          item.className = "search-item";
-          item.innerHTML = `<b>${santri.nama}</b> (NIK: ${santri.nik}) - Saldo: Rp ${Number(santri.saldo).toLocaleString('id-ID')}`;
-          item.onclick = () => pilihSantri(santri);
-          resDiv.appendChild(item);
-        });
-        resDiv.style.display = "block";
-      } else {
-        resDiv.style.display = "none";
-      }
-    });
+    const query = keyword.toLowerCase().trim();
+    const filtered = allSantriData.filter(s => 
+      s.nama.toLowerCase().includes(query) || s.nik.includes(query)
+    ).slice(0, 15);
+
+    if (filtered.length > 0) {
+      resDiv.innerHTML = "";
+      filtered.forEach(santri => {
+        let item = document.createElement("div");
+        item.className = "search-item";
+        item.innerHTML = `<b>${santri.nama}</b> (NIK: ${santri.nik})<br>
+                          <span style="font-size:9px; color:var(--text-light)">Tabungan: Rp ${Number(santri.saldo).toLocaleString('id-ID')} | Harian: Rp ${Number(santri.saldoHarian).toLocaleString('id-ID')}</span>`;
+        item.onclick = () => pilihSantri(santri);
+        resDiv.appendChild(item);
+      });
+      resDiv.style.display = "block";
+    } else {
+      resDiv.style.display = "none";
+    }
   }
 
   function pilihSantri(santri) {
     santriTerpilih = santri;
     realSaldoValue = santri.saldo;
+    realSaldoHarianValue = santri.saldoHarian;
     isMasked = false; // Tampilkan otomatis saat terpilih
 
     document.getElementById("searchResultsManual").style.display = "none";
@@ -614,7 +664,7 @@
     hitungTotalSisa();
   }
 
-  // --- MODEL 2: BARCODE SCANNER ---
+  // --- MODEL 2: BARCODE SCANNER (INSTAN CLIENT-SIDE COCOK) ---
   function toggleBarcodeScanner() {
     if (isScanningBarcode) { stopBarcodeScanner(); } else { startBarcodeScanner(); }
   }
@@ -626,7 +676,7 @@
       { fps: 10, qrbox: { width: 150, height: 150 } },
       (decodedText) => {
         stopBarcodeScanner();
-        cariByNik(decodedText);
+        cariByNikLokal(decodedText);
       },
       (errorMessage) => { }
     ).then(() => {
@@ -641,98 +691,112 @@
         html5QrCode.clear();
         isScanningBarcode = false;
         document.getElementById("btnToggleBarcode").innerText = "Mulai Scan Barcode";
-      });
+      }).catch(err => console.error(err));
     }
   }
 
-  function cariByNik(nik) {
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify({ action: "getSantriByNik", nik: nik })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success && res.data) {
-        pilihSantri(res.data);
-      } else {
-        alert("Data NIK " + nik + " tidak ditemukan!");
-      }
-    });
+  function cariByNikLokal(nik) {
+    if (!isDataLoaded) return;
+    const match = allSantriData.find(s => s.nik.trim() === nik.trim());
+    if (match) {
+      pilihSantri(match);
+    } else {
+      alert("Data NIK " + nik + " tidak ditemukan!");
+    }
   }
 
-  // --- MODEL 3: FACE RECOGNITION (VEKTOR WAJAH KOLOM E) ---
+  // --- MODEL 3: FACE RECOGNITION (PROSES LOKAL INSTAN) ---
   async function initFaceRecognition() {
     const statusText = document.getElementById("faceStatus");
-    statusText.innerText = "Memuat model AI Wajah...";
+    const video = document.getElementById("videoFace");
+    statusText.innerText = "Memuat model AI wajah...";
 
     try {
       if (!faceModelsLoaded) {
-        await faceapi.nets.ssdMobilenetv1.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-        await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
-        await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+        // Menggunakan CDN model publik face-api yang stabil
+        const modelUrl = 'https://justadudewhohacks.github.io/face-api.js/models/';
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(modelUrl);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
         faceModelsLoaded = true;
       }
 
-      statusText.innerText = "Membuka Kamera...";
-      const video = document.getElementById("videoFace");
-      videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      statusText.innerText = "Membuka kamera...";
+      videoStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
+      });
       video.srcObject = videoStream;
 
-      statusText.innerText = "Mencari & Cocokkan Vektor Wajah...";
-      
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "cors",
-        body: JSON.stringify({ action: "getAllFaceVectors" })
-      })
-      .then(res => res.json())
-      .then(async (res) => {
-        if (!res.success || !res.data) {
-          statusText.innerText = "Gagal mengambil database wajah.";
-          return;
-        }
+      video.onloadedmetadata = () => {
+        video.play();
+        statusText.innerText = "Mencari & mencocokkan wajah...";
+        startFaceMatchingLoop();
+      };
 
-        const faceDatabase = res.data;
+    } catch (err) {
+      statusText.innerText = "Gagal menginisiasi kamera: " + err.message;
+      console.error(err);
+    }
+  }
+
+  function startFaceMatchingLoop() {
+    const statusText = document.getElementById("faceStatus");
+    const video = document.getElementById("videoFace");
+
+    faceInterval = setInterval(async () => {
+      if (!videoStream) {
+        clearInterval(faceInterval);
+        return;
+      }
+
+      try {
         const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-        
         if (detection) {
+          statusText.innerText = "Wajah terdeteksi, membandingkan...";
           const currentDescriptor = detection.descriptor;
           let bestMatch = null;
-          let minDistance = 0.6;
+          let minDistance = 0.55; // Ambang batas kemiripan wajah
 
-          faceDatabase.forEach(item => {
-            if (item.vector && item.vector.length === 128) {
-              const distance = faceapi.euclidDistance(currentDescriptor, item.vector);
-              if (distance < minDistance) {
-                minDistance = distance;
-                bestMatch = item;
-              }
+          // Cari wajah yang cocok dari cache allSantriData
+          const validCandidates = allSantriData.filter(s => s.vector && s.vector.length === 128);
+          
+          validCandidates.forEach(item => {
+            const distance = faceapi.euclidDistance(currentDescriptor, item.vector);
+            if (distance < minDistance) {
+              minDistance = distance;
+              bestMatch = item;
             }
           });
 
           if (bestMatch) {
-            statusText.innerText = "✅ Wajah Terdeteksi: " + bestMatch.nama;
+            statusText.innerText = "✅ Cocok: " + bestMatch.nama;
+            clearInterval(faceInterval);
             stopFaceScanner();
             pilihSantri(bestMatch);
           } else {
-            statusText.innerText = "❌ Wajah tidak cocok.";
+            statusText.innerText = "⚠️ Wajah tidak cocok dengan database.";
           }
         } else {
-          statusText.innerText = "⚠️ Dekatkan wajah ke kamera.";
+          statusText.innerText = "🔍 Posisikan wajah di depan kamera...";
         }
-      });
-
-    } catch (err) {
-      statusText.innerText = "Gagal menginisiasi AI: " + err.message;
-    }
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1000);
   }
 
   function stopFaceScanner() {
+    if (faceInterval) {
+      clearInterval(faceInterval);
+      faceInterval = null;
+    }
     if (videoStream) {
       videoStream.getTracks().forEach(track => track.stop());
       videoStream = null;
     }
+    const video = document.getElementById("videoFace");
+    if (video) video.srcObject = null;
+    document.getElementById("faceStatus").innerText = "";
   }
 
   // --- PERHITUNGAN TEMPORARY SALDO ---
@@ -782,9 +846,18 @@
       btn.innerText = "💾 OK - Simpan Ke Sheet";
 
       if (res.success) {
-        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ Sukses! Saldo: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        statusDiv.innerHTML = `<span style='color:var(--success);'>✅ Sukses! Saldo Baru: Rp ${Number(res.saldoBaru).toLocaleString('id-ID')}</span>`;
+        
+        // Perbarui nilai lokal
         realSaldoValue = res.saldoBaru;
         santriTerpilih.saldo = res.saldoBaru;
+        
+        // Sinkronisasi data di cache array lokal
+        const index = allSantriData.findIndex(s => s.nik === santriTerpilih.nik);
+        if (index !== -1) {
+          allSantriData[index].saldo = res.saldoBaru;
+        }
+
         isMasked = false;
         renderSaldo();
         document.getElementById("nominalInput").value = "";
@@ -803,10 +876,11 @@
   function resetForm() {
     santriTerpilih = null;
     realSaldoValue = 0;
+    realSaldoHarianValue = 0;
     isMasked = true;
     
     document.getElementById("profileCard").classList.remove("active");
-    document.getElementById("dispNamaHeader").innerText = "Santri PPMUY";
+    document.getElementById("dispNamaHeader").innerText = "di Menu Tabungan, Wahai Santri PPMUY";
     document.getElementById("dispNama").innerText = "-";
     document.getElementById("dispNik").innerText = "-";
     document.getElementById("dispGender").innerText = "-";
@@ -821,6 +895,9 @@
     cardAksi.style.opacity = "0.5";
     cardAksi.style.pointerEvents = "none";
     document.getElementById("previewSaldoAkhir").innerText = "Rp 0";
+
+    stopBarcodeScanner();
+    stopFaceScanner();
   }
 </script>
 </body>
