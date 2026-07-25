@@ -96,7 +96,7 @@
     <p id="loadingText" class="text-xs font-black tracking-[0.3em] uppercase text-amber-200 animate-pulse text-center max-w-xs px-4 leading-relaxed">Merancang Estetika Seni Digital Premium...</p>
 </div>
 
-<!-- PAGE 1: STUDIO AI (DENGAN TAMPILAN ASLI) -->
+<!-- PAGE 1: STUDIO AI -->
 <div id="pageStudio" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
     
     <!-- PANEL KONTROL KIRI -->
@@ -201,15 +201,14 @@
     </div>
 </div>
 
-<!-- PAGE 2: EDIT MP3 & VIDEO (EMBEDDED IFRAME FULL FRAME) -->
-<div id="pageAudioVideo" class="hidden max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-xl" style="height: calc(100vh - 120px); min-height: 600px;">
+<!-- PAGE 2: EDIT MP3 & VIDEO (EMBEDDED IFRAME LAYAR PENUH) -->
+<div id="pageAudioVideo" class="hidden max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-xl" style="height: calc(100vh - 120px); min-height: 650px;">
     <iframe id="iframeApp" src="" class="w-full h-full border-0"></iframe>
 </div>
 
 <div id="hiddenRenderArea" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden;"></div>
 
 <script>
-    // FUNGSI NAVIGASI TAB MENU (PAGE SWITCHER)
     function switchTab(tab) {
         const pageStudio = document.getElementById('pageStudio');
         const pageAudioVideo = document.getElementById('pageAudioVideo');
@@ -227,7 +226,6 @@
             pageStudio.classList.add('hidden');
             pageAudioVideo.classList.remove('hidden');
             
-            // Set URL iframe hanya saat pertama kali dibuka untuk menghemat bandwidth
             if (!iframe.src || iframe.src === "about:blank") {
                 iframe.src = "https://rebanappmuy.vercel.app/";
             }
@@ -268,12 +266,12 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX = 1200; // Ditingkatkan ke 1200px untuk resolusi cetak dan layar yang lebih tajam
+                    const MAX = 1200;
                     const scale = MAX / Math.max(img.width, img.height);
                     canvas.width = img.width * scale; 
                     canvas.height = img.height * scale;
                     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]); // Kualitas kompresi dinaikkan ke 0.85
+                    resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
                 };
             };
         });
@@ -367,7 +365,7 @@
             await new Promise(r => setTimeout(r, 200));
 
             const canvas = await html2canvas(clonedSlide, { 
-                scale: 2.5, // Menaikkan resolusi export agar gambar tulisan pecah terhindari total
+                scale: 2.5,
                 useCORS: true, 
                 logging: false,
                 backgroundColor: null,
