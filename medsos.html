@@ -14,6 +14,8 @@
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: #f1f5f9; 
             color: #0f172a; 
+            margin: 0;
+            padding: 0;
         }
             
         /* DIMENSI DESAIN ASLI HIGH QUALITY */
@@ -69,26 +71,28 @@
         .font-heading { font-family: 'Cinzel', serif !important; }
     </style>
 </head>
-<body class="p-4 md:p-8 lg:p-12">
+<body class="bg-slate-100 min-h-screen flex flex-col">
 
 <!-- NAVIGATION BAR / MENU ATAS -->
-<div class="max-w-7xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-    <div class="flex items-center gap-2">
-        <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
-        <span class="font-extrabold text-sm uppercase tracking-wider text-slate-800">Pesantren Studio App</span>
+<header class="w-full bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span class="font-extrabold text-sm uppercase tracking-wider text-slate-800">Pesantren Studio App</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <button id="navStudio" onclick="switchTab('studio')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md">
+                ✨ Studio AI
+            </button>
+            <button id="navVideo" onclick="switchTab('video')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+                🎬 EDIT VIDEO
+            </button>
+            <button id="navMp3" onclick="switchTab('mp3')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+                🎵 EDIT MP3
+            </button>
+        </div>
     </div>
-    <div class="flex items-center gap-2 flex-wrap">
-        <button id="navStudio" onclick="switchTab('studio')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md">
-            ✨ Studio AI
-        </button>
-        <button id="navVideo" onclick="switchTab('video')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-            🎬 EDIT VIDEO
-        </button>
-        <button id="navMp3" onclick="switchTab('mp3')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-            🎵 EDIT MP3
-        </button>
-    </div>
-</div>
+</header>
 
 <!-- Premium Glassmorphism Loading UI -->
 <div id="loading" class="hidden fixed inset-0 bg-slate-950/70 z-[100] flex flex-col items-center justify-center backdrop-blur-xl">
@@ -100,7 +104,7 @@
 </div>
 
 <!-- PAGE 1: STUDIO AI -->
-<div id="pageStudio" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+<div id="pageStudio" class="p-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10">
     
     <!-- PANEL KONTROL KIRI -->
     <div class="lg:col-span-5 form-card p-8 rounded-[2.5rem] space-y-6 h-fit">
@@ -204,9 +208,9 @@
     </div>
 </div>
 
-<!-- PAGE 2: EMBEDDED IFRAME LAYAR PENUH (LOCAL RELATIVE PATH) -->
-<div id="pageEmbed" class="hidden max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-xl" style="height: calc(100vh - 120px); min-height: 650px;">
-    <iframe id="iframeApp" src="" class="w-full h-full border-0" allow="microphone; camera; clipboard-read; clipboard-write; autoplay"></iframe>
+<!-- PAGE 2: EMBEDDED FULLSCREEN TANPA BORDER/FRAME -->
+<div id="pageEmbed" class="hidden w-full flex-grow flex flex-col">
+    <iframe id="iframeApp" src="" class="w-full flex-grow border-0 min-h-[calc(100vh-65px)]" allow="microphone; camera; clipboard-read; clipboard-write; autoplay"></iframe>
 </div>
 
 <div id="hiddenRenderArea" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden;"></div>
