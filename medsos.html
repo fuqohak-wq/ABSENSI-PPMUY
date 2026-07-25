@@ -77,12 +77,15 @@
         <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
         <span class="font-extrabold text-sm uppercase tracking-wider text-slate-800">Pesantren Studio App</span>
     </div>
-    <div class="flex items-center gap-3">
-        <button id="navStudio" onclick="switchTab('studio')" class="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md">
+    <div class="flex items-center gap-2 flex-wrap">
+        <button id="navStudio" onclick="switchTab('studio')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md">
             ✨ Studio AI
         </button>
-        <button id="navAudioVideo" onclick="switchTab('audiovideo')" class="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
-            🎵 EDIT MP3 & VIDEO
+        <button id="navVideo" onclick="switchTab('video')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+            🎬 EDIT VIDEO
+        </button>
+        <button id="navMp3" onclick="switchTab('mp3')" class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200">
+            🎵 EDIT MP3
         </button>
     </div>
 </div>
@@ -201,9 +204,9 @@
     </div>
 </div>
 
-<!-- PAGE 2: EDIT MP3 & VIDEO (EMBEDDED IFRAME LAYAR PENUH) -->
-<div id="pageAudioVideo" class="hidden max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-xl" style="height: calc(100vh - 120px); min-height: 650px;">
-    <iframe id="iframeApp" src="" class="w-full h-full border-0"></iframe>
+<!-- PAGE 2: EMBEDDED IFRAME LAYAR PENUH (LOCAL RELATIVE PATH) -->
+<div id="pageEmbed" class="hidden max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-xl" style="height: calc(100vh - 120px); min-height: 650px;">
+    <iframe id="iframeApp" src="" class="w-full h-full border-0" allow="microphone; camera; clipboard-read; clipboard-write; autoplay"></iframe>
 </div>
 
 <div id="hiddenRenderArea" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden;"></div>
@@ -211,27 +214,40 @@
 <script>
     function switchTab(tab) {
         const pageStudio = document.getElementById('pageStudio');
-        const pageAudioVideo = document.getElementById('pageAudioVideo');
+        const pageEmbed = document.getElementById('pageEmbed');
         const navStudio = document.getElementById('navStudio');
-        const navAudioVideo = document.getElementById('navAudioVideo');
+        const navVideo = document.getElementById('navVideo');
+        const navMp3 = document.getElementById('navMp3');
         const iframe = document.getElementById('iframeApp');
+
+        const activeClass = "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md";
+        const inactiveClass = "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200";
 
         if (tab === 'studio') {
             pageStudio.classList.remove('hidden');
-            pageAudioVideo.classList.add('hidden');
+            pageEmbed.classList.add('hidden');
             
-            navStudio.className = "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md";
-            navAudioVideo.className = "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200";
-        } else if (tab === 'audiovideo') {
+            navStudio.className = activeClass;
+            navVideo.className = inactiveClass;
+            navMp3.className = inactiveClass;
+        } else if (tab === 'video') {
             pageStudio.classList.add('hidden');
-            pageAudioVideo.classList.remove('hidden');
+            pageEmbed.classList.remove('hidden');
             
-            if (!iframe.src || iframe.src === "about:blank") {
-                iframe.src = "https://rebanappmuy.vercel.app/";
-            }
+            iframe.src = "./video.html";
 
-            navAudioVideo.className = "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-emerald-600 text-white shadow-md";
-            navStudio.className = "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition bg-slate-100 text-slate-700 hover:bg-slate-200";
+            navVideo.className = activeClass;
+            navStudio.className = inactiveClass;
+            navMp3.className = inactiveClass;
+        } else if (tab === 'mp3') {
+            pageStudio.classList.add('hidden');
+            pageEmbed.classList.remove('hidden');
+            
+            iframe.src = "./mp3.html";
+
+            navMp3.className = activeClass;
+            navStudio.className = inactiveClass;
+            navVideo.className = inactiveClass;
         }
     }
 
@@ -375,10 +391,11 @@
 
             hiddenArea.removeChild(clonedSlide);
 
-            const link = document.createElement('a');
-            link.download = `SlidePremium-${i+1}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            const link = document.getElementById('hiddenRenderArea');
+            const downloadLink = document.createElement('a');
+            downloadLink.download = `SlidePremium-${i+1}.png`;
+            downloadLink.href = canvas.toDataURL('image/png');
+            downloadLink.click();
             await new Promise(r => setTimeout(r, 300));
         }
         setLoading(false);
