@@ -1,33 +1,50 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Dengan Animasi - Visual Effects Studio</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
         .gradient-bg {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            transition: background 0.3s ease;
+        }
+        .dark .gradient-bg {
             background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen py-10 px-4 font-sans text-gray-100">
+<body class="gradient-bg min-h-screen py-10 px-4 font-sans text-slate-800 dark:text-gray-100 transition-colors duration-300">
 
-    <div class="max-w-4xl mx-auto bg-gray-900 rounded-2xl shadow-2xl border border-gray-800 overflow-hidden">
+    <div class="max-w-4xl mx-auto bg-white/95 dark:bg-gray-900 rounded-2xl shadow-2xl border border-blue-200 dark:border-gray-800 overflow-hidden transition-colors duration-300">
+        
+        <!-- Tombol Pilihan Tema (Light / Dark Mode) -->
+        <div class="flex justify-end p-4 pb-0">
+            <button type="button" onclick="toggleTheme()" id="themeToggleBtn" class="flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 bg-blue-100/80 text-blue-800 hover:bg-blue-200 transition text-xs font-bold dark:border-gray-700 dark:bg-gray-800 dark:text-yellow-400 dark:hover:bg-gray-700">
+                🌙 Mode Gelap
+            </button>
+        </div>
+
         <!-- Header & Navigasi Tab -->
-        <div class="p-6 text-center border-b border-gray-800">
-            <h1 class="text-3xl font-bold text-yellow-400 flex justify-center items-center gap-2">
+        <div class="p-6 text-center border-b border-blue-100 dark:border-gray-800">
+            <h1 class="text-3xl font-extrabold text-blue-700 dark:text-yellow-400 flex justify-center items-center gap-2">
                 ✨ Animated Music Video Generator (AI Powered)
             </h1>
-            <p class="text-gray-400 text-sm mt-1">Lirik Presisi Otomatis dengan Gemini AI + Efek Visual Dynamic</p>
+            <p class="text-slate-600 dark:text-gray-400 text-sm mt-1">Lirik Presisi Otomatis dengan Gemini AI + Efek Visual Dynamic</p>
             
             <!-- MENU NAVIGASI PILIHAN EDIT -->
-            <div class="mt-6 flex justify-center gap-3 bg-gray-800 p-1.5 rounded-xl border border-gray-700">
-                <a href="#" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition bg-yellow-500 text-gray-900 shadow-md">
+            <div class="mt-6 flex justify-center gap-3 bg-blue-50/80 dark:bg-gray-800 p-1.5 rounded-xl border border-blue-100 dark:border-gray-700">
+                <a href="#" class="flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition bg-blue-600 text-white shadow-md dark:bg-yellow-500 dark:text-gray-900">
                     ✨ EDIT DENGAN ANIMASI (1-15 Mins)
                 </a>
-                <a href="index.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-gray-400 hover:text-white hover:bg-gray-700">
+                <a href="index.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-slate-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
                     🎬 EDIT VIDEO PANJANG
                 </a>
             </div>
@@ -36,45 +53,45 @@
         <div class="p-6 space-y-6">
             <!-- API Key Input -->
             <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">🔑 Gemini API Key:</label>
-                <input type="password" id="apiKey" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-yellow-500" placeholder="Masukkan Gemini API Key Anda...">
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🔑 Gemini API Key:</label>
+                <input type="password" id="apiKey" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 dark:focus:border-yellow-500" placeholder="Masukkan Gemini API Key Anda...">
             </div>
 
             <!-- Upload Options -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">🎵 Vokal Utama (MP3):</label>
-                    <input type="file" id="audioInput" accept="audio/*" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-yellow-500 file:text-gray-900 hover:file:bg-yellow-400">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🎵 Vokal Utama (MP3):</label>
+                    <input type="file" id="audioInput" accept="audio/*" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700 dark:file:bg-yellow-500 dark:file:text-gray-900 dark:hover:file:bg-yellow-400">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">🎸 Backsound Musik (MP3 - Opsional):</label>
-                    <input type="file" id="backsoundInput" accept="audio/*" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-yellow-500 file:text-gray-900 hover:file:bg-yellow-400">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🎸 Backsound Musik (MP3 - Opsional):</label>
+                    <input type="file" id="backsoundInput" accept="audio/*" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700 dark:file:bg-yellow-500 dark:file:text-gray-900 dark:hover:file:bg-yellow-400">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">🖼️ / 🎥 Background:</label>
-                    <input type="file" id="mediaInput" accept="image/*,video/*" multiple class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-yellow-500 file:text-gray-900 hover:file:bg-yellow-400">
-                    <p class="text-xs text-gray-400 mt-1">*Jika pilih banyak foto, akan berganti otomatis (Slideshow).</p>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🖼️ / 🎥 Background:</label>
+                    <input type="file" id="mediaInput" accept="image/*,video/*" multiple class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-700 dark:text-gray-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700 dark:file:bg-yellow-500 dark:file:text-gray-900 dark:hover:file:bg-yellow-400">
+                    <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">*Jika pilih banyak foto, akan berganti otomatis (Slideshow).</p>
                 </div>
             </div>
 
             <!-- AUDIO MIXER & LIVE PREVIEW -->
-            <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-700 space-y-3">
-                <h3 class="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+            <div class="bg-blue-50/70 dark:bg-gray-800/80 p-4 rounded-xl border border-blue-100 dark:border-gray-700 space-y-3">
+                <h3 class="text-sm font-bold text-blue-700 dark:text-yellow-400 flex items-center gap-2">
                     🎛️ Audio Mixer & Tes Preview Suara
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                     <div>
-                        <label class="block text-xs text-gray-300 mb-1 flex justify-between">
+                        <label class="block text-xs text-slate-700 dark:text-gray-300 mb-1 flex justify-between">
                             <span>Volume Backsound:</span>
-                            <span id="backsoundVolLabel" class="font-bold text-yellow-400">20%</span>
+                            <span id="backsoundVolLabel" class="font-bold text-blue-600 dark:text-yellow-400">20%</span>
                         </label>
-                        <input type="range" id="backsoundVolume" min="0" max="1" step="0.01" value="0.20" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500">
+                        <input type="range" id="backsoundVolume" min="0" max="1" step="0.01" value="0.20" class="w-full h-2 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-yellow-500">
                     </div>
                     <div class="flex gap-2">
-                        <button type="button" id="previewPlayBtn" onclick="toggleAudioPreview()" class="flex-1 py-2 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold text-sm text-gray-200 transition flex items-center justify-center gap-2">
+                        <button type="button" id="previewPlayBtn" onclick="toggleAudioPreview()" class="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg font-semibold text-sm text-white dark:text-gray-200 transition flex items-center justify-center gap-2 shadow-sm">
                             🔊 Putar Preview Audio
                         </button>
-                        <button type="button" id="previewStopBtn" onclick="stopAudioPreview()" class="py-2 px-4 bg-gray-900 hover:bg-gray-800 rounded-lg font-semibold text-sm text-gray-400 hover:text-white transition">
+                        <button type="button" id="previewStopBtn" onclick="stopAudioPreview()" class="py-2 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-gray-900 dark:hover:bg-gray-800 rounded-lg font-semibold text-sm text-slate-700 dark:text-gray-400 dark:hover:text-white transition">
                             ⏹️ Stop
                         </button>
                     </div>
@@ -83,20 +100,20 @@
 
             <!-- Kolom Teks Lirik Acuan -->
             <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">📜 Acuan Teks Lirik (Opsional - Supaya AI Tidak Ngarang):</label>
-                <textarea id="lyricsReference" rows="4" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 focus:outline-none focus:border-yellow-500 placeholder-gray-500" placeholder="Paste lirik lagu di sini... AI akan mencocokkan waktu lirik berdasarkan teks asli ini sehingga akurat."></textarea>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">📜 Acuan Teks Lirik (Opsional - Supaya AI Tidak Ngarang):</label>
+                <textarea id="lyricsReference" rows="4" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 placeholder-slate-400 dark:placeholder-gray-500" placeholder="Paste lirik lagu di sini... AI akan mencocokkan waktu lirik berdasarkan teks asli ini sehingga akurat."></textarea>
             </div>
 
             <!-- KUSTOMISASI LIRIK (FONT & POSISI) -->
-            <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-700 space-y-3">
-                <h3 class="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+            <div class="bg-blue-50/70 dark:bg-gray-800/80 p-4 rounded-xl border border-blue-100 dark:border-gray-700 space-y-3">
+                <h3 class="text-sm font-bold text-blue-700 dark:text-yellow-400 flex items-center gap-2">
                     ⚙️ Kustomisasi Tampilan Lirik & Kompresi
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <!-- Gaya Font -->
                     <div>
-                        <label class="block text-xs text-gray-300 mb-1">Gaya Font Teks:</label>
-                        <select id="fontFamily" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-yellow-500">
+                        <label class="block text-xs text-slate-700 dark:text-gray-300 mb-1">Gaya Font Teks:</label>
+                        <select id="fontFamily" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 rounded-lg p-2 text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:border-blue-500 dark:focus:border-yellow-500">
                             <option value="sans-serif">Sans-Serif (Modern)</option>
                             <option value="serif">Serif (Klasik)</option>
                             <option value="monospace">Monospace (Retro)</option>
@@ -106,8 +123,8 @@
 
                     <!-- Posisi Vertikal -->
                     <div>
-                        <label class="block text-xs text-gray-300 mb-1">Posisi Teks (Vertikal):</label>
-                        <select id="textPosition" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-yellow-500">
+                        <label class="block text-xs text-slate-700 dark:text-gray-300 mb-1">Posisi Teks (Vertikal):</label>
+                        <select id="textPosition" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 rounded-lg p-2 text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:border-blue-500 dark:focus:border-yellow-500">
                             <option value="bottom">Bawah (Default)</option>
                             <option value="center">Tengah</option>
                             <option value="top">Atas</option>
@@ -116,8 +133,8 @@
 
                     <!-- Target Bitrate -->
                     <div>
-                        <label class="block text-xs text-gray-300 mb-1">Target Kompresi MP4:</label>
-                        <select id="bitrateSetting" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-yellow-500">
+                        <label class="block text-xs text-slate-700 dark:text-gray-300 mb-1">Target Kompresi MP4:</label>
+                        <select id="bitrateSetting" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 rounded-lg p-2 text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:border-blue-500 dark:focus:border-yellow-500">
                             <option value="1000000">Ultra Ringan (~1 MB/menit)</option>
                             <option value="1500000" selected>Sedang Medsos (~1.5 MB/menit)</option>
                             <option value="2500000">Kualitas Tinggi (~2.5 MB/menit)</option>
@@ -128,41 +145,41 @@
 
             <!-- Format Ukuran Video (PILIHAN TEGAK / LEBAR) -->
             <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">📐 Format Ukuran Video Output:</label>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">📐 Format Ukuran Video Output:</label>
                 <div class="grid grid-cols-2 gap-4">
-                    <label class="border border-gray-700 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition" id="labelLandscape">
+                    <label class="border border-blue-200 bg-white dark:border-gray-700 dark:bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/50 dark:hover:bg-gray-700 transition" id="labelLandscape">
                         <input type="radio" name="videoFormat" value="landscape" class="sr-only" onclick="selectFormat('landscape')">
-                        <span class="text-lg font-medium text-gray-200">🖥️ Lebar (16:9)</span>
-                        <span class="text-xs text-gray-400">YouTube / Desktop (854x480)</span>
+                        <span class="text-lg font-bold text-slate-800 dark:text-gray-200">🖥️ Lebar (16:9)</span>
+                        <span class="text-xs text-slate-500 dark:text-gray-400">YouTube / Desktop (854x480)</span>
                     </label>
-                    <label class="border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition" id="labelPortrait">
+                    <label class="border-2 border-blue-600 bg-blue-100/80 dark:border-gray-700 dark:bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition" id="labelPortrait">
                         <input type="radio" name="videoFormat" value="portrait" checked class="sr-only" onclick="selectFormat('portrait')">
-                        <span class="text-lg font-medium text-gray-200">📱 Tegak (9:16)</span>
-                        <span class="text-xs text-gray-400">Shorts / Reels / TikTok (480x854)</span>
+                        <span class="text-lg font-bold text-slate-800 dark:text-gray-200">📱 Tegak (9:16)</span>
+                        <span class="text-xs text-slate-500 dark:text-gray-400">Shorts / Reels / TikTok (480x854)</span>
                     </label>
                 </div>
             </div>
 
             <!-- Pilih Efek Animasi -->
             <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">🎨 Pilih Efek Animasi Dynamic:</label>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🎨 Pilih Efek Animasi Dynamic:</label>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <button type="button" onclick="selectEffect('rain')" id="btn-rain" class="effect-btn border-2 border-yellow-500 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('rain')" id="btn-rain" class="effect-btn border-2 border-blue-600 bg-blue-100 text-blue-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         🌧️ Air Hujan
                     </button>
-                    <button type="button" onclick="selectEffect('lightning')" id="btn-lightning" class="effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('lightning')" id="btn-lightning" class="effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         ⚡ Petir & Hujan
                     </button>
-                    <button type="button" onclick="selectEffect('fire')" id="btn-fire" class="effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('fire')" id="btn-fire" class="effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         🔥 Api & Bara
                     </button>
-                    <button type="button" onclick="selectEffect('stars')" id="btn-stars" class="effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('stars')" id="btn-stars" class="effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         🌟 Bintang & Galaxy
                     </button>
-                    <button type="button" onclick="selectEffect('snow')" id="btn-snow" class="effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('snow')" id="btn-snow" class="effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         ❄️ Salju Syahdu
                     </button>
-                    <button type="button" onclick="selectEffect('spectrum')" id="btn-spectrum" class="effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700">
+                    <button type="button" onclick="selectEffect('spectrum')" id="btn-spectrum" class="effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition">
                         📊 Audio Spectrum
                     </button>
                 </div>
@@ -170,30 +187,30 @@
 
             <!-- Canvas Live Preview -->
             <div>
-                <label class="block text-sm font-semibold text-gray-300 mb-2">📺 Live Preview Canvas:</label>
-                <div class="relative w-full bg-black rounded-xl overflow-hidden shadow-inner border border-gray-800 flex items-center justify-center p-4 min-h-[300px]">
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">📺 Live Preview Canvas:</label>
+                <div class="relative w-full bg-slate-950 rounded-xl overflow-hidden shadow-inner border border-blue-200 dark:border-gray-800 flex items-center justify-center p-4 min-h-[300px]">
                     <canvas id="previewCanvas" class="max-h-[400px] object-contain"></canvas>
                 </div>
             </div>
 
             <!-- Status Area -->
-            <div id="statusArea" class="hidden p-4 bg-gray-800 rounded-lg border border-gray-700 text-sm space-y-2">
-                <p id="statusText" class="font-semibold text-yellow-400">Menyiapkan sistem...</p>
-                <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-                    <div id="progressBar" class="bg-yellow-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            <div id="statusArea" class="hidden p-4 bg-blue-50 dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-gray-700 text-sm space-y-2">
+                <p id="statusText" class="font-bold text-blue-700 dark:text-yellow-400">Menyiapkan sistem...</p>
+                <div class="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div id="progressBar" class="bg-blue-600 dark:bg-yellow-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
             </div>
 
             <!-- Action Button -->
-            <button id="renderBtn" onclick="startRenderProcess()" class="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-lg">
+            <button id="renderBtn" onclick="startRenderProcess()" class="w-full py-4 bg-blue-600 hover:bg-blue-700 dark:bg-yellow-500 dark:hover:bg-yellow-400 text-white dark:text-gray-900 font-bold rounded-xl shadow-lg transition flex justify-center items-center gap-2 text-lg">
                 🎬 Proses AI Lirik & Render Video (MP4 Ringan)
             </button>
 
             <!-- Output Preview -->
-            <div id="outputArea" class="hidden space-y-4 pt-4 border-t border-gray-800">
-                <h3 class="text-lg font-bold text-gray-200">Hasil Video MP4 Ultra Lightweight:</h3>
+            <div id="outputArea" class="hidden space-y-4 pt-4 border-t border-blue-100 dark:border-gray-800">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-gray-200">Hasil Video MP4 Ultra Lightweight:</h3>
                 <video id="videoPreview" controls class="w-full rounded-lg shadow-md max-h-[400px] bg-black"></video>
-                <a id="downloadBtn" class="block text-center py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow-md transition cursor-pointer">
+                <a id="downloadBtn" class="block text-center py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow-md transition cursor-pointer">
                     💾 Download Video (MP4 Format)
                 </a>
             </div>
@@ -227,17 +244,61 @@
         let bgImages = [];
         let bgVideo = null;
 
+        // FUNGSI TOGGLE LIGHT / DARK THEME
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeToggleBtn');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                btn.innerHTML = "🌙 Mode Gelap";
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                btn.innerHTML = "☀️ Mode Terang";
+                localStorage.setItem('theme', 'dark');
+            }
+            // Perbarui visualisasi tombol berdasarkan tema baru
+            selectFormat(selectedFormat);
+            selectEffect(currentEffect);
+        }
+
+        // Inisialisasi Tema Berdasarkan Penyimpanan Lokal / Default Light
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const btn = document.getElementById('themeToggleBtn');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (btn) btn.innerHTML = "☀️ Mode Terang";
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (btn) btn.innerHTML = "🌙 Mode Gelap";
+            }
+            selectFormat(selectedFormat);
+            selectEffect(currentEffect);
+        });
+
         function selectFormat(format) {
             selectedFormat = format;
             const land = document.getElementById('labelLandscape');
             const port = document.getElementById('labelPortrait');
+            const isDark = document.documentElement.classList.contains('dark');
             
             if (format === 'landscape') {
-                land.className = "border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
-                port.className = "border border-gray-700 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                if (isDark) {
+                    land.className = "border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                    port.className = "border border-gray-700 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                } else {
+                    land.className = "border-2 border-blue-600 bg-blue-100 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition";
+                    port.className = "border border-blue-200 bg-white rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/50 transition";
+                }
             } else {
-                port.className = "border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
-                land.className = "border border-gray-700 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                if (isDark) {
+                    port.className = "border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                    land.className = "border border-gray-700 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
+                } else {
+                    port.className = "border-2 border-blue-600 bg-blue-100 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50 transition";
+                    land.className = "border border-blue-200 bg-white rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/50 transition";
+                }
             }
             updateCanvasDimensions();
             initParticles();
@@ -338,7 +399,7 @@
 
             // Hubungkan Backsound ke Gain Node volume, baru ke Mixer Bus
             sourceBacksound.connect(gainBacksound);
-            backsoundAngle = gainBacksound.connect(mixBus);
+            sourceBacksound.connect(mixBus);
 
             // Mixer Bus dikeluarkan ke speaker dan ke modul perekam (dest)
             mixBus.connect(audioCtx.destination);
@@ -417,10 +478,20 @@
 
         function selectEffect(effect) {
             currentEffect = effect;
+            const isDark = document.documentElement.classList.contains('dark');
+            
             document.querySelectorAll('.effect-btn').forEach(btn => {
-                btn.className = "effect-btn border border-gray-700 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700";
+                btn.className = isDark
+                    ? "effect-btn border border-gray-700 bg-gray-800 text-gray-300 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700 transition"
+                    : "effect-btn border border-blue-200 bg-white text-slate-700 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition";
             });
-            document.getElementById(`btn-${effect}`).className = "effect-btn border-2 border-yellow-500 bg-gray-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700";
+            
+            const activeBtn = document.getElementById(`btn-${effect}`);
+            if (activeBtn) {
+                activeBtn.className = isDark
+                    ? "effect-btn border-2 border-yellow-500 bg-gray-800 text-white p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-gray-700 transition"
+                    : "effect-btn border-2 border-blue-600 bg-blue-100 text-blue-800 p-3 rounded-xl flex items-center gap-3 font-semibold text-sm hover:bg-blue-50 transition";
+            }
             initParticles();
         }
 
