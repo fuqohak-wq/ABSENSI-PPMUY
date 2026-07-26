@@ -100,8 +100,8 @@
 
             <!-- Kolom Teks Lirik Acuan -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">📜 Acuan Teks Lirik (Opsional - Supaya AI Tidak Ngarang):</label>
-                <textarea id="lyricsReference" rows="4" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 placeholder-slate-400 dark:placeholder-gray-500" placeholder="Paste lirik lagu di sini... AI akan mencocokkan waktu lirik berdasarkan teks asli ini sehingga akurat."></textarea>
+                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">📜 Acuan Teks Lirik (Kosongkan jika ingin AI menulis lirik otomatis secara mandiri):</label>
+                <textarea id="lyricsReference" rows="4" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 placeholder-slate-400 dark:placeholder-gray-500" placeholder="Kosongkan bagian ini jika Anda ingin AI mendeteksi vokal lagu dan menulis teks lirik secara otomatis..."></textarea>
             </div>
 
             <!-- KUSTOMISASI LIRIK (FONT & POSISI) -->
@@ -229,7 +229,6 @@
         let lyricTimestamps = [];
         let selectedFormat = 'portrait'; 
 
-        // Variabel penampung Web Audio Node
         let sourcePrimary, sourceBacksound, gainBacksound, mixBus, dest;
         let audioNodesInitialized = false;
         let isPreviewPlaying = false;
@@ -239,12 +238,10 @@
         
         updateCanvasDimensions();
 
-        // Variabel penampung Media Background
-        let mediaMode = 'none'; // 'images', 'video', 'none'
+        let mediaMode = 'none'; 
         let bgImages = [];
         let bgVideo = null;
 
-        // FUNGSI TOGGLE LIGHT / DARK THEME
         function toggleTheme() {
             const html = document.documentElement;
             const btn = document.getElementById('themeToggleBtn');
@@ -257,12 +254,10 @@
                 btn.innerHTML = "☀️ Mode Terang";
                 localStorage.setItem('theme', 'dark');
             }
-            // Perbarui visualisasi tombol berdasarkan tema baru
             selectFormat(selectedFormat);
             selectEffect(currentEffect);
         }
 
-        // Inisialisasi Tema Berdasarkan Penyimpanan Lokal / Default Light
         document.addEventListener("DOMContentLoaded", () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             const btn = document.getElementById('themeToggleBtn');
@@ -314,14 +309,13 @@
             }
         }
 
-        // Handle Audio Input & Backsound Input
         document.getElementById('audioInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const audioEl = document.getElementById('audioElement');
             audioEl.src = URL.createObjectURL(file);
             audioEl.load();
-            lyricTimestamps = []; // Reset lirik jika file berubah
+            lyricTimestamps = []; 
         });
 
         document.getElementById('backsoundInput').addEventListener('change', (e) => {
@@ -332,7 +326,6 @@
             backsoundEl.load();
         });
 
-        // Handle Volume Slider
         document.getElementById('backsoundVolume').addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             document.getElementById('backsoundVolLabel').innerText = Math.round(val * 100) + "%";
@@ -341,14 +334,13 @@
             }
         });
 
-        // SINKRONISASI PLAYBACK BACKSOUND
         const mainAudio = document.getElementById('audioElement');
         const backsoundAudio = document.getElementById('backsoundElement');
 
         mainAudio.addEventListener('play', () => {
             if (backsoundAudio.src) {
                 backsoundAudio.currentTime = mainAudio.currentTime % (backsoundAudio.duration || 1);
-                backsoundAudio.play().catch(e => console.log("Gagal memutar backsound secara otomatis:", e));
+                backsoundAudio.play().catch(e => console.log("Gagal memutar backsound:", e));
             }
         });
 
@@ -365,7 +357,6 @@
             }
         });
 
-        // INISIALISASI AUDIO GRAPH UNTUK MIXING & PREVIEW
         function initAudioContextAndNodes() {
             if (audioNodesInitialized) {
                 if (audioCtx && audioCtx.state === 'suspended') {
@@ -401,7 +392,6 @@
             audioNodesInitialized = true;
         }
 
-        // KONTROL LIVE PREVIEW SUARA
         function toggleAudioPreview() {
             if (!mainAudio.src) {
                 alert("Silakan unggah Audio Vokal Utama terlebih dahulu.");
@@ -438,7 +428,6 @@
             isPreviewPlaying = false;
         }
 
-        // Handle Upload Background (Multi Foto / Video)
         document.getElementById('mediaInput').addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
             if (!files.length) return;
@@ -698,16 +687,31 @@
                 reader.readAsDataURL(audioChunkBlob);
             });
 
-            let promptText = `Transkripsikan lirik lagu dari rekaman audio ini lengkap dengan timestamp waktu mulai dan waktu selesai yang presisi (dalam hitungan detik).
-Kamu wajib merespons dalam format JSON array murni tanpa ada teks pengantar atau blok markdown tambahan:
-[
-  {"text": "Lirik baris pertama", "start": 0.5, "end": 4.2}
-]`;
+            let promptText = "";
 
             if (lyricsRef && lyricsRef.trim() !== "") {
-                promptText += `\n\nGunakan referensi lirik resmi di bawah ini untuk mencocokkan kata demi kata agar tidak salah:
-${lyricsRef}`;
+                // Mode Pencocokan Berdasarkan Acuan Teks
+                promptText = `Dengarkan rekaman audio lagu ini dari detik ke-${chunkStartTime}. 
+Cocokkan vokal nyanyian pada audio dengan teks lirik resmi yang disediakan di bawah ini.
+Tentukan waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris kalimat lirik yang dinyanyikan.
+Gunakan acuan teks secara ketat dan jangan mengarang kata-kata di luar teks ini.
+
+Referensi Teks Lirik:
+"""
+${lyricsRef}
+"""`;
+            } else {
+                // Mode Transkripsi Otomatis (Jika dikosongkan)
+                promptText = `Dengarkan rekaman vokal/lagu pada audio ini.
+Tolong transkripsikan (tulis ulang secara otomatis) lirik lagu atau kata-kata yang didengar ke dalam bahasa aslinya secara akurat.
+Tentukan waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris kalimat lirik yang dinyanyikan.
+Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya hanya pada vokal penyanyi.`;
             }
+
+            promptText += `\n\nKamu wajib mengembalikan respon murni berupa JSON array sesuai skema di bawah ini, tanpa teks pengantar ataupun blok markdown:
+[
+  {"text": "Kalimat lirik yang terdeteksi", "start": 0.5, "end": 4.2}
+]`;
 
             const payload = {
                 contents: [{
@@ -750,6 +754,8 @@ ${lyricsRef}`;
 
                     const data = await response.json();
                     let responseText = data.candidates[0].content.parts[0].text.trim();
+                    console.log("Gemini Raw Response (Chunk " + chunkStartTime + "):", responseText);
+                    
                     const parsed = JSON.parse(responseText);
 
                     return parsed.map(item => ({
@@ -758,6 +764,7 @@ ${lyricsRef}`;
                         end: Number(item.end) + chunkStartTime
                     }));
                 } catch (e) {
+                    console.error("Gagal memproses bagian lirik pada detik ke-" + chunkStartTime, e);
                     attempts++;
                     await new Promise(r => setTimeout(r, 3000));
                 }
@@ -812,7 +819,7 @@ ${lyricsRef}`;
                     const startTime = i * chunkSize;
                     const endTime = Math.min((i + 1) * chunkSize, decodedAudio.duration);
 
-                    statusText.innerText = `🤖 Gemini AI sedang menganalisis lirik (Bagian ${i + 1}/${totalChunks})...`;
+                    statusText.innerText = `🤖 Gemini AI sedang mendeteksi vokal & lirik (Bagian ${i + 1}/${totalChunks})...`;
                     progressBar.style.width = `${10 + Math.floor(((i + 1) / totalChunks) * 40)}%`;
 
                     const chunkBuffer = sliceAudioBuffer(tempAudioCtx, decodedAudio, startTime, endTime);
