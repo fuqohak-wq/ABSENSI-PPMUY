@@ -44,7 +44,7 @@
                 <a href="#" class="flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition bg-blue-600 text-white shadow-md dark:bg-yellow-500 dark:text-gray-900">
                     ✨ EDIT DENGAN ANIMASI (1-15 Mins)
                 </a>
-                <a href="index.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-slate-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+                <a href="video.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-slate-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
                     🎬 EDIT VIDEO PANJANG
                 </a>
             </div>
@@ -357,7 +357,6 @@
         });
 
         mainAudio.addEventListener('timeupdate', () => {
-            // Memastikan backsound tidak melayang atau keluar sinkronisasi
             if (backsoundAudio.src && !backsoundAudio.paused) {
                 const expectedTime = mainAudio.currentTime % (backsoundAudio.duration || 1);
                 if (Math.abs(backsoundAudio.currentTime - expectedTime) > 0.5) {
@@ -380,28 +379,22 @@
             analyser.fftSize = 128;
             dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-            // Buat Media Element Sources
             sourcePrimary = audioCtx.createMediaElementSource(mainAudio);
             sourceBacksound = audioCtx.createMediaElementSource(backsoundAudio);
 
-            // Gain node untuk kontrol volume backsound
             gainBacksound = audioCtx.createGain();
             const initialVol = parseFloat(document.getElementById('backsoundVolume').value);
             gainBacksound.gain.value = initialVol;
 
-            // Destination node untuk recording dan visualizer mix
             dest = audioCtx.createMediaStreamDestination();
             mixBus = audioCtx.createGain();
 
-            // Hubungkan Vokal Utama langsung ke Analyser & Mixer Bus
             sourcePrimary.connect(analyser);
             sourcePrimary.connect(mixBus);
 
-            // Hubungkan Backsound ke Gain Node volume, baru ke Mixer Bus
             sourceBacksound.connect(gainBacksound);
             sourceBacksound.connect(mixBus);
 
-            // Mixer Bus dikeluarkan ke speaker dan ke modul perekam (dest)
             mixBus.connect(audioCtx.destination);
             mixBus.connect(dest);
 
@@ -461,7 +454,7 @@
                 mediaMode = 'video';
                 bgVideo = document.createElement('video');
                 bgVideo.src = URL.createObjectURL(firstFile);
-                bgVideo.muted = true; // Otomatis Silent
+                bgVideo.muted = true; 
                 bgVideo.loop = true;
                 bgVideo.play();
             } else {
@@ -516,11 +509,9 @@
             const currentTime = mainAudio ? mainAudio.currentTime : 0;
             const duration = mainAudio ? (mainAudio.duration || 1) : 1;
 
-            // 1. Render Background
             if (mediaMode === 'video' && bgVideo && bgVideo.readyState >= 2) {
                 drawScaledMedia(bgVideo);
             } else if (mediaMode === 'images' && bgImages.length > 0) {
-                // Multi-foto slideshow berdasarkan progress durasi audio
                 const imageIndex = Math.min(
                     Math.floor((currentTime / duration) * bgImages.length),
                     bgImages.length - 1
@@ -534,11 +525,9 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
-            // 2. Dark Overlay
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 3. Render Animated Effects
             if (currentEffect === 'rain' || currentEffect === 'lightning') {
                 ctx.strokeStyle = 'rgba(174, 194, 224, 0.6)';
                 ctx.lineWidth = 1.2;
@@ -595,9 +584,7 @@
                 }
             }
 
-            // 4. Render Text Lyric Dynamic
             renderLyricText();
-
             animationId = requestAnimationFrame(drawFrame);
         }
 
@@ -643,10 +630,9 @@
 
         drawFrame();
 
-        // --- FUNGSI AI & CHUNKING ---
-
-        async function audioBufferToWav8k(audioBuffer) {
-            const targetSampleRate = 8000;
+        // --- ENKODER AUDIO KE WAV ---
+        async function audioBufferToWav16k(audioBuffer) {
+            const targetSampleRate = 16000;
             const numChannels = 1;
             const offlineCtx = new OfflineAudioContext(numChannels, Math.ceil(audioBuffer.duration * targetSampleRate), targetSampleRate);
 
@@ -689,6 +675,22 @@
             return new Blob([wavBuffer], { type: 'audio/wav' });
         }
 
+        function sliceAudioBuffer(ctx, buffer, begin, end) {
+            const rate = buffer.sampleRate;
+            const startOffset = Math.floor(begin * rate);
+            const endOffset = Math.min(Math.floor(end * rate), buffer.length);
+            const frameCount = endOffset - startOffset;
+
+            if (frameCount <= 0) return null;
+
+            const newBuffer = ctx.createBuffer(buffer.numberOfChannels, frameCount, rate);
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const channelData = newBuffer.getChannelData(channel);
+                buffer.copyFromChannel(channelData, channel, startOffset);
+            }
+            return newBuffer;
+        }
+
         async function extractLyricsWithGeminiChunk(audioChunkBlob, chunkStartTime, apiKey, lyricsRef) {
             const base64Audio = await new Promise((res) => {
                 const reader = new FileReader();
@@ -696,15 +698,14 @@
                 reader.readAsDataURL(audioChunkBlob);
             });
 
-            let promptText = `Transkripsikan lirik lagu dari audio ini lengkap dengan timestamp waktu mulai dan selesai.
-Respons WAJIB berupa JSON ARRAY murni tanpa teks/markdown tambahan:
+            let promptText = `Transkripsikan lirik lagu dari rekaman audio ini lengkap dengan timestamp waktu mulai dan waktu selesai yang presisi (dalam hitungan detik).
+Kamu wajib merespons dalam format JSON array murni tanpa ada teks pengantar atau blok markdown tambahan:
 [
-  {"text": "Lirik baris pertama", "start": 0.0, "end": 4.5}
-]
-Catatan: Akurasikan detik lirik dengan lagu!`;
+  {"text": "Lirik baris pertama", "start": 0.5, "end": 4.2}
+]`;
 
             if (lyricsRef && lyricsRef.trim() !== "") {
-                promptText += `\n\nACUAN LIRIK ASLI (Gunakan kata/lirik ini secara ketat, hanya selaraskan urutan dan timestamp detiknya sesuai suara audio):
+                promptText += `\n\nGunakan referensi lirik resmi di bawah ini untuk mencocokkan kata demi kata agar tidak salah:
 ${lyricsRef}`;
             }
 
@@ -712,9 +713,24 @@ ${lyricsRef}`;
                 contents: [{
                     parts: [
                         { text: promptText },
-                        { inline_data: { mime_type: "audio/wav", data: base64Audio } }
+                        { inlineData: { mimeType: "audio/wav", data: base64Audio } }
                     ]
-                }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                text: { type: "STRING" },
+                                start: { type: "NUMBER" },
+                                end: { type: "NUMBER" }
+                            },
+                            required: ["text", "start", "end"]
+                        }
+                    }
+                }
             };
 
             let attempts = 0;
@@ -733,10 +749,9 @@ ${lyricsRef}`;
                     }
 
                     const data = await response.json();
-                    let responseText = data.candidates[0].content.parts[0].text;
-                    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-
+                    let responseText = data.candidates[0].content.parts[0].text.trim();
                     const parsed = JSON.parse(responseText);
+
                     return parsed.map(item => ({
                         text: item.text,
                         start: Number(item.start) + chunkStartTime,
@@ -758,7 +773,6 @@ ${lyricsRef}`;
             if (!apiKey) return alert('Silakan masukkan Gemini API Key terlebih dahulu.');
             if (!audioFile) return alert('Silakan upload file Audio MP3 terlebih dahulu.');
 
-            // Menghentikan preview jika sedang menyala
             if (isPreviewPlaying) {
                 stopAudioPreview();
             }
@@ -775,13 +789,11 @@ ${lyricsRef}`;
             try {
                 updateCanvasDimensions();
 
-                // Reset posisi video jika mode video
                 if (mediaMode === 'video' && bgVideo) {
                     bgVideo.currentTime = 0;
                     bgVideo.play();
                 }
 
-                // STEP 1: AI Transkripsi
                 statusText.innerText = "⏳ Membaca & mengompresi audio untuk Gemini AI...";
                 progressBar.style.width = "10%";
 
@@ -798,26 +810,23 @@ ${lyricsRef}`;
 
                 for (let i = 0; i < totalChunks; i++) {
                     const startTime = i * chunkSize;
-                    const duration = Math.min(chunkSize, decodedAudio.duration - startTime);
+                    const endTime = Math.min((i + 1) * chunkSize, decodedAudio.duration);
 
                     statusText.innerText = `🤖 Gemini AI sedang menganalisis lirik (Bagian ${i + 1}/${totalChunks})...`;
                     progressBar.style.width = `${10 + Math.floor(((i + 1) / totalChunks) * 40)}%`;
 
-                    const offlineCtx = new OfflineAudioContext(decodedAudio.numberOfChannels, Math.ceil(duration * decodedAudio.sampleRate), decodedAudio.sampleRate);
-                    const source = offlineCtx.createBufferSource();
-                    source.buffer = decodedAudio;
-                    source.connect(offlineCtx.destination);
-                    source.start(0, startTime, duration);
+                    const chunkBuffer = sliceAudioBuffer(tempAudioCtx, decodedAudio, startTime, endTime);
+                    if (!chunkBuffer) continue;
 
-                    const chunkBuffer = await offlineCtx.startRendering();
-                    const wavBlob = await audioBufferToWav8k(chunkBuffer);
+                    const wavBlob = await audioBufferToWav16k(chunkBuffer);
                     const chunkLyrics = await extractLyricsWithGeminiChunk(wavBlob, startTime, apiKey, lyricsRef);
 
                     lyricTimestamps.push(...chunkLyrics);
                 }
 
-                // STEP 2: Inisialisasi Audio Nodes untuk perekaman mixing
-                statusText.innerText = "📹 Memulai Perekaman Video MP4 Ringan...";
+                lyricTimestamps.sort((a, b) => a.start - b.start);
+
+                statusText.innerText = "📹 Memulai Perekaman Video MP4...";
                 progressBar.style.width = "50%";
 
                 initAudioContextAndNodes();
@@ -832,7 +841,7 @@ ${lyricsRef}`;
                     'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
                     'video/mp4;codecs=h264,aac',
                     'video/mp4',
-                    'video/webm;codecs=vp9',
+                    'video/webm;codecs=vp9,opus',
                     'video/webm'
                 ];
                 
@@ -861,7 +870,7 @@ ${lyricsRef}`;
                     downloadBtn.download = `Animated-Lyric-${Date.now()}.${isMp4 ? 'mp4' : 'webm'}`;
 
                     document.getElementById('outputArea').classList.remove('hidden');
-                    statusText.innerText = `🎉 Video selesai! Ukuran file ringan (~${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
+                    statusText.innerText = `🎉 Video selesai! Ukuran file: (~${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
                     progressBar.style.width = "100%";
                     renderBtn.disabled = false;
                     renderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
