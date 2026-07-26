@@ -61,6 +61,25 @@
             <button type="submit" id="btn-login" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all cursor-pointer">MASUK SISTEM</button>
         </form>
     </div>
+
+    <!-- ========================================================= -->
+    <!-- DITAMBAHKAN: BANNER CUSTOM POP-UP INSTALL PWA             -->
+    <!-- ========================================================= -->
+    <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-download"></i>
+        </div>
+        <div>
+          <h4 class="font-black text-xs uppercase tracking-wide">Install Aplikasi PPMUY</h4>
+          <p class="text-[10px] font-bold text-slate-800 leading-tight">Pasang di layar utama HP agar cepat diakses!</p>
+        </div>
+      </div>
+      <button id="btn-install-pwa" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 font-black text-xs px-3 py-2 rounded-lg cursor-pointer transition-all uppercase tracking-wider flex-shrink-0 ml-2 shadow">
+        INSTALL
+      </button>
+    </div>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
@@ -93,6 +112,42 @@
                 } else { alert(r.message); }
             } catch(err) { alert("Koneksi gagal atau masalah CORS!"); }
             finally { b.disabled = false; b.innerText = "MASUK SISTEM"; }
+        });
+
+        // =========================================================
+        // DITAMBAHKAN: LOGIKA PEMICU BANNER INSTALL AUTOMATIS
+        // =========================================================
+        let deferredPrompt;
+        const installBanner = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('btn-install-pwa');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBanner) {
+                installBanner.classList.remove('hidden');
+            }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('Pengguna menyetujui instalasi PWA');
+                    }
+                    deferredPrompt = null;
+                    installBanner.classList.add('hidden');
+                }
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            if (installBanner) {
+                installBanner.classList.add('hidden');
+            }
+            console.log('PWA berhasil terinstall');
         });
     </script>
 </body>
