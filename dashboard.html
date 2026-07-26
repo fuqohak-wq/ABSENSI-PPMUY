@@ -374,6 +374,23 @@
 
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN CORE ECOSYSTEM</footer>
 
+    <!-- POP-UP BANNER INSTALL PWA -->
+    <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-download"></i>
+        </div>
+        <div>
+          <h4 class="font-black text-xs uppercase tracking-wide">Install Aplikasi PPMUY</h4>
+          <p class="text-[10px] font-bold text-slate-800 leading-tight">Pasang di layar utama HP agar cepat diakses!</p>
+        </div>
+      </div>
+      <button id="btn-install-pwa" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 font-black text-xs px-3 py-2 rounded-lg cursor-pointer transition-all uppercase tracking-wider flex-shrink-0 ml-2 shadow">
+        INSTALL
+      </button>
+    </div>
+
+    <!-- SCRIPT UTAMA DASHBOARD -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
@@ -720,6 +737,45 @@
             localStorage.removeItem('cache_rekap_time');
             window.location.href = "index.html";
         }
+    </script>
+
+    <!-- SCRIPT REGISTRASI SERVICE WORKER & HANDLING EVENT INSTALL PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker Terdaftar!', reg))
+            .catch(err => console.error('Service Worker Gagal:', err));
+        });
+      }
+
+      let deferredPrompt;
+      const installBanner = document.getElementById('pwa-install-banner');
+      const installBtn = document.getElementById('btn-install-pwa');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBanner) installBanner.classList.remove('hidden');
+      });
+
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+              console.log('Pengguna menyetujui instalasi');
+            }
+            deferredPrompt = null;
+            installBanner.classList.add('hidden');
+          }
+        });
+      }
+
+      window.addEventListener('appinstalled', () => {
+        if (installBanner) installBanner.classList.add('hidden');
+      });
     </script>
 </body>
 </html>
