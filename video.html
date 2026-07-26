@@ -24,7 +24,7 @@
             
             <!-- MENU NAVIGASI PILIHAN EDIT -->
             <div class="mt-6 flex justify-center gap-3 bg-gray-100 p-1.5 rounded-xl">
-                <a href="animasi.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-gray-600 hover:text-green-700 hover:bg-white/50">
+                <a href="mp3.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-gray-600 hover:text-green-700 hover:bg-white/50">
                     ✨ EDIT DENGAN ANIMASI
                 </a>
                 <a href="#" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition bg-white text-green-700 shadow-sm border border-gray-200">
@@ -206,7 +206,9 @@
                     progressBar.style.width = `${10 + Math.floor((i / numChunks) * 45)}%`;
 
                     const chunkBuffer = sliceAudioBuffer(audioCtx, fullAudioBuffer, startTime, endTime);
-                    const compressedWav = await compressAudioToUltraLightWav(chunkBuffer);
+                    if (!chunkBuffer) continue;
+
+                    const compressedWav = await audioBufferToWav16k(chunkBuffer);
                     const base64Audio = await blobToBase64(compressedWav);
 
                     const chunkTimestamps = await fetchWithRetry(apiKey, base64Audio, lyricsText, startTime, endTime, statusText);
@@ -227,7 +229,7 @@
 
                 lyricTimestamps.sort((a, b) => a.start - b.start);
 
-                statusText.innerText = "✅ Sinkronisasi selesai! Memulai perekaman video MP4...";
+                statusText.innerText = "✅ Sinkronisasi selesai! Memulai perekaman video...";
                 progressBar.style.width = "60%";
 
                 await renderAndRecord(audio, imageFile);
@@ -235,7 +237,6 @@
             } catch (error) {
                 console.error(error);
                 statusText.innerText = "❌ Terjadi kesalahan: " + error.message;
-                statusText.classList.add('text-red-600');
             } finally {
                 renderBtn.disabled = false;
                 renderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -266,51 +267,61 @@
         function sliceAudioBuffer(ctx, buffer, begin, end) {
             const rate = buffer.sampleRate;
             const startOffset = Math.floor(begin * rate);
-            const endOffset = Math.floor(end * rate);
+            const endOffset = Math.min(Math.floor(end * rate), buffer.length);
             const frameCount = endOffset - startOffset;
 
-            const newBuffer = ctx.createBuffer(1, frameCount, rate);
-            const channelData = newBuffer.getChannelData(0);
-            buffer.copyFromChannel(channelData, 0, startOffset);
+            if (frameCount <= 0) return null;
 
+            const newBuffer = ctx.createBuffer(buffer.numberOfChannels, frameCount, rate);
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const channelData = newBuffer.getChannelData(channel);
+                buffer.copyFromChannel(channelData, channel, startOffset);
+            }
             return newBuffer;
         }
 
-        async function compressAudioToUltraLightWav(buffer) {
-            const targetSampleRate = 8000;
-            const duration = buffer.duration;
-            const offlineCtx = new OfflineAudioContext(1, Math.floor(duration * targetSampleRate), targetSampleRate);
+        async function audioBufferToWav16k(audioBuffer) {
+            const targetSampleRate = 16000;
+            const numChannels = 1;
+            const offlineCtx = new OfflineAudioContext(numChannels, Math.ceil(audioBuffer.duration * targetSampleRate), targetSampleRate);
 
             const source = offlineCtx.createBufferSource();
-            source.buffer = buffer;
-            source.start(0);
+            source.buffer = audioBuffer;
             source.connect(offlineCtx.destination);
+            source.start(0);
 
             const renderedBuffer = await offlineCtx.startRendering();
+            const pcmData = renderedBuffer.getChannelData(0);
 
-            const numOfChan = 1;
-            const length = renderedBuffer.length * numOfChan + 44;
-            const out = new DataView(new ArrayBuffer(length));
-            const channels = renderedBuffer.getChannelData(0);
-            let pos = 0;
+            const wavBuffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(wavBuffer);
 
-            function setUint16(data) { out.setUint16(pos, data, true); pos += 2; }
-            function setUint32(data) { out.setUint32(pos, data, true); pos += 4; }
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            };
 
-            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157);
-            setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan);
-            setUint32(targetSampleRate); setUint32(targetSampleRate * numOfChan);
-            setUint16(numOfChan); setUint16(8);
-            setUint32(0x61746164); setUint32(length - pos - 4);
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, targetSampleRate, true);
+            view.setUint32(28, targetSampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
 
-            for (let i = 0; i < renderedBuffer.length; i++) {
-                let sample = Math.max(-1, Math.min(1, channels[i]));
-                let val = Math.floor((sample + 1) * 127.5);
-                out.setUint8(pos, val);
-                pos += 1;
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++) {
+                const s = Math.max(-1, Math.min(1, pcmData[i]));
+                view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+                offset += 2;
             }
 
-            return new Blob([out], { type: 'audio/wav' });
+            return new Blob([wavBuffer], { type: 'audio/wav' });
         }
 
         function blobToBase64(blob) {
@@ -323,13 +334,14 @@
         }
 
         async function getChunkTimestampsFromGemini(apiKey, base64Audio, lyrics, chunkStart, chunkEnd) {
-            const promptText = `Ini adalah potongan audio lagu dari detik ke-${chunkStart} sampai detik ke-${chunkEnd}.
-Daftar lirik:
+            const promptText = `Ini adalah audio lagu dari detik ke-${chunkStart} sampai detik ke-${chunkEnd}.
+Daftar referensi teks lirik:
 """
 ${lyrics}
 """
-Kembalikan JSON Array SAHAJA:
-[{"text": "lirik", "start": 3.2, "end": 6.8}]`;
+Tolong transkripsikan rekaman vokal pada audio ini dan sesuaikan dengan daftar lirik tersebut beserta rentang detiknya (mulai dari 0.0 sebagai awal audio ini).
+Kembalikan respons murni dalam format JSON Array berikut (tanpa blok markdown):
+[{"text": "lirik", "start": 1.2, "end": 4.5}]`;
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -339,10 +351,25 @@ Kembalikan JSON Array SAHAJA:
                 body: JSON.stringify({
                     contents: [{
                         parts: [
-                            { inlineData: { mimeType: "audio/wav", data: base64Audio } },
-                            { text: promptText }
+                            { text: promptText },
+                            { inlineData: { mimeType: "audio/wav", data: base64Audio } }
                         ]
-                    }]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    text: { type: "STRING" },
+                                    start: { type: "NUMBER" },
+                                    end: { type: "NUMBER" }
+                                },
+                                required: ["text", "start", "end"]
+                            }
+                        }
+                    }
                 })
             });
 
@@ -351,10 +378,9 @@ Kembalikan JSON Array SAHAJA:
 
             const data = await response.json();
             let rawText = data.candidates[0]?.content?.parts[0]?.text || "[]";
-            rawText = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
             
             try {
-                return { status: 200, data: JSON.parse(rawText) };
+                return { status: 200, data: JSON.parse(rawText.trim()) };
             } catch (e) {
                 return { status: 200, data: [] };
             }
@@ -365,7 +391,6 @@ Kembalikan JSON Array SAHAJA:
                 const canvas = document.getElementById('renderCanvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Dimensi dioptimalkan agar ringan namun tetap jernih di layar HP
                 if (selectedFormat === 'landscape') {
                     canvas.width = 1280;
                     canvas.height = 720;
@@ -383,14 +408,12 @@ Kembalikan JSON Array SAHAJA:
                     source.connect(dest);
                     source.connect(audioCtx.destination);
 
-                    // Ambil stream 25 FPS (ringan & smooth)
                     const canvasStream = canvas.captureStream(25); 
                     const combinedStream = new MediaStream([
                         ...canvasStream.getVideoTracks(),
                         ...dest.stream.getAudioTracks()
                     ]);
 
-                    // DETEKSI FORMAT MP4 & OPTIMASI BITRATE
                     const mp4Types = [
                         'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
                         'video/mp4;codecs=h264,aac',
@@ -402,7 +425,6 @@ Kembalikan JSON Array SAHAJA:
                     const chosenMime = mp4Types.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
                     const isMp4 = chosenMime.includes('mp4');
 
-                    // Ambil batas bitrate dari pilihan UI
                     const targetBitrate = parseInt(document.getElementById('bitrateSetting')?.value || '1500000');
 
                     const recorderOptions = {
@@ -430,7 +452,7 @@ Kembalikan JSON Array SAHAJA:
                         downloadBtn.download = `Lirik-Video-${Date.now()}.${isMp4 ? 'mp4' : 'webm'}`;
                         
                         document.getElementById('outputArea').classList.remove('hidden');
-                        document.getElementById('statusText').innerText = `🎉 Video MP4 selesai! Selesai diproses (~${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
+                        document.getElementById('statusText').innerText = `🎉 Video selesai diproses! Ukuran file: (~${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
                         document.getElementById('progressBar').style.width = "100%";
                         resolve();
                     };
@@ -459,7 +481,6 @@ Kembalikan JSON Array SAHAJA:
                         const selectedFont = document.getElementById('fontFamily')?.value || 'sans-serif';
                         const selectedPos = document.getElementById('textPosition')?.value || 'bottom';
 
-                        // Render Gambar Background
                         ctx.drawImage(img, imgX, imgY, imgW, imgH);
                         ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -482,11 +503,9 @@ Kembalikan JSON Array SAHAJA:
                                 lastText = text;
                             }
 
-                            // Box Background Teks
                             ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
                             ctx.fillRect(canvas.width / 2 - cachedTextWidth / 2 - 16, textY - fontSize + 4, cachedTextWidth + 32, fontSize + 16);
 
-                            // Text Outline & Fill
                             ctx.strokeStyle = "#000000";
                             ctx.lineWidth = 5;
                             ctx.strokeText(text, canvas.width / 2, textY);
