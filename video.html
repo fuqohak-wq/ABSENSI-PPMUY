@@ -54,8 +54,8 @@
 
             <!-- 4. Tempel Lirik -->
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">📝 4. Tempel Lirik Teks Asli (Berurutan per baris):</label>
-                <textarea id="lyricsInput" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" placeholder="Masukkan lirik di sini..."></textarea>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">📝 4. Tempel Lirik Teks Asli (Kosongkan jika ingin AI menulis lirik otomatis secara mandiri):</label>
+                <textarea id="lyricsInput" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm" placeholder="Kosongkan bagian ini jika Anda ingin AI mendeteksi vokal lagu dan menulis teks lirik secara otomatis..."></textarea>
             </div>
 
             <!-- 5. KUSTOMISASI LIRIK & KUALITAS -->
@@ -167,7 +167,6 @@
             if (!apiKey) return alert("Silakan masukkan Gemini API Key.");
             if (!audioFile) return alert("Silakan unggah file audio MP3.");
             if (!imageFile) return alert("Silakan unggah gambar background.");
-            if (!lyricsText) return alert("Silakan isi teks lirik.");
 
             const statusArea = document.getElementById('statusArea');
             const statusText = document.getElementById('statusText');
@@ -202,7 +201,7 @@
                     const startTime = i * chunkSize;
                     const endTime = Math.min((i + 1) * chunkSize, totalDuration);
 
-                    statusText.innerText = `🤖 Menganalisis lirik bagian ${i + 1} dari ${numChunks}...`;
+                    statusText.innerText = `🤖 AI mendeteksi & menyusun lirik bagian ${i + 1} dari ${numChunks}...`;
                     progressBar.style.width = `${10 + Math.floor((i / numChunks) * 45)}%`;
 
                     const chunkBuffer = sliceAudioBuffer(audioCtx, fullAudioBuffer, startTime, endTime);
@@ -334,14 +333,27 @@
         }
 
         async function getChunkTimestampsFromGemini(apiKey, base64Audio, lyrics, chunkStart, chunkEnd) {
-            const promptText = `Ini adalah audio lagu dari detik ke-${chunkStart} sampai detik ke-${chunkEnd}.
+            let promptText = "";
+
+            if (lyrics && lyrics.trim() !== "") {
+                // Mode Pencocokan Berdasarkan Acuan Teks
+                promptText = `Ini adalah audio lagu dari detik ke-${chunkStart} sampai detik ke-${chunkEnd}.
 Daftar referensi teks lirik:
 """
 ${lyrics}
 """
-Tolong transkripsikan rekaman vokal pada audio ini dan sesuaikan dengan daftar lirik tersebut beserta rentang detiknya (mulai dari 0.0 sebagai awal audio ini).
-Kembalikan respons murni dalam format JSON Array berikut (tanpa blok markdown):
-[{"text": "lirik", "start": 1.2, "end": 4.5}]`;
+Tolong dengarkan vokal nyanyian pada audio dan cocokkan dengan lirik resmi tersebut.
+Tentukan waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris lirik yang dinyanyikan.`;
+            } else {
+                // Mode Transkripsi Otomatis (Jika dikosongkan)
+                promptText = `Ini adalah audio lagu dari detik ke-${chunkStart} sampai detik ke-${chunkEnd}.
+Tolong transkripsikan secara mandiri dan otomatis lirik vokal atau kata-kata yang didengar ke dalam bahasa aslinya secara akurat.
+Tentukan juga rentang waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris kalimat lirik yang kamu dengar.
+Abaikan musik instrumen latar belakang, fokuslah hanya pada vokal penyanyi.`;
+            }
+
+            promptText += `\n\nKamu wajib mengembalikan respon murni berupa JSON array sesuai skema di bawah ini, tanpa teks pengantar ataupun blok markdown:
+[{"text": "lirik baris pertama", "start": 1.2, "end": 4.5}]`;
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -378,6 +390,7 @@ Kembalikan respons murni dalam format JSON Array berikut (tanpa blok markdown):
 
             const data = await response.json();
             let rawText = data.candidates[0]?.content?.parts[0]?.text || "[]";
+            console.log("Gemini Raw Response (Chunk " + chunkStart + "):", rawText);
             
             try {
                 return { status: 200, data: JSON.parse(rawText.trim()) };
