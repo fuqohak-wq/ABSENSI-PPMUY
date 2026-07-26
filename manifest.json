@@ -1,0 +1,21 @@
+{
+  "short_name": "PPMU Yahyawiyyah",
+  "name": "Manajemen Santri PPMU Yahyawiyyah",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#0d5c3a",
+  "theme_color": "#0d5c3a",
+  "display": "standalone",
+  "orientation": "portrait"
+}
