@@ -44,19 +44,10 @@
                 <a href="#" class="flex-1 py-2.5 px-4 rounded-lg font-bold text-sm transition bg-blue-600 text-white shadow-md dark:bg-yellow-500 dark:text-gray-900">
                     ✨ EDIT DENGAN ANIMASI (1-15 Mins)
                 </a>
-                <a href="video.html" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm transition text-slate-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
-                    🎬 EDIT VIDEO PANJANG
-                </a>
             </div>
         </div>
 
         <div class="p-6 space-y-6">
-            <!-- API Key Input -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🔑 Gemini API Key:</label>
-                <input type="password" id="apiKey" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700 rounded-lg text-sm text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 dark:focus:border-yellow-500" placeholder="Masukkan Gemini API Key Anda...">
-            </div>
-
             <!-- Upload Options -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -82,10 +73,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                     <div>
                         <label class="block text-xs text-slate-700 dark:text-gray-300 mb-1 flex justify-between">
-                            <span>Volume Backsound:</span>
-                            <span id="backsoundVolLabel" class="font-bold text-blue-600 dark:text-yellow-400">20%</span>
+                            <span>Volume Backsound (Meredam instrumen latar):</span>
+                            <span id="backsoundVolLabel" class="font-bold text-blue-600 dark:text-yellow-400">10%</span>
                         </label>
-                        <input type="range" id="backsoundVolume" min="0" max="1" step="0.01" value="0.20" class="w-full h-2 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-yellow-500">
+                        <!-- Nilai awal diset rendah (10%) untuk mencegah vokal tertutup -->
+                        <input type="range" id="backsoundVolume" min="0" max="1" step="0.01" value="0.10" class="w-full h-2 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-yellow-500">
                     </div>
                     <div class="flex gap-2">
                         <button type="button" id="previewPlayBtn" onclick="toggleAudioPreview()" class="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg font-semibold text-sm text-white dark:text-gray-200 transition flex items-center justify-center gap-2 shadow-sm">
@@ -211,8 +203,11 @@
                 <h3 class="text-lg font-bold text-slate-800 dark:text-gray-200">Hasil Video MP4 Ultra Lightweight:</h3>
                 <video id="videoPreview" controls class="w-full rounded-lg shadow-md max-h-[400px] bg-black"></video>
                 <a id="downloadBtn" class="block text-center py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow-md transition cursor-pointer">
-                    💾 Download Video (MP4 Format)
+                    💾 Download Video (Lokal)
                 </a>
+                <button id="saveToDriveBtn" onclick="uploadOutputToDrive()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition text-center">
+                    ☁️ Simpan Otomatis ke Google Drive & Cloud Sheets
+                </button>
             </div>
         </div>
     </div>
@@ -222,6 +217,9 @@
     <audio id="backsoundElement" class="hidden" loop></audio>
 
     <script>
+        // Endpoint Google Apps Script Web App Anda
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxR_lKGIA2JglT9tg3K3ms0S2Ayj9bgOPeylUEDotmW825f4ergDTluvrtCCyHe3kLUFw/exec";
+
         let currentEffect = 'rain';
         let animationId = null;
         let particles = [];
@@ -232,6 +230,7 @@
         let sourcePrimary, sourceBacksound, gainBacksound, mixBus, dest;
         let audioNodesInitialized = false;
         let isPreviewPlaying = false;
+        let finalRenderedBlob = null; 
 
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
@@ -586,6 +585,9 @@
             ctx.drawImage(media, (canvas.width / 2) - (imgW / 2), (canvas.height / 2) - (imgH / 2), imgW, imgH);
         }
 
+        /**
+         * Menggambar Teks Lirik dengan Word Wrap Dinamis agar rapi dan tidak terpotong di tepi layar.
+         */
         function renderLyricText() {
             const selectedFont = document.getElementById('fontFamily').value;
             const selectedPos = document.getElementById('textPosition').value;
@@ -594,26 +596,67 @@
             const activeLyric = lyricTimestamps.find(l => currentTime >= l.start && currentTime <= l.end);
 
             if (activeLyric && activeLyric.text) {
-                const fontSize = selectedFormat === 'landscape' ? 26 : 24;
+                const fontSize = selectedFormat === 'landscape' ? 24 : 20;
                 ctx.font = `bold ${fontSize}px ${selectedFont}`;
                 ctx.textAlign = "center";
 
-                let textY = canvas.height * 0.82; 
-                if (selectedPos === 'center') textY = canvas.height * 0.5;
-                if (selectedPos === 'top') textY = canvas.height * 0.2;
+                const paddingHorizontal = 24;
+                const maxTextWidth = canvas.width - (paddingHorizontal * 2);
+                const words = activeLyric.text.split(" ");
+                const lines = [];
+                let currentLine = words[0] || "";
 
-                const text = activeLyric.text;
-                const textWidth = ctx.measureText(text).width;
+                // Melakukan pemotongan baris (word wrap) otomatis
+                for (let i = 1; i < words.length; i++) {
+                    const testLine = currentLine + " " + words[i];
+                    const testWidth = ctx.measureText(testLine).width;
+                    if (testWidth < maxTextWidth) {
+                        currentLine = testLine;
+                    } else {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    }
+                }
+                if (currentLine) {
+                    lines.push(currentLine);
+                }
 
-                ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-                ctx.fillRect(canvas.width / 2 - textWidth / 2 - 15, textY - fontSize + 4, textWidth + 30, fontSize + 14);
+                // Kalkulasi letak vertikal (Y)
+                let baseTextY = canvas.height * 0.82; 
+                if (selectedPos === 'center') baseTextY = canvas.height * 0.5;
+                if (selectedPos === 'top') baseTextY = canvas.height * 0.2;
 
-                ctx.strokeStyle = "#000000";
-                ctx.lineWidth = 4;
-                ctx.strokeText(text, canvas.width / 2, textY);
+                const lineHeight = fontSize + 8;
+                let startY = baseTextY;
+                
+                if (selectedPos === 'bottom') {
+                    startY = baseTextY - ((lines.length - 1) * lineHeight);
+                } else if (selectedPos === 'center') {
+                    startY = baseTextY - (((lines.length - 1) * lineHeight) / 2);
+                }
 
-                ctx.fillStyle = "#facc15";
-                ctx.fillText(text, canvas.width / 2, textY);
+                lines.forEach((line, index) => {
+                    const lineY = startY + (index * lineHeight);
+                    const textWidth = ctx.measureText(line).width;
+
+                    // Background transparan tulisan lirik
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+                    ctx.fillRect(
+                        (canvas.width / 2) - (textWidth / 2) - 12, 
+                        lineY - fontSize + 3, 
+                        textWidth + 24, 
+                        fontSize + 10
+                    );
+
+                    // Border (Stroke) Hitam
+                    ctx.strokeStyle = "#000000";
+                    ctx.lineWidth = 4;
+                    ctx.strokeText(line, canvas.width / 2, lineY);
+
+                    // Isi Teks Kuning
+                    ctx.fillStyle = "#facc15";
+                    ctx.fillText(line, canvas.width / 2, lineY);
+                });
             }
         }
 
@@ -626,7 +669,7 @@
             const offlineCtx = new OfflineAudioContext(numChannels, Math.ceil(audioBuffer.duration * targetSampleRate), targetSampleRate);
 
             const source = offlineCtx.createBufferSource();
-            source.buffer = audioBuffer;
+            source.buffer = offlineCtx.renderBuffer || audioBuffer;
             source.connect(offlineCtx.destination);
             source.start(0);
 
@@ -680,105 +723,40 @@
             return newBuffer;
         }
 
-        async function extractLyricsWithGeminiChunk(audioChunkBlob, chunkStartTime, apiKey, lyricsRef) {
-            const base64Audio = await new Promise((res) => {
+        /**
+         * Mengirimkan audio ke Google Apps Script Web App secara eksternal (POST)
+         */
+        async function callGeminiBackend(audioBlob, chunkStartTime, lyricsRef) {
+            const base64Audio = await new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.onloadend = () => res(reader.result.split(',')[1]);
-                reader.readAsDataURL(audioChunkBlob);
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(audioBlob);
             });
 
-            let promptText = "";
-
-            if (lyricsRef && lyricsRef.trim() !== "") {
-                // Mode Pencocokan Berdasarkan Acuan Teks
-                promptText = `Dengarkan rekaman audio lagu ini dari detik ke-${chunkStartTime}. 
-Cocokkan vokal nyanyian pada audio dengan teks lirik resmi yang disediakan di bawah ini.
-Tentukan waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris kalimat lirik yang dinyanyikan.
-Gunakan acuan teks secara ketat dan jangan mengarang kata-kata di luar teks ini.
-
-Referensi Teks Lirik:
-"""
-${lyricsRef}
-"""`;
-            } else {
-                // Mode Transkripsi Otomatis (Jika dikosongkan)
-                promptText = `Dengarkan rekaman vokal/lagu pada audio ini.
-Tolong transkripsikan (tulis ulang secara otomatis) lirik lagu atau kata-kata yang didengar ke dalam bahasa aslinya secara akurat.
-Tentukan waktu mulai (start) dan selesai (end) dalam hitungan detik untuk setiap baris kalimat lirik yang dinyanyikan.
-Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya hanya pada vokal penyanyi.`;
-            }
-
-            promptText += `\n\nKamu wajib mengembalikan respon murni berupa JSON array sesuai skema di bawah ini, tanpa teks pengantar ataupun blok markdown:
-[
-  {"text": "Kalimat lirik yang terdeteksi", "start": 0.5, "end": 4.2}
-]`;
-
             const payload = {
-                contents: [{
-                    parts: [
-                        { text: promptText },
-                        { inlineData: { mimeType: "audio/wav", data: base64Audio } }
-                    ]
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                text: { type: "STRING" },
-                                start: { type: "NUMBER" },
-                                end: { type: "NUMBER" }
-                            },
-                            required: ["text", "start", "end"]
-                        }
-                    }
-                }
+                action: "transcribe",
+                audioBase64: base64Audio,
+                chunkStartTime: chunkStartTime,
+                lyricsRef: lyricsRef
             };
 
-            let attempts = 0;
-            while (attempts < 5) {
-                try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.status === 429 || response.status === 503) {
-                        attempts++;
-                        await new Promise(r => setTimeout(r, 4000 * attempts));
-                        continue;
-                    }
-
-                    const data = await response.json();
-                    let responseText = data.candidates[0].content.parts[0].text.trim();
-                    console.log("Gemini Raw Response (Chunk " + chunkStartTime + "):", responseText);
-                    
-                    const parsed = JSON.parse(responseText);
-
-                    return parsed.map(item => ({
-                        text: item.text,
-                        start: Number(item.start) + chunkStartTime,
-                        end: Number(item.end) + chunkStartTime
-                    }));
-                } catch (e) {
-                    console.error("Gagal memproses bagian lirik pada detik ke-" + chunkStartTime, e);
-                    attempts++;
-                    await new Promise(r => setTimeout(r, 3000));
-                }
+            const response = await fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || "Gagal melakukan transkripsi.");
             }
-            return [];
+            return result.data;
         }
 
         async function startRenderProcess() {
-            const apiKey = document.getElementById('apiKey').value.trim();
             const audioFile = document.getElementById('audioInput').files[0];
             const lyricsRef = document.getElementById('lyricsReference').value;
 
-            if (!apiKey) return alert('Silakan masukkan Gemini API Key terlebih dahulu.');
-            if (!audioFile) return alert('Silakan upload file Audio MP3 terlebih dahulu.');
+            if (!audioFile) return alert('Silakan unggah berkas Audio Vokal Utama terlebih dahulu.');
 
             if (isPreviewPlaying) {
                 stopAudioPreview();
@@ -801,7 +779,7 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                     bgVideo.play();
                 }
 
-                statusText.innerText = "⏳ Membaca & mengompresi audio untuk Gemini AI...";
+                statusText.innerText = "⏳ Membaca & menyiapkan audio untuk Gemini AI...";
                 progressBar.style.width = "10%";
 
                 mainAudio.src = URL.createObjectURL(audioFile);
@@ -826,14 +804,15 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                     if (!chunkBuffer) continue;
 
                     const wavBlob = await audioBufferToWav16k(chunkBuffer);
-                    const chunkLyrics = await extractLyricsWithGeminiChunk(wavBlob, startTime, apiKey, lyricsRef);
-
+                    
+                    // Memanggil REST API Apps Script
+                    const chunkLyrics = await callGeminiBackend(wavBlob, startTime, lyricsRef);
                     lyricTimestamps.push(...chunkLyrics);
                 }
 
                 lyricTimestamps.sort((a, b) => a.start - b.start);
 
-                statusText.innerText = "📹 Memulai Perekaman Video MP4...";
+                statusText.innerText = "📹 Memulai Perekaman Video Format MP4...";
                 progressBar.style.width = "50%";
 
                 initAudioContextAndNodes();
@@ -866,8 +845,8 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                 recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
                 recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: chosenMime });
-                    const videoUrl = URL.createObjectURL(blob);
+                    finalRenderedBlob = new Blob(chunks, { type: chosenMime });
+                    const videoUrl = URL.createObjectURL(finalRenderedBlob);
 
                     const videoPreview = document.getElementById('videoPreview');
                     const downloadBtn = document.getElementById('downloadBtn');
@@ -877,7 +856,7 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                     downloadBtn.download = `Animated-Lyric-${Date.now()}.${isMp4 ? 'mp4' : 'webm'}`;
 
                     document.getElementById('outputArea').classList.remove('hidden');
-                    statusText.innerText = `🎉 Video selesai! Ukuran file: (~${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
+                    statusText.innerText = `🎉 Video selesai diproses secara lokal! Ukuran berkas: (~${(finalRenderedBlob.size / (1024 * 1024)).toFixed(2)} MB)`;
                     progressBar.style.width = "100%";
                     renderBtn.disabled = false;
                     renderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -893,7 +872,7 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                 mainAudio.ontimeupdate = () => {
                     const progressPercent = 50 + ((mainAudio.currentTime / mainAudio.duration) * 50);
                     progressBar.style.width = `${progressPercent}%`;
-                    statusText.innerText = `🎬 Merender Video: ${Math.floor(mainAudio.currentTime)}s / ${Math.floor(mainAudio.duration)}s`;
+                    statusText.innerText = `🎬 Menulis Video & Efek: ${Math.floor(mainAudio.currentTime)}s / ${Math.floor(mainAudio.duration)}s`;
                 };
 
                 mainAudio.onended = () => {
@@ -906,6 +885,62 @@ Abaikan musik instrumen atau ketukan drum latar belakang, fokuslah sepenuhnya ha
                 alert("Terjadi kesalahan: " + err.message);
                 renderBtn.disabled = false;
                 renderBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        /**
+         * Mengunggah hasil render Blob dari client ke Google Drive & Cloud Sheets via POST REST API
+         */
+        async function uploadOutputToDrive() {
+            if (!finalRenderedBlob) {
+                alert("Tidak ada rekaman video yang tersedia untuk disimpan.");
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveToDriveBtn');
+            const originalText = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = "⏳ Sedang mengunggah ke Google Drive & mencatat ke Sheets...";
+            saveBtn.className = "w-full py-3 bg-amber-500 text-white font-bold rounded-lg shadow-md transition text-center cursor-not-allowed";
+
+            try {
+                const base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(finalRenderedBlob);
+                });
+
+                const formatExtension = finalRenderedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+                const fileName = `Animated-Lyric-${Date.now()}.${formatExtension}`;
+                const lyricsJSON = JSON.stringify(lyricTimestamps);
+
+                const payload = {
+                    action: "saveVideo",
+                    videoBase64: base64Data,
+                    fileName: fileName,
+                    lyricsJSON: lyricsJSON
+                };
+
+                const response = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+                saveBtn.className = "w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition text-center";
+
+                if (result.success) {
+                    alert(`File Berhasil disimpan!\n\nNama Berkas: ${result.fileName}\nFolder: Animated Music Videos\nDatabase Log: Video Render Log`);
+                } else {
+                    alert("Penyimpanan gagal: " + result.error);
+                }
+            } catch (err) {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+                saveBtn.className = "w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition text-center";
+                alert("Gagal terhubung ke Google Drive: " + err.message);
             }
         }
     </script>
