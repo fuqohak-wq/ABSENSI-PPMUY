@@ -76,7 +76,6 @@
                             <span>Volume Backsound (Meredam instrumen latar):</span>
                             <span id="backsoundVolLabel" class="font-bold text-blue-600 dark:text-yellow-400">10%</span>
                         </label>
-                        <!-- Nilai awal diset rendah (10%) untuk mencegah vokal tertutup -->
                         <input type="range" id="backsoundVolume" min="0" max="1" step="0.01" value="0.10" class="w-full h-2 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-yellow-500">
                     </div>
                     <div class="flex gap-2">
@@ -269,6 +268,13 @@
             }
             selectFormat(selectedFormat);
             selectEffect(currentEffect);
+
+            // Terapkan batas volume native awal saat halaman selesai dimuat
+            const backsoundEl = document.getElementById('backsoundElement');
+            const initialVol = parseFloat(document.getElementById('backsoundVolume').value);
+            if (backsoundEl) {
+                backsoundEl.volume = initialVol;
+            }
         });
 
         function selectFormat(format) {
@@ -323,11 +329,23 @@
             const backsoundEl = document.getElementById('backsoundElement');
             backsoundEl.src = URL.createObjectURL(file);
             backsoundEl.load();
+            
+            // Set volume native berkas backsound yang baru diunggah sesuai slider
+            const val = parseFloat(document.getElementById('backsoundVolume').value);
+            backsoundEl.volume = val; 
         });
 
         document.getElementById('backsoundVolume').addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             document.getElementById('backsoundVolLabel').innerText = Math.round(val * 100) + "%";
+            
+            // 1. Kunci Pertama: Set volume pada tingkat element audio native (Menghindari kebocoran preview 100%)
+            const backsoundEl = document.getElementById('backsoundElement');
+            if (backsoundEl) {
+                backsoundEl.volume = val;
+            }
+
+            // 2. Kunci Kedua: Set volume pada simpul Web Audio API Node untuk perekaman render
             if (gainBacksound) {
                 gainBacksound.gain.value = val;
             }
@@ -338,6 +356,10 @@
 
         mainAudio.addEventListener('play', () => {
             if (backsoundAudio.src) {
+                // Pastikan volume native terkunci saat mulai diputar
+                const currentVol = parseFloat(document.getElementById('backsoundVolume').value);
+                backsoundAudio.volume = currentVol;
+                
                 backsoundAudio.currentTime = mainAudio.currentTime % (backsoundAudio.duration || 1);
                 backsoundAudio.play().catch(e => console.log("Gagal memutar backsound:", e));
             }
@@ -375,6 +397,7 @@
             gainBacksound = audioCtx.createGain();
             const initialVol = parseFloat(document.getElementById('backsoundVolume').value);
             gainBacksound.gain.value = initialVol;
+            backsoundAudio.volume = initialVol; // Penguncian lapis ketiga
 
             dest = audioCtx.createMediaStreamDestination();
             mixBus = audioCtx.createGain();
@@ -405,6 +428,10 @@
                 document.getElementById('previewPlayBtn').innerHTML = "🔊 Putar Preview Audio";
                 isPreviewPlaying = false;
             } else {
+                // Kunci volume native tepat sebelum memulai audio preview
+                const currentVol = parseFloat(document.getElementById('backsoundVolume').value);
+                backsoundAudio.volume = currentVol;
+
                 mainAudio.play().then(() => {
                     if (backsoundAudio.src) {
                         backsoundAudio.currentTime = mainAudio.currentTime % (backsoundAudio.duration || 1);
