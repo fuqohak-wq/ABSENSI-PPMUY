@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Nilai Rapor - PP Miftahul Ulum Yahyawiyyah</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap');
+    .font-arabic { font-family: 'Amiri', serif; }
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen py-8 px-4">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border overflow-hidden">
+    
+    <!-- Kop Header -->
+    <div class="bg-emerald-900 text-white p-6 text-center border-b-4 border-amber-400">
+      <p class="font-arabic text-2xl mb-1">المعهد الديني الإسلامي مفتاح العلوم يحيوية</p>
+      <h1 class="text-lg font-bold tracking-wide uppercase">Pondok Pesantren Miftahul Ulum Yahyawiyyah</h1>
+      <p class="font-arabic text-md text-emerald-200 mt-0.5">المدرسة الدينية الرسمية الدحلانية</p>
+      <p class="text-[11px] text-emerald-100 mt-1">Desa Talun, Kec. Kayen, Kab. Pati, Jawa Tengah 59171</p>
+    </div>
+
+    <div class="p-6 space-y-6">
+      
+      <!-- Filter Selector -->
+      <div class="bg-slate-50 p-4 rounded-xl border grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">1. Pilih Kelas</label>
+          <select id="kelasSelect" onchange="onKelasChange()" class="w-full p-2.5 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-emerald-600">
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">2. Pilih Mata Pelajaran</label>
+          <select id="mapelSelect" onchange="loadSantriTable()" disabled class="w-full p-2.5 border rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-emerald-600 disabled:bg-slate-100">
+            <option value="">-- Pilih Mapel --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Info Guru Pengampu -->
+      <div id="guruInfo" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-xs text-emerald-800 flex justify-between items-center">
+        <span>Pengampu: <strong id="namaGuru" class="text-emerald-950"></strong></span>
+        <span id="fanBadge" class="bg-emerald-200 px-2 py-0.5 rounded font-arabic text-sm"></span>
+      </div>
+
+      <!-- Tabel Input Nilai Santri -->
+      <div id="tableSection" class="hidden space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-slate-800 text-sm">3. Input Nilai Santri (Urut Absen A-Z)</h3>
+          <span class="text-xs text-slate-500">Isi nilai (0 - 100)</span>
+        </div>
+
+        <div class="overflow-x-auto border rounded-xl">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 text-slate-700 text-xs uppercase border-b">
+              <tr>
+                <th class="p-3 w-12 text-center">No</th>
+                <th class="p-3">Nama Santri</th>
+                <th class="p-3 w-32 text-center">Nilai</th>
+                <th class="p-3 w-40 text-center">Status Rapor</th>
+                <th class="p-3 w-28 text-center">Cetak PDF</th>
+              </tr>
+            </thead>
+            <tbody id="santriTableBody" class="divide-y">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tombol Aksi Bawah -->
+        <div class="space-y-4 pt-2">
+          <button onclick="saveAllNilai()" id="btnSave" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+            💾 Simpan Semua Nilai Mapel Ini
+          </button>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button onclick="generateBulkPdfRapor()" id="btnBulk" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+              📦 Cetak & Unduh ZIP Rapor Kelas
+            </button>
+            <button onclick="generateMergedPdfRapor()" id="btnMerged" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+              📄 Cetak Gabungan Satu PDF Kelas
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Loading / Progress -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full text-center space-y-3 shadow-2xl">
+      <h3 id="modalTitle" class="font-bold text-slate-800">Memproses...</h3>
+      <p id="modalMsg" class="text-xs text-slate-600">Mohon tunggu sebentar.</p>
+      
+      <!-- Progress Bar Kontrol UI -->
+      <div id="progContainer" class="hidden w-full bg-slate-200 rounded-full h-2.5 my-2">
+        <div id="progBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+
+      <div id="modalLinks" class="hidden space-y-2 pt-2">
+        <a id="pdfBtn" target="_blank" class="block bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded-lg font-bold shadow">📄 Buka PDF Rapor</a>
+        <a id="docBtn" target="_blank" class="block bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 rounded-lg font-bold shadow">📝 Edit Google Doc</a>
+      </div>
+      <button onclick="closeModal()" class="text-xs text-slate-400 hover:underline pt-2">Tutup</button>
+    </div>
+  </div>
+
+  <script>
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyCLnfTfCrPmlkXbQMgkcDhWMjB_IGRMU246UzRVNZZpLOfs4JP801J6yUMqor6Tzmn/exec";
+
+    let masterData = {};
+
+    window.onload = async () => {
+      showModal("Loading Data...", "Mengambil daftar kelas dari Google Sheet.");
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=get_initial_data`);
+        if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheet.");
+        const data = await res.json();
+        closeModal();
+
+        if (data.status === "success") {
+          masterData = data;
+          const kelasSelect = document.getElementById('kelasSelect');
+          kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+          
+          data.kelasList.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.innerText = k;
+            kelasSelect.appendChild(opt);
+          });
+        } else {
+          showModal("Error", data.message);
+        }
+      } catch (e) {
+        showModal("Error", "Gagal menyambungkan ke Google Sheets. Pastikan Web App Script dideploy sebagai 'Anyone'. Detail: " + e.toString());
+      }
+    };
+
+    function onKelasChange() {
+      const kelas = document.getElementById('kelasSelect').value;
+      const mapelSelect = document.getElementById('mapelSelect');
+      mapelSelect.innerHTML = '<option value="">-- Pilih Mapel --</option>';
+      document.getElementById('tableSection').classList.add('hidden');
+      document.getElementById('guruInfo').classList.add('hidden');
+
+      if (kelas && masterData.mapelByKelas && masterData.mapelByKelas[kelas]) {
+        masterData.mapelByKelas[kelas].forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.mapel;
+          opt.innerText = `${m.mapel} (${m.versiArab})`;
+          mapelSelect.appendChild(opt);
+        });
+        mapelSelect.disabled = false;
+      } else {
+        mapelSelect.disabled = true;
+      }
+    }
+
+    async function loadSantriTable() {
+      const kelas = document.getElementById('kelasSelect').value;
+      const mapel = document.getElementById('mapelSelect').value;
+
+      if (!kelas || !mapel) return;
+
+      const mapelObj = masterData.mapelByKelas[kelas].find(m => m.mapel === mapel);
+      if (mapelObj) {
+        document.getElementById('namaGuru').innerText = mapelObj.guru;
+        document.getElementById('fanBadge').innerText = mapelObj.fan;
+        document.getElementById('guruInfo').classList.remove('hidden');
+      }
+
+      showModal("Memuat Santri...", "Mengambil data santri...");
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=get_santri_by_kelas&kelas=${encodeURIComponent(kelas)}&mapel=${encodeURIComponent(mapel)}`);
+        const data = await res.json();
+        closeModal();
+
+        if (data.status === "success") {
+          renderTable(data.santriList, data.existingNilai, data.statusKelengkapan);
+          document.getElementById('tableSection').classList.remove('hidden');
+        } else {
+          showModal("Error", data.message);
+        }
+      } catch (e) {
+        showModal("Error", "Gagal memuat santri: " + e.toString());
+      }
+    }
+
+    function renderTable(santriList, existingNilai, statusKelengkapan) {
+      const tbody = document.getElementById('santriTableBody');
+      tbody.innerHTML = '';
+
+      if (santriList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Tidak ada santri di kelas ini.</td></tr>`;
+        return;
+      }
+
+      santriList.forEach((s, idx) => {
+        const nilaiVal = existingNilai[s.nama] !== undefined ? existingNilai[s.nama] : '';
+        const stat = statusKelengkapan[s.nama] || { terisi: 0, total: 0, isFull: false };
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50";
+        tr.innerHTML = `
+          <td class="p-3 text-center text-xs font-semibold text-slate-500">${idx + 1}</td>
+          <td class="p-3 font-medium text-slate-800">${s.nama}</td>
+          <td class="p-3 text-center">
+            <input type="number" min="0" max="100" data-nik="${s.nik}" data-nama="${s.nama}" value="${nilaiVal}" 
+              placeholder="0" class="nilai-input w-20 p-1.5 border rounded text-center font-bold text-emerald-800 outline-none focus:ring-2 focus:ring-emerald-600">
+          </td>
+          <td class="p-3 text-center">
+            ${stat.isFull 
+              ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 rounded-full">FULL (${stat.terisi}/${stat.total})</span>`
+              : `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-1 rounded-full">Belum (${stat.terisi}/${stat.total})</span>`
+            }
+          </td>
+          <td class="p-3 text-center">
+            <button onclick="generatePdfRapor('${s.nama}')" 
+              class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-2.5 py-1.5 rounded transition shadow">
+              🖨️ PDF
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function saveAllNilai() {
+      const kelas = document.getElementById('kelasSelect').value;
+      const mapel = document.getElementById('mapelSelect').value;
+      const guru = document.getElementById('namaGuru').innerText;
+
+      const inputs = document.querySelectorAll('.nilai-input');
+      const scores = [];
+
+      inputs.forEach(inp => {
+        scores.push({
+          nik: inp.dataset.nik,
+          nama: inp.dataset.nama,
+          nilai: inp.value !== "" ? parseFloat(inp.value) : ""
+        });
+      });
+
+      const payload = { kelas, mapel, guru, scores };
+
+      showModal("Saving...", "Menyimpan nilai ke Google Sheet...");
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=save_nilai&data=${encodeURIComponent(JSON.stringify(payload))}`);
+        const data = await res.json();
+        
+        if (data.status === "success") {
+          showModal("Sukses! 🎉", "Nilai berhasil disimpan.");
+          setTimeout(() => { closeModal(); loadSantriTable(); }, 1200);
+        } else {
+          showModal("Error", data.message);
+        }
+      } catch (e) {
+        showModal("Error", "Gagal menyimpan: " + e.toString());
+      }
+    }
+
+    async function generatePdfRapor(namaSantri) {
+      const kelas = document.getElementById('kelasSelect').value;
+
+      showModal("Mencetak PDF...", "Membuat berkas PDF dari Google Doc...");
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=generate_pdf&nama=${encodeURIComponent(namaSantri)}&kelas=${encodeURIComponent(kelas)}`);
+        const data = await res.json();
+
+        if (data.status === "success") {
+          document.getElementById('modalTitle').innerText = "PDF Siap! 📄";
+          document.getElementById('modalMsg').innerText = `Rapor ${namaSantri} berhasil dibuat.`;
+          document.getElementById('pdfBtn').href = data.pdfUrl;
+          document.getElementById('pdfBtn').innerText = "📄 Buka PDF Rapor";
+          document.getElementById('pdfBtn').classList.remove('hidden');
+          document.getElementById('docBtn').href = data.docUrl;
+          document.getElementById('docBtn').classList.remove('hidden');
+          document.getElementById('modalLinks').classList.remove('hidden');
+        } else {
+          showModal("Error", data.message);
+        }
+      } catch (e) {
+        showModal("Error", "Gagal generate PDF: " + e.toString());
+      }
+    }
+
+    async function generateBulkPdfRapor() {
+      const kelas = document.getElementById('kelasSelect').value;
+      if (!kelas) {
+        alert("Pilih kelas terlebih dahulu.");
+        return;
+      }
+
+      showModal("Mencetak Bulk ZIP...", "Membuat PDF seluruh santri di kelas ini dan mengompres ke ZIP. Proses ini membutuhkan waktu (1-2 menit)...");
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=generate_pdf_bulk&kelas=${encodeURIComponent(kelas)}`);
+        const data = await res.json();
+
+        if (data.status === "success") {
+          document.getElementById('modalTitle').innerText = "ZIP Siap! 📦";
+          document.getElementById('modalMsg').innerText = data.message;
+          document.getElementById('pdfBtn').href = data.zipUrl;
+          document.getElementById('pdfBtn').innerText = "📥 Download file ZIP";
+          document.getElementById('pdfBtn').classList.remove('hidden');
+          document.getElementById('docBtn').classList.add('hidden'); 
+          document.getElementById('modalLinks').classList.remove('hidden');
+        } else {
+          showModal("Error", data.message);
+        }
+      } catch (e) {
+        showModal("Error", "Gagal cetak satu kelas: " + e.toString());
+      }
+    }
+
+    // ==========================================
+    // INTEGRASI FRONTEND CHUNKED BATCH MERGE
+    // ==========================================
+    async function generateMergedPdfRapor() {
+      const kelas = document.getElementById('kelasSelect').value;
+      if (!kelas) {
+        alert("Pilih kelas terlebih dahulu.");
+        return;
+      }
+
+      // Menampilkan modal inisiasi
+      showModal("Menggabungkan PDF...", "Tahap 1: Menyiapkan berkas master kosong di Google Drive...");
+      document.getElementById('progContainer').classList.remove('hidden');
+      updateProgress(5);
+
+      try {
+        // Langkah 1: Inisiasi Master Doc Kosong
+        const initRes = await fetch(`${GAS_API_URL}?action=init_merge&kelas=${encodeURIComponent(kelas)}`);
+        const initData = await initRes.json();
+
+        if (initData.status !== "success") {
+          showModal("Error", initData.message);
+          return;
+        }
+
+        const masterDocId = initData.masterDocId;
+        const listSantri = initData.listSantri;
+        const totalSantri = listSantri.length;
+
+        // Langkah 2: Mencicil data santri dalam kelompok kecil (Batch berisi 5 santri)
+        const batchSize = 5;
+        for (let i = 0; i < totalSantri; i += batchSize) {
+          const batch = listSantri.slice(i, i + batchSize);
+          const currentProgress = Math.min(Math.round(((i) / totalSantri) * 80) + 10, 85);
+          
+          showModal(
+            "Menggabungkan PDF...", 
+            `Tahap 2: Menempelkan data santri (${i + 1} s.d ${Math.min(i + batchSize, totalSantri)} dari ${totalSantri})...`
+          );
+          updateProgress(currentProgress);
+
+          const appendRes = await fetch(
+            `${GAS_API_URL}?action=append_merge_batch&masterDocId=${encodeURIComponent(masterDocId)}&kelas=${encodeURIComponent(kelas)}&batch=${encodeURIComponent(JSON.stringify(batch))}`
+          );
+          const appendData = await appendRes.json();
+
+          if (appendData.status !== "success") {
+            showModal("Error", "Gagal saat menempelkan data batch: " + appendData.message);
+            return;
+          }
+        }
+
+        // Langkah 3: Finalisasi Konversi ke PDF
+        showModal("Menggabungkan PDF...", "Tahap 3: Mengonversi berkas dokumen akhir ke PDF...");
+        updateProgress(90);
+
+        const finalizeRes = await fetch(
+          `${GAS_API_URL}?action=finalize_merge&masterDocId=${encodeURIComponent(masterDocId)}&kelas=${encodeURIComponent(kelas)}`
+        );
+        const finalizeData = await finalizeRes.json();
+
+        if (finalizeData.status === "success") {
+          updateProgress(100);
+          document.getElementById('modalTitle').innerText = "PDF Gabungan Berhasil! 📄";
+          document.getElementById('modalMsg').innerText = `Berhasil menggabungkan seluruh rapor kelas ${kelas} tanpa kendala timeout.`;
+          document.getElementById('pdfBtn').href = finalizeData.pdfUrl;
+          document.getElementById('pdfBtn').innerText = "📄 Download PDF Gabungan";
+          document.getElementById('pdfBtn').classList.remove('hidden');
+          document.getElementById('docBtn').classList.add('hidden'); 
+          document.getElementById('modalLinks').classList.remove('hidden');
+        } else {
+          showModal("Error", finalizeData.message);
+        }
+
+      } catch (e) {
+        showModal("Error", "Gagal menyambungkan selama proses penggabungan. Detail: " + e.toString());
+      } finally {
+        setTimeout(() => {
+          document.getElementById('progContainer').classList.add('hidden');
+        }, 1500);
+      }
+    }
+
+    function updateProgress(percentage) {
+      document.getElementById('progBar').style.width = percentage + "%";
+    }
+
+    function showModal(title, msg) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalMsg').innerText = msg;
+      document.getElementById('modalLinks').classList.add('hidden');
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+      document.getElementById('progBar').style.width = "0%";
+    }
+  </script>
+</body>
+</html>
