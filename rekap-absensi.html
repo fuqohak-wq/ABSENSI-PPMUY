@@ -32,6 +32,26 @@
     .benar { background-color: #e6f4ea !important; border-color: #137333 !important; color: #137333 !important; font-weight: 600; }
     .salah { background-color: #fce8e6 !important; border-color: #c5221f !important; color: #c5221f !important; font-weight: 600; }
     .kunci { border: 2px solid #137333 !important; background-color: #e6f4ea !important; }
+
+    /* LAYOUT KHUSUS FRAME INPUT NILAI LAYAR PENUH */
+    .full-screen-tab {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 16rem !important; /* Menyesuaikan lebar sidebar desktop (w-64) */
+      z-index: 40 !important;
+      background-color: #ffffff;
+    }
+    .dark .full-screen-tab {
+      background-color: #0f172a;
+    }
+    @media (max-width: 767px) {
+      .full-screen-tab {
+        left: 0 !important;
+        bottom: 60px !important; /* Memberikan ruang untuk navigasi bawah di mobile */
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 transition-theme min-h-screen flex pb-16 md:pb-0">
@@ -261,22 +281,9 @@
       </div>
     </section>
 
-    <!-- NEW SECTION: INPUT NILAI RAPOT -->
-    <section id="tab-input-nilai" class="space-y-6 hidden">
-      <div class="card bg-white p-4 rounded-2xl border border-gray-100 shadow-md">
-        <div class="flex justify-between items-center mb-4">
-          <div>
-            <h2 class="text-xl font-bold">Input Nilai Rapor</h2>
-            <p class="text-xs text-gray-400">Pencatatan dan Evaluasi Nilai Rapor PPMUY</p>
-          </div>
-          <a href="https://rapotppmuy.vercel.app" target="_blank" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg border border-blue-200 hover:bg-blue-100 transition flex items-center gap-1">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Penuh
-          </a>
-        </div>
-        <div class="w-full h-[70vh] md:h-[75vh] rounded-xl overflow-hidden border border-gray-200">
-          <iframe src="https://rapotppmuy.vercel.app" class="w-full h-full border-0" allow="fullscreen"></iframe>
-        </div>
-      </div>
+    <!-- SECTION: INPUT NILAI (FULL SCREEN LAYOUT) -->
+    <section id="tab-input-nilai" class="hidden full-screen-tab flex flex-col">
+      <iframe src="https://rapotppmuy.vercel.app" class="w-full h-full border-0" allow="fullscreen"></iframe>
     </section>
 
     <section id="tab-statistik" class="space-y-6 hidden">
