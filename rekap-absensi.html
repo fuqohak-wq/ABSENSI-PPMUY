@@ -52,6 +52,9 @@
         <button onclick="switchTab('input-soal')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-input-soal">
           <i class="fa-solid fa-file-invoice"></i><span>Input Soal</span>
         </button>
+        <button onclick="switchTab('input-nilai')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-input-nilai">
+          <i class="fa-solid fa-pen-to-square"></i><span>Input Nilai</span>
+        </button>
         <button onclick="switchTab('statistik')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-100 font-medium transition sidebar-btn" id="sidebar-btn-statistik">
           <i class="fa-solid fa-graduation-cap"></i><span>Capaian</span>
         </button>
@@ -80,6 +83,9 @@
     </button>
     <button onclick="switchTab('input-soal')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-input-soal">
       <i class="fa-solid fa-file-invoice text-lg"></i><span class="text-[10px] font-medium">Buat Soal</span>
+    </button>
+    <button onclick="switchTab('input-nilai')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-input-nilai">
+      <i class="fa-solid fa-pen-to-square text-lg"></i><span class="text-[10px] font-medium">Nilai</span>
     </button>
     <button onclick="switchTab('statistik')" class="flex flex-col items-center space-y-0.5 text-gray-400 mobile-btn" id="mobile-btn-statistik">
       <i class="fa-solid fa-graduation-cap text-lg"></i><span class="text-[10px] font-medium">Capaian</span>
@@ -252,6 +258,24 @@
             <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Simpan Soal Ke Google Sheets
           </button>
         </form>
+      </div>
+    </section>
+
+    <!-- NEW SECTION: INPUT NILAI RAPOT -->
+    <section id="tab-input-nilai" class="space-y-6 hidden">
+      <div class="card bg-white p-4 rounded-2xl border border-gray-100 shadow-md">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-xl font-bold">Input Nilai Rapor</h2>
+            <p class="text-xs text-gray-400">Pencatatan dan Evaluasi Nilai Rapor PPMUY</p>
+          </div>
+          <a href="https://rapotppmuy.vercel.app" target="_blank" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg border border-blue-200 hover:bg-blue-100 transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Penuh
+          </a>
+        </div>
+        <div class="w-full h-[70vh] md:h-[75vh] rounded-xl overflow-hidden border border-gray-200">
+          <iframe src="https://rapotppmuy.vercel.app" class="w-full h-full border-0" allow="fullscreen"></iframe>
+        </div>
       </div>
     </section>
 
