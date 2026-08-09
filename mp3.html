@@ -151,6 +151,19 @@
                 </div>
             </div>
 
+            <!-- FITUR BARU: OPTIMASI YOUTUBE SHORTS -->
+            <div class="bg-amber-50/60 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200 dark:border-amber-900/50">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="limitShorts" class="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-yellow-500 dark:bg-gray-700 dark:border-gray-600">
+                    <div>
+                        <span class="block text-sm font-bold text-amber-800 dark:text-amber-400">🔥 Optimalkan Khusus YouTube Shorts & Reels</span>
+                        <span class="text-xs text-slate-600 dark:text-gray-400 block mt-0.5">
+                            Mengunci format video ke Tegak (9:16) dan secara otomatis memotong durasi render maksimal 60 detik (syarat wajib agar video otomatis terdeteksi sebagai Shorts oleh sistem YouTube).
+                        </span>
+                    </div>
+                </label>
+            </div>
+
             <!-- Pilih Efek Animasi -->
             <div>
                 <label class="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">🎨 Pilih Efek Animasi Dynamic:</label>
@@ -275,6 +288,13 @@
             if (backsoundEl) {
                 backsoundEl.volume = initialVol;
             }
+
+            // Integrasi Event Listener untuk checkbox Shorts
+            document.getElementById('limitShorts').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    selectFormat('portrait');
+                }
+            });
         });
 
         function selectFormat(format) {
@@ -283,6 +303,11 @@
             const port = document.getElementById('labelPortrait');
             const isDark = document.documentElement.classList.contains('dark');
             
+            // Jika memilih landscape, matikan pilihan Shorts (karena Shorts wajib tegak 9:16)
+            if (format === 'landscape') {
+                document.getElementById('limitShorts').checked = false;
+            }
+
             if (format === 'landscape') {
                 if (isDark) {
                     land.className = "border-2 border-yellow-500 bg-gray-800 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition";
@@ -782,6 +807,7 @@
         async function startRenderProcess() {
             const audioFile = document.getElementById('audioInput').files[0];
             const lyricsRef = document.getElementById('lyricsReference').value;
+            const isShorts = document.getElementById('limitShorts').checked;
 
             if (!audioFile) return alert('Silakan unggah berkas Audio Vokal Utama terlebih dahulu.');
 
@@ -816,13 +842,16 @@
                 const tempAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const decodedAudio = await tempAudioCtx.decodeAudioData(arrayBuffer);
 
+                // Jika mode Shorts aktif, potong target durasi maks 60 detik
+                const renderDuration = isShorts ? Math.min(decodedAudio.duration, 60) : decodedAudio.duration;
+
                 const chunkSize = 60;
-                const totalChunks = Math.ceil(decodedAudio.duration / chunkSize);
+                const totalChunks = Math.ceil(renderDuration / chunkSize);
                 lyricTimestamps = [];
 
                 for (let i = 0; i < totalChunks; i++) {
                     const startTime = i * chunkSize;
-                    const endTime = Math.min((i + 1) * chunkSize, decodedAudio.duration);
+                    const endTime = Math.min((i + 1) * chunkSize, renderDuration);
 
                     statusText.innerText = `🤖 Gemini AI sedang mendeteksi vokal & lirik (Bagian ${i + 1}/${totalChunks})...`;
                     progressBar.style.width = `${10 + Math.floor(((i + 1) / totalChunks) * 40)}%`;
@@ -839,7 +868,7 @@
 
                 lyricTimestamps.sort((a, b) => a.start - b.start);
 
-                statusText.innerText = "📹 Memulai Perekaman Video Format MP4...";
+                statusText.innerText = isShorts ? "📹 Memulai Perekaman Format YouTube Shorts..." : "📹 Memulai Perekaman Video Format MP4...";
                 progressBar.style.width = "50%";
 
                 initAudioContextAndNodes();
@@ -880,7 +909,9 @@
 
                     videoPreview.src = videoUrl;
                     downloadBtn.href = videoUrl;
-                    downloadBtn.download = `Animated-Lyric-${Date.now()}.${isMp4 ? 'mp4' : 'webm'}`;
+
+                    const suffix = isShorts ? '-shorts' : '';
+                    downloadBtn.download = `Animated-Lyric${suffix}-${Date.now()}.${isMp4 ? 'mp4' : 'webm'}`;
 
                     document.getElementById('outputArea').classList.remove('hidden');
                     statusText.innerText = `🎉 Video selesai diproses secara lokal! Ukuran berkas: (~${(finalRenderedBlob.size / (1024 * 1024)).toFixed(2)} MB)`;
@@ -897,13 +928,25 @@
                 recorder.start();
 
                 mainAudio.ontimeupdate = () => {
-                    const progressPercent = 50 + ((mainAudio.currentTime / mainAudio.duration) * 50);
+                    const current = mainAudio.currentTime;
+
+                    // Batalkan rekaman secara otomatis jika melampaui batas Shorts (60 detik)
+                    if (isShorts && current >= 60) {
+                        mainAudio.pause();
+                        recorder.stop();
+                        backsoundAudio.pause();
+                        return;
+                    }
+
+                    const progressPercent = 50 + ((current / renderDuration) * 50);
                     progressBar.style.width = `${progressPercent}%`;
-                    statusText.innerText = `🎬 Menulis Video & Efek: ${Math.floor(mainAudio.currentTime)}s / ${Math.floor(mainAudio.duration)}s`;
+                    statusText.innerText = `🎬 Menulis Video & Efek: ${Math.floor(current)}s / ${Math.floor(renderDuration)}s`;
                 };
 
                 mainAudio.onended = () => {
-                    recorder.stop();
+                    if (recorder.state !== "inactive") {
+                        recorder.stop();
+                    }
                     backsoundAudio.pause();
                 };
 
