@@ -194,7 +194,7 @@
                 </a>
             </div>
             
-            <!-- TOMBOL HAPUS CACHE WEB (Ditempatkan di bawah grid administrasi) -->
+            <!-- TOMBOL HAPUS CACHE WEB -->
             <div class="mt-2">
                 <button onclick="clearWebCache()" class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 dark:border dark:border-red-500/20 font-bold text-xs uppercase tracking-wider transition cursor-pointer">
                     <i class="fa-solid fa-trash"></i>
@@ -251,7 +251,8 @@
 
                     <div>
                         <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-sm"></i> REKAP KEGIATAN KEPESANTRENAN</h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                        <!-- Grid disesuaikan menjadi sm:grid-cols-5 untuk menampung 10 elemen secara seimbang -->
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
                             <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">Quranan</span>
                                 <span id="v-quranan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
@@ -283,6 +284,16 @@
                             <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">PDF 3</span>
                                 <span id="v-pdf3" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <!-- FITUR BARU: ZIARAH -->
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Ziarah</span>
+                                <span id="v-ziarah" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <!-- FITUR BARU: JUMATAN -->
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Jumatan</span>
+                                <span id="v-jumatan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
                             </div>
                         </div>
                     </div>
@@ -404,9 +415,8 @@
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
-        let controllerAktif = null; // Controller pembatalan request
+        let controllerAktif = null;
 
-        // DIALOG CONTROLLER UNTUK METODE SCAN ABSENSI
         function bukaModalPilihanScan() {
             const modal = document.getElementById('modal-pilihan-scan');
             if(modal) {
@@ -423,7 +433,6 @@
             }
         }
 
-        // CONTROLLER UNTUK IFRAME SCAN WAJAH & TABUNGAN (Kamera hanya menyala saat dibuka)
         function bukaIframeTabungan() {
             tutupModalPilihanScan();
             const iframe = document.getElementById('iframe-tabungan');
@@ -444,12 +453,11 @@
                 modalIframe.classList.add('hidden');
                 const iframe = document.getElementById('iframe-tabungan');
                 if (iframe) {
-                    iframe.src = "about:blank"; // Hentikan kamera seketika
+                    iframe.src = "about:blank";
                 }
             }
         }
 
-        // MAPPING PEMBAGIAN OTORITAS MENU BERDASARKAN ROLE
         const MAP_OTORITAS = {
             "KIAI": ["*"],
             "KEPALA_PONDOK": [
@@ -493,13 +501,9 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // Muat data cache secara instan di awal agar performa responsif (< 1 detik)
             muatDariCacheLokal();
-
-            // Jalankan request pembaruan data secara background
             muatSeluruhRekapDashboard(false);
 
-            // Perbarui background data setiap 30 detik secara otomatis
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 30000);
@@ -625,7 +629,6 @@
         }
 
         async function muatSeluruhRekapDashboard(forceBypass = false) {
-            // Jika request manual ditekan saat request sebelumnya masih loading, gagalkan request sebelumnya secara paksa
             if (isFetching) {
                 if (forceBypass && controllerAktif) {
                     controllerAktif.abort(); 
@@ -649,9 +652,7 @@
             }
 
             try {
-                // Optimalisasi: Mengirimkan parameter tanggal hari ini di WIB (Asia/Jakarta)
-                // agar server Google Apps Script hanya memproses data historis hari ini (bukan ribuan baris keseluruhan)
-                const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" }); // format YYYY-MM-DD
+                const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
                 const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
 
                 const res = await fetch(targetUrl, { method: "GET", signal: signal });
@@ -693,12 +694,15 @@
             document.getElementById('stat-belum').innerText = r.rekapWajah.belum || '0';
 
             r.rekapShalat = r.rekapShalat || {};
+            
+            // Jamaah Shalat
             document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || 0;
             document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || 0;
             document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || 0;
             document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || 0;
             document.getElementById('v-isya').innerText = r.rekapShalat.Isya || 0;
 
+            // Kegiatan Kepesantrenan (Termasuk Ziarah & Jumatan)
             document.getElementById('v-quranan').innerText = r.rekapShalat.Quranan || 0;
             document.getElementById('v-afsahan').innerText = r.rekapShalat.Afsahan || 0;
             document.getElementById('v-belajar').innerText = r.rekapShalat.Belajar || 0;
@@ -707,6 +711,8 @@
             document.getElementById('v-pdf1').innerText = r.rekapShalat["PDF 1"] || 0;
             document.getElementById('v-pdf2').innerText = r.rekapShalat["PDF 2"] || 0;
             document.getElementById('v-pdf3').innerText = r.rekapShalat["PDF 3"] || 0;
+            document.getElementById('v-ziarah').innerText = r.rekapShalat.Ziarah || 0;
+            document.getElementById('v-jumatan').innerText = r.rekapShalat.Jumatan || 0;
 
             renderTabelWajah();
             
@@ -751,12 +757,10 @@
     <script>
         async function clearWebCache() {
             if (confirm("Hapus seluruh cache web ini dan muat ulang halaman?")) {
-                // 1. Kirim pesan hapus cache ke Service Worker
                 if ('navigator' in window && navigator.serviceWorker.controller) {
                     navigator.serviceWorker.controller.postMessage({ action: 'clearCache' });
                 }
 
-                // 2. Unregister Service Worker
                 if ('serviceWorker' in navigator) {
                     const registrations = await navigator.serviceWorker.getRegistrations();
                     for (let registration of registrations) {
@@ -764,7 +768,6 @@
                     }
                 }
 
-                // 3. Paksa reload halaman dari server
                 window.location.reload(true);
             }
         }
