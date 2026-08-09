@@ -77,7 +77,13 @@
                 <span id="badge-role" class="text-[9px] bg-yellow-400 text-indigo-950 px-2 py-0.5 rounded-full font-black tracking-widest block w-max uppercase mt-0.5">ROLE</span>
             </div>
         </div>
+        
+        <!-- TOMBOL CONTROL HEADER -->
         <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- TOMBOL HAPUS CACHE DI HEADER (Merah Elegan) -->
+            <button onclick="clearWebCache()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-red-400 hover:text-red-300" title="Hapus Cache Web">
+                <i class="fa-solid fa-trash text-base"></i>
+            </button>
             <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400" title="Ganti Tema">
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
@@ -193,14 +199,6 @@
                     <div class="overflow-hidden"><h4 class="text-xs font-black tracking-wide dynamic-text-main truncate">Evaluasi</h4><p class="text-[9px] dynamic-text-muted truncate">Setiap Bakdo Dzuhur</p></div>
                 </a>
             </div>
-            
-            <!-- TOMBOL HAPUS CACHE WEB -->
-            <div class="mt-2">
-                <button onclick="clearWebCache()" class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 dark:border dark:border-red-500/20 font-bold text-xs uppercase tracking-wider transition cursor-pointer">
-                    <i class="fa-solid fa-trash"></i>
-                    <span>Hapus Cache Web</span>
-                </button>
-            </div>
         </section>
 
         <!-- REKAP DATA SECTION -->
@@ -251,7 +249,6 @@
 
                     <div>
                         <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-sm"></i> REKAP KEGIATAN KEPESANTRENAN</h3>
-                        <!-- Grid disesuaikan menjadi sm:grid-cols-5 untuk menampung 10 elemen secara seimbang -->
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
                             <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">Quranan</span>
@@ -285,12 +282,10 @@
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">PDF 3</span>
                                 <span id="v-pdf3" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
                             </div>
-                            <!-- FITUR BARU: ZIARAH -->
                             <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">Ziarah</span>
                                 <span id="v-ziarah" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
                             </div>
-                            <!-- FITUR BARU: JUMATAN -->
                             <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
                                 <span class="text-[9px] font-black dynamic-text-row block uppercase">Jumatan</span>
                                 <span id="v-jumatan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
@@ -358,7 +353,6 @@
                     </div>
                 </a>
                 
-                <!-- OPSI KETIGA: SCAN WAJAH & INTIP TABUNGAN -->
                 <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full">
                     <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                     <div class="text-left">
@@ -380,12 +374,9 @@
 
     <!-- MODAL POPUP IFRAME FULLSCREEN SEAMLESS (SCAN WAJAH & INTIP TABUNGAN) -->
     <div id="modal-iframe-tabungan" class="fixed inset-0 z-50 bg-slate-950 hidden w-screen h-screen flex-col overflow-hidden">
-        <!-- Floating Close Button minimalis di pojok kanan atas -->
         <button onclick="tutupIframeTabungan()" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-all flex items-center justify-center shadow-lg cursor-pointer" title="Kembali ke Dashboard">
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
-        
-        <!-- Frame yang diisi penuh 100% tanpa sela -->
         <div class="w-full h-full bg-white">
             <iframe id="iframe-tabungan" src="about:blank" class="w-full h-full border-0 m-0 p-0 block" allow="camera; microphone; clipboard-write"></iframe>
         </div>
