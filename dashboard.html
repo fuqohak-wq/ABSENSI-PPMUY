@@ -88,7 +88,7 @@
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
             <button onclick="muatSeluruhRekapDashboard(true)" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap">
-                <i id="icon-refresh" class="fa-solid fa-rotate animate-duration-500"></i>
+                <i id="icon-refresh" class="fa-solid fa-rotate"></i>
             </button>
             <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
@@ -495,9 +495,10 @@
             muatDariCacheLokal();
             muatSeluruhRekapDashboard(false);
 
+            // MEMBACA DATA REKAPITULASI DENGAN INTERVAL 3 DETIK (REALTIME AMAN)
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
-            }, 30000);
+            }, 3000);
         });
 
         function terapkanOtoritasMenu(userRole) {
@@ -744,22 +745,54 @@
         }
     </script>
 
-    <!-- SCRIPT KHUSUS HAPUS CACHE WEB -->
+    <!-- SCRIPT KHUSUS HAPUS CACHE WEB TOTAL -->
     <script>
         async function clearWebCache() {
-            if (confirm("Hapus seluruh cache web ini dan muat ulang halaman?")) {
-                if ('navigator' in window && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({ action: 'clearCache' });
-                }
+            if (confirm("Hapus seluruh cache web, data login, dan muat ulang aplikasi dari awal?")) {
+                // 1. Hapus Storage Lokal
+                localStorage.clear();
+                sessionStorage.clear();
 
-                if ('serviceWorker' in navigator) {
-                    const registrations = await navigator.serviceWorker.getRegistrations();
-                    for (let registration of registrations) {
-                        await registration.unregister();
+                // 2. Hapus Cache Storage PWA
+                if ('caches' in window) {
+                    try {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(
+                            cacheNames.map(cacheName => caches.delete(cacheName))
+                        );
+                    } catch (e) {
+                        console.warn("Gagal menghapus Cache Storage:", e);
                     }
                 }
 
-                window.location.reload(true);
+                // 3. Unregister Seluruh Service Workers
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registrations = await navigator.serviceWorker.getRegistrations();
+                        for (let registration of registrations) {
+                            await registration.unregister();
+                        }
+                    } catch (e) {
+                        console.warn("Gagal menghentikan Service Worker:", e);
+                    }
+                }
+
+                // 4. Bersihkan Database IndexedDB jika ada
+                if ('indexedDB' in window) {
+                    try {
+                        if (window.indexedDB.databases) {
+                            const dbs = await window.indexedDB.databases();
+                            for (let db of dbs) {
+                                window.indexedDB.deleteDatabase(db.name);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Gagal membersihkan IndexedDB:", e);
+                    }
+                }
+
+                // 5. Kembalikan ke halaman login awal
+                window.location.href = "index.html";
             }
         }
     </script>
