@@ -14,11 +14,12 @@
       --text-muted: #64748b;
       --border: #e2e8f0;
       --success: #10b981;
+      --success-hover: #059669;
     }
 
     * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 24px; }
-    .container { max-width: 900px; margin: 0 auto; }
+    .container { max-width: 950px; margin: 0 auto; }
     
     .header { text-align: center; margin-bottom: 28px; }
     .header h1 { font-size: 26px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0; }
@@ -43,31 +44,38 @@
 
     .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .results-title { font-size: 18px; font-weight: 700; margin: 0; }
-    .sync-badge { font-size: 12px; background: #ecfdf5; color: #047857; padding: 4px 10px; border-radius: 20px; font-weight: 600; border: 1px solid #a7f3d0; }
+    .sync-badge { font-size: 12px; background: #ecfdf5; color: #047857; padding: 4px 10px; border-radius: 20px; font-weight: 600; border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 4px; }
 
-    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
-    .item-card:hover { transform: translateY(-2px); border-color: #cbd5e1; }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.015); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, border-color 0.2s; }
+    .item-card:hover { transform: translateY(-3px); border-color: #cbd5e1; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04); }
     
-    .card-tags { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .card-tags { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
     .tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
     .tag-blue { background: #eff6ff; color: #1d4ed8; }
     .tag-green { background: #f0fdf4; color: #15803d; }
     .tag-gray { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
 
-    .card-title { font-size: 15px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-main); line-height: 1.4; }
-    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+    .card-title { font-size: 16px; font-weight: 700; margin: 0 0 10px 0; color: var(--text-main); line-height: 1.4; }
+    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; min-height: 60px; }
     
-    /* Tombol Link Aktif */
-    .btn-link { display: inline-block; width: 100%; text-align: center; padding: 8px 12px; background: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; margin-bottom: 12px; transition: background 0.2s; }
-    .btn-link:hover { background: #1d4ed8; }
+    .contact-info { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; }
+    .contact-info b { color: var(--text-main); }
+    
+    .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+    
+    .btn-link { display: inline-flex; align-items: center; justify-content: center; width: 100%; text-align: center; padding: 10px; background: var(--primary); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: background 0.2s; gap: 6px; }
+    .btn-link:hover { background: var(--primary-hover); }
 
-    .card-meta { font-size: 12px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between; color: var(--text-muted); }
+    .btn-wa { display: inline-flex; align-items: center; justify-content: center; width: 100%; text-align: center; padding: 10px; background: var(--success); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 13px; font-weight: 600; transition: background 0.2s; gap: 6px; border: none; cursor: pointer; }
+    .btn-wa:hover { background: var(--success-hover); }
+
+    .card-meta { font-size: 11px; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; display: flex; justify-content: space-between; color: var(--text-muted); }
 
     .spinner { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid white; width: 16px; height: 16px; animation: spin 0.8s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .empty-state { text-align: center; padding: 40px 20px; background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--border); color: var(--text-muted); font-size: 14px; }
+    .empty-state { text-align: center; padding: 50px 20px; background: var(--bg-card); border-radius: 14px; border: 1px dashed var(--border); color: var(--text-muted); font-size: 14px; grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -131,7 +139,7 @@
           <label for="kategori">Kategori Lomba</label>
           <select id="kategori">
             <option value="ALL">ALL (Semua)</option>
-            <option value="KITAB">KITAB / MARAHA</option>
+            <option value="KITAB">KITAB / MARAHAL</option>
             <option value="TAHFIDZ">TAHFIDZ</option>
             <option value="PIDATO">PIDATO</option>
           </select>
@@ -168,7 +176,7 @@
 
   <div id="resultsGrid" class="results-grid">
     <div class="empty-state">
-      Pilih filter di atas lalu klik tombol <b>"Proses AI & Cari Realtime"</b>.
+      Pilih kriteria filter di atas kemudian klik tombol <b>"Proses AI & Cari Realtime"</b>.
     </div>
   </div>
 
@@ -176,6 +184,7 @@
 
 <script>
   let activeMode = 'beasiswa';
+  // Silakan sesuaikan URL Web App Apps Script Anda
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym6cothw1aVyIe22WQgO7xQTSOxaWSrP0fZWc3x3wLxR6W7FcSDvqX8UhQquvJguBJuQ/exec";
 
   function switchMode(mode) {
@@ -209,13 +218,13 @@
     const syncStatus = document.getElementById('syncStatus');
 
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = `<div class="spinner"></div> <span>Gemini AI Sedang Searching Web...</span>`;
+    btnSubmit.innerHTML = `<div class="spinner"></div> <span>Gemini AI Sedang Mencari Data Aktif...</span>`;
     syncStatus.classList.add('hidden');
     
     resultsGrid.innerHTML = `
       <div class="empty-state">
-        <div class="spinner" style="border-top-color: var(--primary); border-color: #e2e8f0; width:22px; height:22px; margin: 0 auto 12px auto;"></div>
-        Sedang mencari link pendaftaran realtime di internet...
+        <div class="spinner" style="border-top-color: var(--primary); border-color: #e2e8f0; width:26px; height:26px; margin: 0 auto 16px auto;"></div>
+        Sedang memproses dan mencari tautan rujukan resmi di internet...
       </div>`;
 
     let payload = {
@@ -247,14 +256,34 @@
         syncStatus.classList.remove('hidden');
         renderCards(res.data);
       } else {
-        resultsGrid.innerHTML = `<div class="empty-state">⚠️ Data tidak ditemukan. Silakan ganti kombinasi filter.</div>`;
+        resultsGrid.innerHTML = `<div class="empty-state">⚠️ Data tidak ditemukan. Silakan ganti kombinasi opsi filter Anda.</div>`;
       }
     })
     .catch(err => {
       btnSubmit.disabled = false;
       btnSubmit.innerHTML = `<span>Proses AI & Cari Realtime</span>`;
-      resultsGrid.innerHTML = `<div class="empty-state" style="color:#dc2626;">Terjadi kesalahan: ${err.message}</div>`;
+      resultsGrid.innerHTML = `<div class="empty-state" style="color:#dc2626;">Terjadi kesalahan sistem: ${err.message}</div>`;
     });
+  }
+
+  /**
+   * Fungsi untuk membuat tautan WhatsApp langsung dari teks nomor kontak
+   */
+  function buildWhatsAppLink(contactText) {
+    if (!contactText || contactText === "-") return null;
+    
+    // Mengekstrak semua digit angka dari teks kontak
+    const cleanNumbers = contactText.replace(/\D/g, '');
+    
+    if (cleanNumbers.length >= 9) {
+      let waNumber = cleanNumbers;
+      // Konversi format nomor lokal 08xx ke kode internasional 628xx
+      if (waNumber.startsWith('0')) {
+        waNumber = '62' + waNumber.slice(1);
+      }
+      return `https://wa.me/${waNumber}`;
+    }
+    return null;
   }
 
   function renderCards(items) {
@@ -266,6 +295,19 @@
       card.className = 'item-card';
 
       const linkUrl = item.link || '#';
+      const waLink = buildWhatsAppLink(item.kontak);
+      
+      // Mengatur tampilan penulisan kontak
+      let contactHtml = `<div class="contact-info"><b>Kontak:</b> ${item.kontak || '-'}</div>`;
+      
+      let waButtonHtml = '';
+      if (waLink) {
+        waButtonHtml = `
+          <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-wa">
+            Hubungi via WhatsApp 💬
+          </a>
+        `;
+      }
 
       card.innerHTML = `
         <div>
@@ -276,15 +318,17 @@
           </div>
           <h3 class="card-title">${item.judul}</h3>
           <p class="card-desc">${item.deskripsi}</p>
+          ${contactHtml}
         </div>
 
-        <div>
+        <div class="button-group">
           <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn-link">
              Cek / Buka Sumber Info 🔗
           </a>
+          ${waButtonHtml}
           <div class="card-meta">
             <span>Kategori: <b>${item.kategori}</b></span>
-            <span>Verified AI</span>
+            <span>Verified AI Grounding</span>
           </div>
         </div>
       `;
