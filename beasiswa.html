@@ -57,6 +57,11 @@
 
     .card-title { font-size: 15px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-main); line-height: 1.4; }
     .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+    
+    /* Tombol Link Aktif */
+    .btn-link { display: inline-block; width: 100%; text-align: center; padding: 8px 12px; background: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; margin-bottom: 12px; transition: background 0.2s; }
+    .btn-link:hover { background: #1d4ed8; }
+
     .card-meta { font-size: 12px; border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between; color: var(--text-muted); }
 
     .spinner { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid white; width: 16px; height: 16px; animation: spin 0.8s linear infinite; }
@@ -71,7 +76,7 @@
   
   <div class="header">
     <h1>Portal Pencarian Beasiswa & Lomba</h1>
-    <p>Sistem Pencarian Cerdas Berbasis Gemini AI & Google Sheets</p>
+    <p>Pencarian Real-Time Berbasis Gemini AI & Google Sheets</p>
   </div>
 
   <div class="filter-card">
@@ -151,19 +156,19 @@
       </div>
 
       <button type="button" id="btnSubmit" class="submit-btn" onclick="submitData()">
-        <span>Proses AI & Tampilkan Hasil</span>
+        <span>Proses AI & Cari Realtime</span>
       </button>
     </form>
   </div>
 
   <div class="results-header">
-    <h2 class="results-title">Hasil Pencarian AI</h2>
+    <h2 class="results-title">Hasil Pencarian Realtime</h2>
     <span id="syncStatus" class="sync-badge hidden">✓ Tersimpan di Google Sheets</span>
   </div>
 
   <div id="resultsGrid" class="results-grid">
     <div class="empty-state">
-      Silakan pilih filter di atas lalu klik <b>"Proses AI & Tampilkan Hasil"</b>.
+      Pilih filter di atas lalu klik tombol <b>"Proses AI & Cari Realtime"</b>.
     </div>
   </div>
 
@@ -204,13 +209,13 @@
     const syncStatus = document.getElementById('syncStatus');
 
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = `<div class="spinner"></div> <span>Gemini AI Sedang Mencari Data...</span>`;
+    btnSubmit.innerHTML = `<div class="spinner"></div> <span>Gemini AI Sedang Searching Web...</span>`;
     syncStatus.classList.add('hidden');
     
     resultsGrid.innerHTML = `
       <div class="empty-state">
         <div class="spinner" style="border-top-color: var(--primary); border-color: #e2e8f0; width:22px; height:22px; margin: 0 auto 12px auto;"></div>
-        Menghubungkan ke Gemini AI & Google Sheets...
+        Sedang mencari link pendaftaran realtime di internet...
       </div>`;
 
     let payload = {
@@ -236,18 +241,18 @@
     .then(res => res.json())
     .then(res => {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = `<span>Proses AI & Tampilkan Hasil</span>`;
+      btnSubmit.innerHTML = `<span>Proses AI & Cari Realtime</span>`;
 
       if (res.status === "success" && res.data && res.data.length > 0) {
         syncStatus.classList.remove('hidden');
         renderCards(res.data);
       } else {
-        resultsGrid.innerHTML = `<div class="empty-state">⚠️ Tidak ada data ditemukan. Silakan ganti kombinasi filter.</div>`;
+        resultsGrid.innerHTML = `<div class="empty-state">⚠️ Data tidak ditemukan. Silakan ganti kombinasi filter.</div>`;
       }
     })
     .catch(err => {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = `<span>Proses AI & Tampilkan Hasil</span>`;
+      btnSubmit.innerHTML = `<span>Proses AI & Cari Realtime</span>`;
       resultsGrid.innerHTML = `<div class="empty-state" style="color:#dc2626;">Terjadi kesalahan: ${err.message}</div>`;
     });
   }
@@ -260,6 +265,8 @@
       const card = document.createElement('div');
       card.className = 'item-card';
 
+      const linkUrl = item.link || '#';
+
       card.innerHTML = `
         <div>
           <div class="card-tags">
@@ -270,9 +277,15 @@
           <h3 class="card-title">${item.judul}</h3>
           <p class="card-desc">${item.deskripsi}</p>
         </div>
-        <div class="card-meta">
-          <span>Kategori: <b>${item.kategori}</b></span>
-          <span>Verified AI</span>
+
+        <div>
+          <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="btn-link">
+             Cek / Buka Sumber Info 🔗
+          </a>
+          <div class="card-meta">
+            <span>Kategori: <b>${item.kategori}</b></span>
+            <span>Verified AI</span>
+          </div>
         </div>
       `;
 
