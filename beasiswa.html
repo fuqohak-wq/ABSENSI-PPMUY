@@ -3,167 +3,232 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cari Beasiswa & Lomba AI</title>
+  <title>Portal Beasiswa & Lomba AI</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .card { background: #ffffff; padding: 28px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 550px; }
-    h2 { text-align: center; color: #1a1a1a; margin-top: 0; margin-bottom: 24px; font-size: 22px; font-weight: 700; }
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 24px; }
     
-    .nav-buttons { display: flex; gap: 10px; margin-bottom: 24px; background: #eef2f5; padding: 6px; border-radius: 10px; }
-    .nav-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; background: transparent; color: #666; transition: all 0.3s ease; }
-    .nav-btn.active { background: #007bff; color: #ffffff; box-shadow: 0 2px 8px rgba(0,123,255,0.3); }
+    .container { max-width: 1000px; margin: 0 auto; }
     
-    .form-group { margin-bottom: 18px; }
-    label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 14px; }
-    select { width: 100%; padding: 12px; border: 1px solid #cccccc; border-radius: 8px; font-size: 14px; background-color: #fff; transition: border-color 0.2s; }
-    select:focus { outline: none; border-color: #007bff; }
+    /* Header Bar */
+    .header { text-align: center; margin-bottom: 32px; }
+    .header h1 { font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 8px 0; letter-spacing: -0.5px; }
+    .header p { color: var(--text-muted); font-size: 15px; margin: 0; }
+
+    /* Search & Filter Card */
+    .filter-card { background: var(--bg-card); padding: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); margin-bottom: 32px; }
     
-    .submit-btn { width: 100%; padding: 14px; border: none; border-radius: 8px; background: #28a745; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-    .submit-btn:hover { background: #218838; }
-    .submit-btn:disabled { background: #a5d6a7; cursor: not-allowed; }
-    
+    .nav-tabs { display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 10px 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; color: var(--text-muted); background: transparent; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .form-group select { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background-color: #fff; color: var(--text-main); outline: none; transition: border-color 0.2s; }
+    .form-group select:focus { border-color: var(--primary); }
+
+    .submit-btn { width: 100%; padding: 12px 20px; border: none; border-radius: 8px; background: var(--primary); color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .submit-btn:hover { background: var(--primary-hover); }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
     .hidden { display: none; }
-    #status { margin-top: 20px; text-align: center; font-weight: 600; font-size: 14px; word-break: break-word; }
+
+    /* Results Section / Viewer */
+    .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .results-title { font-size: 20px; font-weight: 700; color: var(--text-main); margin: 0; }
+    .sync-badge { font-size: 12px; background: #ecfdf5; color: #047857; padding: 4px 10px; border-radius: 20px; font-weight: 600; border: 1px solid #a7f3d0; }
+
+    /* Result Cards Grid */
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .item-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
+    .item-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     
+    .card-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+    .tag-blue { background: #eff6ff; color: #1d4ed8; }
+    .tag-green { background: #f0fdf4; color: #15803d; }
+    .tag-gray { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+    .card-title { font-size: 16px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-main); line-height: 1.4; }
+    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+    
+    .card-meta { font-size: 12px; border-top: 1px solid var(--border); pt: 12px; padding-top: 12px; display: flex; justify-content: space-between; color: var(--text-muted); }
+
     /* Loading Spinner */
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; vertical-align: middle; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid white; width: 16px; height: 16px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 48px 20px; background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--border); color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Pencarian Beasiswa & Lomba AI</h2>
+<div class="container">
   
-  <div class="nav-buttons">
-    <button type="button" class="nav-btn active" onclick="switchMode('beasiswa')">Cari Beasiswa</button>
-    <button type="button" class="nav-btn" onclick="switchMode('lomba')">Cari Lomba</button>
+  <div class="header">
+    <h1>Portal Pencarian Beasiswa & Lomba</h1>
+    <p>Cari informasi terkini secara cerdas berbasis Gemini AI & Google Sheets</p>
   </div>
 
-  <form id="searchForm">
-    <!-- Filter Tahun -->
-    <div class="form-group">
-      <label for="tahun">Tahun</label>
-      <select id="tahun" name="tahun">
-        <option value="ALL">ALL (Semua Tahun)</option>
-        <option value="2026" selected>2026</option>
-        <option value="2025">2025</option>
-        <option value="2024">2024</option>
-      </select>
+  <!-- Form Filter -->
+  <div class="filter-card">
+    <div class="nav-tabs">
+      <button type="button" class="tab-btn active" onclick="switchMode('beasiswa')">Cari Beasiswa</button>
+      <button type="button" class="tab-btn" onclick="switchMode('lomba')">Cari Lomba</button>
     </div>
 
-    <!-- Mode Beasiswa -->
-    <div id="section-beasiswa">
-      <div class="form-group">
-        <label for="jurusan">Jurusan</label>
-        <select id="jurusan" name="jurusan">
-          <option value="ALL">ALL (Semua Jurusan)</option>
-          <option value="USHULUDDIN">USHULUDDIN</option>
-          <option value="TARBIYAH">TARBIYAH</option>
-          <option value="SYARIAH">SYARIAH</option>
-          <option value="FEBI">FEBI</option>
-          <option value="UMUM">UMUM</option>
-        </select>
+    <form id="searchForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tahun">Tahun</label>
+          <select id="tahun">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+
+        <!-- Section Beasiswa -->
+        <div id="sec-beasiswa" class="form-group">
+          <label for="jurusan">Jurusan</label>
+          <select id="jurusan">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="USHULUDDIN">USHULUDDIN</option>
+            <option value="TARBIYAH">TARBIYAH</option>
+            <option value="SYARIAH">SYARIAH</option>
+            <option value="FEBI">FEBI</option>
+          </select>
+        </div>
+        <div id="sec-beasiswa-2" class="form-group">
+          <label for="tingkat">Tingkat</label>
+          <select id="tingkat">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="S1">S1</option>
+            <option value="S2">S2</option>
+            <option value="S3">S3</option>
+          </select>
+        </div>
+        <div id="sec-beasiswa-3" class="form-group">
+          <label for="daerah">Daerah</label>
+          <select id="daerah">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="PATI">PATI</option>
+            <option value="KUDUS">KUDUS</option>
+            <option value="JEPARA">JEPARA</option>
+          </select>
+        </div>
+
+        <!-- Section Lomba -->
+        <div id="sec-lomba-1" class="form-group hidden">
+          <label for="kategori">Kategori Lomba</label>
+          <select id="kategori">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="KITAB">KITAB / MARAHA</option>
+            <option value="TAHFIDZ">TAHFIDZ</option>
+            <option value="PIDATO">PIDATO</option>
+          </select>
+        </div>
+        <div id="sec-lomba-2" class="form-group hidden">
+          <label for="biaya">Biaya Pendaftaran</label>
+          <select id="biaya">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="GRATIS">GRATIS</option>
+            <option value="BAYAR">BERBAYAR</option>
+          </select>
+        </div>
+        <div id="sec-lomba-3" class="form-group hidden">
+          <label for="tempat">Tempat / Pelaksanaan</label>
+          <select id="tempat">
+            <option value="ALL">ALL (Semua)</option>
+            <option value="ONLINE">ONLINE</option>
+            <option value="PATI">PATI</option>
+            <option value="KUDUS">KUDUS</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="tingkat">Tingkat Pendidikan</label>
-        <select id="tingkat" name="tingkat">
-          <option value="ALL">ALL (Semua Jenjang)</option>
-          <option value="S1">S1</option>
-          <option value="S2">S2</option>
-          <option value="S3">S3</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="daerah">Daerah / Wilayah</label>
-        <select id="daerah" name="daerah">
-          <option value="ALL">ALL (Semua Daerah)</option>
-          <option value="PATI">PATI</option>
-          <option value="KUDUS">KUDUS</option>
-          <option value="JEPARA">JEPARA</option>
-          <option value="REMBANG">REMBANG</option>
-          <option value="NASIONAL">NASIONAL / INDONESIA</option>
-        </select>
-      </div>
+
+      <button type="button" id="btnSubmit" class="submit-btn" onclick="submitData()">
+        <span>Proses AI & Tampilkan Hasil</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Viewer Hasil / Cards Display -->
+  <div class="results-header">
+    <h2 class="results-title">Hasil Pencarian AI</h2>
+    <span id="syncStatus" class="sync-badge hidden">✓ Tersimpan di Google Sheets</span>
+  </div>
+
+  <div id="resultsGrid" class="results-grid">
+    <div class="empty-state">
+      Silakan pilih filter di atas lalu klik <b>"Proses AI & Tampilkan Hasil"</b> untuk menemukan info beasiswa/lomba.
     </div>
+  </div>
 
-    <!-- Mode Lomba -->
-    <div id="section-lomba" class="hidden">
-      <div class="form-group">
-        <label for="kategori">Kategori Lomba</label>
-        <select id="kategori" name="kategori">
-          <option value="ALL">ALL (Semua Kategori)</option>
-          <option value="KITAB">KITAB / MARAHA</option>
-          <option value="TAHFIDZ">TAHFIDZ AL-QUR'AN</option>
-          <option value="PIDATO">PIDATO / DAI</option>
-          <option value="ESAI">ESAI / KARYA TULIS</option>
-          <option value="DESIGN">DESAIN / FOTOGRAFI</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="biaya">Biaya Pendaftaran</label>
-        <select id="biaya" name="biaya">
-          <option value="ALL">ALL (Semua)</option>
-          <option value="GRATIS">GRATIS</option>
-          <option value="BAYAR">BERBAYAR</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="tempat">Tempat / Pelaksanaan</label>
-        <select id="tempat" name="tempat">
-          <option value="ALL">ALL (Semua Lokasi)</option>
-          <option value="ONLINE">ONLINE</option>
-          <option value="PATI">PATI</option>
-          <option value="KUDUS">KUDUS</option>
-          <option value="JEPARA">JEPARA</option>
-          <option value="REMBANG">REMBANG</option>
-        </select>
-      </div>
-    </div>
-
-    <button type="button" id="btnSubmit" class="submit-btn" onclick="submitData()">Proses AI & Simpan ke Sheets</button>
-  </form>
-
-  <div id="status"></div>
 </div>
 
 <script>
   let activeMode = 'beasiswa';
-
-  // URL Google Apps Script milikmu
+  
+  // URL Deployment Web App Apps Script milikmu
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbym6cothw1aVyIe22WQgO7xQTSOxaWSrP0fZWc3x3wLxR6W7FcSDvqX8UhQquvJguBJuQ/exec";
 
   function switchMode(mode) {
     activeMode = mode;
-    const btns = document.querySelectorAll('.nav-btn');
-    const secBeasiswa = document.getElementById('section-beasiswa');
-    const secLomba = document.getElementById('section-lomba');
+    const btns = document.querySelectorAll('.tab-btn');
+    
+    const b1 = document.getElementById('sec-beasiswa');
+    const b2 = document.getElementById('sec-beasiswa-2');
+    const b3 = document.getElementById('sec-beasiswa-3');
+
+    const l1 = document.getElementById('sec-lomba-1');
+    const l2 = document.getElementById('sec-lomba-2');
+    const l3 = document.getElementById('sec-lomba-3');
 
     if (mode === 'beasiswa') {
       btns[0].classList.add('active');
       btns[1].classList.remove('active');
-      secBeasiswa.classList.remove('hidden');
-      secLomba.classList.add('hidden');
+      
+      b1.classList.remove('hidden'); b2.classList.remove('hidden'); b3.classList.remove('hidden');
+      l1.classList.add('hidden'); l2.classList.add('hidden'); l3.classList.add('hidden');
     } else {
       btns[1].classList.add('active');
       btns[0].classList.remove('active');
-      secLomba.classList.remove('hidden');
-      secBeasiswa.classList.add('hidden');
+      
+      b1.classList.add('hidden'); b2.classList.add('hidden'); b3.classList.add('hidden');
+      l1.classList.remove('hidden'); l2.classList.remove('hidden'); l3.classList.remove('hidden');
     }
   }
 
   function submitData() {
-    const statusDiv = document.getElementById('status');
     const btnSubmit = document.getElementById('btnSubmit');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const syncStatus = document.getElementById('syncStatus');
 
-    // UI Loading State
+    // State Loading UI
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = `<span class="spinner"></span> AI Sedang Mencari & Menyimpan...`;
-    statusDiv.style.color = '#007bff';
-    statusDiv.innerText = "Sedang memproses permintaan dengan Gemini AI...";
+    btnSubmit.innerHTML = `<div class="spinner"></div> <span>Gemini AI Sedang Mencari Data...</span>`;
+    syncStatus.classList.add('hidden');
+    resultsGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="spinner" style="border-top-color: var(--primary); border-color: #e2e8f0; width:24px; height:24px; margin: 0 auto 12px auto;"></div>
+        Memproses permintaan dengan AI & menghubungkan ke internet...
+      </div>`;
 
-    // Siapkan Payload Data
+    // Ambil Nilai Form
     let payload = {
       jenis: activeMode.toUpperCase(),
       tahun: document.getElementById('tahun').value,
@@ -179,30 +244,62 @@
       payload.daerah_tempat = document.getElementById('tempat').value;
     }
 
-    // Mengirim Data ke Google Apps Script
+    // Kirim Request
     fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Menggunakan text/plain untuk menghindari CORS pre-flight block dari Apps Script
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(res => res.json())
+    .then(res => {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = "Proses AI & Simpan ke Sheets";
+      btnSubmit.innerHTML = `<span>Proses AI & Tampilkan Hasil</span>`;
 
-      if (data.status === "success") {
-        statusDiv.style.color = '#28a745';
-        statusDiv.innerText = " Berhasil! Data riwayat dan hasil pencarian Gemini AI telah disimpan ke Google Sheets.";
+      if (res.status === "success" && res.data && res.data.length > 0) {
+        syncStatus.classList.remove('hidden');
+        renderCards(res.data);
       } else {
-        statusDiv.style.color = '#dc3545';
-        statusDiv.innerText = " Terjadi kesalahan: " + (data.message || "Gagal memproses data.");
+        resultsGrid.innerHTML = `
+          <div class="empty-state">
+            ⚠️ Tidak dapat menemukan data spesifik atau AI sedang sibuk. Silakan coba kombinasi filter lainnya.
+          </div>`;
       }
     })
-    .catch(error => {
+    .catch(err => {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = "Proses AI & Simpan ke Sheets";
-      statusDiv.style.color = '#dc3545';
-      statusDiv.innerText = " Gagal menghubungi server: " + error.message;
+      btnSubmit.innerHTML = `<span>Proses AI & Tampilkan Hasil</span>`;
+      resultsGrid.innerHTML = `
+        <div class="empty-state" style="color:#dc2626;">
+          Gagal terhubung ke server: ${err.message}
+        </div>`;
+    });
+  }
+
+  function renderCards(items) {
+    const resultsGrid = document.getElementById('resultsGrid');
+    resultsGrid.innerHTML = "";
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'item-card';
+
+      card.innerHTML = `
+        <div>
+          <div class="card-tags">
+            <span class="tag tag-blue">${item.tahun || '2026'}</span>
+            <span class="tag tag-green">${item.tingkat_biaya || 'UMUM'}</span>
+            <span class="tag tag-gray">${item.lokasi || 'NASIONAL'}</span>
+          </div>
+          <h3 class="card-title">${item.judul}</h3>
+          <p class="card-desc">${item.deskripsi}</p>
+        </div>
+        <div class="card-meta">
+          <span>Kategori: <b>${item.kategori}</b></span>
+          <span> Verified AI</span>
+        </div>
+      `;
+
+      resultsGrid.appendChild(card);
     });
   }
 </script>
