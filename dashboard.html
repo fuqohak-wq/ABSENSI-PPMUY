@@ -80,14 +80,13 @@
         
         <!-- TOMBOL CONTROL HEADER -->
         <div class="flex items-center gap-1.5 sm:gap-2">
-            <!-- TOMBOL HAPUS CACHE DI HEADER (Merah Elegan) -->
             <button onclick="clearWebCache()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-red-400 hover:text-red-300" title="Hapus Cache Web">
                 <i class="fa-solid fa-trash text-base"></i>
             </button>
             <button onclick="toggleTema()" id="btn-tema" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-amber-400" title="Ganti Tema">
                 <i class="fa-solid fa-sun text-base"></i>
             </button>
-            <button onclick="muatSeluruhRekapDashboard(true)" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap">
+            <button onclick="refreshManual()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 text-emerald-400 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow" title="Refresh Rekap">
                 <i id="icon-refresh" class="fa-solid fa-rotate"></i>
             </button>
             <button onclick="prosesLogout()" class="w-10 h-10 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-indigo-950 flex items-center justify-center cursor-pointer border-2 border-white shadow transition-all"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -107,7 +106,6 @@
                 <a href="daftarwajah.html" class="text-xs font-black text-yellow-400 flex items-center gap-1 uppercase tracking-widest mt-4 hover:underline">BUKA MENU <i class="fa-solid fa-circle-arrow-right"></i></a>
             </div>
 
-            <!-- MENU SCAN WAJAH DIUBAH MENJADI PELUNCUR DIALOG -->
             <div id="menu-scan-wajah" class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
                 <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-face-viewfinder text-indigo-900 text-base"></i></div>
                 <div class="mt-3">
@@ -204,23 +202,25 @@
         <!-- REKAP DATA SECTION -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
             <div class="lg:col-span-2 flex flex-col gap-6">
+                <!-- 3 CARDS TOP STATS -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md">
                         <span class="text-[10px] font-black dynamic-text-title tracking-wider block uppercase">TOTAL SANTRI</span>
-                        <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
+                        <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
                     </div>
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-md">
                         <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 tracking-wider block uppercase">SUDAH REGISTRASI</span>
-                        <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
+                        <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
                     </div>
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-md">
                         <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">BELUM REGISTRASI</span>
-                        <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">...</span>
+                        <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
                     </div>
                 </div>
 
                 <!-- DUA SUB-GRID ANALISIS AKTIVITAS SIKLUS -->
                 <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-md flex flex-col gap-6">
+                    <!-- REKAP JAMAAH SHALAT -->
                     <div>
                         <h3 class="text-xs font-black text-cyan-600 dark:text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-chart-simple text-sm"></i> REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
@@ -247,6 +247,7 @@
                         </div>
                     </div>
 
+                    <!-- REKAP KEGIATAN KEPESANTRENAN -->
                     <div>
                         <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-sm"></i> REKAP KEGIATAN KEPESANTRENAN</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
@@ -400,9 +401,14 @@
       </button>
     </div>
 
-    <!-- SCRIPT UTAMA DASHBOARD -->
+    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (1 DETIK) -->
     <script>
+        // API URL UTAMA (Untuk sesi, peran, log feed real-time, dan list santri)
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        
+        // API URL KHUSUS REKAP KEGIATAN & STATISTIK (Interval 1 Detik)
+        const REKAP_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec';
+
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
@@ -493,13 +499,69 @@
             setTemaAplikasi(temaSimpanan);
             
             muatDariCacheLokal();
-            muatSeluruhRekapDashboard(false);
 
-            // MEMBACA DATA REKAPITULASI DENGAN INTERVAL 3 DETIK (REALTIME AMAN)
+            // 1. Panggil Statistik Jumlah Kegiatan secara Cepat (1 Detik)
+            fetchRekapKegiatanKhusus();
+            setInterval(fetchRekapKegiatanKhusus, 1000);
+
+            // 2. Panggil Data Umum & Kiosk Real-Time (3 Detik)
+            muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
         });
+
+        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK (MENGGUNAKAN CODE.GS BARU ANDA)
+        async function fetchRekapKegiatanKhusus() {
+            try {
+                const response = await fetch(REKAP_APPS_SCRIPT_URL);
+                const data = await response.json();
+
+                if (data && data.rekap) {
+                    updateRekapUIKhusus(data.rekap);
+                }
+            } catch (err) {
+                console.error("Gagal mengambil data rekap kegiatan khusus:", err);
+            }
+        }
+
+        function updateRekapUIKhusus(rekap) {
+            const setVal = (id, key) => {
+                const el = document.getElementById(id);
+                if (el && rekap[key] !== undefined) {
+                    el.innerText = rekap[key];
+                }
+            };
+
+            // STATS ATAS
+            setVal('stat-total', 'TOTAL SANTRI');
+            setVal('stat-sudah', 'SUDAH REGISTRASI');
+            setVal('stat-belum', 'BELUM REGISTRASI');
+
+            // REKAP SHALAT
+            setVal('v-subuh', 'SUBUH');
+            setVal('v-dzuhur', 'DZUHUR');
+            setVal('v-ashar', 'ASHAR');
+            setVal('v-maghrib', 'MAGHRIB');
+            setVal('v-isya', 'ISYA');
+
+            // REKAP KEGIATAN
+            setVal('v-quranan', 'QURANAN');
+            setVal('v-afsahan', 'AFSAHAN');
+            setVal('v-belajar', 'BELAJAR');
+            setVal('v-ndalem', 'NDALEM');
+            setVal('v-sorogan', 'SOROGAN');
+            setVal('v-pdf1', 'PDF 1');
+            setVal('v-pdf2', 'PDF 2');
+            setVal('v-pdf3', 'PDF 3');
+            setVal('v-ziarah', 'ZIARAH');
+            setVal('v-jumatan', 'JUMATAN');
+        }
+
+        function refreshManual() {
+            fetchRekapKegiatanKhusus();
+            muatSeluruhRekapDashboard(true);
+        }
 
         function terapkanOtoritasMenu(userRole) {
             const semuaIdMenu = [
@@ -677,37 +739,13 @@
         function tampilkanDataKeUI(r, feedBox) {
             if (!r) return;
             
+            // Render list santri (Validasi Master Data)
             r.rekapWajah = r.rekapWajah || {};
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
-
-            document.getElementById('stat-total').innerText = r.rekapWajah.total || '0';
-            document.getElementById('stat-sudah').innerText = r.rekapWajah.sudah || '0';
-            document.getElementById('stat-belum').innerText = r.rekapWajah.belum || '0';
-
-            r.rekapShalat = r.rekapShalat || {};
-            
-            // Jamaah Shalat
-            document.getElementById('v-subuh').innerText = r.rekapShalat.Subuh || 0;
-            document.getElementById('v-dzuhur').innerText = r.rekapShalat.Dzuhur || 0;
-            document.getElementById('v-ashar').innerText = r.rekapShalat.Ashar || 0;
-            document.getElementById('v-maghrib').innerText = r.rekapShalat.Maghrib || 0;
-            document.getElementById('v-isya').innerText = r.rekapShalat.Isya || 0;
-
-            // Kegiatan Kepesantrenan (Termasuk Ziarah & Jumatan)
-            document.getElementById('v-quranan').innerText = r.rekapShalat.Quranan || 0;
-            document.getElementById('v-afsahan').innerText = r.rekapShalat.Afsahan || 0;
-            document.getElementById('v-belajar').innerText = r.rekapShalat.Belajar || 0;
-            document.getElementById('v-ndalem').innerText = r.rekapShalat.Ndalem || 0;
-            document.getElementById('v-sorogan').innerText = r.rekapShalat.Sorogan || 0;
-            document.getElementById('v-pdf1').innerText = r.rekapShalat["PDF 1"] || 0;
-            document.getElementById('v-pdf2').innerText = r.rekapShalat["PDF 2"] || 0;
-            document.getElementById('v-pdf3').innerText = r.rekapShalat["PDF 3"] || 0;
-            document.getElementById('v-ziarah').innerText = r.rekapShalat.Ziarah || 0;
-            document.getElementById('v-jumatan').innerText = r.rekapShalat.Jumatan || 0;
-
             renderTabelWajah();
             
+            // Render Live Feed Kiosk
             if(feedBox) {
                 if (!r.liveFeed || r.liveFeed.length === 0) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
@@ -749,11 +787,9 @@
     <script>
         async function clearWebCache() {
             if (confirm("Hapus seluruh cache web, data login, dan muat ulang aplikasi dari awal?")) {
-                // 1. Hapus Storage Lokal
                 localStorage.clear();
                 sessionStorage.clear();
 
-                // 2. Hapus Cache Storage PWA
                 if ('caches' in window) {
                     try {
                         const cacheNames = await caches.keys();
@@ -765,7 +801,6 @@
                     }
                 }
 
-                // 3. Unregister Seluruh Service Workers
                 if ('serviceWorker' in navigator) {
                     try {
                         const registrations = await navigator.serviceWorker.getRegistrations();
@@ -777,7 +812,6 @@
                     }
                 }
 
-                // 4. Bersihkan Database IndexedDB jika ada
                 if ('indexedDB' in window) {
                     try {
                         if (window.indexedDB.databases) {
@@ -791,7 +825,6 @@
                     }
                 }
 
-                // 5. Kembalikan ke halaman login awal
                 window.location.href = "index.html";
             }
         }
