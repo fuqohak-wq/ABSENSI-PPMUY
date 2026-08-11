@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime Dashboard Absensi Santri</title>
+    <title>Dashboard Rekap Absensi Santri</title>
     <!-- Google Fonts & Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -15,224 +15,178 @@
         .card-shadow {
             box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
         }
-        .custom-scroll::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
     </style>
 </head>
-<body class="p-4 md:p-6 text-slate-800">
+<body class="p-4 md:p-8 text-slate-800">
 
-    <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="max-w-[1400px] mx-auto flex flex-col gap-6">
         
-        <!-- KOLOM KIRI (BAGIAN UTAMA / REKAP & TABLE) -->
-        <div class="lg:col-span-8 flex flex-col gap-6">
-            
-            <!-- TOP STATS (3 CARDS) -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white rounded-2xl p-4 text-center card-shadow border border-slate-100">
-                    <p class="text-[11px] font-extrabold tracking-wider text-blue-900 uppercase">TOTAL SANTRI</p>
-                    <p id="stat-total" class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-1">0</p>
-                </div>
-                <div class="bg-white rounded-2xl p-4 text-center card-shadow border border-slate-100">
-                    <p class="text-[11px] font-extrabold tracking-wider text-emerald-600 uppercase">SUDAH REGISTRASI</p>
-                    <p id="stat-sudah" class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-1">0</p>
-                </div>
-                <div class="bg-white rounded-2xl p-4 text-center card-shadow border border-slate-100">
-                    <p class="text-[11px] font-extrabold tracking-wider text-amber-600 uppercase">BELUM REGISTRASI</p>
-                    <p id="stat-belum" class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-1">0</p>
-                </div>
+        <!-- TOP STATS (3 CARDS FULL WIDTH) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-6 text-center card-shadow border border-slate-100">
+                <p class="text-xs font-extrabold tracking-wider text-blue-900 uppercase">TOTAL SANTRI</p>
+                <p id="stat-total" class="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2">0</p>
             </div>
-
-            <!-- MAIN CONTAINER: REKAP SHALAT & KEPESANTRENAN -->
-            <div class="bg-white rounded-2xl p-6 card-shadow border border-slate-100 flex flex-col gap-6">
-                
-                <!-- REKAP JAMAAH SHALAT -->
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
-                        <h2 class="text-xs font-black tracking-wider text-emerald-600 uppercase">REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h2>
-                    </div>
-                    <div class="grid grid-cols-5 gap-3">
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">SUBUH</p>
-                            <p id="val-subuh" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">DZUHUR</p>
-                            <p id="val-dzuhur" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">ASHAR</p>
-                            <p id="val-ashar" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">MAGHRIB</p>
-                            <p id="val-maghrib" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">ISYA</p>
-                            <p id="val-isya" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- REKAP KEGIATAN KEPESANTRENAN -->
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        <h2 class="text-xs font-black tracking-wider text-emerald-600 uppercase">REKAP KEGIATAN KEPESANTRENAN</h2>
-                    </div>
-                    
-                    <!-- Row 1 -->
-                    <div class="grid grid-cols-5 gap-3 mb-3">
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">QURANAN</p>
-                            <p id="val-quranan" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">AFSAHAN</p>
-                            <p id="val-afsahan" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">BELAJAR</p>
-                            <p id="val-belajar" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">NDALEM</p>
-                            <p id="val-ndalem" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">SOROGAN</p>
-                            <p id="val-sorogan" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                    </div>
-
-                    <!-- Row 2 -->
-                    <div class="grid grid-cols-5 gap-3">
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">PDF 1</p>
-                            <p id="val-pdf1" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">PDF 2</p>
-                            <p id="val-pdf2" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">PDF 3</p>
-                            <p id="val-pdf3" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">ZIARAH</p>
-                            <p id="val-ziarah" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                        <div class="bg-slate-100/80 rounded-xl p-3 text-center">
-                            <p class="text-[10px] font-extrabold text-slate-600">JUMATAN</p>
-                            <p id="val-jumatan" class="text-2xl font-black text-slate-900 mt-1">0</p>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="bg-white rounded-2xl p-6 text-center card-shadow border border-slate-100">
+                <p class="text-xs font-extrabold tracking-wider text-emerald-600 uppercase">SUDAH REGISTRASI</p>
+                <p id="stat-sudah" class="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2">0</p>
             </div>
-
-            <!-- TABEL STATUS REGISTRASI -->
-            <div class="bg-white rounded-2xl p-6 card-shadow border border-slate-100">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex gap-2">
-                        <button class="bg-amber-500 text-white font-extrabold text-xs px-4 py-2 rounded-lg shadow-sm">BELUM DAFTAR</button>
-                        <button class="bg-slate-200 text-slate-600 font-extrabold text-xs px-4 py-2 rounded-lg hover:bg-slate-300">SUDAH DAFTAR</button>
-                    </div>
-                    <span class="text-xs font-bold text-blue-600 tracking-wider">VALIDASI MASTER DATA</span>
-                </div>
-
-                <!-- Table Header -->
-                <div class="grid grid-cols-12 text-[11px] font-extrabold text-blue-600 border-b border-slate-100 pb-2 mb-2">
-                    <div class="col-span-5">NAMA SANTRI</div>
-                    <div class="col-span-4">KELAS</div>
-                    <div class="col-span-3 text-right">STATUS</div>
-                </div>
-
-                <!-- Table Content Placeholder -->
-                <div class="space-y-3 text-xs font-bold text-slate-800">
-                    <div class="grid grid-cols-12 items-center">
-                        <div class="col-span-5 uppercase">MARYATUL ULFA</div>
-                        <div class="col-span-4 text-slate-500">KELAS 9 (ASATIDZ 3)</div>
-                        <div class="col-span-3 text-right">
-                            <span class="bg-amber-100 text-amber-600 text-[10px] font-extrabold px-2 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-12 items-center">
-                        <div class="col-span-5 uppercase">M ZIDAN LAILI AKROMUL HAQ</div>
-                        <div class="col-span-4 text-slate-500">KELAS 7 (ASATIDZ 1)</div>
-                        <div class="col-span-3 text-right">
-                            <span class="bg-amber-100 text-amber-600 text-[10px] font-extrabold px-2 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-12 items-center">
-                        <div class="col-span-5 uppercase">ILYA ZUMROTUL WAFA</div>
-                        <div class="col-span-4 text-slate-500">KELAS 4 (ULYA 1)</div>
-                        <div class="col-span-3 text-right">
-                            <span class="bg-amber-100 text-amber-600 text-[10px] font-extrabold px-2 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-white rounded-2xl p-6 text-center card-shadow border border-slate-100">
+                <p class="text-xs font-extrabold tracking-wider text-amber-600 uppercase">BELUM REGISTRASI</p>
+                <p id="stat-belum" class="text-4xl md:text-5xl font-extrabold text-slate-900 mt-2">0</p>
             </div>
-
         </div>
 
-        <!-- KOLOM KANAN (LIVE KIOSK TRACKER) -->
-        <div class="lg:col-span-4">
-            <div class="bg-white rounded-2xl p-5 card-shadow border border-slate-100 h-full flex flex-col">
-                
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="relative flex h-3 w-3">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                        </span>
-                        <h3 class="text-xs font-black tracking-wider text-emerald-600 uppercase">LIVE KIOSK TRACKER</h3>
+        <!-- MAIN CONTAINER: REKAP SHALAT & KEPESANTRENAN -->
+        <div class="bg-white rounded-2xl p-6 md:p-8 card-shadow border border-slate-100 flex flex-col gap-8">
+            
+            <!-- REKAP JAMAAH SHALAT -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                    <h2 class="text-sm font-black tracking-wider text-emerald-600 uppercase">REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h2>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">SUBUH</p>
+                        <p id="val-subuh" class="text-3xl font-black text-slate-900 mt-2">0</p>
                     </div>
-                    <span class="text-[10px] font-extrabold bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-full">SIKLUS HARI INI</span>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">DZUHUR</p>
+                        <p id="val-dzuhur" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">ASHAR</p>
+                        <p id="val-ashar" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">MAGHRIB</p>
+                        <p id="val-maghrib" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">ISYA</p>
+                        <p id="val-isya" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REKAP KEGIATAN KEPESANTRENAN -->
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <h2 class="text-sm font-black tracking-wider text-emerald-600 uppercase">REKAP KEGIATAN KEPESANTRENAN</h2>
+                </div>
+                
+                <!-- Row 1 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">QURANAN</p>
+                        <p id="val-quranan" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">AFSAHAN</p>
+                        <p id="val-afsahan" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">BELAJAR</p>
+                        <p id="val-belajar" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">NDALEM</p>
+                        <p id="val-ndalem" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">SOROGAN</p>
+                        <p id="val-sorogan" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
                 </div>
 
-                <!-- Live Stream Feed Container -->
-                <div id="live-tracker-feed" class="flex-1 overflow-y-auto custom-scroll space-y-3 pr-1 max-h-[720px]">
-                    <div class="text-center py-6 text-slate-400 text-xs font-semibold">Memuat data realtime...</div>
+                <!-- Row 2 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">PDF 1</p>
+                        <p id="val-pdf1" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">PDF 2</p>
+                        <p id="val-pdf2" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">PDF 3</p>
+                        <p id="val-pdf3" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">ZIARAH</p>
+                        <p id="val-ziarah" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
+                    <div class="bg-slate-100/80 rounded-xl p-4 text-center">
+                        <p class="text-xs font-extrabold text-slate-600">JUMATAN</p>
+                        <p id="val-jumatan" class="text-3xl font-black text-slate-900 mt-2">0</p>
+                    </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- TABEL STATUS REGISTRASI -->
+        <div class="bg-white rounded-2xl p-6 md:p-8 card-shadow border border-slate-100">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex gap-2">
+                    <button class="bg-amber-500 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg shadow-sm">BELUM DAFTAR</button>
+                    <button class="bg-slate-100 text-slate-600 font-extrabold text-xs px-5 py-2.5 rounded-lg hover:bg-slate-200">SUDAH DAFTAR</button>
+                </div>
+                <span class="text-xs font-bold text-blue-600 tracking-wider">VALIDASI MASTER DATA</span>
+            </div>
+
+            <!-- Table Header -->
+            <div class="grid grid-cols-12 text-xs font-extrabold text-blue-600 border-b border-slate-100 pb-3 mb-3">
+                <div class="col-span-5">NAMA SANTRI</div>
+                <div class="col-span-4">KELAS</div>
+                <div class="col-span-3 text-right">STATUS</div>
+            </div>
+
+            <!-- Table Content -->
+            <div class="space-y-4 text-xs font-bold text-slate-800">
+                <div class="grid grid-cols-12 items-center">
+                    <div class="col-span-5 uppercase">MARYATUL ULFA</div>
+                    <div class="col-span-4 text-slate-500">KELAS 9 (ASATIDZ 3)</div>
+                    <div class="col-span-3 text-right">
+                        <span class="bg-amber-100 text-amber-600 text-[11px] font-extrabold px-3 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 items-center">
+                    <div class="col-span-5 uppercase">M ZIDAN LAILI AKROMUL HAQ</div>
+                    <div class="col-span-4 text-slate-500">KELAS 7 (ASATIDZ 1)</div>
+                    <div class="col-span-3 text-right">
+                        <span class="bg-amber-100 text-amber-600 text-[11px] font-extrabold px-3 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 items-center">
+                    <div class="col-span-5 uppercase">ILYA ZUMROTUL WAFA</div>
+                    <div class="col-span-4 text-slate-500">KELAS 4 (ULYA 1)</div>
+                    <div class="col-span-3 text-right">
+                        <span class="bg-amber-100 text-amber-600 text-[11px] font-extrabold px-3 py-1 rounded border-r-2 border-amber-500">BELUM DAFTAR</span>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- SCRIPT REALTIME FETCHING -->
+    <!-- SCRIPT FETCHING FAST REFRESH (1 DETIK) -->
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec';
 
-        async function fetchRealtimeData() {
+        async function fetchRekapData() {
             try {
-                const response = await fetch(APPS_SCRIPT_URL + '?action=getData');
+                const response = await fetch(APPS_SCRIPT_URL);
                 const data = await response.json();
-
-                if (data.error) {
-                    console.error("Error dari Apps Script:", data.error);
-                    return;
-                }
 
                 if (data && data.rekap) {
                     updateRekapUI(data.rekap);
                 }
-                if (data && data.logs) {
-                    updateLiveTrackerUI(data.logs);
-                }
             } catch (err) {
-                console.error("Gagal sinkronisasi data:", err);
+                console.error("Gagal mengambil data:", err);
             }
         }
 
@@ -267,33 +221,9 @@
             setVal('val-jumatan', 'JUMATAN');
         }
 
-        function updateLiveTrackerUI(logs) {
-            const feed = document.getElementById('live-tracker-feed');
-            if (!feed) return;
-
-            if (!logs || logs.length === 0) {
-                feed.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-semibold">Belum ada log absensi</div>`;
-                return;
-            }
-
-            feed.innerHTML = '';
-            logs.forEach(log => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-100/80 p-3 rounded-xl border-r-4 border-emerald-500 flex justify-between items-center transition-all hover:bg-slate-200/60";
-                card.innerHTML = `
-                    <div>
-                        <p class="text-xs font-black text-slate-800 uppercase">${log.nik || 'SANTRI'}</p>
-                        <p class="text-[10px] text-slate-500 font-semibold mt-0.5">${log.timestamp || ''} - ${log.kegiatan || ''} (${log.pengabsen || ''})</p>
-                    </div>
-                    <span class="bg-emerald-200 text-emerald-800 text-[9px] font-black px-2 py-1 rounded">BERHASIL</span>
-                `;
-                feed.appendChild(card);
-            });
-        }
-
-        // Loop polling 1 detik (Kecepatan aman batas kuota API Google)
-        setInterval(fetchRealtimeData, 1000);
-        fetchRealtimeData();
+        // Ambil data setiap 1 detik
+        setInterval(fetchRekapData, 1000);
+        fetchRekapData();
     </script>
 </body>
 </html>
