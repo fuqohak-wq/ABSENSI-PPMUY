@@ -213,7 +213,11 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', muatDataRekap);
+        // Eksekusi data saat pertama kali dimuat, lalu panggil ulang setiap 1 detik (1000 ms)
+        window.addEventListener('DOMContentLoaded', () => {
+            muatDataRekap();
+            setInterval(muatDataRekap, 1000);
+        });
     </script>
 </body>
 </html>
