@@ -437,11 +437,11 @@
       </button>
     </div>
 
-    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (3 DETIK SINKRON, 1 DETIK RENDER) -->
+    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (SINKRONISASI CACHE INSTAN) -->
     <script>
-        // API URL UTAMA (Sesi, peran, log feed real-time, dan list santri)
+        // API URL UTAMA (Untuk sesi, peran, log feed real-time, dan list santri)
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
-        
+
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
@@ -531,20 +531,21 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
+            // RENDERING CACHE INSTAN (0 milidetik - Tidak Menunggu Proses Jaringan / No Loading Screen)
             muatDariCacheLokal();
 
-            // 1. Sinkronisasi UI Kecepatan Tinggi (1 Detik) dari Cache Lokal (Mencegah Limit Google Apps Script)
+            // 1. Sinkronisasi Antarmuka secara Berulang dari Cache Lokal (Setiap 1 Detik)
             fetchRekapKegiatanKhusus();
             setInterval(fetchRekapKegiatanKhusus, 1000);
 
-            // 2. Refresh Data Server dari Google Spreadsheet Utama Secara Latar Belakang (3 Detik)
+            // 2. Tarik Data Terbaru secara Senyap dari Server Utama di Latar Belakang (Setiap 3 Detik)
             muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
         });
 
-        // FUNGSI KHUSUS UNTUK UPDATE STATISTIK LAYAR SECARA CEPAT LEWAT CACHE
+        // FUNGSI KHUSUS UNTUK MEMBACA DATA CACHE LOKAL AGAR LOADING 0ms
         function fetchRekapKegiatanKhusus() {
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
@@ -553,7 +554,7 @@
                     const r = JSON.parse(dataCache);
                     updateStatsUI(r);
                 } catch (e) {
-                    console.warn("Gagal membaca cache lokal untuk statistik:", e);
+                    console.warn("Gagal membaca cache lokal untuk rekap kegiatan:", e);
                 }
             }
         }
