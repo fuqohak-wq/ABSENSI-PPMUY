@@ -202,7 +202,7 @@
         <!-- REKAP DATA SECTION -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
             <div class="lg:col-span-2 flex flex-col gap-6">
-                <!-- 3 CARDS TOP STATS (DENGAN REKAP PUTRA / PUTRI) -->
+                <!-- 3 CARDS TOP STATS (DENGAN DETAIL PUTRA / PUTRI) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md flex flex-col justify-between">
                         <div>
@@ -437,7 +437,7 @@
       </button>
     </div>
 
-    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (1 DETIK) -->
+    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH -->
     <script>
         // API URL UTAMA (Untuk sesi, peran, log feed real-time, dan list santri)
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
@@ -547,7 +547,7 @@
             }, 3000);
         });
 
-        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK
+        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK (Interval 1 Detik)
         async function fetchRekapKegiatanKhusus() {
             try {
                 const response = await fetch(REKAP_APPS_SCRIPT_URL);
@@ -564,12 +564,17 @@
         function updateRekapUIKhusus(rekap) {
             const setVal = (id, key) => {
                 const el = document.getElementById(id);
-                if (el && rekap[key] !== undefined) {
+                if (el && rekap[key] !== undefined && rekap[key] !== null) {
+                    // Pengaman: Jangan biarkan API kedua menimpa detail registrasi wajah yang sudah benar dengan 0
+                    const isStatWajah = id.startsWith('stat-');
+                    if (isStatWajah && Number(rekap[key]) === 0) {
+                        return; 
+                    }
                     el.innerText = rekap[key];
                 }
             };
 
-            // STATS UTAMA
+            // STATS ATAS
             setVal('stat-total', 'TOTAL SANTRI');
             setVal('stat-sudah', 'SUDAH REGISTRASI');
             setVal('stat-belum', 'BELUM REGISTRASI');
@@ -788,6 +793,26 @@
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
             renderTabelWajah();
+
+            // MENULISKAN DATA STATISTIK UTAMA DAN GENDER DETIL DARI master_santri KE KARTU UI
+            const updateKartuStat = (id, nilai) => {
+                const el = document.getElementById(id);
+                if (el && nilai !== undefined && nilai !== null) {
+                    el.innerText = nilai;
+                }
+            };
+
+            updateKartuStat('stat-total', r.rekapWajah.total);
+            updateKartuStat('stat-total-putra', r.rekapWajah.totalPutra);
+            updateKartuStat('stat-total-putri', r.rekapWajah.totalPutri);
+
+            updateKartuStat('stat-sudah', r.rekapWajah.sudah);
+            updateKartuStat('stat-sudah-putra', r.rekapWajah.sudahPutra);
+            updateKartuStat('stat-sudah-putri', r.rekapWajah.sudahPutri);
+
+            updateKartuStat('stat-belum', r.rekapWajah.belum);
+            updateKartuStat('stat-belum-putra', r.rekapWajah.belumPutra);
+            updateKartuStat('stat-belum-putri', r.rekapWajah.belumPutri);
             
             // Render Live Feed Kiosk
             if(feedBox) {
