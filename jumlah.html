@@ -26,19 +26,6 @@
             });
         }
     </script>
-
-    <script>
-        // DETEKSI INSTAN SESI AKTIF (Mencegah flash layout)
-        (function() {
-            const versiSesi = localStorage.getItem('app_session_version');
-            const nama = localStorage.getItem('session_nama');
-            const role = localStorage.getItem('session_role');
-            
-            if (versiSesi === 'v2_resmi' && nama && role) {
-                window.location.replace("dashboard.html");
-            }
-        })();
-    </script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl flex flex-col gap-4 text-center">
