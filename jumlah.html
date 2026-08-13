@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PPMU Yahyawiyyah">
 
-    <!-- Memuat aset secara non-blocking agar halaman segera muncul -->
+    <!-- Memuat aset Tailwind & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     
@@ -28,7 +28,7 @@
     </script>
 
     <script>
-        // DETEKSI INSTAN SESI AKTIF (Mencegah tampilan berkedip/flash)
+        // DETEKSI INSTAN SESI AKTIF (Mencegah flash layout)
         (function() {
             const versiSesi = localStorage.getItem('app_session_version');
             const nama = localStorage.getItem('session_nama');
@@ -62,7 +62,7 @@
         </form>
     </div>
 
-    <!-- BANNER CUSTOM POP-UP INSTALL PWA -->
+    <!-- BANNER PWA -->
     <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0">
@@ -79,7 +79,8 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
+        // Disamakan dengan URL Web App Apps Script Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec";
         
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -87,23 +88,27 @@
             b.disabled = true; 
             b.innerText = "VALIDASI CLOUD...";
             
-            const passwordInput = document.getElementById('inp-pass').value;
-            const p = new URLSearchParams();
-            p.append('aksi', 'login_admin');
-            p.append('username', document.getElementById('inp-user').value);
-            p.append('password', passwordInput);
+            const usernameInput = document.getElementById('inp-user').value.trim();
+            const passwordInput = document.getElementById('inp-pass').value.trim();
+
+            const payload = {
+                aksi: 'login_admin',
+                username: usernameInput,
+                password: passwordInput
+            };
 
             try {
+                // Menggunakan text/plain agar tidak memicu Preflight CORS Issue pada Google Apps Script
                 let res = await fetch(API_URL, { 
                     method: "POST", 
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" }, 
-                    body: p.toString() 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                    body: JSON.stringify(payload)
                 });
                 
                 let r = await res.json();
                 if (r.status === "success") {
-                    localStorage.setItem('session_nama', r.nama);
-                    localStorage.setItem('session_role', r.role);
+                    localStorage.setItem('session_nama', r.nama || '');
+                    localStorage.setItem('session_role', r.role || '');
                     localStorage.setItem('session_password', passwordInput);
                     localStorage.setItem('app_session_version', 'v2_resmi');
                     
@@ -113,16 +118,18 @@
                     
                     window.location.href = "dashboard.html";
                 } else { 
-                    alert(r.message); 
+                    alert(r.message || "Login gagal, silakan periksa kredensial Anda."); 
                 }
             } catch(err) { 
-                alert("Koneksi gagal atau masalah CORS!"); 
+                alert("Koneksi gagal atau terjadi masalah jaringan/CORS!"); 
+                console.error(err);
             } finally { 
                 b.disabled = false; 
                 b.innerText = "MASUK SISTEM"; 
             }
         });
 
+        // Logika PWA Banner
         let deferredPrompt;
         const installBanner = document.getElementById('pwa-install-banner');
         const installBtn = document.getElementById('btn-install-pwa');
