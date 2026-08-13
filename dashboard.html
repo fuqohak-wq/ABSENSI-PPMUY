@@ -246,7 +246,7 @@
             <!-- REKAP DATA SECTION -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
                 <div class="lg:col-span-2 flex flex-col gap-6">
-                    <!-- 3 CARDS TOP STATS (TAMPILAN JUMLAH SANTRI JELAS & ELEGAN) -->
+                    <!-- 3 CARDS TOP STATS (SANTRI STATISTICS DISPLAY) -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="dynamic-bg-box border-2 border-sky-500/30 rounded-2xl p-5 text-center shadow-lg flex flex-col justify-between bg-gradient-to-b from-sky-500/5 to-transparent">
                             <div>
@@ -488,8 +488,8 @@
     <!-- CORE SYSTEM SCRIPTS (SPA CONTROLLER)                      -->
     <!-- ========================================================= -->
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
-        const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI (HASIL DEPLOY BARU)
+        const API_URL = "https://script.google.com/macros/s/AKfycbxIqPO7fC2Lx_tCD5K6Qf3oMHED5gFDo7zEtfux5QKJUfkp7B0FFm1xTan8t2VXDN7K/exec";
 
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
@@ -549,13 +549,13 @@
             muatDariCacheLokal();
             muatSeluruhRekapDashboard(true);
 
-            // Siklus pembacaan berkala terpusat untuk menghindari penumpukan request
+            // Interval pembacaan terintegrasi dipercepat ke 5 detik (Aman dari Quota Limit GAS)
             intervalDashboard = setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 5000);
         }
 
-        // Penanganan Proses Login Cepat
+        // Penanganan Proses Login Cepat & Aman
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const b = document.getElementById('btn-login');
@@ -619,7 +619,7 @@
 
             try {
                 const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
-                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
+                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${encodeURIComponent(roleLokal)}&tanggal=${encodeURIComponent(formatHariIni)}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
 
                 const res = await fetch(targetUrl, { method: "GET", signal: signal });
                 const r = await res.json();
@@ -633,6 +633,10 @@
 
                     localStorage.setItem('cache_rekap_dashboard', JSON.stringify(r));
                     tampilkanDataKeUI(r, feedBox);
+                } else {
+                    if (r.message) {
+                        alert("Laporan Sistem: " + r.message);
+                    }
                 }
             } catch (error) {
                 if (error.name !== 'AbortError') {
@@ -655,7 +659,7 @@
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
             renderTabelWajah();
 
-            // Set Nilai Elemen Aman
+            // Penulisan Nilai Elemen
             const setVal = (id, val) => {
                 const el = document.getElementById(id);
                 if (el) {
