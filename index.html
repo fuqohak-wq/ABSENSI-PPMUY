@@ -63,7 +63,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- BANNER CUSTOM POP-UP INSTALL PWA                          -->
+    <!-- DITAMBAHKAN: BANNER CUSTOM POP-UP INSTALL PWA             -->
     <!-- ========================================================= -->
     <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
       <div class="flex items-center gap-3">
@@ -81,50 +81,41 @@
     </div>
 
     <script>
-        // Masukkan URL hasil deployment baru Web App Google Apps Script Anda di sini
-        const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const b = document.getElementById('btn-login');
-            b.disabled = true; 
-            b.innerText = "VALIDASI CLOUD...";
+            b.disabled = true; b.innerText = "VALIDASI CLOUD...";
             
-            const usernameInput = document.getElementById('inp-user').value.trim();
-            const passwordInput = document.getElementById('inp-pass').value.trim();
-            
-            // Dioptimalkan: Menggunakan metode GET yang diproses secara instan oleh server Google (Bypass Redireksi POST)
-            const targetUrl = `${API_URL}?aksi=login_admin&username=${encodeURIComponent(usernameInput)}&password=${encodeURIComponent(passwordInput)}&_ts=${Date.now()}`;
+            const passwordInput = document.getElementById('inp-pass').value;
+            const p = new URLSearchParams();
+            p.append('aksi', 'login_admin');
+            p.append('username', document.getElementById('inp-user').value);
+            p.append('password', passwordInput);
 
             try {
-                let res = await fetch(targetUrl, { method: "GET" });
+                let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: p.toString() });
                 let r = await res.json();
-                
                 if (r.status === "success") {
-                    // Menyimpan data sesi utama ke LocalStorage
+                    // Menyimpan data sesi utama
                     localStorage.setItem('session_nama', r.nama);
                     localStorage.setItem('session_role', r.role);
+                    
+                    // MENYIMPAN PASSWORD KE LOKAL (Kunci untuk deteksi ganti password)
                     localStorage.setItem('session_password', passwordInput);
+                    
+                    // MENYIMPAN VERSI SESI (Mencegah kick otomatis perangkat baru)
                     localStorage.setItem('app_session_version', 'v2_resmi');
                     
-                    if (r.otoritas) {
-                        localStorage.setItem('session_otoritas', r.otoritas);
-                    }
-                    
                     window.location.href = "dashboard.html";
-                } else { 
-                    alert(r.message); 
-                }
-            } catch(err) { 
-                alert("Koneksi gagal atau masalah CORS!"); 
-            } finally { 
-                b.disabled = false; 
-                b.innerText = "MASUK SISTEM"; 
-            }
+                } else { alert(r.message); }
+            } catch(err) { alert("Koneksi gagal atau masalah CORS!"); }
+            finally { b.disabled = false; b.innerText = "MASUK SISTEM"; }
         });
 
         // =========================================================
-        // LOGIKA PEMICU BANNER INSTALL OTOMATIS
+        // DITAMBAHKAN: LOGIKA PEMICU BANNER INSTALL AUTOMATIS
         // =========================================================
         let deferredPrompt;
         const installBanner = document.getElementById('pwa-install-banner');
