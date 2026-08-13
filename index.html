@@ -63,7 +63,7 @@
     </div>
 
     <!-- ========================================================= -->
-    <!-- DITAMBAHKAN: BANNER CUSTOM POP-UP INSTALL PWA             -->
+    <!-- BANNER CUSTOM POP-UP INSTALL PWA                          -->
     <!-- ========================================================= -->
     <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
       <div class="flex items-center gap-3">
@@ -81,12 +81,14 @@
     </div>
 
     <script>
+        // Masukkan URL hasil deployment baru Web App Google Apps Script Anda di sini
         const API_URL = "https://script.google.com/macros/s/AKfycbwR-Ml0M6mCXj2yc_E0Ihll3V3HIDlithCuMYvIsxSrtZdhVDJNMFZ5WKb657o8di5x/exec";
         
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const b = document.getElementById('btn-login');
-            b.disabled = true; b.innerText = "VALIDASI CLOUD...";
+            b.disabled = true; 
+            b.innerText = "VALIDASI CLOUD...";
             
             const passwordInput = document.getElementById('inp-pass').value;
             const p = new URLSearchParams();
@@ -95,27 +97,43 @@
             p.append('password', passwordInput);
 
             try {
-                let res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: p.toString() });
+                let res = await fetch(API_URL, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" }, 
+                    body: p.toString() 
+                });
+                
                 let r = await res.json();
                 if (r.status === "success") {
-                    // Menyimpan data sesi utama
+                    // Menyimpan data sesi utama ke LocalStorage
                     localStorage.setItem('session_nama', r.nama);
                     localStorage.setItem('session_role', r.role);
                     
-                    // MENYIMPAN PASSWORD KE LOKAL (Kunci untuk deteksi ganti password)
+                    // Menyimpan password ke lokal (untuk keperluan pencocokan/keamanan internal)
                     localStorage.setItem('session_password', passwordInput);
                     
-                    // MENYIMPAN VERSI SESI (Mencegah kick otomatis perangkat baru)
+                    // Menyimpan versi sesi (mencegah log-out otomatis perangkat)
                     localStorage.setItem('app_session_version', 'v2_resmi');
                     
+                    // Menyimpan otoritas jika nantinya dibutuhkan di halaman dashboard.html
+                    if (r.otoritas) {
+                        localStorage.setItem('session_otoritas', r.otoritas);
+                    }
+                    
                     window.location.href = "dashboard.html";
-                } else { alert(r.message); }
-            } catch(err) { alert("Koneksi gagal atau masalah CORS!"); }
-            finally { b.disabled = false; b.innerText = "MASUK SISTEM"; }
+                } else { 
+                    alert(r.message); 
+                }
+            } catch(err) { 
+                alert("Koneksi gagal atau masalah CORS!"); 
+            } finally { 
+                b.disabled = false; 
+                b.innerText = "MASUK SISTEM"; 
+            }
         });
 
         // =========================================================
-        // DITAMBAHKAN: LOGIKA PEMICU BANNER INSTALL AUTOMATIS
+        // LOGIKA PEMICU BANNER INSTALL OTOMATIS
         // =========================================================
         let deferredPrompt;
         const installBanner = document.getElementById('pwa-install-banner');
