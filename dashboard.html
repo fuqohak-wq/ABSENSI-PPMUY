@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PPMU Yahyawiyyah">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body, header, div, section, button, table, td, th, footer, a {
@@ -205,6 +205,7 @@
                 
                 <!-- 3 CARDS TOP STATS (NATIVE, ESTETIK, CEPAT) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- TOTAL SANTRI -->
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-black dynamic-text-title tracking-wider block uppercase">TOTAL SANTRI</span>
@@ -221,6 +222,8 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- SUDAH REGISTRASI -->
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-md flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 tracking-wider block uppercase">SUDAH REGISTRASI</span>
@@ -237,6 +240,8 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- BELUM REGISTRASI -->
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-md flex flex-col justify-between">
                         <div>
                             <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">BELUM REGISTRASI</span>
@@ -440,7 +445,9 @@
 
     <!-- SCRIPT UTAMA DASHBOARD -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        // Dua endpoint API yang digabungkan secara paralel
+        const API_DASHBOARD = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        const API_JUMLAH = "https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec";
 
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
@@ -531,21 +538,21 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // RENDERING CACHE INSTAN (0 milidetik - Tidak Menunggu Proses Jaringan)
+            // RENDERING INSTAN DARI CACHE LOKAL (Waktu muat: < 10ms tanpa menunggu server)
             muatDariCacheLokal();
 
-            // 1. Sinkronisasi Antarmuka secara Berulang dari Cache Lokal (Setiap 1 Detik)
+            // 1. Refresh visual UI secara berkala berbasis data cache lokal (Setiap 1 Detik)
             fetchRekapKegiatanKhusus();
             setInterval(fetchRekapKegiatanKhusus, 1000);
 
-            // 2. Tarik Data Terbaru secara Senyap dari Server Utama di Latar Belakang (Setiap 3 Detik)
+            // 2. Tarik data terbaru di background secara berkala (Setiap 3 Detik)
             muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
         });
 
-        // FUNGSI KHUSUS UNTUK MEMBACA DATA CACHE LOKAL AGAR LOADING 0ms
+        // MEMBACA DATA CACHE LOKAL AGAR LOADING INSTAN 0-ms SAAT HALAMAN DIBUKA
         function fetchRekapKegiatanKhusus() {
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
@@ -554,12 +561,12 @@
                     const r = JSON.parse(dataCache);
                     updateStatsUI(r);
                 } catch (e) {
-                    console.warn("Gagal membaca cache lokal untuk rekap kegiatan:", e);
+                    console.warn("Gagal membaca cache rekap kegiatan:", e);
                 }
             }
         }
 
-        // FUNGSI SINKRONISASI BINDING STATISTIK LANGSUNG KE HTML (NATIVE & SANGAT CEPAT)
+        // PARSER & BINDER STATISTIK DUA TEMPLATE KE SATU UI SECARA REALTIME
         function updateStatsUI(r) {
             if (!r) return;
 
@@ -568,40 +575,109 @@
                 if (el) el.innerText = (val !== undefined && val !== null) ? val : "0";
             };
 
-            // STATS REKAP WAJAH SANTRI
+            // Inisialisasi variabel rekap terintegrasi
+            let totalPa = 0, totalPi = 0, totalSantri = 0;
+            let regPa = 0, regPi = 0, regTotal = 0;
+            let unregPa = 0, unregPi = 0, unregTotal = 0;
+
+            let subuh = 0, dzuhur = 0, ashar = 0, maghrib = 0, isya = 0;
+            let quranan = 0, afsahan = 0, belajar = 0, ndalem = 0, sorogan = 0;
+            let pdf1 = 0, pdf2 = 0, pdf3 = 0, ziarah = 0, jumatan = 0;
+
+            // Alur Pengambilan 1: Dari Source API Jumlah (jumlah.html)
+            if (r.rekapJumlahSource) {
+                const d = r.rekapJumlahSource;
+                totalPa = d["JUMLAH PUTRA"] || 0;
+                totalPi = d["JUMLAH PUTRI"] || 0;
+                totalSantri = totalPa + totalPi;
+
+                regPa = d["SUDAH REG PA"] || 0;
+                regPi = d["SUDAH REG PI"] || 0;
+                regTotal = regPa + regPi;
+
+                unregPa = d["BELUM REG PA"] || 0;
+                unregPi = d["BELUM REG PI"] || 0;
+                unregTotal = unregPa + unregPi;
+
+                subuh = d["SUBUH"] || 0;
+                dzuhur = d["DZUHUR"] || 0;
+                ashar = d["ASHAR"] || 0;
+                maghrib = d["MAGHRIB"] || 0;
+                isya = d["ISYA"] || 0;
+
+                quranan = d["QURANAN"] || 0;
+                afsahan = d["AFSAHAN"] || 0;
+                belajar = d["BELAJAR"] || 0;
+                ndalem = d["NDALEM"] || 0;
+                sorogan = d["SOROGAN"] || 0;
+                pdf1 = d["PDF 1"] || 0;
+                pdf2 = d["PDF 2"] || 0;
+                pdf3 = d["PDF 3"] || 0;
+                ziarah = d["ZIARAH"] || 0;
+                jumatan = d["JUMATAN"] || 0;
+            } 
+            
+            // Alur Pengambilan 2: Overwrite/Fallback dengan Source API Dashboard utama jika tersedia
             if (r.rekapWajah) {
-                setVal('stat-total', r.rekapWajah.total);
-                setVal('stat-total-putra', r.rekapWajah.totalPutra);
-                setVal('stat-total-putri', r.rekapWajah.totalPutri);
-
-                setVal('stat-sudah', r.rekapWajah.sudah);
-                setVal('stat-sudah-putra', r.rekapWajah.sudahPutra);
-                setVal('stat-sudah-putri', r.rekapWajah.sudahPutri);
-
-                setVal('stat-belum', r.rekapWajah.belum);
-                setVal('stat-belum-putra', r.rekapWajah.belumPutra);
-                setVal('stat-belum-putri', r.rekapWajah.belumPutri);
+                if (r.rekapWajah.total !== undefined) totalSantri = r.rekapWajah.total;
+                if (r.rekapWajah.totalPutra !== undefined) totalPa = r.rekapWajah.totalPutra;
+                if (r.rekapWajah.totalPutri !== undefined) totalPi = r.rekapWajah.totalPutri;
+                if (r.rekapWajah.sudah !== undefined) regTotal = r.rekapWajah.sudah;
+                if (r.rekapWajah.sudahPutra !== undefined) regPa = r.rekapWajah.sudahPutra;
+                if (r.rekapWajah.sudahPutri !== undefined) regPi = r.rekapWajah.sudahPutri;
+                if (r.rekapWajah.belum !== undefined) unregTotal = r.rekapWajah.belum;
+                if (r.rekapWajah.belumPutra !== undefined) unregPa = r.rekapWajah.belumPutra;
+                if (r.rekapWajah.belumPutri !== undefined) unregPi = r.rekapWajah.belumPutri;
             }
 
-            // STATS SIKLUS KEGIATAN & JAMAAH
             if (r.rekapShalat) {
-                setVal('v-subuh', r.rekapShalat['Subuh']);
-                setVal('v-dzuhur', r.rekapShalat['Dzuhur']);
-                setVal('v-ashar', r.rekapShalat['Ashar']);
-                setVal('v-maghrib', r.rekapShalat['Maghrib']);
-                setVal('v-isya', r.rekapShalat['Isya']);
+                if (r.rekapShalat['Subuh'] !== undefined) subuh = r.rekapShalat['Subuh'];
+                if (r.rekapShalat['Dzuhur'] !== undefined) dzuhur = r.rekapShalat['Dzuhur'];
+                if (r.rekapShalat['Ashar'] !== undefined) ashar = r.rekapShalat['Ashar'];
+                if (r.rekapShalat['Maghrib'] !== undefined) maghrib = r.rekapShalat['Maghrib'];
+                if (r.rekapShalat['Isya'] !== undefined) isya = r.rekapShalat['Isya'];
 
-                setVal('v-quranan', r.rekapShalat['Quranan']);
-                setVal('v-afsahan', r.rekapShalat['Afsahan']);
-                setVal('v-belajar', r.rekapShalat['Belajar']);
-                setVal('v-ndalem', r.rekapShalat['Ndalem']);
-                setVal('v-sorogan', r.rekapShalat['Sorogan']);
-                setVal('v-pdf1', r.rekapShalat['PDF 1']);
-                setVal('v-pdf2', r.rekapShalat['PDF 2']);
-                setVal('v-pdf3', r.rekapShalat['PDF 3']);
-                setVal('v-ziarah', r.rekapShalat['Ziarah']);
-                setVal('v-jumatan', r.rekapShalat['Jumatan']);
+                if (r.rekapShalat['Quranan'] !== undefined) quranan = r.rekapShalat['Quranan'];
+                if (r.rekapShalat['Afsahan'] !== undefined) afsahan = r.rekapShalat['Afsahan'];
+                if (r.rekapShalat['Belajar'] !== undefined) belajar = r.rekapShalat['Belajar'];
+                if (r.rekapShalat['Ndalem'] !== undefined) ndalem = r.rekapShalat['Ndalem'];
+                if (r.rekapShalat['Sorogan'] !== undefined) sorogan = r.rekapShalat['Sorogan'];
+                if (r.rekapShalat['PDF 1'] !== undefined) pdf1 = r.rekapShalat['PDF 1'];
+                if (r.rekapShalat['PDF 2'] !== undefined) pdf2 = r.rekapShalat['PDF 2'];
+                if (r.rekapShalat['PDF 3'] !== undefined) pdf3 = r.rekapShalat['PDF 3'];
+                if (r.rekapShalat['Ziarah'] !== undefined) ziarah = r.rekapShalat['Ziarah'];
+                if (r.rekapShalat['Jumatan'] !== undefined) jumatan = r.rekapShalat['Jumatan'];
             }
+
+            // Terapkan nilai ke elemen HTML secara instan
+            setVal('stat-total', totalSantri);
+            setVal('stat-total-putra', totalPa);
+            setVal('stat-total-putri', totalPi);
+
+            setVal('stat-sudah', regTotal);
+            setVal('stat-sudah-putra', regPa);
+            setVal('stat-sudah-putri', regPi);
+
+            setVal('stat-belum', unregTotal);
+            setVal('stat-belum-putra', unregPa);
+            setVal('stat-belum-putri', unregPi);
+
+            setVal('v-subuh', subuh);
+            setVal('v-dzuhur', dzuhur);
+            setVal('v-ashar', ashar);
+            setVal('v-maghrib', maghrib);
+            setVal('v-isya', isya);
+
+            setVal('v-quranan', quranan);
+            setVal('v-afsahan', afsahan);
+            setVal('v-belajar', belajar);
+            setVal('v-ndalem', ndalem);
+            setVal('v-sorogan', sorogan);
+            setVal('v-pdf1', pdf1);
+            setVal('v-pdf2', pdf2);
+            setVal('v-pdf3', pdf3);
+            setVal('v-ziarah', ziarah);
+            setVal('v-jumatan', jumatan);
         }
 
         function refreshManual() {
@@ -722,11 +798,12 @@
                     const feedBox = document.getElementById('box-live-feed');
                     tampilkanDataKeUI(r, feedBox);
                 } catch (e) {
-                    console.warn("Gagal membaca cache lokal:", e);
+                    console.warn("Gagal memuat cache lokal awal:", e);
                 }
             }
         }
 
+        // PENARIKAN DATA PARALEL MULTI-API (Asinkron Tanpa Membekukan UI)
         async function muatSeluruhRekapDashboard(forceBypass = false) {
             if (isFetching) {
                 if (forceBypass && controllerAktif) {
@@ -752,26 +829,53 @@
 
             try {
                 const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
-                const targetUrl = `${API_URL}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
+                
+                // Siapkan URL untuk kedua API
+                const urlDashboard = `${API_DASHBOARD}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
+                const urlJumlah = `${API_JUMLAH}?_ts=${Date.now()}`;
 
-                const res = await fetch(targetUrl, { method: "GET", signal: signal });
-                const r = await res.json();
+                // Eksekusi kedua request secara bersamaan (Promise.allSettled)
+                const [resDash, resJml] = await Promise.allSettled([
+                    fetch(urlDashboard, { method: "GET", signal: signal }).then(res => res.json()),
+                    fetch(urlJumlah, { method: "GET", signal: signal }).then(res => res.json())
+                ]);
 
-                if (r.status === "success") {
+                // Buat wadah penyimpanan gabungan data terbaru
+                let dataGabungan = {};
+                
+                // Ambil data cache lama untuk di-merge terlebih dahulu
+                const dataLama = localStorage.getItem('cache_rekap_dashboard');
+                if (dataLama) {
+                    try { dataGabungan = JSON.parse(dataLama); } catch(e){}
+                }
+
+                // Proses data dari API Dashboard Utama
+                if (resDash.status === "fulfilled" && resDash.value.status === "success") {
+                    const r = resDash.value;
                     if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
                         alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
                         prosesLogout();
                         return;
                     }
-
-                    localStorage.setItem('cache_rekap_dashboard', JSON.stringify(r));
-                    tampilkanDataKeUI(r, feedBox);
+                    dataGabungan = { ...dataGabungan, ...r };
                 }
+
+                // Proses data dari API khusus penghitung statistik (jumlah.html)
+                if (resJml.status === "fulfilled" && resJml.value && resJml.value.rekap) {
+                    dataGabungan.rekapJumlahSource = resJml.value.rekap;
+                }
+
+                // Simpan hasil penggabungan ke cache lokal terintegrasi
+                localStorage.setItem('cache_rekap_dashboard', JSON.stringify(dataGabungan));
+                
+                // Terapkan data gabungan terbaru ke UI secara seamless
+                tampilkanDataKeUI(dataGabungan, feedBox);
+
             } catch (error) {
                 if (error.name === 'AbortError') {
                     console.log("Sinkronisasi sebelumnya berhasil dihentikan oleh pengguna.");
                 } else {
-                    console.error("Gagal sinkronisasi data dari server:", error);
+                    console.error("Gagal sinkronisasi data dari server utama:", error);
                 }
             } finally {
                 isFetching = false;
@@ -784,13 +888,13 @@
         function tampilkanDataKeUI(r, feedBox) {
             if (!r) return;
             
-            // Render list santri (Validasi Master Data)
+            // Render list validasi master data (Wajah Santri)
             r.rekapWajah = r.rekapWajah || {};
             dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
             dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
             renderTabelWajah();
             
-            // Render Live Feed Kiosk
+            // Render Live Feed Kiosk Tracker
             if(feedBox) {
                 if (!r.liveFeed || r.liveFeed.length === 0) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
@@ -817,7 +921,7 @@
                 }
             }
 
-            // Update stats visual instan di UI
+            // Update statistik visual secara instan
             updateStatsUI(r);
         }
         
