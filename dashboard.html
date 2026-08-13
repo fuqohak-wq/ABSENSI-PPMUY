@@ -202,12 +202,136 @@
         <!-- REKAP DATA SECTION -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
             <div class="lg:col-span-2 flex flex-col gap-6">
-                <!-- PANEL IFRAME SEAMLESS INTEGRATED (EMBED JUMLAH.HTML) -->
-                <div class="dynamic-bg-box border dynamic-border rounded-2xl overflow-hidden shadow-md h-[600px] sm:h-[450px] lg:h-[415px] relative">
-                    <iframe id="iframe-rekap-jumlah" src="jumlah.html" class="w-full h-full border-0 block bg-transparent" allowtransparency="true"></iframe>
+                
+                <!-- 3 CARDS TOP STATS (NATIVE, ESTETIK, CEPAT) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black dynamic-text-title tracking-wider block uppercase">TOTAL SANTRI</span>
+                            <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-total-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-total-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 tracking-wider block uppercase">SUDAH REGISTRASI</span>
+                            <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-sudah-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-sudah-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">BELUM REGISTRASI</span>
+                            <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-belum-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-belum-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- VALIDASI MASTER DATA TABEL -->
+                <!-- DUA SUB-GRID ANALISIS AKTIVITAS SIKLUS -->
+                <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-md flex flex-col gap-6">
+                    <!-- REKAP JAMAAH SHALAT -->
+                    <div>
+                        <h3 class="text-xs font-black text-cyan-600 dark:text-cyan-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-chart-simple text-sm"></i> REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">SUBUH</span>
+                                <span id="v-subuh" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">DZUHUR</span>
+                                <span id="v-dzuhur" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">ASHAR</span>
+                                <span id="v-ashar" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">MAGHRIB</span>
+                                <span id="v-maghrib" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl col-span-2 sm:col-span-1">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">ISYA</span>
+                                <span id="v-isya" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REKAP KEGIATAN KEPESANTRENAN -->
+                    <div>
+                        <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-sm"></i> REKAP KEGIATAN KEPESANTRENAN</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Quranan</span>
+                                <span id="v-quranan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Afsahan</span>
+                                <span id="v-afsahan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Belajar</span>
+                                <span id="v-belajar" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Ndalem</span>
+                                <span id="v-ndalem" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Sorogan</span>
+                                <span id="v-sorogan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">PDF 1</span>
+                                <span id="v-pdf1" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">PDF 2</span>
+                                <span id="v-pdf2" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">PDF 3</span>
+                                <span id="v-pdf3" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Ziarah</span>
+                                <span id="v-ziarah" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                            <div class="dynamic-bg-inner border dynamic-border p-2.5 rounded-xl">
+                                <span class="text-[9px] font-black dynamic-text-row block uppercase">Jumatan</span>
+                                <span id="v-jumatan" class="text-base sm:text-lg font-black dynamic-text-main block mt-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 sm:p-5 flex flex-col h-72 shadow-md">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 border-b dynamic-border pb-3">
                         <div class="flex gap-2 w-full sm:w-auto">
@@ -237,7 +361,6 @@
                 </div>
             </div>
 
-            <!-- LIVE KIOSK TRACKER -->
             <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-md flex flex-col h-full min-h-[380px] lg:max-h-[530px]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish animate-pulse text-sm"></i> LIVE KIOSK TRACKER</h3>
@@ -287,7 +410,7 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP IFRAME FULLSCREEN SEAMLESS (SCAN WAJAH & INTIP TABUNGAN) -->
+    <!-- MODAL POPUP IFRAME FULLSCREEN SEAMLESS -->
     <div id="modal-iframe-tabungan" class="fixed inset-0 z-50 bg-slate-950 hidden w-screen h-screen flex-col overflow-hidden">
         <button onclick="tutupIframeTabungan()" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-all flex items-center justify-center shadow-lg cursor-pointer" title="Kembali ke Dashboard">
             <i class="fa-solid fa-xmark text-lg"></i>
@@ -408,22 +531,81 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
+            // RENDERING CACHE INSTAN (0 milidetik - Tidak Menunggu Proses Jaringan)
             muatDariCacheLokal();
 
-            // Pemuatan data server untuk live kiosk feed & tabel validasi
+            // 1. Sinkronisasi Antarmuka secara Berulang dari Cache Lokal (Setiap 1 Detik)
+            fetchRekapKegiatanKhusus();
+            setInterval(fetchRekapKegiatanKhusus, 1000);
+
+            // 2. Tarik Data Terbaru secara Senyap dari Server Utama di Latar Belakang (Setiap 3 Detik)
             muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
         });
 
+        // FUNGSI KHUSUS UNTUK MEMBACA DATA CACHE LOKAL AGAR LOADING 0ms
+        function fetchRekapKegiatanKhusus() {
+            const CACHE_KEY = 'cache_rekap_dashboard';
+            const dataCache = localStorage.getItem(CACHE_KEY);
+            if (dataCache) {
+                try {
+                    const r = JSON.parse(dataCache);
+                    updateStatsUI(r);
+                } catch (e) {
+                    console.warn("Gagal membaca cache lokal untuk rekap kegiatan:", e);
+                }
+            }
+        }
+
+        // FUNGSI SINKRONISASI BINDING STATISTIK LANGSUNG KE HTML (NATIVE & SANGAT CEPAT)
+        function updateStatsUI(r) {
+            if (!r) return;
+
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = (val !== undefined && val !== null) ? val : "0";
+            };
+
+            // STATS REKAP WAJAH SANTRI
+            if (r.rekapWajah) {
+                setVal('stat-total', r.rekapWajah.total);
+                setVal('stat-total-putra', r.rekapWajah.totalPutra);
+                setVal('stat-total-putri', r.rekapWajah.totalPutri);
+
+                setVal('stat-sudah', r.rekapWajah.sudah);
+                setVal('stat-sudah-putra', r.rekapWajah.sudahPutra);
+                setVal('stat-sudah-putri', r.rekapWajah.sudahPutri);
+
+                setVal('stat-belum', r.rekapWajah.belum);
+                setVal('stat-belum-putra', r.rekapWajah.belumPutra);
+                setVal('stat-belum-putri', r.rekapWajah.belumPutri);
+            }
+
+            // STATS SIKLUS KEGIATAN & JAMAAH
+            if (r.rekapShalat) {
+                setVal('v-subuh', r.rekapShalat['Subuh']);
+                setVal('v-dzuhur', r.rekapShalat['Dzuhur']);
+                setVal('v-ashar', r.rekapShalat['Ashar']);
+                setVal('v-maghrib', r.rekapShalat['Maghrib']);
+                setVal('v-isya', r.rekapShalat['Isya']);
+
+                setVal('v-quranan', r.rekapShalat['Quranan']);
+                setVal('v-afsahan', r.rekapShalat['Afsahan']);
+                setVal('v-belajar', r.rekapShalat['Belajar']);
+                setVal('v-ndalem', r.rekapShalat['Ndalem']);
+                setVal('v-sorogan', r.rekapShalat['Sorogan']);
+                setVal('v-pdf1', r.rekapShalat['PDF 1']);
+                setVal('v-pdf2', r.rekapShalat['PDF 2']);
+                setVal('v-pdf3', r.rekapShalat['PDF 3']);
+                setVal('v-ziarah', r.rekapShalat['Ziarah']);
+                setVal('v-jumatan', r.rekapShalat['Jumatan']);
+            }
+        }
+
         function refreshManual() {
             muatSeluruhRekapDashboard(true);
-            const iframe = document.getElementById('iframe-rekap-jumlah');
-            if (iframe) {
-                // Me-refresh iframe dengan sidik waktu agar mendapatkan data terbaru
-                iframe.src = `jumlah.html?_ts=${Date.now()}`;
-            }
         }
 
         function terapkanOtoritasMenu(userRole) {
@@ -634,6 +816,9 @@
                     feedBox.innerHTML = logItems;
                 }
             }
+
+            // Update stats visual instan di UI
+            updateStatsUI(r);
         }
         
         function prosesLogout() {
