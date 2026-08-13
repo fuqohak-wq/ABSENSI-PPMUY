@@ -3,148 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Pengurus - E-Pesantren</title>
+    <title>Rekap Jumlah - E-Pesantren</title>
     
-    <!-- PWA Settings -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PPMU Yahyawiyyah">
-
     <!-- Memuat aset Tailwind & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    
-    <!-- Register Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Terdaftar!'))
-                    .catch(err => console.error('Service Worker Gagal:', err));
-            });
-        }
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-sm bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl flex flex-col gap-4 text-center">
-        <div>
-            <div class="w-14 h-14 bg-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-lg">
-                <i class="fa-solid fa-shield-halved text-slate-950 text-2xl"></i>
-            </div>
-            <h1 class="text-base font-black text-amber-400 tracking-wider uppercase">E-PESANTREN CORE</h1>
-            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Otorisasi Manajemen Terpadu</p>
-        </div>
-        <form id="form-login" class="space-y-3 text-left">
-            <div>
-                <label class="text-[10px] font-black text-slate-400 tracking-wider uppercase block mb-1">Username Pengurus:</label>
-                <input type="text" id="inp-user" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-amber-400" required>
-            </div>
-            <div>
-                <label class="text-[10px] font-black text-slate-400 tracking-wider uppercase block mb-1">PIN / Password:</label>
-                <input type="password" id="inp-pass" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-amber-400" required>
-            </div>
-            <button type="submit" id="btn-login" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all cursor-pointer">MASUK SISTEM</button>
-        </form>
-    </div>
 
-    <!-- BANNER PWA -->
-    <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0">
-          <i class="fa-solid fa-download"></i>
-        </div>
+    <div class="w-full max-w-5xl bg-slate-900/90 border border-slate-800/80 p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col gap-6">
+        
+        <!-- SECTION 1: REKAP JAMAAH SHALAT -->
         <div>
-          <h4 class="font-black text-xs uppercase tracking-wide">Install Aplikasi PPMUY</h4>
-          <p class="text-[10px] font-bold text-slate-800 leading-tight">Pasang di layar utama HP agar cepat diakses!</p>
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-chart-simple text-cyan-400 text-lg"></i>
+                <h2 class="text-sm font-black text-cyan-400 tracking-wider uppercase">REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">SUBUH</p>
+                    <p id="val-subuh" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">DZUHUR</p>
+                    <p id="val-dzuhur" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ASHAR</p>
+                    <p id="val-ashar" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">MAGHRIB</p>
+                    <p id="val-maghrib" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center col-span-2 sm:col-span-1">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ISYA</p>
+                    <p id="val-isya" class="text-2xl font-black text-white">0</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <button id="btn-install-pwa" class="bg-slate-900 hover:bg-slate-800 text-yellow-400 font-black text-xs px-3 py-2 rounded-lg cursor-pointer transition-all uppercase tracking-wider flex-shrink-0 ml-2 shadow">
-        INSTALL
-      </button>
+
+        <!-- SECTION 2: REKAP KEGIATAN KEPESANTRENAN -->
+        <div>
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-book-bookmark text-emerald-400 text-lg"></i>
+                <h2 class="text-sm font-black text-emerald-400 tracking-wider uppercase">REKAP KEGIATAN KEPESANTRENAN</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">QURANAN</p>
+                    <p id="val-quranan" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">AFSAHAN</p>
+                    <p id="val-afsahan" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">BELAJAR</p>
+                    <p id="val-belajar" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">NDALEM</p>
+                    <p id="val-ndalem" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">SOROGAN</p>
+                    <p id="val-sorogan" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 1</p>
+                    <p id="val-pdf1" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 2</p>
+                    <p id="val-pdf2" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 3</p>
+                    <p id="val-pdf3" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ZIARAH</p>
+                    <p id="val-ziarah" class="text-2xl font-black text-white">0</p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
+                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">JUMATAN</p>
+                    <p id="val-jumatan" class="text-2xl font-black text-white">0</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Disamakan dengan URL Web App Apps Script Anda
         const API_URL = "https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec";
-        
-        document.getElementById('form-login').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const b = document.getElementById('btn-login');
-            b.disabled = true; 
-            b.innerText = "VALIDASI CLOUD...";
-            
-            const usernameInput = document.getElementById('inp-user').value.trim();
-            const passwordInput = document.getElementById('inp-pass').value.trim();
 
-            const payload = {
-                aksi: 'login_admin',
-                username: usernameInput,
-                password: passwordInput
-            };
-
+        async function muatDataRekap() {
             try {
-                // Menggunakan text/plain agar tidak memicu Preflight CORS Issue pada Google Apps Script
-                let res = await fetch(API_URL, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-                    body: JSON.stringify(payload)
-                });
-                
-                let r = await res.json();
-                if (r.status === "success") {
-                    localStorage.setItem('session_nama', r.nama || '');
-                    localStorage.setItem('session_role', r.role || '');
-                    localStorage.setItem('session_password', passwordInput);
-                    localStorage.setItem('app_session_version', 'v2_resmi');
-                    
-                    if (r.otoritas) {
-                        localStorage.setItem('session_otoritas', r.otoritas);
-                    }
-                    
-                    window.location.href = "dashboard.html";
-                } else { 
-                    alert(r.message || "Login gagal, silakan periksa kredensial Anda."); 
+                let response = await fetch(API_URL);
+                let result = await response.json();
+
+                if (result && result.rekap) {
+                    const data = result.rekap;
+
+                    // Mengisi angka Jamaah Shalat
+                    if (data["SUBUH"] !== undefined) document.getElementById('val-subuh').innerText = data["SUBUH"];
+                    if (data["DZUHUR"] !== undefined) document.getElementById('val-dzuhur').innerText = data["DZUHUR"];
+                    if (data["ASHAR"] !== undefined) document.getElementById('val-ashar').innerText = data["ASHAR"];
+                    if (data["MAGHRIB"] !== undefined) document.getElementById('val-maghrib').innerText = data["MAGHRIB"];
+                    if (data["ISYA"] !== undefined) document.getElementById('val-isya').innerText = data["ISYA"];
+
+                    // Mengisi angka Kegiatan Kepesantrenan
+                    if (data["QURANAN"] !== undefined) document.getElementById('val-quranan').innerText = data["QURANAN"];
+                    if (data["AFSAHAN"] !== undefined) document.getElementById('val-afsahan').innerText = data["AFSAHAN"];
+                    if (data["BELAJAR"] !== undefined) document.getElementById('val-belajar').innerText = data["BELAJAR"];
+                    if (data["NDALEM"] !== undefined) document.getElementById('val-ndalem').innerText = data["NDALEM"];
+                    if (data["SOROGAN"] !== undefined) document.getElementById('val-sorogan').innerText = data["SOROGAN"];
+                    if (data["PDF 1"] !== undefined) document.getElementById('val-pdf1').innerText = data["PDF 1"];
+                    if (data["PDF 2"] !== undefined) document.getElementById('val-pdf2').innerText = data["PDF 2"];
+                    if (data["PDF 3"] !== undefined) document.getElementById('val-pdf3').innerText = data["PDF 3"];
+                    if (data["ZIARAH"] !== undefined) document.getElementById('val-ziarah').innerText = data["ZIARAH"];
+                    if (data["JUMATAN"] !== undefined) document.getElementById('val-jumatan').innerText = data["JUMATAN"];
                 }
-            } catch(err) { 
-                alert("Koneksi gagal atau terjadi masalah jaringan/CORS!"); 
-                console.error(err);
-            } finally { 
-                b.disabled = false; 
-                b.innerText = "MASUK SISTEM"; 
+            } catch (err) {
+                console.error("Gagal memuat rekap:", err);
             }
-        });
-
-        // Logika PWA Banner
-        let deferredPrompt;
-        const installBanner = document.getElementById('pwa-install-banner');
-        const installBtn = document.getElementById('btn-install-pwa');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            if (installBanner) {
-                installBanner.classList.remove('hidden');
-            }
-        });
-
-        if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    deferredPrompt = null;
-                    installBanner.classList.add('hidden');
-                }
-            });
         }
 
-        window.addEventListener('appinstalled', () => {
-            if (installBanner) {
-                installBanner.classList.add('hidden');
-            }
-        });
+        // Jalankan saat halaman dibuka
+        window.addEventListener('DOMContentLoaded', muatDataRekap);
     </script>
 </body>
 </html>
