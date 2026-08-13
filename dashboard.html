@@ -437,14 +437,11 @@
       </button>
     </div>
 
-    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (1 DETIK) -->
+    <!-- SCRIPT UTAMA DASHBOARD & FAST REFRESH (3 DETIK SINKRON, 1 DETIK RENDER) -->
     <script>
-        // API URL UTAMA (Untuk sesi, peran, log feed real-time, dan list santri)
+        // API URL UTAMA (Sesi, peran, log feed real-time, dan list santri)
         const API_URL = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
         
-        // API URL KHUSUS REKAP KEGIATAN & STATISTIK (Interval 1 Detik)
-        const REKAP_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec';
-
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
@@ -536,74 +533,78 @@
             
             muatDariCacheLokal();
 
-            // 1. Panggil Statistik Jumlah Kegiatan secara Cepat (1 Detik)
+            // 1. Sinkronisasi UI Kecepatan Tinggi (1 Detik) dari Cache Lokal (Mencegah Limit Google Apps Script)
             fetchRekapKegiatanKhusus();
             setInterval(fetchRekapKegiatanKhusus, 1000);
 
-            // 2. Panggil Data Umum & Kiosk Real-Time (3 Detik)
+            // 2. Refresh Data Server dari Google Spreadsheet Utama Secara Latar Belakang (3 Detik)
             muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
         });
 
-        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK
-        async function fetchRekapKegiatanKhusus() {
-            try {
-                const response = await fetch(REKAP_APPS_SCRIPT_URL);
-                const data = await response.json();
-
-                if (data && data.rekap) {
-                    updateRekapUIKhusus(data.rekap);
+        // FUNGSI KHUSUS UNTUK UPDATE STATISTIK LAYAR SECARA CEPAT LEWAT CACHE
+        function fetchRekapKegiatanKhusus() {
+            const CACHE_KEY = 'cache_rekap_dashboard';
+            const dataCache = localStorage.getItem(CACHE_KEY);
+            if (dataCache) {
+                try {
+                    const r = JSON.parse(dataCache);
+                    updateStatsUI(r);
+                } catch (e) {
+                    console.warn("Gagal membaca cache lokal untuk statistik:", e);
                 }
-            } catch (err) {
-                console.error("Gagal mengambil data rekap kegiatan khusus:", err);
             }
         }
 
-        function updateRekapUIKhusus(rekap) {
-            const setVal = (id, key) => {
+        // FUNGSI UNTUK MERENDER SELURUH DATA ANGKA KE ELEMEN HTML DASHBOARD
+        function updateStatsUI(r) {
+            if (!r) return;
+
+            const setVal = (id, val) => {
                 const el = document.getElementById(id);
-                if (el && rekap[key] !== undefined) {
-                    el.innerText = rekap[key];
-                }
+                if (el) el.innerText = (val !== undefined && val !== null) ? val : "0";
             };
 
-            // STATS UTAMA
-            setVal('stat-total', 'TOTAL SANTRI');
-            setVal('stat-sudah', 'SUDAH REGISTRASI');
-            setVal('stat-belum', 'BELUM REGISTRASI');
+            // STATS UTAMA & GENDER BREAKDOWN (Dihitung Realtime dari Master Santri di Google Sheets)
+            if (r.rekapWajah) {
+                setVal('stat-total', r.rekapWajah.total);
+                setVal('stat-total-putra', r.rekapWajah.totalPutra);
+                setVal('stat-total-putri', r.rekapWajah.totalPutri);
 
-            // STATS BREAKDOWN (GENDER PUTRA / PUTRI)
-            setVal('stat-total-putra', 'TOTAL PUTRA');
-            setVal('stat-total-putri', 'TOTAL PUTRI');
-            setVal('stat-sudah-putra', 'SUDAH PUTRA');
-            setVal('stat-sudah-putri', 'SUDAH PUTRI');
-            setVal('stat-belum-putra', 'BELUM PUTRA');
-            setVal('stat-belum-putri', 'BELUM PUTRI');
+                setVal('stat-sudah', r.rekapWajah.sudah);
+                setVal('stat-sudah-putra', r.rekapWajah.sudahPutra);
+                setVal('stat-sudah-putri', r.rekapWajah.sudahPutri);
 
-            // REKAP SHALAT
-            setVal('v-subuh', 'SUBUH');
-            setVal('v-dzuhur', 'DZUHUR');
-            setVal('v-ashar', 'ASHAR');
-            setVal('v-maghrib', 'MAGHRIB');
-            setVal('v-isya', 'ISYA');
+                setVal('stat-belum', r.rekapWajah.belum);
+                setVal('stat-belum-putra', r.rekapWajah.belumPutra);
+                setVal('stat-belum-putri', r.rekapWajah.belumPutri);
+            }
 
-            // REKAP KEGIATAN
-            setVal('v-quranan', 'QURANAN');
-            setVal('v-afsahan', 'AFSAHAN');
-            setVal('v-belajar', 'BELAJAR');
-            setVal('v-ndalem', 'NDALEM');
-            setVal('v-sorogan', 'SOROGAN');
-            setVal('v-pdf1', 'PDF 1');
-            setVal('v-pdf2', 'PDF 2');
-            setVal('v-pdf3', 'PDF 3');
-            setVal('v-ziarah', 'ZIARAH');
-            setVal('v-jumatan', 'JUMATAN');
+            // REKAP JAMAAH SHALAT (Berdasarkan Rumus di Sheet absensi_jamaah F1:G15)
+            if (r.rekapShalat) {
+                setVal('v-subuh', r.rekapShalat['Subuh']);
+                setVal('v-dzuhur', r.rekapShalat['Dzuhur']);
+                setVal('v-ashar', r.rekapShalat['Ashar']);
+                setVal('v-maghrib', r.rekapShalat['Maghrib']);
+                setVal('v-isya', r.rekapShalat['Isya']);
+
+                // REKAP KEGIATAN LAINNYA
+                setVal('v-quranan', r.rekapShalat['Quranan']);
+                setVal('v-afsahan', r.rekapShalat['Afsahan']);
+                setVal('v-belajar', r.rekapShalat['Belajar']);
+                setVal('v-ndalem', r.rekapShalat['Ndalem']);
+                setVal('v-sorogan', r.rekapShalat['Sorogan']);
+                setVal('v-pdf1', r.rekapShalat['PDF 1']);
+                setVal('v-pdf2', r.rekapShalat['PDF 2']);
+                setVal('v-pdf3', r.rekapShalat['PDF 3']);
+                setVal('v-ziarah', r.rekapShalat['Ziarah']);
+                setVal('v-jumatan', r.rekapShalat['Jumatan']);
+            }
         }
 
         function refreshManual() {
-            fetchRekapKegiatanKhusus();
             muatSeluruhRekapDashboard(true);
         }
 
@@ -815,6 +816,9 @@
                     feedBox.innerHTML = logItems;
                 }
             }
+
+            // Update stats visual instan di UI
+            updateStatsUI(r);
         }
         
         function prosesLogout() {
