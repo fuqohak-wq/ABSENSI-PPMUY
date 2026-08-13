@@ -3,96 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekap Jumlah - E-Pesantren</title>
+    <title>Rekap Management - E-Pesantren</title>
     
-    <!-- Memuat aset Tailwind & FontAwesome -->
+    <!-- Memuat aset Tailwind CSS & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 sm:p-8 flex justify-center items-center">
 
-    <div class="w-full max-w-5xl bg-slate-900/90 border border-slate-800/80 p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col gap-6">
-        
-        <!-- SECTION 1: REKAP JAMAAH SHALAT -->
-        <div>
-            <div class="flex items-center gap-2 mb-4">
-                <i class="fa-solid fa-chart-simple text-cyan-400 text-lg"></i>
-                <h2 class="text-sm font-black text-cyan-400 tracking-wider uppercase">REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h2>
-            </div>
+    <div class="w-full max-w-6xl space-y-6">
+
+        <!-- KARTU UTAMA: STATISTIK SANTRI (3 CARD ATAS) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">SUBUH</p>
-                    <p id="val-subuh" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">DZUHUR</p>
-                    <p id="val-dzuhur" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ASHAR</p>
-                    <p id="val-ashar" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">MAGHRIB</p>
-                    <p id="val-maghrib" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center col-span-2 sm:col-span-1">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ISYA</p>
-                    <p id="val-isya" class="text-2xl font-black text-white">0</p>
+            <!-- TOTAL SANTRI -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 text-center flex flex-col justify-between">
+                <h3 class="text-xs font-black text-blue-900 tracking-wider uppercase">TOTAL SANTRI</h3>
+                <div id="total-santri" class="text-4xl font-black text-slate-900 my-3">0</div>
+                <div class="grid grid-cols-2 pt-3 border-t border-slate-100 text-[11px] font-bold">
+                    <div>
+                        <span class="text-sky-500 block text-[10px] uppercase">PUTRA (L)</span>
+                        <span id="total-pa" class="text-slate-800 font-extrabold">0</span>
+                    </div>
+                    <div class="border-l border-slate-100">
+                        <span class="text-rose-500 block text-[10px] uppercase">PUTRI (P)</span>
+                        <span id="total-pi" class="text-slate-800 font-extrabold">0</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- SUDAH REGISTRASI -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 text-center flex flex-col justify-between">
+                <h3 class="text-xs font-black text-emerald-600 tracking-wider uppercase">SUDAH REGISTRASI</h3>
+                <div id="reg-total" class="text-4xl font-black text-slate-900 my-3">0</div>
+                <div class="grid grid-cols-2 pt-3 border-t border-slate-100 text-[11px] font-bold">
+                    <div>
+                        <span class="text-sky-500 block text-[10px] uppercase">PUTRA (L)</span>
+                        <span id="reg-pa" class="text-slate-800 font-extrabold">0</span>
+                    </div>
+                    <div class="border-l border-slate-100">
+                        <span class="text-rose-500 block text-[10px] uppercase">PUTRI (P)</span>
+                        <span id="reg-pi" class="text-slate-800 font-extrabold">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BELUM REGISTRASI -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 text-center flex flex-col justify-between">
+                <h3 class="text-xs font-black text-amber-600 tracking-wider uppercase">BELUM REGISTRASI</h3>
+                <div id="unreg-total" class="text-4xl font-black text-slate-900 my-3">0</div>
+                <div class="grid grid-cols-2 pt-3 border-t border-slate-100 text-[11px] font-bold">
+                    <div>
+                        <span class="text-sky-500 block text-[10px] uppercase">PUTRA (L)</span>
+                        <span id="unreg-pa" class="text-slate-800 font-extrabold">0</span>
+                    </div>
+                    <div class="border-l border-slate-100">
+                        <span class="text-rose-500 block text-[10px] uppercase">PUTRI (P)</span>
+                        <span id="unreg-pi" class="text-slate-800 font-extrabold">0</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- SECTION 2: REKAP KEGIATAN KEPESANTRENAN -->
-        <div>
-            <div class="flex items-center gap-2 mb-4">
-                <i class="fa-solid fa-book-bookmark text-emerald-400 text-lg"></i>
-                <h2 class="text-sm font-black text-emerald-400 tracking-wider uppercase">REKAP KEGIATAN KEPESANTRENAN</h2>
-            </div>
+        <!-- CONTAINER BAWAH: JAMAAH SHALAT & KEGIATAN -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-8">
             
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">QURANAN</p>
-                    <p id="val-quranan" class="text-2xl font-black text-white">0</p>
+            <!-- SECTION 1: REKAP JAMAAH SHALAT -->
+            <div>
+                <div class="flex items-center gap-2 mb-4 text-cyan-600">
+                    <i class="fa-solid fa-chart-simple text-base"></i>
+                    <h2 class="text-xs sm:text-sm font-black tracking-wider uppercase">REKAP JAMAAH SHALAT (SIKLUS OPERASIONAL)</h2>
                 </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">AFSAHAN</p>
-                    <p id="val-afsahan" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">BELAJAR</p>
-                    <p id="val-belajar" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">NDALEM</p>
-                    <p id="val-ndalem" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">SOROGAN</p>
-                    <p id="val-sorogan" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 1</p>
-                    <p id="val-pdf1" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 2</p>
-                    <p id="val-pdf2" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">PDF 3</p>
-                    <p id="val-pdf3" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">ZIARAH</p>
-                    <p id="val-ziarah" class="text-2xl font-black text-white">0</p>
-                </div>
-                <div class="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl text-center">
-                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2">JUMATAN</p>
-                    <p id="val-jumatan" class="text-2xl font-black text-white">0</p>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">SUBUH</p>
+                        <p id="val-subuh" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">DZUHUR</p>
+                        <p id="val-dzuhur" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">ASHAR</p>
+                        <p id="val-ashar" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">MAGHRIB</p>
+                        <p id="val-maghrib" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center col-span-2 sm:col-span-1">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">ISYA</p>
+                        <p id="val-isya" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
                 </div>
             </div>
+
+            <!-- SECTION 2: REKAP KEGIATAN KEPESANTRENAN -->
+            <div>
+                <div class="flex items-center gap-2 mb-4 text-emerald-600">
+                    <i class="fa-solid fa-book-bookmark text-base"></i>
+                    <h2 class="text-xs sm:text-sm font-black tracking-wider uppercase">REKAP KEGIATAN KEPESANTRENAN</h2>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">QURANAN</p>
+                        <p id="val-quranan" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">AFSAHAN</p>
+                        <p id="val-afsahan" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">BELAJAR</p>
+                        <p id="val-belajar" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">NDALEM</p>
+                        <p id="val-ndalem" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">SOROGAN</p>
+                        <p id="val-sorogan" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">PDF 1</p>
+                        <p id="val-pdf1" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">PDF 2</p>
+                        <p id="val-pdf2" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">PDF 3</p>
+                        <p id="val-pdf3" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">ZIARAH</p>
+                        <p id="val-ziarah" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-slate-100/70 p-4 rounded-2xl text-center">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">JUMATAN</p>
+                        <p id="val-jumatan" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -106,33 +164,55 @@
                 let result = await response.json();
 
                 if (result && result.rekap) {
-                    const data = result.rekap;
+                    const d = result.rekap;
 
-                    // Mengisi angka Jamaah Shalat
-                    if (data["SUBUH"] !== undefined) document.getElementById('val-subuh').innerText = data["SUBUH"];
-                    if (data["DZUHUR"] !== undefined) document.getElementById('val-dzuhur').innerText = data["DZUHUR"];
-                    if (data["ASHAR"] !== undefined) document.getElementById('val-ashar').innerText = data["ASHAR"];
-                    if (data["MAGHRIB"] !== undefined) document.getElementById('val-maghrib').innerText = data["MAGHRIB"];
-                    if (data["ISYA"] !== undefined) document.getElementById('val-isya').innerText = data["ISYA"];
+                    // 1. Data Putra/Putri & Registrasi (Card Atas)
+                    const jmlPa = d["JUMLAH PUTRA"] || 0;
+                    const jmlPi = d["JUMLAH PUTRI"] || 0;
+                    const regPa = d["SUDAH REG PA"] || 0;
+                    const regPi = d["SUDAH REG PI"] || 0;
+                    const unregPa = d["BELUM REG PA"] || 0;
+                    const unregPi = d["BELUM REG PI"] || 0;
 
-                    // Mengisi angka Kegiatan Kepesantrenan
-                    if (data["QURANAN"] !== undefined) document.getElementById('val-quranan').innerText = data["QURANAN"];
-                    if (data["AFSAHAN"] !== undefined) document.getElementById('val-afsahan').innerText = data["AFSAHAN"];
-                    if (data["BELAJAR"] !== undefined) document.getElementById('val-belajar').innerText = data["BELAJAR"];
-                    if (data["NDALEM"] !== undefined) document.getElementById('val-ndalem').innerText = data["NDALEM"];
-                    if (data["SOROGAN"] !== undefined) document.getElementById('val-sorogan').innerText = data["SOROGAN"];
-                    if (data["PDF 1"] !== undefined) document.getElementById('val-pdf1').innerText = data["PDF 1"];
-                    if (data["PDF 2"] !== undefined) document.getElementById('val-pdf2').innerText = data["PDF 2"];
-                    if (data["PDF 3"] !== undefined) document.getElementById('val-pdf3').innerText = data["PDF 3"];
-                    if (data["ZIARAH"] !== undefined) document.getElementById('val-ziarah').innerText = data["ZIARAH"];
-                    if (data["JUMATAN"] !== undefined) document.getElementById('val-jumatan').innerText = data["JUMATAN"];
+                    // Render Total Santri
+                    document.getElementById('total-pa').innerText = jmlPa;
+                    document.getElementById('total-pi').innerText = jmlPi;
+                    document.getElementById('total-santri').innerText = jmlPa + jmlPi;
+
+                    // Render Sudah Registrasi
+                    document.getElementById('reg-pa').innerText = regPa;
+                    document.getElementById('reg-pi').innerText = regPi;
+                    document.getElementById('reg-total').innerText = regPa + regPi;
+
+                    // Render Belum Registrasi
+                    document.getElementById('unreg-pa').innerText = unregPa;
+                    document.getElementById('unreg-pi').innerText = unregPi;
+                    document.getElementById('unreg-total').innerText = unregPa + unregPi;
+
+                    // 2. Data Jamaah Shalat
+                    document.getElementById('val-subuh').innerText = d["SUBUH"] || 0;
+                    document.getElementById('val-dzuhur').innerText = d["DZUHUR"] || 0;
+                    document.getElementById('val-ashar').innerText = d["ASHAR"] || 0;
+                    document.getElementById('val-maghrib').innerText = d["MAGHRIB"] || 0;
+                    document.getElementById('val-isya').innerText = d["ISYA"] || 0;
+
+                    // 3. Data Kegiatan Kepesantrenan
+                    document.getElementById('val-quranan').innerText = d["QURANAN"] || 0;
+                    document.getElementById('val-afsahan').innerText = d["AFSAHAN"] || 0;
+                    document.getElementById('val-belajar').innerText = d["BELAJAR"] || 0;
+                    document.getElementById('val-ndalem').innerText = d["NDALEM"] || 0;
+                    document.getElementById('val-sorogan').innerText = d["SOROGAN"] || 0;
+                    document.getElementById('val-pdf1').innerText = d["PDF 1"] || 0;
+                    document.getElementById('val-pdf2').innerText = d["PDF 2"] || 0;
+                    document.getElementById('val-pdf3').innerText = d["PDF 3"] || 0;
+                    document.getElementById('val-ziarah').innerText = d["ZIARAH"] || 0;
+                    document.getElementById('val-jumatan').innerText = d["JUMATAN"] || 0;
                 }
             } catch (err) {
-                console.error("Gagal memuat rekap:", err);
+                console.error("Gagal mengambil data dari Google Sheets:", err);
             }
         }
 
-        // Jalankan saat halaman dibuka
         window.addEventListener('DOMContentLoaded', muatDataRekap);
     </script>
 </body>
