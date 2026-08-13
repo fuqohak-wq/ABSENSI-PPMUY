@@ -202,19 +202,55 @@
         <!-- REKAP DATA SECTION -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
             <div class="lg:col-span-2 flex flex-col gap-6">
-                <!-- 3 CARDS TOP STATS -->
+                <!-- 3 CARDS TOP STATS (DENGAN REKAP PUTRA / PUTRI) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md">
-                        <span class="text-[10px] font-black dynamic-text-title tracking-wider block uppercase">TOTAL SANTRI</span>
-                        <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black dynamic-text-title tracking-wider block uppercase">TOTAL SANTRI</span>
+                            <span id="stat-total" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-total-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-total-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-md">
-                        <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 tracking-wider block uppercase">SUDAH REGISTRASI</span>
-                        <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-emerald-500 shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 tracking-wider block uppercase">SUDAH REGISTRASI</span>
+                            <span id="stat-sudah" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-sudah-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-sudah-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-md">
-                        <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">BELUM REGISTRASI</span>
-                        <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                    <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center border-l-4 border-l-amber-500 shadow-md flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 tracking-wider block uppercase">BELUM REGISTRASI</span>
+                            <span id="stat-belum" class="text-xl sm:text-2xl font-black dynamic-text-main mt-1 block">0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t dynamic-border text-[10px] font-bold">
+                            <div class="text-sky-500 dark:text-sky-400 border-r dynamic-border">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRA (L)</span>
+                                <span id="stat-belum-putra" class="text-xs font-black">0</span>
+                            </div>
+                            <div class="text-rose-500 dark:text-rose-400">
+                                <span class="block text-[8px] uppercase opacity-75">PUTRI (P)</span>
+                                <span id="stat-belum-putri" class="text-xs font-black">0</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -511,7 +547,7 @@
             }, 3000);
         });
 
-        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK (MENGGUNAKAN CODE.GS BARU ANDA)
+        // FUNGSI KHUSUS UNTUK REKAP JUMLAH KEGIATAN & STATISTIK
         async function fetchRekapKegiatanKhusus() {
             try {
                 const response = await fetch(REKAP_APPS_SCRIPT_URL);
@@ -533,10 +569,18 @@
                 }
             };
 
-            // STATS ATAS
+            // STATS UTAMA
             setVal('stat-total', 'TOTAL SANTRI');
             setVal('stat-sudah', 'SUDAH REGISTRASI');
             setVal('stat-belum', 'BELUM REGISTRASI');
+
+            // STATS BREAKDOWN (GENDER PUTRA / PUTRI)
+            setVal('stat-total-putra', 'TOTAL PUTRA');
+            setVal('stat-total-putri', 'TOTAL PUTRI');
+            setVal('stat-sudah-putra', 'SUDAH PUTRA');
+            setVal('stat-sudah-putri', 'SUDAH PUTRI');
+            setVal('stat-belum-putra', 'BELUM PUTRA');
+            setVal('stat-belum-putri', 'BELUM PUTRI');
 
             // REKAP SHALAT
             setVal('v-subuh', 'SUBUH');
