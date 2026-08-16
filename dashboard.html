@@ -445,7 +445,7 @@
 
     <!-- SCRIPT UTAMA DASHBOARD -->
     <script>
-        // Dua endpoint API yang digabungkan secara paralel
+        // Dua endpoint API
         const API_DASHBOARD = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
         const API_JUMLAH = "https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec";
 
@@ -453,6 +453,9 @@
         let tabAktif = "BELUM";
         let isFetching = false;
         let controllerAktif = null;
+
+        // EKSEKUSI CACHE LOKAL DI AWAL SCRIPT AGAR RENDERING SECEPAT MUNGKIN (0-ms LOADING)
+        muatDariCacheLokal();
 
         function bukaModalPilihanScan() {
             const modal = document.getElementById('modal-pilihan-scan');
@@ -538,28 +541,35 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
-            // RENDERING INSTAN DARI CACHE LOKAL (Waktu muat: < 10ms tanpa menunggu server)
+            // Render ulang dari cache lokal sesaat setelah DOM siap untuk presisi tata letak
             muatDariCacheLokal();
 
-            // 1. Refresh visual UI secara berkala berbasis data cache lokal (Setiap 1 Detik)
-            fetchRekapKegiatanKhusus();
-            setInterval(fetchRekapKegiatanKhusus, 1000);
-
-            // 2. Tarik data terbaru di background secara berkala (Setiap 3 Detik)
+            // SINKRONISASI DATA UTAMA SECARA OTOMATIS
             muatSeluruhRekapDashboard(false);
+            
+            // Interval background sync
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
-            }, 3000);
+            }, 5000);
         });
 
-        // MEMBACA DATA CACHE LOKAL AGAR LOADING INSTAN 0-ms SAAT HALAMAN DIBUKA
         function fetchRekapKegiatanKhusus() {
+            muatDariCacheLokal();
+        }
+
+        // MEMBACA DATA CACHE LOKAL AGAR LOADING INSTAN 0-ms SAAT HALAMAN DIBUKA
+        function muatDariCacheLokal() {
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
             if (dataCache) {
                 try {
                     const r = JSON.parse(dataCache);
-                    updateStatsUI(r);
+                    // Gunakan setTimeout agar proses rendering tidak memblokir parsing utas utama browser
+                    setTimeout(() => {
+                        updateStatsUI(r);
+                        renderTabelWajahDariData(r.rekapWajah || {});
+                        tampilkanLiveFeedUI(r.liveFeed || []);
+                    }, 0);
                 } catch (e) {
                     console.warn("Gagal membaca cache rekap kegiatan:", e);
                 }
@@ -575,7 +585,6 @@
                 if (el) el.innerText = (val !== undefined && val !== null) ? val : "0";
             };
 
-            // Inisialisasi variabel rekap terintegrasi
             let totalPa = 0, totalPi = 0, totalSantri = 0;
             let regPa = 0, regPi = 0, regTotal = 0;
             let unregPa = 0, unregPi = 0, unregTotal = 0;
@@ -584,7 +593,7 @@
             let quranan = 0, afsahan = 0, belajar = 0, ndalem = 0, sorogan = 0;
             let pdf1 = 0, pdf2 = 0, pdf3 = 0, ziarah = 0, jumatan = 0;
 
-            // Alur Pengambilan 1: Dari Source API Jumlah (jumlah.html)
+            // Sumber Data 1: Data dari API Jumlah (rekapJumlahSource)
             if (r.rekapJumlahSource) {
                 const d = r.rekapJumlahSource;
                 totalPa = d["JUMLAH PUTRA"] || 0;
@@ -617,7 +626,7 @@
                 jumatan = d["JUMATAN"] || 0;
             } 
             
-            // Alur Pengambilan 2: Overwrite/Fallback dengan Source API Dashboard utama jika tersedia
+            // Sumber Data 2: Timpa data dengan data dari API Dashboard Utama jika tersedia (Data Terkini)
             if (r.rekapWajah) {
                 if (r.rekapWajah.total !== undefined) totalSantri = r.rekapWajah.total;
                 if (r.rekapWajah.totalPutra !== undefined) totalPa = r.rekapWajah.totalPutra;
@@ -649,7 +658,6 @@
                 if (r.rekapShalat['Jumatan'] !== undefined) jumatan = r.rekapShalat['Jumatan'];
             }
 
-            // Terapkan nilai ke elemen HTML secara instan
             setVal('stat-total', totalSantri);
             setVal('stat-total-putra', totalPa);
             setVal('stat-total-putri', totalPi);
@@ -789,36 +797,55 @@
             tblBody.innerHTML = rows;
         }
 
-        function muatDariCacheLokal() {
-            const CACHE_KEY = 'cache_rekap_dashboard';
-            const dataCache = localStorage.getItem(CACHE_KEY);
-            if (dataCache) {
-                try {
-                    const r = JSON.parse(dataCache);
-                    const feedBox = document.getElementById('box-live-feed');
-                    tampilkanDataKeUI(r, feedBox);
-                } catch (e) {
-                    console.warn("Gagal memuat cache lokal awal:", e);
+        function renderTabelWajahDariData(rekapWajah) {
+            dataRekapGlobal.listBelum = rekapWajah.listBelum || [];
+            dataRekapGlobal.listSudah = rekapWajah.listSudah || [];
+            renderTabelWajah();
+        }
+
+        function tampilkanLiveFeedUI(liveFeed) {
+            const feedBox = document.getElementById('box-live-feed');
+            if(!feedBox) return;
+            
+            if (!liveFeed || liveFeed.length === 0) {
+                feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
+            } else {
+                let logItems = "";
+                const totalLog = liveFeed.length;
+                for (let i = 0; i < totalLog; i++) {
+                    const log = liveFeed[i];
+                    const jamTampil = log.jam || log.waktu || "00:00";
+                    const kegTampil = log.shalat || log.kegiatan || "Jamaah";
+                    const petugasTampil = log.petugas || "Kiosk Mandiri";
+
+                    logItems += `
+                        <div class="flex justify-between items-center p-2 rounded-xl border dynamic-border dynamic-bg-inner">
+                            <div class="overflow-hidden">
+                                <h4 class="text-xs font-black dynamic-text-main truncate uppercase">${log.nama}</h4>
+                                <p class="text-[9px] text-slate-400 font-mono mt-0.5">${jamTampil} - ${kegTampil} (${petugasTampil})</p>
+                            </div>
+                            <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
+                        </div>
+                    `;
                 }
+                feedBox.innerHTML = logItems;
             }
         }
 
-        // PENARIKAN DATA PARALEL MULTI-API (Asinkron Tanpa Membekukan UI)
+        // PENARIKAN DATA PARALEL MULTI-API SECARA ASINKRON & INDEPENDEN (TANPA SALING MENUNGGU)
         async function muatSeluruhRekapDashboard(forceBypass = false) {
-            if (isFetching) {
-                if (forceBypass && controllerAktif) {
-                    controllerAktif.abort(); 
-                    isFetching = false; 
-                } else {
-                    return; 
-                }
+            if (isFetching && !forceBypass) {
+                return;
+            }
+
+            if (forceBypass && controllerAktif) {
+                controllerAktif.abort();
             }
 
             isFetching = true;
             controllerAktif = new AbortController();
             const signal = controllerAktif.signal;
 
-            const feedBox = document.getElementById('box-live-feed');
             const iconRefresh = document.getElementById('icon-refresh');
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
@@ -827,102 +854,70 @@
                 iconRefresh.classList.add('fa-spin', 'animate-spin');
             }
 
-            try {
-                const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
-                
-                // Siapkan URL untuk kedua API
-                const urlDashboard = `${API_DASHBOARD}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
-                const urlJumlah = `${API_JUMLAH}?_ts=${Date.now()}`;
+            const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+            const urlDashboard = `${API_DASHBOARD}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
+            const urlJumlah = `${API_JUMLAH}?_ts=${Date.now()}`;
 
-                // Eksekusi kedua request secara bersamaan (Promise.allSettled)
-                const [resDash, resJml] = await Promise.allSettled([
-                    fetch(urlDashboard, { method: "GET", signal: signal }).then(res => res.json()),
-                    fetch(urlJumlah, { method: "GET", signal: signal }).then(res => res.json())
-                ]);
+            // PEMANGGILAN INDEPENDEN: API Utama Dashboard (Menggunakan Server Cache, Resolusi < 150ms)
+            fetch(urlDashboard, { method: "GET", signal: signal })
+                .then(res => res.json())
+                .then(r => {
+                    if (r.status === "success") {
+                        if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
+                            alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
+                            prosesLogout();
+                            return;
+                        }
 
-                // Buat wadah penyimpanan gabungan data terbaru
-                let dataGabungan = {};
-                
-                // Ambil data cache lama untuk di-merge terlebih dahulu
-                const dataLama = localStorage.getItem('cache_rekap_dashboard');
-                if (dataLama) {
-                    try { dataGabungan = JSON.parse(dataLama); } catch(e){}
-                }
-
-                // Proses data dari API Dashboard Utama
-                if (resDash.status === "fulfilled" && resDash.value.status === "success") {
-                    const r = resDash.value;
-                    if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
-                        alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
-                        prosesLogout();
-                        return;
+                        // Gabungkan ke data lokal yang ada
+                        let dataGabungan = {};
+                        const dataLama = localStorage.getItem('cache_rekap_dashboard');
+                        if (dataLama) {
+                            try { dataGabungan = JSON.parse(dataLama); } catch(e){}
+                        }
+                        
+                        dataGabungan = { ...dataGabungan, ...r };
+                        localStorage.setItem('cache_rekap_dashboard', JSON.stringify(dataGabungan));
+                        
+                        // Perbarui UI secara langsung tanpa menunggu API Jumlah selesai
+                        updateStatsUI(dataGabungan);
+                        renderTabelWajahDariData(dataGabungan.rekapWajah || {});
+                        tampilkanLiveFeedUI(dataGabungan.liveFeed || []);
                     }
-                    dataGabungan = { ...dataGabungan, ...r };
-                }
-
-                // Proses data dari API khusus penghitung statistik (jumlah.html)
-                if (resJml.status === "fulfilled" && resJml.value && resJml.value.rekap) {
-                    dataGabungan.rekapJumlahSource = resJml.value.rekap;
-                }
-
-                // Simpan hasil penggabungan ke cache lokal terintegrasi
-                localStorage.setItem('cache_rekap_dashboard', JSON.stringify(dataGabungan));
-                
-                // Terapkan data gabungan terbaru ke UI secara seamless
-                tampilkanDataKeUI(dataGabungan, feedBox);
-
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log("Sinkronisasi sebelumnya berhasil dihentikan oleh pengguna.");
-                } else {
-                    console.error("Gagal sinkronisasi data dari server utama:", error);
-                }
-            } finally {
-                isFetching = false;
-                if (iconRefresh) {
-                    iconRefresh.classList.remove('fa-spin', 'animate-spin');
-                }
-            }
-        }
-
-        function tampilkanDataKeUI(r, feedBox) {
-            if (!r) return;
-            
-            // Render list validasi master data (Wajah Santri)
-            r.rekapWajah = r.rekapWajah || {};
-            dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
-            dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
-            renderTabelWajah();
-            
-            // Render Live Feed Kiosk Tracker
-            if(feedBox) {
-                if (!r.liveFeed || r.liveFeed.length === 0) {
-                    feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
-                } else {
-                    let logItems = "";
-                    const totalLog = r.liveFeed.length;
-                    for (let i = 0; i < totalLog; i++) {
-                        const log = r.liveFeed[i];
-                        const jamTampil = log.jam || log.waktu || "00:00";
-                        const kegTampil = log.shalat || log.kegiatan || "Jamaah";
-                        const petugasTampil = log.petugas || "Kiosk Mandiri";
-
-                        logItems += `
-                            <div class="flex justify-between items-center p-2 rounded-xl border dynamic-border dynamic-bg-inner">
-                                <div class="overflow-hidden">
-                                    <h4 class="text-xs font-black dynamic-text-main truncate uppercase">${log.nama}</h4>
-                                    <p class="text-[9px] text-slate-400 font-mono mt-0.5">${jamTampil} - ${kegTampil} (${petugasTampil})</p>
-                                </div>
-                                <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
-                            </div>
-                        `;
+                })
+                .catch(err => {
+                    if (err.name !== 'AbortError') {
+                        console.warn("Koneksi dashboard utama terputus:", err);
                     }
-                    feedBox.innerHTML = logItems;
-                }
-            }
+                })
+                .finally(() => {
+                    if (iconRefresh) {
+                        iconRefresh.classList.remove('fa-spin', 'animate-spin');
+                    }
+                    isFetching = false;
+                });
 
-            // Update statistik visual secara instan
-            updateStatsUI(r);
+            // PEMANGGILAN INDEPENDEN: API Khusus Penghitung Statistik (Bisa Lebih Lambat, Diperbarui Secara Background)
+            fetch(urlJumlah, { method: "GET", signal: signal })
+                .then(res => res.json())
+                .then(r => {
+                    if (r && r.rekap) {
+                        let dataGabungan = {};
+                        const dataLama = localStorage.getItem('cache_rekap_dashboard');
+                        if (dataLama) {
+                            try { dataGabungan = JSON.parse(dataLama); } catch(e){}
+                        }
+
+                        dataGabungan.rekapJumlahSource = r.rekap;
+                        localStorage.setItem('cache_rekap_dashboard', JSON.stringify(dataGabungan));
+                        updateStatsUI(dataGabungan);
+                    }
+                })
+                .catch(err => {
+                    if (err.name !== 'AbortError') {
+                        console.warn("Koneksi API rekap jumlah terputus:", err);
+                    }
+                });
         }
         
         function prosesLogout() {
