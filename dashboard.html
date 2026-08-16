@@ -78,6 +78,7 @@
             </div>
         </div>
         
+        <!-- TOMBOL CONTROL HEADER -->
         <div class="flex items-center gap-1.5 sm:gap-2">
             <button onclick="clearWebCache()" class="w-10 h-10 rounded-xl bg-slate-800 hover:scale-105 flex items-center justify-center cursor-pointer transition-all border border-slate-700 shadow text-red-400 hover:text-red-300" title="Hapus Cache Web">
                 <i class="fa-solid fa-trash text-base"></i>
@@ -94,6 +95,7 @@
 
     <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex flex-col gap-6 sm:gap-8 flex-1">
         
+        <!-- SECTION MENU UTAMA -->
         <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 no-print">
             <div id="menu-daftar-wajah" class="royal-card rounded-2xl p-5 flex flex-col justify-between aspect-[1.7/1] sm:aspect-auto sm:min-h-[160px]">
                 <div class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-camera text-indigo-900 text-base"></i></div>
@@ -123,7 +125,7 @@
             </div>
         </section>
 
-        <!-- SUB MENU ADMINISTRASI -->
+        <!-- SECTION SUB-MENU ADMINISTRASI -->
         <section id="section-sub-menu" class="flex flex-col gap-3 no-print border-t dynamic-border pt-4">
             <div class="flex items-center gap-2 px-1">
                 <i class="fa-solid fa-cubes text-yellow-500 text-xs"></i>
@@ -201,6 +203,7 @@
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print border-t dynamic-border pt-6">
             <div class="lg:col-span-2 flex flex-col gap-6">
                 
+                <!-- 3 CARDS TOP STATS (NATIVE, ESTETIK, CEPAT) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- TOTAL SANTRI -->
                     <div class="dynamic-bg-box border dynamic-border rounded-2xl p-4 text-center shadow-md flex flex-col justify-between">
@@ -257,6 +260,7 @@
                     </div>
                 </div>
 
+                <!-- DUA SUB-GRID ANALISIS AKTIVITAS SIKLUS -->
                 <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-md flex flex-col gap-6">
                     <!-- REKAP JAMAAH SHALAT -->
                     <div>
@@ -362,7 +366,6 @@
                 </div>
             </div>
 
-            <!-- LIVE KIOSK TRACKER -->
             <div class="dynamic-bg-box border dynamic-border rounded-2xl p-5 shadow-md flex flex-col h-full min-h-[380px] lg:max-h-[530px]">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish animate-pulse text-sm"></i> LIVE KIOSK TRACKER</h3>
@@ -375,7 +378,7 @@
         </section>
     </div>
 
-    <!-- MODAL METODE SCAN -->
+    <!-- MODAL POPUP PILIHAN METODE SCAN -->
     <div id="modal-pilihan-scan" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
         <div class="w-full max-w-md bg-slate-900 border-2 border-yellow-400 rounded-2xl p-6 shadow-2xl relative">
             <button onclick="tutupModalPilihanScan()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -393,11 +396,11 @@
                     </div>
                 </a>
                 
-                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full text-white">
-                    <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0"><i class="fa-solid fa-piggy-bank"></i></div>
+                <button onclick="bukaIframeTabungan()" class="flex items-center gap-4 p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-yellow-400/50 transition-all cursor-pointer group text-left w-full">
+                    <div class="w-10 h-10 bg-yellow-400/10 group-hover:bg-yellow-400/20 rounded-lg flex items-center justify-center text-yellow-400 text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                     <div class="text-left">
-                        <h4 class="text-xs font-black group-hover:text-yellow-400 uppercase tracking-wider">Scan Wajah & Intip Tabungan</h4>
-                        <p class="text-[9px] text-slate-400 mt-0.5 font-bold">Pemindaian biometrik terintegrasi sistem pengecekan tabungan.</p>
+                        <h4 class="text-xs font-black text-slate-100 group-hover:text-yellow-400 uppercase tracking-wider">Scan Wajah & Intip Tabungan</h4>
+                        <p class="text-[9px] text-slate-400 mt-0.5">Pemindaian biometrik terintegrasi sistem pengecekan tabungan.</p>
                     </div>
                 </button>
 
@@ -412,7 +415,7 @@
         </div>
     </div>
 
-    <!-- MODAL IFRAME TABUNGAN -->
+    <!-- MODAL POPUP IFRAME FULLSCREEN SEAMLESS -->
     <div id="modal-iframe-tabungan" class="fixed inset-0 z-50 bg-slate-950 hidden w-screen h-screen flex-col overflow-hidden">
         <button onclick="tutupIframeTabungan()" class="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-all flex items-center justify-center shadow-lg cursor-pointer" title="Kembali ke Dashboard">
             <i class="fa-solid fa-xmark text-lg"></i>
@@ -424,6 +427,7 @@
 
     <footer class="w-full text-center py-3 text-[9px] dynamic-text-muted font-extrabold tracking-widest border-t dynamic-border dynamic-bg-header no-print">E-PESANTREN CORE ECOSYSTEM</footer>
 
+    <!-- POP-UP BANNER INSTALL PWA -->
     <div id="pwa-install-banner" class="hidden fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm bg-yellow-400 text-slate-950 p-4 rounded-xl shadow-2xl flex justify-between items-center z-50 border-2 border-yellow-300">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center text-yellow-400 text-lg flex-shrink-0">
@@ -439,15 +443,75 @@
       </button>
     </div>
 
-    <!-- SCRIPT UTAMA DASHBOARD OPTIMIZED -->
+    <!-- SCRIPT UTAMA DASHBOARD -->
     <script>
+        // Dua endpoint API yang digabungkan secara paralel
         const API_DASHBOARD = "https://script.google.com/macros/s/AKfycbzF2gAQGAPt3cHCb3-SWIMwxXAF-LVxK6Xp3Mf7-IBANxTAH-3QMEz4DZQ1Diek2uAF-g/exec";
+        const API_JUMLAH = "https://script.google.com/macros/s/AKfycbz_N9_agDmK4FqGBRxg53tlS7b8x2atP6yGIpj_LCvWa3CxWwOoRACDQeIpMtvZMshi/exec";
 
         let dataRekapGlobal = { listBelum: [], listSudah: [] };
         let tabAktif = "BELUM";
         let isFetching = false;
-        let isTableLoaded = false;
         let controllerAktif = null;
+
+        function bukaModalPilihanScan() {
+            const modal = document.getElementById('modal-pilihan-scan');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function tutupModalPilihanScan() {
+            const modal = document.getElementById('modal-pilihan-scan');
+            if(modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function bukaIframeTabungan() {
+            tutupModalPilihanScan();
+            const iframe = document.getElementById('iframe-tabungan');
+            if (iframe) {
+                iframe.src = "https://nasehat.vercel.app";
+            }
+            const modalIframe = document.getElementById('modal-iframe-tabungan');
+            if(modalIframe) {
+                modalIframe.classList.remove('hidden');
+                modalIframe.classList.add('flex');
+            }
+        }
+
+        function tutupIframeTabungan() {
+            const modalIframe = document.getElementById('modal-iframe-tabungan');
+            if(modalIframe) {
+                modalIframe.classList.remove('flex');
+                modalIframe.classList.add('hidden');
+                const iframe = document.getElementById('iframe-tabungan');
+                if (iframe) {
+                    iframe.src = "about:blank";
+                }
+            }
+        }
+
+        const MAP_OTORITAS = {
+            "KIAI": ["*"],
+            "KEPALA_PONDOK": [
+                "menu-daftar-wajah", "menu-scan-wajah", "menu-absen-guru", "menu-perpustakaan", 
+                "menu-aduan", "menu-keuangan", "menu-aset", "menu-jadwal-oprak", "menu-perizinan", 
+                "menu-pelanggaran", "menu-dispensasi", "menu-jadwal-piket", "menu-absen-ustadz-manual", 
+                "menu-soal-ujian", "menu-rekap-nilai", "menu-evaluasi"
+            ],
+            "GURU_PDF": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian"],
+            "USTADZ": ["menu-daftar-wajah", "menu-scan-wajah"],
+            "PENDIDIKAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-soal-ujian", "menu-dispensasi", "menu-jadwal-oprak", "menu-perpustakaan", "menu-rekap-nilai"],
+            "KEAMANAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-dispensasi", "menu-jadwal-oprak", "menu-pelanggaran", "menu-perizinan", "menu-evaluasi"],
+            "KEBERSIHAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-jadwal-piket"],
+            "HUMAS": ["menu-daftar-wajah", "menu-scan-wajah", "menu-aduan"],
+            "PENGAIRAN": ["menu-daftar-wajah", "menu-scan-wajah", "menu-aset","menu-dispensasi"],
+            "BENDAHARA": ["menu-daftar-wajah", "menu-scan-wajah", "menu-keuangan"]
+        };
 
         window.addEventListener('DOMContentLoaded', () => {
             const versiSesi = localStorage.getItem('app_session_version');
@@ -474,24 +538,21 @@
             const temaSimpanan = localStorage.getItem('dashboard_theme') || 'theme-dark';
             setTemaAplikasi(temaSimpanan);
             
+            // RENDERING INSTAN DARI CACHE LOKAL (Waktu muat: < 10ms tanpa menunggu server)
             muatDariCacheLokal();
 
-            // Refresh UI visual secara berkala berbasis data cache lokal (Setiap 1 Detik)
+            // 1. Refresh visual UI secara berkala berbasis data cache lokal (Setiap 1 Detik)
             fetchRekapKegiatanKhusus();
             setInterval(fetchRekapKegiatanKhusus, 1000);
 
-            // Muat polling cepat statistik di background (Setiap 3 Detik)
+            // 2. Tarik data terbaru di background secara berkala (Setiap 3 Detik)
             muatSeluruhRekapDashboard(false);
             setInterval(() => {
                 muatSeluruhRekapDashboard(false);
             }, 3000);
-
-            // Lazy load daftar tabel wajah (Delay 1 detik saat startup agar statistik tampil instan terlebih dahulu)
-            setTimeout(() => {
-                muatDetailTabelWajah(false);
-            }, 1000);
         });
 
+        // MEMBACA DATA CACHE LOKAL AGAR LOADING INSTAN 0-ms SAAT HALAMAN DIBUKA
         function fetchRekapKegiatanKhusus() {
             const CACHE_KEY = 'cache_rekap_dashboard';
             const dataCache = localStorage.getItem(CACHE_KEY);
@@ -505,6 +566,7 @@
             }
         }
 
+        // PARSER & BINDER STATISTIK DUA TEMPLATE KE SATU UI SECARA REALTIME
         function updateStatsUI(r) {
             if (!r) return;
 
@@ -513,6 +575,7 @@
                 if (el) el.innerText = (val !== undefined && val !== null) ? val : "0";
             };
 
+            // Inisialisasi variabel rekap terintegrasi
             let totalPa = 0, totalPi = 0, totalSantri = 0;
             let regPa = 0, regPi = 0, regTotal = 0;
             let unregPa = 0, unregPi = 0, unregTotal = 0;
@@ -520,39 +583,73 @@
             let subuh = 0, dzuhur = 0, ashar = 0, maghrib = 0, isya = 0;
             let quranan = 0, afsahan = 0, belajar = 0, ndalem = 0, sorogan = 0;
             let pdf1 = 0, pdf2 = 0, pdf3 = 0, ziarah = 0, jumatan = 0;
+
+            // Alur Pengambilan 1: Dari Source API Jumlah (jumlah.html)
+            if (r.rekapJumlahSource) {
+                const d = r.rekapJumlahSource;
+                totalPa = d["JUMLAH PUTRA"] || 0;
+                totalPi = d["JUMLAH PUTRI"] || 0;
+                totalSantri = totalPa + totalPi;
+
+                regPa = d["SUDAH REG PA"] || 0;
+                regPi = d["SUDAH REG PI"] || 0;
+                regTotal = regPa + regPi;
+
+                unregPa = d["BELUM REG PA"] || 0;
+                unregPi = d["BELUM REG PI"] || 0;
+                unregTotal = unregPa + unregPi;
+
+                subuh = d["SUBUH"] || 0;
+                dzuhur = d["DZUHUR"] || 0;
+                ashar = d["ASHAR"] || 0;
+                maghrib = d["MAGHRIB"] || 0;
+                isya = d["ISYA"] || 0;
+
+                quranan = d["QURANAN"] || 0;
+                afsahan = d["AFSAHAN"] || 0;
+                belajar = d["BELAJAR"] || 0;
+                ndalem = d["NDALEM"] || 0;
+                sorogan = d["SOROGAN"] || 0;
+                pdf1 = d["PDF 1"] || 0;
+                pdf2 = d["PDF 2"] || 0;
+                pdf3 = d["PDF 3"] || 0;
+                ziarah = d["ZIARAH"] || 0;
+                jumatan = d["JUMATAN"] || 0;
+            } 
             
+            // Alur Pengambilan 2: Overwrite/Fallback dengan Source API Dashboard utama jika tersedia
             if (r.rekapWajah) {
                 if (r.rekapWajah.total !== undefined) totalSantri = r.rekapWajah.total;
                 if (r.rekapWajah.totalPutra !== undefined) totalPa = r.rekapWajah.totalPutra;
                 if (r.rekapWajah.totalPutri !== undefined) totalPi = r.rekapWajah.totalPutri;
-                
                 if (r.rekapWajah.sudah !== undefined) regTotal = r.rekapWajah.sudah;
                 if (r.rekapWajah.sudahPutra !== undefined) regPa = r.rekapWajah.sudahPutra;
                 if (r.rekapWajah.sudahPutri !== undefined) regPi = r.rekapWajah.sudahPutri;
-                
                 if (r.rekapWajah.belum !== undefined) unregTotal = r.rekapWajah.belum;
                 if (r.rekapWajah.belumPutra !== undefined) unregPa = r.rekapWajah.belumPutra;
                 if (r.rekapWajah.belumPutri !== undefined) unregPi = r.rekapWajah.belumPutri;
             }
 
             if (r.rekapShalat) {
-                subuh = r.rekapShalat['Subuh'] || 0;
-                dzuhur = r.rekapShalat['Dzuhur'] || 0;
-                ashar = r.rekapShalat['Ashar'] || 0;
-                maghrib = r.rekapShalat['Maghrib'] || 0;
-                isya = r.rekapShalat['Isya'] || 0;
-                quranan = r.rekapShalat['Quranan'] || 0;
-                afsahan = r.rekapShalat['Afsahan'] || 0;
-                belajar = r.rekapShalat['Belajar'] || 0;
-                ndalem = r.rekapShalat['Ndalem'] || 0;
-                sorogan = r.rekapShalat['Sorogan'] || 0;
-                pdf1 = r.rekapShalat['PDF 1'] || 0;
-                pdf2 = r.rekapShalat['PDF 2'] || 0;
-                pdf3 = r.rekapShalat['PDF 3'] || 0;
-                ziarah = r.rekapShalat['Ziarah'] || 0;
-                jumatan = r.rekapShalat['Jumatan'] || 0;
+                if (r.rekapShalat['Subuh'] !== undefined) subuh = r.rekapShalat['Subuh'];
+                if (r.rekapShalat['Dzuhur'] !== undefined) dzuhur = r.rekapShalat['Dzuhur'];
+                if (r.rekapShalat['Ashar'] !== undefined) ashar = r.rekapShalat['Ashar'];
+                if (r.rekapShalat['Maghrib'] !== undefined) maghrib = r.rekapShalat['Maghrib'];
+                if (r.rekapShalat['Isya'] !== undefined) isya = r.rekapShalat['Isya'];
+
+                if (r.rekapShalat['Quranan'] !== undefined) quranan = r.rekapShalat['Quranan'];
+                if (r.rekapShalat['Afsahan'] !== undefined) afsahan = r.rekapShalat['Afsahan'];
+                if (r.rekapShalat['Belajar'] !== undefined) belajar = r.rekapShalat['Belajar'];
+                if (r.rekapShalat['Ndalem'] !== undefined) ndalem = r.rekapShalat['Ndalem'];
+                if (r.rekapShalat['Sorogan'] !== undefined) sorogan = r.rekapShalat['Sorogan'];
+                if (r.rekapShalat['PDF 1'] !== undefined) pdf1 = r.rekapShalat['PDF 1'];
+                if (r.rekapShalat['PDF 2'] !== undefined) pdf2 = r.rekapShalat['PDF 2'];
+                if (r.rekapShalat['PDF 3'] !== undefined) pdf3 = r.rekapShalat['PDF 3'];
+                if (r.rekapShalat['Ziarah'] !== undefined) ziarah = r.rekapShalat['Ziarah'];
+                if (r.rekapShalat['Jumatan'] !== undefined) jumatan = r.rekapShalat['Jumatan'];
             }
 
+            // Terapkan nilai ke elemen HTML secara instan
             setVal('stat-total', totalSantri);
             setVal('stat-total-putra', totalPa);
             setVal('stat-total-putri', totalPi);
@@ -584,15 +681,7 @@
         }
 
         function refreshManual() {
-            bersihkanKlienCache();
             muatSeluruhRekapDashboard(true);
-            muatDetailTabelWajah(true);
-        }
-
-        function bersihkanKlienCache() {
-            localStorage.removeItem('cache_rekap_dashboard');
-            localStorage.removeItem('cache_detail_tabel');
-            isTableLoaded = false;
         }
 
         function terapkanOtoritasMenu(userRole) {
@@ -677,7 +766,7 @@
             
             let listData = (tabAktif === "BELUM") ? dataRekapGlobal.listBelum : dataRekapGlobal.listSudah;
             if (!listData || listData.length === 0) {
-                tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 uppercase font-bold text-[10px]">${isTableLoaded ? 'Data tidak ditemukan.' : 'Membongkar arsip data...'}</td></tr>`;
+                tblBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 uppercase font-bold text-[10px]">Data tidak ditemukan.</td></tr>`;
                 return;
             }
 
@@ -712,18 +801,9 @@
                     console.warn("Gagal memuat cache lokal awal:", e);
                 }
             }
-
-            const TABLE_CACHE_KEY = 'cache_detail_tabel';
-            const tableCache = localStorage.getItem(TABLE_CACHE_KEY);
-            if (tableCache) {
-                try {
-                    const r = JSON.parse(tableCache);
-                    tampilkanTabelKeUI(r);
-                } catch(e){}
-            }
         }
 
-        // POLLING ULTRA INSTAN (Selesai dalam < 50ms)
+        // PENARIKAN DATA PARALEL MULTI-API (Asinkron Tanpa Membekukan UI)
         async function muatSeluruhRekapDashboard(forceBypass = false) {
             if (isFetching) {
                 if (forceBypass && controllerAktif) {
@@ -743,73 +823,78 @@
             const passwordLokal = localStorage.getItem('session_password');
             const roleLokal = localStorage.getItem('session_role');
 
-            if (iconRefresh && forceBypass) {
+            if (iconRefresh) {
                 iconRefresh.classList.add('fa-spin', 'animate-spin');
             }
 
             try {
                 const formatHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+                
+                // Siapkan URL untuk kedua API
                 const urlDashboard = `${API_DASHBOARD}?aksi=ambil_rekap_dashboard&role=${roleLokal}&tanggal=${formatHariIni}&filter=hari_ini&today_only=true&_ts=${Date.now()}`;
+                const urlJumlah = `${API_JUMLAH}?_ts=${Date.now()}`;
 
-                const response = await fetch(urlDashboard, { method: "GET", signal: signal });
-                const r = await response.json();
+                // Eksekusi kedua request secara bersamaan (Promise.allSettled)
+                const [resDash, resJml] = await Promise.allSettled([
+                    fetch(urlDashboard, { method: "GET", signal: signal }).then(res => res.json()),
+                    fetch(urlJumlah, { method: "GET", signal: signal }).then(res => res.json())
+                ]);
 
-                if (r && r.status === "success") {
+                // Buat wadah penyimpanan gabungan data terbaru
+                let dataGabungan = {};
+                
+                // Ambil data cache lama untuk di-merge terlebih dahulu
+                const dataLama = localStorage.getItem('cache_rekap_dashboard');
+                if (dataLama) {
+                    try { dataGabungan = JSON.parse(dataLama); } catch(e){}
+                }
+
+                // Proses data dari API Dashboard Utama
+                if (resDash.status === "fulfilled" && resDash.value.status === "success") {
+                    const r = resDash.value;
                     if (r.password_terbaru && passwordLokal !== String(r.password_terbaru)) {
                         alert("Sesi Anda telah berakhir atau password telah diubah. Silakan login kembali!");
                         prosesLogout();
                         return;
                     }
-                    
-                    localStorage.setItem('cache_rekap_dashboard', JSON.stringify(r));
-                    tampilkanDataKeUI(r, feedBox);
+                    dataGabungan = { ...dataGabungan, ...r };
                 }
 
+                // Proses data dari API khusus penghitung statistik (jumlah.html)
+                if (resJml.status === "fulfilled" && resJml.value && resJml.value.rekap) {
+                    dataGabungan.rekapJumlahSource = resJml.value.rekap;
+                }
+
+                // Simpan hasil penggabungan ke cache lokal terintegrasi
+                localStorage.setItem('cache_rekap_dashboard', JSON.stringify(dataGabungan));
+                
+                // Terapkan data gabungan terbaru ke UI secara seamless
+                tampilkanDataKeUI(dataGabungan, feedBox);
+
             } catch (error) {
-                if (error.name !== 'AbortError') {
-                    console.error("Gagal sinkronisasi data rekap:", error);
+                if (error.name === 'AbortError') {
+                    console.log("Sinkronisasi sebelumnya berhasil dihentikan oleh pengguna.");
+                } else {
+                    console.error("Gagal sinkronisasi data dari server utama:", error);
                 }
             } finally {
                 isFetching = false;
-                if (iconRefresh && forceBypass) {
+                if (iconRefresh) {
                     iconRefresh.classList.remove('fa-spin', 'animate-spin');
                 }
             }
         }
 
-        // AMBIL DATA DETAIL TABEL (Hanya dipanggil sekali / jarang terjadi refresh)
-        async function muatDetailTabelWajah(forceBypass = false) {
-            if (isTableLoaded && !forceBypass) return;
-
-            try {
-                const urlTabel = `${API_DASHBOARD}?aksi=ambil_detail_tabel&_ts=${Date.now()}`;
-                const response = await fetch(urlTabel);
-                const r = await response.json();
-
-                if (r && r.status === "success") {
-                    localStorage.setItem('cache_detail_tabel', JSON.stringify(r.lists));
-                    tampilkanTabelKeUI(r.lists);
-                }
-            } catch (e) {
-                console.error("Gagal mengambil detail tabel:", e);
-            }
-        }
-
-        function tampilkanTabelKeUI(lists) {
-            if (!lists) return;
-            const listBelumRaw = lists.listBelum || [];
-            const listSudahRaw = lists.listSudah || [];
-            
-            dataRekapGlobal.listBelum = listBelumRaw.map(arr => ({ nama: arr[0], kelas: arr[1] }));
-            dataRekapGlobal.listSudah = listSudahRaw.map(arr => ({ nama: arr[0], kelas: arr[1] }));
-            
-            isTableLoaded = true;
-            renderTabelWajah();
-        }
-
         function tampilkanDataKeUI(r, feedBox) {
             if (!r) return;
             
+            // Render list validasi master data (Wajah Santri)
+            r.rekapWajah = r.rekapWajah || {};
+            dataRekapGlobal.listBelum = r.rekapWajah.listBelum || [];
+            dataRekapGlobal.listSudah = r.rekapWajah.listSudah || [];
+            renderTabelWajah();
+            
+            // Render Live Feed Kiosk Tracker
             if(feedBox) {
                 if (!r.liveFeed || r.liveFeed.length === 0) {
                     feedBox.innerHTML = `<div class="text-center text-[11px] py-10 text-slate-500 font-bold uppercase">Belum ada log scan wajah hari ini.</div>`;
@@ -828,7 +913,7 @@
                                     <h4 class="text-xs font-black dynamic-text-main truncate uppercase">${log.nama}</h4>
                                     <p class="text-[9px] text-slate-400 font-mono mt-0.5">${jamTampil} - ${kegTampil} (${petugasTampil})</p>
                                 </div>
-                                <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase flex-shrink-0">BERHASIL</span>
+                                <span class="text-[9px] bg-emerald-500/20 text-emerald-500 font-black px-2 py-0.5 rounded uppercase">BERHASIL</span>
                             </div>
                         `;
                     }
@@ -836,6 +921,7 @@
                 }
             }
 
+            // Update statistik visual secara instan
             updateStatsUI(r);
         }
         
@@ -844,13 +930,12 @@
             localStorage.removeItem('session_role');
             localStorage.removeItem('session_password');
             localStorage.removeItem('cache_rekap_dashboard');
-            localStorage.removeItem('cache_detail_tabel');
             localStorage.removeItem('cache_rekap_time');
             window.location.href = "index.html";
         }
     </script>
 
-    <!-- SCRIPT HAPUS CACHE WEB TOTAL -->
+    <!-- SCRIPT KHUSUS HAPUS CACHE WEB TOTAL -->
     <script>
         async function clearWebCache() {
             if (confirm("Hapus seluruh cache web, data login, dan muat ulang aplikasi dari awal?")) {
@@ -897,7 +982,7 @@
         }
     </script>
 
-    <!-- SERVICE WORKER -->
+    <!-- SCRIPT REGISTRASI SERVICE WORKER & HANDLING EVENT INSTALL PWA -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
