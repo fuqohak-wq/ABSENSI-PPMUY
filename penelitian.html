@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angket Penelitian Interaktif</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Quicksand', sans-serif;
+    }
+    .custom-gradient {
+      background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+    }
+  </style>
+</head>
+<body class="custom-gradient min-h-screen py-10 px-4 flex justify-center items-center">
+
+  <div class="max-w-3xl w-full bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/50">
+    
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 p-8 text-white text-center relative">
+      <h1 class="text-3xl font-bold mb-2">✨ Angket Penelitian ✨</h1>
+      <p class="text-sm opacity-90">Bagikan pengalaman belajarmu bersama kami secara menyenangkan!</p>
+      <div class="absolute bottom-0 left-0 w-full bg-black/10 h-2">
+        <div id="progressBar" class="bg-yellow-300 h-full transition-all duration-500" style="width: 5%;"></div>
+      </div>
+    </div>
+
+    <!-- Form Konten -->
+    <form id="researchForm" class="p-8 space-y-8">
+      
+      <!-- STEP 1: DEMOGRAFI -->
+      <div id="step-1" class="step-container space-y-6">
+        <div class="border-b pb-4 mb-6">
+          <h2 class="text-xl font-bold text-gray-700 flex items-center gap-2">
+            <span class="p-2 bg-pink-100 rounded-lg text-pink-500 text-sm">Step 1</span> Informasi Identitas
+          </h2>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Email Anda <span class="text-red-500">*</span></label>
+          <input type="email" id="email" required placeholder="nama@email.com" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white/50">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Nama <span class="text-red-500">*</span></label>
+          <input type="text" id="nama" required placeholder="Ketik nama di sini..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white/50">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Usia <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-pink-50 transition">
+              <input type="radio" name="usia" value="< 20 Tahun" required class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-gray-700">&lt; 20 Tahun</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-pink-50 transition">
+              <input type="radio" name="usia" value="21-30 Tahun" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-gray-700">21-30 Tahun</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-pink-50 transition">
+              <input type="radio" name="usia" value="31-40 Tahun" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-gray-700">31-40 Tahun</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-pink-50 transition">
+              <input type="radio" name="usia" value="> 41 Tahun" class="text-indigo-600 focus:ring-indigo-500">
+              <span class="text-gray-700">&gt; 41 Tahun</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Status Pernikahan <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-purple-50 transition">
+              <input type="radio" name="status" value="Menikah" required class="text-indigo-600">
+              <span class="text-gray-700">Menikah</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-purple-50 transition">
+              <input type="radio" name="status" value="Belum Menikah" class="text-indigo-600">
+              <span class="text-gray-700">Belum Menikah</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Status Proses Belajar/Hafalan <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+              <input type="radio" name="statusHafalan" value="Selesai target" required class="text-indigo-600">
+              <span class="text-gray-700">Selesai Target</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 transition">
+              <input type="radio" name="statusHafalan" value="Sedang Berproses" class="text-indigo-600">
+              <span class="text-gray-700">Sedang Berproses</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4">
+          <button type="button" onclick="nextStep(2)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105 shadow-md">
+            Mulai Pengisian <i class="fa-solid fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: ANGKET PERTANYAAN (Dibuat Dinamis) -->
+      <div id="step-2" class="step-container hidden space-y-8">
+        <div class="border-b pb-4 mb-6">
+          <h2 class="text-xl font-bold text-gray-700 flex items-center gap-2">
+            <span class="p-2 bg-purple-100 rounded-lg text-purple-500 text-sm">Step 2</span> Instrumen Evaluasi Diri
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">Pilih skala dari 1 (Sangat Tidak Sesuai) sampai 4 (Sangat Sesuai)</p>
+        </div>
+
+        <!-- Wadah Pertanyaan Dinamis -->
+        <div id="questionsContainer" class="space-y-8"></div>
+
+        <div class="flex justify-between pt-6 border-t">
+          <button type="button" onclick="prevStep(1)" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-6 rounded-xl transition">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Kembali
+          </button>
+          <button type="submit" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105 shadow-md">
+            Kirim Jawaban <i class="fa-solid fa-paper-plane ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform scale-95 transition-all duration-300">
+        <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex justify-center items-center text-4xl mx-auto mb-6">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">Terima Kasih Banyak!</h3>
+        <p class="text-gray-600 mb-6">Jawaban riset Anda telah sukses kami simpan ke database Google Sheets.</p>
+        <button onclick="resetForm()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-3 px-6 rounded-xl transition duration-300 hover:from-indigo-600 hover:to-purple-700">
+          <i class="fa-solid fa-arrows-rotate mr-2"></i> Isikan Data Baru Lagi
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification untuk Pesan Semangat -->
+  <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 z-50 bg-white/95 border-l-4 border-indigo-500 shadow-xl rounded-xl p-4 flex items-center gap-3 max-w-sm">
+    <div class="text-2xl" id="toastIcon">✨</div>
+    <div>
+      <p class="font-bold text-sm text-gray-800" id="toastTitle">Pilihan yang Bagus!</p>
+      <p class="text-xs text-gray-600" id="toastMessage">Semangat terus belajarnya ya!</p>
+    </div>
+  </div>
+
+  <script>
+    // MASUKKAN URL GOOGLE WEB APP SCRIPT ANDA DI SINI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEdvIxHE-nTAOG8XIVrmqHJrih5o6IoAQCkSfj9PHvHnG9Mq4KZ--KAMTWi71-R7Hc/exec";
+
+    // Kumpulan pertanyaan yang telah disesuaikan agar general (belajar/menghafal)
+    const questions = [
+      "Keluarga saya sering memberi nasehat agar saya senantiasa menjaga kesehatan saya",
+      "Kyai, Bu Nyai, atau Ustadzah menanyakan keadaan saya khususnya berkaitan tentang perkembangan hafalan saya",
+      "Bila saya memiliki suatu rencana, saya selalu meminta pertimbangan keluarga saya",
+      "Saya sering mendapat pujian dari teman-teman atas kesabaran saya dalam menghadapi berbagai masalah",
+      "Guru atau pembimbing memberikan semangat setiap saat dalam proses menghafal/belajar",
+      "Keluarga saya selalu menghargai apapun keputusan baik yang saya ambil",
+      "Bila saya kelihatan sedih, teman-teman saya selalu berusaha menghibur",
+      "Orang tua dan keluarga saya selalu membesarkan hati saya bila saya merasa putus asa",
+      "Saya merasa bersyukur menjadi pribadi yang memiliki kesempatan untuk menghafal/belajar",
+      "Saya mampu menerima kemampuan hafalan saya meskipun belum sebaik yang saya harapkan",
+      "Saya tetap menghargai diri sendiri meskipun mengalami kesulitan menjaga konsistensi belajar",
+      "Saya memiliki orang-orang yang dapat memberikan dukungan ketika saya mengalami kesulitan dalam menghafal",
+      "Kegiatan belajar/menghafal membantu saya membangun hubungan yang lebih baik dengan orang lain",
+      "Saya mampu menentukan target belajar/hafalan berdasarkan kemampuan diri saya",
+      "Saya mampu membuat keputusan sendiri berkaitan dengan kegiatan belajar dan menghafal",
+      "Saya mampu mengatur waktu antara menghafal/belajar dan kegiatan lainnya",
+      "Saya mampu mencari cara yang tepat ketika menghadapi kesulitan dalam menjaga fokus",
+      "Menghafal/belajar membuat saya memiliki arah hidup yang lebih jelas",
+      "Saya merasa kegiatan menghafal/belajar memberikan makna penting bagi kehidupan saya",
+      "Hafalan/ilmu baru memotivasi saya untuk menjadi pribadi yang lebih bermanfaat",
+      "Proses belajar/menghafal membantu saya berkembang menjadi pribadi yang lebih baik",
+      "Saya terus berusaha meningkatkan kualitas diri, baik dalam ingatan maupun kehidupan sehari-hari",
+      "Ketika mendapatkan masalah, saya akan bertukar cerita kepada sahabat yang memahami saya",
+      "Saya memilih berusaha langsung daripada hanya memikirkan bagaimana masalah saya terselesaikan",
+      "Permasalahan yang saya alami membuat saya sadar akan makna kehidupan",
+      "Saya mampu menyelesaikan masalah saat sedang berada dalam proses belajar/menghafal",
+      "Mencari makna dari setiap kegagalan yang saya alami, membuat saya lebih siap dalam melangkah ke depan",
+      "Ketika ada permasalahan, saya langsung memikirkan alternatif jalan keluarnya",
+      "Pendapat orang yang berpengalaman merupakan masukan berharga dalam pemecahan masalah saya",
+      "Saya aktif mencari cara mengatasi tantangan yang saya hadapi",
+      "Saya cenderung untuk cepat pulih dari sakit atau masalah psikis",
+      "Saya dapat tumbuh dalam arti positif dengan menangani situasi yang sulit",
+      "Saya melihat tantangan sebagai peluang untuk belajar hal baru",
+      "Saya dapat melewati masa-masa sulit karena saya sudah berpengalaman mengatasi hal serupa sebelumnya",
+      "Saya biasanya percaya diri dalam mengerjakan hal-hal yang sudah saya targetkan",
+      "Saya dapat beradaptasi pada perubahan lingkungan belajar dengan baik",
+      "Saya selalu berusaha belajar dari kesalahan masa lalu",
+      "Saya cenderung lebih antusias menghadapi masalah ketimbang menghindarinya",
+      "Saya biasanya optimis dan penuh harapan menatap masa depan",
+      "Saya cenderung cepat bangkit dari kejadian yang penuh tekanan",
+      "Saya dapat melihat sisi humoris/positif dari sebuah masalah yang rumit"
+    ];
+
+    // Koleksi ucapan semangat yang dinamis & tidak membosankan
+    const positiveQuotes = [
+      { text: "Pilihan yang mantap! Teruskan ya!", icon: "🚀", title: "Luar Biasa!" },
+      { text: "Setiap langkah kecil membawamu lebih dekat pada tujuan.", icon: "🌱", title: "Keren!" },
+      { text: "Terima kasih atas kejujuranmu yang berharga.", icon: "💖", title: "Sangat Menghargai!" },
+      { text: "Kamu melakukan pekerjaan luar biasa!", icon: "✨", title: "Hebat!" },
+      { text: "Tetap konsisten, usahamu tidak akan sia-sia.", icon: "🔥", title: "Fokus!" },
+      { text: "Pilihan cerdas! Yuk lanjut lagi.", icon: "💡", title: "Brilian!" },
+      { text: "Wawasanmu sangat membantu penelitian ini.", icon: "📝", title: "Terima Kasih!" },
+      { text: "Hebat! Pertahankan fokusmu.", icon: "🎯", title: "Fokus!" }
+    ];
+
+    // Render Pertanyaan Dinamis ke dalam HTML
+    const container = document.getElementById('questionsContainer');
+    questions.forEach((q, index) => {
+      const qNum = index + 1;
+      const qHTML = `
+        <div class="bg-gray-50/70 p-6 rounded-2xl border border-gray-100 space-y-4 shadow-sm hover:shadow transition duration-200">
+          <p class="text-gray-800 font-semibold leading-relaxed">
+            <span class="inline-block bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full mr-2">${qNum}</span> ${q} <span class="text-red-500">*</span>
+          </p>
+          <div class="grid grid-cols-4 gap-2">
+            ${[1, 2, 3, 4].map(val => {
+              let label = "";
+              if (val === 1) label = "Sangat Tidak Sesuai";
+              if (val === 4) label = "Sangat Sesuai";
+              return `
+                <label class="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:bg-indigo-50/50 transition">
+                  <input type="radio" name="q${qNum}" value="${val}" required class="mb-2 text-indigo-600 focus:ring-indigo-500" onchange="showToast()">
+                  <span class="text-xs font-bold text-gray-500 mb-1">${val}</span>
+                  ${label ? `<span class="text-[10px] text-gray-400 text-center leading-tight">${label}</span>` : ''}
+                </label>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      container.innerHTML += qHTML;
+    });
+
+    // Menampilkan toast notifikasi acak
+    function showToast() {
+      const randomQuote = positiveQuotes[Math.floor(Math.random() * positiveQuotes.length)];
+      document.getElementById('toastIcon').innerText = randomQuote.icon;
+      document.getElementById('toastTitle').innerText = randomQuote.title;
+      document.getElementById('toastMessage').innerText = randomQuote.text;
+      
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 2500);
+      updateProgress();
+    }
+
+    // Update Progress Bar
+    function updateProgress() {
+      const totalRequired = questions.length + 4; // 41 pertanyaan + 4 input profil
+      let answered = 0;
+      
+      if (document.getElementById('email').value) answered++;
+      if (document.getElementById('nama').value) answered++;
+      if (document.querySelector('input[name="usia"]:checked')) answered++;
+      if (document.querySelector('input[name="status"]:checked')) answered++;
+      if (document.querySelector('input[name="statusHafalan"]:checked')) answered++;
+      
+      for(let i=1; i<=questions.length; i++) {
+        if(document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+      }
+      
+      const percentage = Math.round((answered / totalRequired) * 100);
+      document.getElementById('progressBar').style.width = `${Math.max(5, percentage)}%`;
+    }
+
+    // Navigasi Langkah (Steps)
+    function nextStep(step) {
+      if (step === 2) {
+        // Validasi input di Step 1
+        const email = document.getElementById('email').checkValidity();
+        const nama = document.getElementById('nama').checkValidity();
+        const usia = document.querySelector('input[name="usia"]:checked');
+        const status = document.querySelector('input[name="status"]:checked');
+        const statusHafalan = document.querySelector('input[name="statusHafalan"]:checked');
+
+        if (!email || !nama || !usia || !status || !statusHafalan) {
+          alert("Silakan lengkapi semua data identitas terlebih dahulu!");
+          return;
+        }
+      }
+      
+      document.querySelectorAll('.step-container').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateProgress();
+    }
+
+    function prevStep(step) {
+      document.querySelectorAll('.step-container').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Mengirim Form Data ke Apps Script
+    document.getElementById('researchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> Mengirim...`;
+
+      const formData = {
+        email: document.getElementById('email').value,
+        nama: document.getElementById('nama').value,
+        usia: document.querySelector('input[name="usia"]:checked').value,
+        status: document.querySelector('input[name="status"]:checked').value,
+        statusHafalan: document.querySelector('input[name="statusHafalan"]:checked').value
+      };
+
+      for(let i = 1; i <= questions.length; i++) {
+        formData[`q${i}`] = document.querySelector(`input[name="q${i}"]:checked`).value;
+      }
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Untuk bypass masalah CORS Apps Script
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(() => {
+        // Menampilkan Modal Sukses
+        document.getElementById('successModal').classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Kirim Jawaban <i class="fa-solid fa-paper-plane ml-2"></i>`;
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Terjadi kesalahan koneksi saat mengirim data. Coba lagi.");
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Kirim Jawaban <i class="fa-solid fa-paper-plane ml-2"></i>`;
+      });
+    });
+
+    // Reset Form untuk Pengisian Baru (Supaya satu browser bisa isi berkali-kali)
+    function resetForm() {
+      document.getElementById('researchForm').reset();
+      document.getElementById('successModal').classList.add('hidden');
+      nextStep(1);
+    }
+  </script>
+</body>
+</html>
