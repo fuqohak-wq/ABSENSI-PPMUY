@@ -37,14 +37,13 @@
           <i class="fa-solid fa-shield-halved text-amber-600 dark:text-emerald-400"></i> Admin: <span class="font-extrabold">ADMIN KEPULANGAN</span>
         </div>
 
-        <!-- TOGGLE MODE GELAP / TERANG -->
         <button onclick="toggleTheme()" id="btnTheme" class="bg-slate-900 hover:bg-slate-800 dark:bg-amber-400 dark:hover:bg-amber-300 text-white dark:text-slate-950 font-black px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 shadow-lg border border-black">
           <i id="themeIcon" class="fa-solid fa-moon text-amber-300 dark:text-slate-950"></i> <span id="themeText">Mode Gelap</span>
         </button>
       </div>
     </div>
 
-    <!-- STICKY ACTION BAR (PROSES DI ATAS - ZERO SCROLL) -->
+    <!-- STICKY ACTION BAR -->
     <div class="sticky top-2 z-50 bg-white/95 dark:bg-slate-800/95 border-2 border-slate-900 dark:border-slate-700 rounded-2xl p-4 shadow-2xl backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-3">
       <div class="flex items-center justify-between w-full md:w-auto gap-4 bg-amber-400 dark:bg-slate-900 px-5 py-3 rounded-xl border-2 border-slate-900 dark:border-slate-700 shadow-inner">
         <span class="text-xs font-black text-slate-950 dark:text-amber-400 uppercase tracking-wider">BATCH TOTAL:</span>
@@ -56,27 +55,24 @@
       </button>
     </div>
 
-    <!-- REKAPITULASI PENARIKAN -->
+    <!-- REKAPITULASI REALTIME DARI SPREADSHEET -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- TOTAL CASH OUT -->
       <div class="bg-amber-400 dark:bg-gradient-to-br dark:from-emerald-700 dark:to-teal-900 text-slate-950 dark:text-white rounded-2xl p-5 shadow-xl relative overflow-hidden border-2 border-slate-900 dark:border-slate-700">
         <p class="text-slate-900 dark:text-emerald-100 text-xs font-black uppercase tracking-wider mb-1">TOTAL CASH OUT REKAPITULASI</p>
         <h2 id="rekapTotalNominal" class="text-3xl font-black tracking-tight text-slate-950 dark:text-white">Rp 0</h2>
         <p class="text-slate-900 dark:text-emerald-200 text-xs mt-2 flex items-center gap-1 font-bold">
-          <i class="fa-solid fa-circle-info"></i> Total dana tunai disiapkan
+          <i class="fa-solid fa-database"></i> Real-time dari Google Sheet
         </p>
       </div>
 
-      <!-- TOTAL SANTRI -->
       <div class="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div>
           <p class="text-slate-700 dark:text-slate-400 text-xs font-black uppercase tracking-wider mb-1">TOTAL SANTRI TERCATAT</p>
           <h3 id="rekapTotalSantri" class="text-3xl font-black text-slate-900 dark:text-white">0 Santri</h3>
         </div>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-bold">Selesai ditarik lewat sistem</p>
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-bold">Total transaksi sukses di Sheet</p>
       </div>
 
-      <!-- STATUS SERVER -->
       <div class="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-700 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div>
           <p class="text-slate-700 dark:text-slate-400 text-xs font-black uppercase tracking-wider mb-1">STATUS SERVER</p>
@@ -84,8 +80,8 @@
             <span class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse border border-slate-900"></span> Google Sheet Connected
           </div>
         </div>
-        <button onclick="resetRekap()" class="text-xs text-red-600 dark:text-red-400 hover:text-red-800 transition text-left flex items-center gap-1 mt-3 font-black">
-          <i class="fa-solid fa-rotate-left"></i> Reset Sesi Hitungan
+        <button onclick="fetchRekapFromSheet()" class="text-xs text-blue-600 dark:text-sky-400 hover:underline transition text-left flex items-center gap-1 mt-3 font-black">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh Data Rekap dari Sheet
         </button>
       </div>
     </div>
@@ -93,8 +89,13 @@
     <!-- MAIN FORM & TABLE DATA -->
     <div class="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-700 rounded-2xl shadow-2xl p-4 md:p-6 space-y-5">
       
-      <!-- Controls Input -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-sky-100 dark:bg-slate-900/50 p-4 rounded-xl border-2 border-slate-900 dark:border-slate-700">
+      <!-- Controls Input (Ditambah Pilihan Tanggal) -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-sky-100 dark:bg-slate-900/50 p-4 rounded-xl border-2 border-slate-900 dark:border-slate-700">
+        <div>
+          <label class="block text-xs font-black text-slate-900 dark:text-yellow-400 mb-1.5 uppercase tracking-wide">TANGGAL PENARIKAN</label>
+          <input type="date" id="inputTanggalPenarikan" class="w-full bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-600 rounded-xl p-2.5 text-sm font-black text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm">
+        </div>
+
         <div>
           <label class="block text-xs font-black text-slate-900 dark:text-yellow-400 mb-1.5 uppercase tracking-wide">PILIH KOTA TUJUAN</label>
           <select id="selectKota" onchange="loadDataSantriKota()" class="w-full bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-600 rounded-xl p-2.5 text-sm font-black text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm">
@@ -103,7 +104,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-black text-slate-900 dark:text-yellow-400 mb-1.5 uppercase tracking-wide">SET NOMINAL PER SANTRI (RP)</label>
+          <label class="block text-xs font-black text-slate-900 dark:text-yellow-400 mb-1.5 uppercase tracking-wide">SET NOMINAL SANTRI (RP)</label>
           <input type="text" id="inputNominalKota" oninput="formatAndApplyBulkNominal(this)" placeholder="150.000" class="w-full bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-600 rounded-xl p-2.5 text-sm font-black text-emerald-700 dark:text-emerald-400 focus:ring-2 focus:ring-amber-400 focus:outline-none shadow-sm">
         </div>
 
@@ -167,14 +168,15 @@
     let selectedSantriList = [];
     let allPpmuySantriCache = [];
 
-    let sessionTotalNominal = parseInt(localStorage.getItem('rekap_nominal') || '0');
-    let sessionTotalSantri = parseInt(localStorage.getItem('rekap_santri') || '0');
-
     window.onload = function() {
       const savedTheme = localStorage.getItem('appTheme') || 'light';
       setTheme(savedTheme);
 
-      updateRekapUI();
+      // Set default tanggal hari ini
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("inputTanggalPenarikan").value = today;
+
+      fetchRekapFromSheet();
       fetchCities();
       fetchAllSantriForManual();
     };
@@ -206,25 +208,28 @@
       }
     }
 
-    function updateRekapUI() {
-      document.getElementById('rekapTotalNominal').innerText = 'Rp ' + formatRibuan(sessionTotalNominal);
-      document.getElementById('rekapTotalSantri').innerText = sessionTotalSantri + ' Santri';
+    // AMBIL REKAP LANGSUNG DARI GOOGLE SHEET (SYNCHRONIZED)
+    function fetchRekapFromSheet() {
+      document.getElementById('rekapTotalNominal').innerText = "Memuat...";
+      document.getElementById('rekapTotalSantri').innerText = "...";
+
+      fetch(`${SCRIPT_URL}?action=getRekapSummary`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === "success") {
+            document.getElementById('rekapTotalNominal').innerText = 'Rp ' + formatRibuan(res.totalNominal);
+            document.getElementById('rekapTotalSantri').innerText = res.totalSantri + ' Santri';
+          }
+        })
+        .catch(() => {
+          document.getElementById('rekapTotalNominal').innerText = 'Rp 0';
+          document.getElementById('rekapTotalSantri').innerText = '0 Santri';
+        });
     }
 
-    function resetRekap() {
-      if(confirm("Reset total rekapitulasi sesi ini menjadi Rp 0?")) {
-        sessionTotalNominal = 0;
-        sessionTotalSantri = 0;
-        localStorage.setItem('rekap_nominal', '0');
-        localStorage.setItem('rekap_santri', '0');
-        updateRekapUI();
-      }
-    }
-
-    // FUNGSI UNLIMITED FORMAT RIBUAN
     function formatRibuan(val) {
       if (val === "" || val === null || val === undefined) return "";
-      let rawNumber = val.toString().replace(/\D/g, ""); // Ambil hanya angka murni
+      let rawNumber = val.toString().replace(/\D/g, "");
       if (!rawNumber) return "";
       return new Intl.NumberFormat('id-ID').format(rawNumber);
     }
@@ -246,8 +251,7 @@
               select.innerHTML += `<option value="${city}">${city}</option>`;
             });
           }
-        })
-        .catch(err => alert("Gagal mengambil daftar kota: " + err));
+        });
     }
 
     function fetchAllSantriForManual() {
@@ -386,7 +390,9 @@
     function prosesSimpan() {
       if (selectedSantriList.length === 0) return;
 
-      if (!confirm(`Konfirmasi Penarikan: Simpan transaksi untuk ${selectedSantriList.length} santri ini?`)) {
+      const tglPilihan = document.getElementById("inputTanggalPenarikan").value;
+
+      if (!confirm(`Konfirmasi Penarikan (${tglPilihan}): Simpan transaksi untuk ${selectedSantriList.length} santri ini?`)) {
         return;
       }
 
@@ -398,19 +404,17 @@
         method: "POST",
         body: JSON.stringify({
           action: "saveTransactions",
+          tanggalPenarikan: tglPilihan,
           data: selectedSantriList
         })
       })
       .then(res => res.json())
       .then(res => {
         if (res.status === "success") {
-          sessionTotalNominal += res.totalAmount;
-          sessionTotalSantri += res.insertedCount;
-          localStorage.setItem('rekap_nominal', sessionTotalNominal.toString());
-          localStorage.setItem('rekap_santri', sessionTotalSantri.toString());
-          updateRekapUI();
+          // Ambil rekap terbaru langsung dari sheet
+          fetchRekapFromSheet();
 
-          alert(`TRANSAKSI BERHASIL!\n\n${res.insertedCount} Santri berhasil ditarik uangnya.\nTotal Batch Ini: Rp ${formatRibuan(res.totalAmount)}`);
+          alert(`TRANSAKSI BERHASIL!\n\n${res.insertedCount} Santri berhasil ditarik uangnya tanggal ${tglPilihan}.\nTotal Batch Ini: Rp ${formatRibuan(res.totalAmount)}`);
           
           selectedSantriList = [];
           renderTable();
