@@ -138,7 +138,7 @@
           <h3 class="font-black text-slate-900 dark:text-slate-200 flex items-center gap-2 text-sm uppercase tracking-wide">
             <i class="fa-solid fa-list-check text-red-600 dark:text-emerald-400"></i> Rincian Santri Ditarik Uang (<span id="countSantri" class="text-red-600 dark:text-emerald-400 font-black">0</span>)
           </h3>
-          <span class="text-xs text-slate-700 dark:text-slate-400 font-extrabold">Koreksi nominal & hapus jika batal</span>
+          <span class="text-xs text-slate-700 dark:text-slate-400 font-extrabold">Santri saldo tidak mencukupi otomatis ditolak</span>
         </div>
 
         <div class="overflow-x-auto border-2 border-slate-900 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 shadow-inner">
@@ -148,14 +148,15 @@
                 <th class="p-3 w-12 text-center">No</th>
                 <th class="p-3 w-36">NIK</th>
                 <th class="p-3">Nama Lengkap</th>
-                <th class="p-3 w-36">Kota Asal</th>
-                <th class="p-3 w-48">Nominal Uang (Rp)</th>
+                <th class="p-3 w-32">Kota Asal</th>
+                <th class="p-3 w-36">Saldo Santri (Rp)</th>
+                <th class="p-3 w-44">Nominal Ditarik (Rp)</th>
                 <th class="p-3 w-16 text-center">Hapus</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y-2 divide-slate-200 dark:divide-slate-800">
               <tr>
-                <td colspan="6" class="p-8 text-center text-slate-600 dark:text-slate-400 font-bold italic">Silahkan pilih kota tujuan di atas untuk memulai.</td>
+                <td colspan="7" class="p-8 text-center text-slate-600 dark:text-slate-400 font-bold italic">Silahkan pilih kota tujuan di atas untuk memulai.</td>
               </tr>
             </tbody>
           </table>
@@ -168,14 +169,14 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUGsSm8OwPiwM_8hiD4C7jq_s3XL-CNikoEhT5d6CdjIl-hiZRR__cSVr-DzfPovgE/exec";
 
-    let selectedSantriList = [];
+    let rawFetchedSantriList = []; // Data mentah dari kota terpilih
+    let selectedSantriList = [];   // Data santri lolos kualifikasi saldo
     let allPpmuySantriCache = [];
 
     window.onload = function() {
       const savedTheme = localStorage.getItem('appTheme') || 'light';
       setTheme(savedTheme);
 
-      // Set default tanggal hari ini
       const today = new Date().toISOString().split('T')[0];
       document.getElementById("inputTanggalPenarikan").value = today;
 
@@ -243,7 +244,6 @@
       }
     }
 
-    // AMBIL REKAP LANGSUNG DARI GOOGLE SHEET (SYNCHRONIZED)
     function fetchRekapFromSheet() {
       document.getElementById('rekapTotalNominal').innerText = "Memuat...";
       document.getElementById('rekapTotalSantri').innerText = "...";
@@ -302,7 +302,7 @@
             const dataList = document.getElementById("listAllSantri");
             dataList.innerHTML = "";
             res.data.forEach(s => {
-              dataList.innerHTML += `<option value="${s.nik} - ${s.nama} (${s.kota})"></option>`;
+              dataList.innerHTML += `<option value="${s.nik} - ${s.nama} (${s.kota}) [Saldo: Rp ${formatRibuan(s.saldo)}]"></option>`;
             });
           }
         });
@@ -315,21 +315,44 @@
       const rawNominalKota = document.getElementById("inputNominalKota").value;
       const nominalKota = unformatRibuan(rawNominalKota);
 
-      document.getElementById("tableBody").innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-800 dark:text-slate-300 font-extrabold"><i class="fa-solid fa-spinner animate-spin"></i> Memuat data santri kota ${city}...</td></tr>`;
+      document.getElementById("tableBody").innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-800 dark:text-slate-300 font-extrabold"><i class="fa-solid fa-spinner animate-spin"></i> Memuat data santri & mengecek saldo kota ${city}...</td></tr>`;
 
       fetch(`${SCRIPT_URL}?action=getSantriByCity&city=${encodeURIComponent(city)}`)
         .then(res => res.json())
         .then(res => {
           if (res.status === "success") {
-            selectedSantriList = res.data.map(s => ({
-              ...s,
-              nominal: nominalKota
-            }));
-            renderTable();
-            showToast(`Berhasil memuat ${res.data.length} santri dari ${city}`, "success");
+            rawFetchedSantriList = res.data;
+            filterSantriBySaldo(nominalKota, city);
           }
         })
         .catch(() => showToast("Gagal mengambil data santri", "error"));
+    }
+
+    // LOGIKA PENYARINGAN UTAMA SALDO CUKUP / TIDAK
+    function filterSantriBySaldo(nominalKota, cityName = "") {
+      selectedSantriList = [];
+      let rejectedCount = 0;
+
+      rawFetchedSantriList.forEach(s => {
+        if (s.saldo >= nominalKota && nominalKota > 0) {
+          selectedSantriList.push({
+            ...s,
+            nominal: nominalKota
+          });
+        } else {
+          rejectedCount++;
+        }
+      });
+
+      renderTable();
+
+      if (cityName) {
+        if (rejectedCount > 0) {
+          showToast(`Dimuat: ${selectedSantriList.length} santri. Ditolak: ${rejectedCount} santri (Saldo kurang/Rp 0).`, "warning");
+        } else {
+          showToast(`Berhasil memuat ${selectedSantriList.length} santri dari ${cityName}`, "success");
+        }
+      }
     }
 
     function formatAndApplyBulkNominal(input) {
@@ -337,10 +360,14 @@
       input.value = formatted;
       const nominalVal = unformatRibuan(formatted);
 
-      selectedSantriList.forEach(s => {
-        s.nominal = nominalVal;
-      });
-      renderTable();
+      if (rawFetchedSantriList.length > 0) {
+        filterSantriBySaldo(nominalVal);
+      } else {
+        selectedSantriList.forEach(s => {
+          s.nominal = nominalVal;
+        });
+        renderTable();
+      }
     }
 
     function renderTable() {
@@ -348,7 +375,7 @@
       tbody.innerHTML = "";
 
       if (selectedSantriList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-600 dark:text-slate-400 font-bold italic">Belum ada data santri dipilih.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-600 dark:text-slate-400 font-bold italic">Tidak ada data santri yang memenuhi syarat saldo mencukupi.</td></tr>`;
         document.getElementById("btnSimpan").disabled = true;
         document.getElementById("countSantri").innerText = "0";
         document.getElementById("textBatchTotal").innerText = "Rp 0";
@@ -364,10 +391,11 @@
             <td class="p-3 font-mono text-xs font-black text-slate-800 dark:text-slate-300">${s.nik}</td>
             <td class="p-3 font-black text-slate-950 dark:text-white">${s.nama}</td>
             <td class="p-3 text-slate-700 dark:text-slate-300 text-xs font-bold">${s.kota || '-'}</td>
+            <td class="p-3 font-black text-emerald-700 dark:text-emerald-400 text-xs">Rp ${formatRibuan(s.saldo)}</td>
             <td class="p-3">
               <div class="relative">
                 <span class="absolute left-3 top-2 text-xs text-slate-900 dark:text-slate-400 font-black">Rp</span>
-                <input type="text" value="${formatRibuan(s.nominal)}" oninput="updateSantriNominal(${idx}, this)" class="w-full bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs font-black text-slate-950 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm">
+                <input type="text" value="${formatRibuan(s.nominal)}" oninput="updateSantriNominal(${idx}, this)" class="w-full bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-700 rounded-lg pl-9 pr-3 py-1.5 text-xs font-black text-slate-950 dark:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm">
               </div>
             </td>
             <td class="p-3 text-center">
@@ -387,7 +415,15 @@
     function updateSantriNominal(index, input) {
       const formatted = formatRibuan(input.value);
       input.value = formatted;
-      selectedSantriList[index].nominal = unformatRibuan(formatted);
+      const newNominal = unformatRibuan(formatted);
+      const santri = selectedSantriList[index];
+
+      // Jika disetel nominal melebihi saldonya
+      if (newNominal > santri.saldo) {
+        showToast(`Nominal penarikan (Rp ${formatRibuan(newNominal)}) melebihi saldo santri ${santri.nama} (Rp ${formatRibuan(santri.saldo)})!`, "error");
+      }
+
+      selectedSantriList[index].nominal = newNominal;
 
       let total = selectedSantriList.reduce((acc, curr) => acc + curr.nominal, 0);
       document.getElementById("textBatchTotal").innerText = "Rp " + formatRibuan(total);
@@ -417,16 +453,23 @@
         const rawNominalKota = document.getElementById("inputNominalKota").value;
         const defaultNominal = unformatRibuan(rawNominalKota);
 
+        // Validasi Saldo untuk Tambah Manual
+        if (found.saldo < defaultNominal || defaultNominal === 0) {
+          showToast(`TIDAK BISA DITAMBAHKAN! Saldo ${found.nama} (Rp ${formatRibuan(found.saldo)}) kurang dari nominal transport (Rp ${formatRibuan(defaultNominal)}).`, "error");
+          return;
+        }
+
         selectedSantriList.push({
           nik: found.nik,
           nama: found.nama,
           kota: found.kota,
+          saldo: found.saldo,
           nominal: defaultNominal
         });
 
         document.getElementById("inputManualSearch").value = "";
         renderTable();
-        showToast(`Santri manual ${found.nama} berhasil ditambahkan.`, "success");
+        showToast(`Santri manual ${found.nama} (Saldo: Rp ${formatRibuan(found.saldo)}) berhasil ditambahkan.`, "success");
       } else {
         showToast("Santri tidak ditemukan! Pilih dari dropdown yang tersedia.", "error");
       }
@@ -434,6 +477,13 @@
 
     function prosesSimpan() {
       if (selectedSantriList.length === 0) return;
+
+      // Proteksi Akhir: Pastikan tidak ada transaksi yang melebihi saldo saat tombol simpan ditekan
+      const invalidSantri = selectedSantriList.find(s => s.nominal > s.saldo || s.nominal === 0);
+      if (invalidSantri) {
+        showToast(`PENARIKAN BATAL: Transaksi untuk ${invalidSantri.nama} melebihi saldonya (Saldo: Rp ${formatRibuan(invalidSantri.saldo)}, Ditarik: Rp ${formatRibuan(invalidSantri.nominal)}).`, "error");
+        return;
+      }
 
       const tglPilihan = document.getElementById("inputTanggalPenarikan").value;
       if (!tglPilihan) {
@@ -464,6 +514,7 @@
           showToast(`BERHASIL! ${res.insertedCount} santri ditarik uangnya. Total: Rp ${formatRibuan(res.totalAmount)}`, "success");
           
           selectedSantriList = [];
+          rawFetchedSantriList = [];
           renderTable();
         } else {
           showToast("Gagal menyimpan: " + res.message, "error");
