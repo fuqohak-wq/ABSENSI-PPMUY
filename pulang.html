@@ -1,148 +1,158 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kasir Transport Kepulangan Maulid - PPMUY Pusat</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+<body id="appBody" class="bg-slate-900 text-slate-100 dark:bg-slate-900 dark:text-slate-100 min-h-screen p-3 md:p-6 transition-colors duration-300">
 
-  <div class="max-w-6xl mx-auto space-y-6">
+  <div class="max-w-6xl mx-auto space-y-4">
     
-    <!-- Top Bar / Header Banking Style -->
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center text-2xl font-bold">
+    <!-- Top Bar / Header & Toggle Theme -->
+    <div class="bg-slate-800 dark:bg-slate-800 bg-sky-800 text-white border border-slate-700 dark:border-slate-700 border-black rounded-2xl p-4 md:p-5 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-3 transition-colors">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-500/20 dark:bg-emerald-500/20 bg-yellow-400 text-emerald-400 dark:text-emerald-400 text-black rounded-xl flex items-center justify-center text-xl font-black">
           <i class="fa-solid fa-wallet"></i>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-white tracking-wide">PPMUY DISBURSEMENT SYSTEM</h1>
-          <p class="text-xs text-slate-400">Pengambilan Uang Transport Kepulangan Maulid • Santri Pusat</p>
+          <h1 class="text-lg font-extrabold tracking-wide uppercase">PPMUY DISBURSEMENT SYSTEM</h1>
+          <p class="text-xs text-slate-300 dark:text-slate-400">Pengambilan Uang Transport Kepulangan Maulid • Santri Pusat</p>
         </div>
-      </div>
-      <div class="flex items-center gap-2 bg-slate-900/60 border border-slate-700/60 px-4 py-2 rounded-xl text-xs text-slate-300">
-        <i class="fa-solid fa-shield-halved text-emerald-400"></i> Otorisasi: <span class="font-semibold text-white">ADMIN KEPULANGAN</span>
-      </div>
-    </div>
-
-    <!-- REKAPITULASI PENARIKAN TUNAI (TOTAL ALL-TIME SESI) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-gradient-to-br from-emerald-600 to-teal-800 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 opacity-10 text-white text-8xl">
-          <i class="fa-solid fa-money-bill-wave"></i>
-        </div>
-        <p class="text-emerald-100 text-xs font-medium uppercase tracking-wider mb-1">TOTAL CASH OUT REKAPITULASI</p>
-        <h2 id="rekapTotalNominal" class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Rp 0</h2>
-        <p class="text-emerald-200 text-xs mt-2 flex items-center gap-1">
-          <i class="fa-solid fa-circle-info"></i> Total dana tunai yang harus disediakan
-        </p>
       </div>
 
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-md flex flex-col justify-between">
-        <div>
-          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">TOTAL SANTRI TERCATAT</p>
-          <h3 id="rekapTotalSantri" class="text-2xl font-bold text-slate-100">0 Santri</h3>
+      <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+        <div class="flex items-center gap-2 bg-slate-900/60 dark:bg-slate-900/60 bg-black/40 border border-slate-700 dark:border-slate-700 border-yellow-400/50 px-3 py-1.5 rounded-xl text-xs">
+          <i class="fa-solid fa-shield-halved text-emerald-400 dark:text-emerald-400 text-yellow-300"></i> Admin: <span class="font-bold">ADMIN KEPULANGAN</span>
         </div>
-        <p class="text-xs text-slate-400 mt-2">Jumlah santri ditarik melalui sistem</p>
-      </div>
 
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-md flex flex-col justify-between">
-        <div>
-          <p class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">STATUS SERVER</p>
-          <div class="flex items-center gap-2 text-emerald-400 font-semibold text-sm mt-1">
-            <span class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></span> Google Sheet Connected
-          </div>
-        </div>
-        <button onclick="resetRekap()" class="text-xs text-slate-400 hover:text-rose-400 transition text-left flex items-center gap-1 mt-2">
-          <i class="fa-solid fa-rotate-left"></i> Reset Hitungan Sesi
+        <!-- SAKLAR MODE GELAP / TERANG -->
+        <button onclick="toggleTheme()" id="btnTheme" class="bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md">
+          <i id="themeIcon" class="fa-solid fa-sun text-amber-600"></i> <span id="themeText">Mode Terang</span>
         </button>
       </div>
     </div>
 
-    <!-- MAIN FORM & TRANSACTION TABLE -->
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl p-6 space-y-6">
-      
-      <!-- Input Controls -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+    <!-- STICKY ACTION BAR (TOMBOL PROSES DI ATAS KANAN - ZERO SCROLL) -->
+    <div class="sticky top-2 z-50 bg-slate-800/95 dark:bg-slate-800/95 bg-sky-900/95 border-2 border-slate-700 dark:border-slate-700 border-black rounded-2xl p-4 shadow-2xl backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-3">
+      <div class="flex items-center justify-between w-full md:w-auto gap-3 bg-slate-900 dark:bg-slate-900 bg-black px-4 py-2.5 rounded-xl border border-slate-700 dark:border-slate-700 border-yellow-400">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-400 text-yellow-400 uppercase tracking-wider">BATCH TOTAL:</span>
+        <span id="textBatchTotal" class="text-xl md:text-2xl font-black text-emerald-400 dark:text-emerald-400 text-yellow-300">Rp 0</span>
+      </div>
+
+      <button onclick="prosesSimpan()" id="btnSimpan" disabled class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-500 bg-red-600 hover:bg-red-500 text-slate-950 dark:text-slate-950 text-white font-black px-8 py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 border-2 border-transparent border-black">
+        <i class="fa-solid fa-bolt text-base"></i> PROSES PENARIKAN SEKARANG
+      </button>
+    </div>
+
+    <!-- REKAPITULASI PENARIKAN TUNAI -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="bg-gradient-to-br from-emerald-700 to-teal-900 dark:from-emerald-700 dark:to-teal-900 from-yellow-400 to-amber-500 text-white dark:text-white text-black rounded-2xl p-4 shadow-lg relative overflow-hidden border border-black/20">
+        <p class="text-emerald-100 dark:text-emerald-100 text-slate-900 text-xs font-bold uppercase tracking-wider mb-1">TOTAL CASH OUT REKAPITULASI</p>
+        <h2 id="rekapTotalNominal" class="text-2xl font-black tracking-tight">Rp 0</h2>
+        <p class="text-emerald-200 dark:text-emerald-200 text-slate-900 text-xs mt-1 flex items-center gap-1 font-medium">
+          <i class="fa-solid fa-circle-info"></i> Total dana tunai disiapkan
+        </p>
+      </div>
+
+      <div class="bg-slate-800 dark:bg-slate-800 bg-sky-800 border border-slate-700 dark:border-slate-700 border-black rounded-2xl p-4 shadow-md flex flex-col justify-between">
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">PILIH KOTA TUJUAN</label>
-          <select id="selectKota" onchange="loadDataSantriKota()" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm font-medium text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <p class="text-slate-400 dark:text-slate-400 text-yellow-300 text-xs font-bold uppercase tracking-wider mb-1">TOTAL SANTRI TERCATAT</p>
+          <h3 id="rekapTotalSantri" class="text-2xl font-black text-white">0 Santri</h3>
+        </div>
+        <p class="text-xs text-slate-400 dark:text-slate-400 text-slate-200 mt-1">Selesai ditarik lewat sistem</p>
+      </div>
+
+      <div class="bg-slate-800 dark:bg-slate-800 bg-sky-800 border border-slate-700 dark:border-slate-700 border-black rounded-2xl p-4 shadow-md flex flex-col justify-between">
+        <div>
+          <p class="text-slate-400 dark:text-slate-400 text-yellow-300 text-xs font-bold uppercase tracking-wider mb-1">STATUS SERVER</p>
+          <div class="flex items-center gap-2 text-emerald-400 dark:text-emerald-400 text-yellow-300 font-bold text-xs mt-1">
+            <span class="w-2.5 h-2.5 bg-emerald-400 dark:bg-emerald-400 bg-yellow-300 rounded-full animate-pulse"></span> Google Sheet Connected
+          </div>
+        </div>
+        <button onclick="resetRekap()" class="text-xs text-slate-400 dark:text-slate-400 text-red-300 hover:text-red-500 transition text-left flex items-center gap-1 mt-2 font-bold">
+          <i class="fa-solid fa-rotate-left"></i> Reset Sesi Hitungan
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN FORM & TABLE DATA -->
+    <div class="bg-slate-800 dark:bg-slate-800 bg-sky-800 border border-slate-700 dark:border-slate-700 border-black rounded-2xl shadow-xl p-4 md:p-5 space-y-4">
+      
+      <!-- Controls Input -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-900/50 dark:bg-slate-900/50 bg-sky-950 p-4 rounded-xl border border-slate-700 dark:border-slate-700 border-black">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 dark:text-slate-400 text-yellow-400 mb-1 uppercase">PILIH KOTA TUJUAN</label>
+          <select id="selectKota" onchange="loadDataSantriKota()" class="w-full bg-slate-800 dark:bg-slate-800 bg-white border border-slate-600 dark:border-slate-600 border-black rounded-xl p-2.5 text-sm font-bold text-white dark:text-white text-black focus:ring-2 focus:ring-yellow-400 focus:outline-none">
             <option value="">-- Memuat Kota... --</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1">SET NOMINAL PER SANTRI (RP)</label>
-          <input type="text" id="inputNominalKota" oninput="formatAndApplyBulkNominal(this)" placeholder="150.000" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-sm font-bold text-emerald-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <label class="block text-xs font-bold text-slate-400 dark:text-slate-400 text-yellow-400 mb-1 uppercase">SET NOMINAL PER SANTRI (RP)</label>
+          <input type="text" id="inputNominalKota" oninput="formatAndApplyBulkNominal(this)" placeholder="150.000" class="w-full bg-slate-800 dark:bg-slate-800 bg-white border border-slate-600 dark:border-slate-600 border-black rounded-xl p-2.5 text-sm font-black text-emerald-400 dark:text-emerald-400 text-black focus:ring-2 focus:ring-yellow-400 focus:outline-none">
         </div>
 
         <div class="flex items-end">
-          <button onclick="loadDataSantriKota()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold p-3 rounded-xl text-sm transition flex items-center justify-center gap-2 border border-slate-600">
+          <button onclick="loadDataSantriKota()" class="w-full bg-slate-700 dark:bg-slate-700 bg-yellow-400 hover:bg-yellow-300 text-white dark:text-white text-black font-extrabold p-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 border border-black">
             <i class="fa-solid fa-filter"></i> Muat Data Kota
           </button>
         </div>
       </div>
 
-      <!-- Tambah Santri Manual / Rombongan -->
-      <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-        <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">
+      <!-- Tambah Santri Manual -->
+      <div class="bg-amber-500/10 dark:bg-amber-500/10 bg-yellow-400/20 border border-amber-500/20 dark:border-amber-500/20 border-black rounded-xl p-3.5">
+        <label class="block text-xs font-black text-amber-400 dark:text-amber-400 text-yellow-300 uppercase tracking-wider mb-2">
           <i class="fa-solid fa-user-plus"></i> Tambah Manual Santri Luar Kota / Ikut Mobil
         </label>
         <div class="flex flex-col md:flex-row gap-2">
-          <input type="text" id="inputManualSearch" list="listAllSantri" placeholder="Ketik NIK atau Nama Santri..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+          <input type="text" id="inputManualSearch" list="listAllSantri" placeholder="Ketik NIK atau Nama Santri..." class="flex-1 bg-slate-900 dark:bg-slate-900 bg-white border border-slate-700 dark:border-slate-700 border-black rounded-xl p-2 text-sm text-white dark:text-white text-black font-bold focus:outline-none focus:ring-2 focus:ring-yellow-400">
           <datalist id="listAllSantri"></datalist>
-          <button onclick="addManualSantri()" class="bg-amber-600 hover:bg-amber-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1">
+          <button onclick="addManualSantri()" class="bg-amber-600 dark:bg-amber-600 bg-black hover:bg-slate-900 text-white font-extrabold px-5 py-2 rounded-xl text-sm transition flex items-center justify-center gap-1 border border-black">
             <i class="fa-solid fa-plus"></i> Tambahkan
           </button>
         </div>
       </div>
 
       <!-- Table Section -->
-      <div class="space-y-3">
+      <div class="space-y-2">
         <div class="flex justify-between items-center px-1">
-          <h3 class="font-bold text-slate-200 flex items-center gap-2 text-sm">
-            <i class="fa-solid fa-list-check text-emerald-400"></i> Rincian Santri Ditarik Uang (<span id="countSantri" class="text-emerald-400">0</span>)
+          <h3 class="font-bold text-slate-200 dark:text-slate-200 text-white flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-list-check text-emerald-400 dark:text-emerald-400 text-yellow-300"></i> Rincian Santri Ditarik Uang (<span id="countSantri" class="text-emerald-400 dark:text-emerald-400 text-yellow-300 font-extrabold">0</span>)
           </h3>
-          <span class="text-xs text-slate-400">Ceklis & Koreksi Nominal Sebelum Diproses</span>
+          <span class="text-xs text-slate-400 dark:text-slate-400 text-slate-200 font-medium">Koreksi nominal & hapus jika batal</span>
         </div>
 
-        <div class="overflow-x-auto border border-slate-700 rounded-xl bg-slate-900/30">
+        <div class="overflow-x-auto border border-slate-700 dark:border-slate-700 border-black rounded-xl bg-slate-900/30 dark:bg-slate-900/30 bg-sky-950">
           <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-slate-900/80 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+            <thead class="bg-slate-900/80 dark:bg-slate-900/80 bg-black text-slate-400 dark:text-slate-400 text-yellow-300 text-xs uppercase tracking-wider border-b border-slate-700 dark:border-slate-700 border-black">
               <tr>
-                <th class="p-3.5 w-12 text-center">No</th>
-                <th class="p-3.5 w-36">NIK</th>
-                <th class="p-3.5">Nama Lengkap</th>
-                <th class="p-3.5 w-32">Kota Asal</th>
-                <th class="p-3.5 w-48">Nominal Uang (Rp)</th>
-                <th class="p-3.5 w-16 text-center">Hapus</th>
+                <th class="p-3 w-12 text-center">No</th>
+                <th class="p-3 w-36">NIK</th>
+                <th class="p-3">Nama Lengkap</th>
+                <th class="p-3 w-32">Kota Asal</th>
+                <th class="p-3 w-48">Nominal Uang (Rp)</th>
+                <th class="p-3 w-16 text-center">Hapus</th>
               </tr>
             </thead>
-            <tbody id="tableBody" class="divide-y divide-slate-700/50">
+            <tbody id="tableBody" class="divide-y divide-slate-700/50 dark:divide-slate-700/50 divide-black">
               <tr>
-                <td colspan="6" class="p-8 text-center text-slate-500 italic">Silahkan pilih kota tujuan untuk menampilkan daftar santri.</td>
+                <td colspan="6" class="p-6 text-center text-slate-400 dark:text-slate-400 text-slate-200 italic font-medium">Silahkan pilih kota tujuan di atas.</td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-
-      <!-- Action Footer -->
-      <div class="pt-4 border-t border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="bg-slate-900 px-4 py-3 rounded-xl border border-slate-700 flex items-center gap-3">
-          <span class="text-xs text-slate-400 font-medium uppercase">Batch Total:</span>
-          <span id="textBatchTotal" class="text-xl font-bold text-emerald-400">Rp 0</span>
-        </div>
-
-        <button onclick="prosesSimpan()" id="btnSimpan" disabled class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-extrabold px-8 py-4 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
-          <i class="fa-solid fa-check-double text-base"></i> PROSES PENARIKAN SEKARANG
-        </button>
       </div>
 
     </div>
@@ -155,15 +165,44 @@
     let selectedSantriList = [];
     let allPpmuySantriCache = [];
 
-    // Rekap Sesi LocalStorage
     let sessionTotalNominal = parseInt(localStorage.getItem('rekap_nominal') || '0');
     let sessionTotalSantri = parseInt(localStorage.getItem('rekap_santri') || '0');
 
     window.onload = function() {
+      // Restore Theme Preference
+      const savedTheme = localStorage.getItem('appTheme') || 'light';
+      setTheme(savedTheme);
+
       updateRekapUI();
       fetchCities();
       fetchAllSantriForManual();
     };
+
+    // Toggle & Mode Terang / Gelap
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    }
+
+    function setTheme(theme) {
+      const body = document.getElementById('appBody');
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+        body.className = "bg-sky-600 text-slate-900 min-h-screen p-3 md:p-6 transition-colors duration-300";
+        icon.className = "fa-solid fa-moon text-slate-900";
+        text.innerText = "Mode Gelap";
+        localStorage.setItem('appTheme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        body.className = "bg-slate-900 text-slate-100 min-h-screen p-3 md:p-6 transition-colors duration-300";
+        icon.className = "fa-solid fa-sun text-amber-500";
+        text.innerText = "Mode Terang";
+        localStorage.setItem('appTheme', 'dark');
+      }
+    }
 
     function updateRekapUI() {
       document.getElementById('rekapTotalNominal').innerText = 'Rp ' + formatRibuan(sessionTotalNominal);
@@ -171,7 +210,7 @@
     }
 
     function resetRekap() {
-      if(confirm("Apakah Anda yakin ingin mereset hitungan total rekapitulasi sesi ini menjadi 0?")) {
+      if(confirm("Reset total rekapitulasi sesi ini menjadi Rp 0?")) {
         sessionTotalNominal = 0;
         sessionTotalSantri = 0;
         localStorage.setItem('rekap_nominal', '0');
@@ -237,7 +276,7 @@
       const rawNominalKota = document.getElementById("inputNominalKota").value;
       const nominalKota = unformatRibuan(rawNominalKota);
 
-      document.getElementById("tableBody").innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Memuat santri kota ${city}...</td></tr>`;
+      document.getElementById("tableBody").innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-300">Memuat data santri kota ${city}...</td></tr>`;
 
       fetch(`${SCRIPT_URL}?action=getSantriByCity&city=${encodeURIComponent(city)}`)
         .then(res => res.json())
@@ -268,7 +307,7 @@
       tbody.innerHTML = "";
 
       if (selectedSantriList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500 italic">Belum ada data santri dipilih.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-300 italic">Belum ada data santri dipilih.</td></tr>`;
         document.getElementById("btnSimpan").disabled = true;
         document.getElementById("countSantri").innerText = "0";
         document.getElementById("textBatchTotal").innerText = "Rp 0";
@@ -279,20 +318,20 @@
       selectedSantriList.forEach((s, idx) => {
         total += s.nominal;
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-800/60 transition text-slate-200">
-            <td class="p-3.5 text-center text-slate-500 font-medium">${idx + 1}</td>
-            <td class="p-3.5 font-mono text-xs text-slate-400">${s.nik}</td>
-            <td class="p-3.5 font-semibold text-white">${s.nama}</td>
-            <td class="p-3.5 text-slate-400 text-xs">${s.kota || '-'}</td>
-            <td class="p-3.5">
+          <tr class="hover:bg-slate-800/60 dark:hover:bg-slate-800/60 hover:bg-sky-900 transition text-slate-100 font-semibold">
+            <td class="p-3 text-center text-slate-400 dark:text-slate-400 text-yellow-300 font-extrabold">${idx + 1}</td>
+            <td class="p-3 font-mono text-xs text-slate-300 dark:text-slate-400 text-white">${s.nik}</td>
+            <td class="p-3 font-bold text-white">${s.nama}</td>
+            <td class="p-3 text-slate-300 dark:text-slate-400 text-slate-200 text-xs">${s.kota || '-'}</td>
+            <td class="p-3">
               <div class="relative">
-                <span class="absolute left-3 top-2.5 text-xs text-slate-500">Rp</span>
-                <input type="text" value="${formatRibuan(s.nominal)}" oninput="updateSantriNominal(${idx}, this)" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-xs font-bold text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                <span class="absolute left-3 top-2 text-xs text-slate-400 dark:text-slate-400 text-black font-bold">Rp</span>
+                <input type="text" value="${formatRibuan(s.nominal)}" oninput="updateSantriNominal(${idx}, this)" class="w-full bg-slate-900 dark:bg-slate-900 bg-white border border-slate-700 dark:border-slate-700 border-black rounded-lg pl-9 pr-3 py-1.5 text-xs font-black text-emerald-400 dark:text-emerald-400 text-black focus:outline-none focus:ring-1 focus:ring-yellow-400">
               </div>
             </td>
-            <td class="p-3.5 text-center">
-              <button onclick="removeSantri(${idx})" class="text-slate-500 hover:text-rose-400 transition p-1" title="Hapus dari daftar">
-                <i class="fa-solid fa-trash-can"></i>
+            <td class="p-3 text-center">
+              <button onclick="removeSantri(${idx})" class="bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-lg transition" title="Hapus dari daftar">
+                <i class="fa-solid fa-trash-can text-xs"></i>
               </button>
             </td>
           </tr>
@@ -369,14 +408,13 @@
       .then(res => res.json())
       .then(res => {
         if (res.status === "success") {
-          // Update Rekapitulasi Cash Out Sesi Ini
           sessionTotalNominal += res.totalAmount;
           sessionTotalSantri += res.insertedCount;
           localStorage.setItem('rekap_nominal', sessionTotalNominal.toString());
           localStorage.setItem('rekap_santri', sessionTotalSantri.toString());
           updateRekapUI();
 
-          alert(`TRANSAKSI BERHASIL!\n\n${res.insertedCount} Santri ditarik uangnya.\nTotal Tunai Diproses Batch Ini: Rp ${formatRibuan(res.totalAmount)}`);
+          alert(`TRANSAKSI BERHASIL!\n\n${res.insertedCount} Santri ditarik uangnya.\nTotal Batch Ini: Rp ${formatRibuan(res.totalAmount)}`);
           
           selectedSantriList = [];
           renderTable();
@@ -387,7 +425,7 @@
       .catch(err => alert("Terjadi kesalahan: " + err))
       .finally(() => {
         btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-check-double text-base"></i> PROSES PENARIKAN SEKARANG`;
+        btn.innerHTML = `<i class="fa-solid fa-bolt text-base"></i> PROSES PENARIKAN SEKARANG`;
       });
     }
   </script>
