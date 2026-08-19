@@ -116,13 +116,25 @@
 
     let masterData = {};
 
+    // Helper untuk menangani respon HTML error dari Google Apps Script
+    async function safeFetchJson(url) {
+      const res = await fetch(url);
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error("Respon server bukan JSON:", text);
+        if (text.includes("Authorization required") || text.includes("sign in")) {
+          throw new Error("Izin akses ditolak. Anda harus melakukan otorisasi (Langkah 1) pada Apps Script Anda.");
+        }
+        throw new Error("Gagal memproses data. Pastikan Web App sudah di-deploy ulang sebagai versi baru (New Version).");
+      }
+    }
+
     window.onload = async () => {
       showModal("Loading Data...", "Mengambil daftar kelas dari Google Sheet.");
       try {
-        const res = await fetch(`${GAS_API_URL}?action=get_initial_data`);
-        if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheet.");
-        const data = await res.json();
-        closeModal();
+        const data = await safeFetchJson(`${GAS_API_URL}?action=get_initial_data`);
 
         if (data.status === "success") {
           masterData = data;
@@ -135,11 +147,12 @@
             opt.innerText = k;
             kelasSelect.appendChild(opt);
           });
+          closeModal();
         } else {
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal menyambungkan ke Google Sheets. Detail: " + e.toString());
+        showModal("Error Koneksi", e.message);
       }
     };
 
@@ -179,8 +192,7 @@
       showModal("Memuat Santri...", "Mengambil data santri...");
 
       try {
-        const res = await fetch(`${GAS_API_URL}?action=get_santri_by_kelas&kelas=${encodeURIComponent(kelas)}&mapel=${encodeURIComponent(mapel)}`);
-        const data = await res.json();
+        const data = await safeFetchJson(`${GAS_API_URL}?action=get_santri_by_kelas&kelas=${encodeURIComponent(kelas)}&mapel=${encodeURIComponent(mapel)}`);
         closeModal();
 
         if (data.status === "success") {
@@ -190,7 +202,7 @@
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal memuat santri: " + e.toString());
+        showModal("Error Koneksi", e.message);
       }
     }
 
@@ -254,8 +266,7 @@
       showModal("Saving...", "Menyimpan nilai ke Google Sheet...");
 
       try {
-        const res = await fetch(`${GAS_API_URL}?action=save_nilai&data=${encodeURIComponent(JSON.stringify(payload))}`);
-        const data = await res.json();
+        const data = await safeFetchJson(`${GAS_API_URL}?action=save_nilai&data=${encodeURIComponent(JSON.stringify(payload))}`);
         
         if (data.status === "success") {
           showModal("Sukses! 🎉", "Nilai berhasil disimpan.");
@@ -264,7 +275,7 @@
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal menyimpan: " + e.toString());
+        showModal("Error Koneksi", e.message);
       }
     }
 
@@ -274,8 +285,7 @@
       showModal("Mencetak PDF...", "Membuat berkas PDF dari Google Doc...");
 
       try {
-        const res = await fetch(`${GAS_API_URL}?action=generate_pdf&nama=${encodeURIComponent(namaSantri)}&kelas=${encodeURIComponent(kelas)}`);
-        const data = await res.json();
+        const data = await safeFetchJson(`${GAS_API_URL}?action=generate_pdf&nama=${encodeURIComponent(namaSantri)}&kelas=${encodeURIComponent(kelas)}`);
 
         if (data.status === "success") {
           document.getElementById('modalTitle').innerText = "PDF Siap! 📄";
@@ -290,7 +300,7 @@
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal generate PDF: " + e.toString());
+        showModal("Error Koneksi", e.message);
       }
     }
 
@@ -304,8 +314,7 @@
       showModal("Mencetak Bulk ZIP...", "Membuat PDF seluruh santri di kelas ini dan mengompres ke ZIP. Proses ini membutuhkan waktu (1-2 menit)...");
 
       try {
-        const res = await fetch(`${GAS_API_URL}?action=generate_pdf_bulk&kelas=${encodeURIComponent(kelas)}`);
-        const data = await res.json();
+        const data = await safeFetchJson(`${GAS_API_URL}?action=generate_pdf_bulk&kelas=${encodeURIComponent(kelas)}`);
 
         if (data.status === "success") {
           document.getElementById('modalTitle').innerText = "ZIP Siap! 📦";
@@ -319,7 +328,7 @@
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal cetak satu kelas: " + e.toString());
+        showModal("Error Koneksi", e.message);
       }
     }
 
@@ -335,8 +344,7 @@
       updateProgress(5);
 
       try {
-        const initRes = await fetch(`${GAS_API_URL}?action=init_merge&kelas=${encodeURIComponent(kelas)}`);
-        const initData = await initRes.json();
+        const initData = await safeFetchJson(`${GAS_API_URL}?action=init_merge&kelas=${encodeURIComponent(kelas)}`);
 
         if (initData.status !== "success") {
           showModal("Error", initData.message);
@@ -358,10 +366,9 @@
           );
           updateProgress(currentProgress);
 
-          const appendRes = await fetch(
+          const appendData = await safeFetchJson(
             `${GAS_API_URL}?action=append_merge_batch&masterDocId=${encodeURIComponent(masterDocId)}&kelas=${encodeURIComponent(kelas)}&batch=${encodeURIComponent(JSON.stringify(batch))}`
           );
-          const appendData = await appendRes.json();
 
           if (appendData.status !== "success") {
             showModal("Error", "Gagal saat menempelkan data batch: " + appendData.message);
@@ -372,10 +379,9 @@
         showModal("Menggabungkan PDF...", "Tahap 3: Mengonversi berkas dokumen akhir ke PDF...");
         updateProgress(90);
 
-        const finalizeRes = await fetch(
+        const finalizeData = await safeFetchJson(
           `${GAS_API_URL}?action=finalize_merge&masterDocId=${encodeURIComponent(masterDocId)}&kelas=${encodeURIComponent(kelas)}`
         );
-        const finalizeData = await finalizeRes.json();
 
         if (finalizeData.status === "success") {
           updateProgress(100);
@@ -391,7 +397,7 @@
         }
 
       } catch (e) {
-        showModal("Error", "Gagal menyambungkan selama proses penggabungan. Detail: " + e.toString());
+        showModal("Error Koneksi", e.message);
       } finally {
         setTimeout(() => {
           document.getElementById('progContainer').classList.add('hidden');
