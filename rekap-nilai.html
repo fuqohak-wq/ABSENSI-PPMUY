@@ -324,7 +324,7 @@
     }
 
     // ==========================================
-    // INTEGRASI FRONTEND CHUNKED BATCH MERGE
+    // INTEGRASI FRONTEND CHUNKED BATCH MERGE (OPTIMASI BATCH SIZE = 12)
     // ==========================================
     async function generateMergedPdfRapor() {
       const kelas = document.getElementById('kelasSelect').value;
@@ -333,13 +333,11 @@
         return;
       }
 
-      // Menampilkan modal inisiasi
       showModal("Menggabungkan PDF...", "Tahap 1: Menyiapkan berkas master kosong di Google Drive...");
       document.getElementById('progContainer').classList.remove('hidden');
       updateProgress(5);
 
       try {
-        // Langkah 1: Inisiasi Master Doc Kosong
         const initRes = await fetch(`${GAS_API_URL}?action=init_merge&kelas=${encodeURIComponent(kelas)}`);
         const initData = await initRes.json();
 
@@ -352,8 +350,8 @@
         const listSantri = initData.listSantri;
         const totalSantri = listSantri.length;
 
-        // Langkah 2: Mencicil data santri dalam kelompok kecil (Batch berisi 5 santri)
-        const batchSize = 5;
+        // Peningkatan ukuran batch dari 5 ke 12 santri untuk memotong latensi komunikasi jaringan
+        const batchSize = 12;
         for (let i = 0; i < totalSantri; i += batchSize) {
           const batch = listSantri.slice(i, i + batchSize);
           const currentProgress = Math.min(Math.round(((i) / totalSantri) * 80) + 10, 85);
@@ -375,7 +373,6 @@
           }
         }
 
-        // Langkah 3: Finalisasi Konversi ke PDF
         showModal("Menggabungkan PDF...", "Tahap 3: Mengonversi berkas dokumen akhir ke PDF...");
         updateProgress(90);
 
