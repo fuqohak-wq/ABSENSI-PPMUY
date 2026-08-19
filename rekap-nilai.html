@@ -139,7 +139,7 @@
           showModal("Error", data.message);
         }
       } catch (e) {
-        showModal("Error", "Gagal menyambungkan ke Google Sheets. Pastikan Web App Script dideploy sebagai 'Anyone'. Detail: " + e.toString());
+        showModal("Error", "Gagal menyambungkan ke Google Sheets. Detail: " + e.toString());
       }
     };
 
@@ -323,9 +323,6 @@
       }
     }
 
-    // ==========================================
-    // INTEGRASI FRONTEND CHUNKED BATCH MERGE (OPTIMASI BATCH SIZE = 12)
-    // ==========================================
     async function generateMergedPdfRapor() {
       const kelas = document.getElementById('kelasSelect').value;
       if (!kelas) {
@@ -350,8 +347,7 @@
         const listSantri = initData.listSantri;
         const totalSantri = listSantri.length;
 
-        // Peningkatan ukuran batch dari 5 ke 12 santri untuk memotong latensi komunikasi jaringan
-        const batchSize = 12;
+        const batchSize = 5;
         for (let i = 0; i < totalSantri; i += batchSize) {
           const batch = listSantri.slice(i, i + batchSize);
           const currentProgress = Math.min(Math.round(((i) / totalSantri) * 80) + 10, 85);
@@ -391,7 +387,7 @@
           document.getElementById('docBtn').classList.add('hidden'); 
           document.getElementById('modalLinks').classList.remove('hidden');
         } else {
-          showModal("Error", finalizeData.message);
+          showModal("Gagal Membuat PDF Gabungan", finalizeData.message);
         }
 
       } catch (e) {
