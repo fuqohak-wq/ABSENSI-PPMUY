@@ -216,7 +216,6 @@
       }
 
       santriList.forEach((s, idx) => {
-        // Normalisasi kunci nama ke Uppercase untuk menghilangkan sensitivitas huruf besar/kecil
         const key = s.nama.trim().toUpperCase();
         const nilaiVal = existingNilai[key] !== undefined ? existingNilai[key] : '';
         const stat = statusKelengkapan[s.nama] || { terisi: 0, total: 0, isFull: false };
