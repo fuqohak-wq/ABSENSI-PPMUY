@@ -216,7 +216,8 @@
       }
 
       santriList.forEach((s, idx) => {
-        const nilaiVal = existingNilai[s.nama] !== undefined ? existingNilai[s.nama] : '';
+        const key = s.nama.trim();
+        const nilaiVal = existingNilai[key] !== undefined ? existingNilai[key] : '';
         const stat = statusKelengkapan[s.nama] || { terisi: 0, total: 0, isFull: false };
 
         const tr = document.createElement('tr');
