@@ -18,8 +18,53 @@
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      color: #333;
+      color: #2c3e50;
     }
+    
+    .filter-container {
+      max-width: 1200px;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-control {
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      background-color: #fff;
+    }
+    .filter-control:focus {
+      border-color: #007bff;
+    }
+    .btn-refresh {
+      padding: 8px 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-refresh:hover {
+      background-color: #218838;
+    }
+
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -31,7 +76,7 @@
       background-color: #ffffff;
       border-radius: 10px;
       padding: 15px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.08);
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       border-left: 5px solid #007bff;
@@ -45,12 +90,12 @@
     }
     .card .nama {
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
       color: #2c3e50;
       margin-bottom: 5px;
     }
-    .card .kelas {
-      font-size: 13px;
+    .card .kelas-gender {
+      font-size: 12px;
       color: #6c757d;
       margin-bottom: 12px;
     }
@@ -81,14 +126,41 @@
 <body>
 
   <h1>Presensi Kedatangan Santri</h1>
+
+  <div class="filter-container">
+    <div class="filter-group">
+      <input type="text" id="searchNama" class="filter-control" placeholder="Cari nama santri..." oninput="applyFilter()">
+
+      <select id="filterKelas" class="filter-control" onchange="applyFilter()">
+        <option value="">-- Semua Kelas --</option>
+      </select>
+
+      <select id="filterGender" class="filter-control" onchange="applyFilter()">
+        <option value="">-- Semua Gender --</option>
+        <option value="L">Laki-laki (L)</option>
+        <option value="P">Perempuan (P)</option>
+      </select>
+    </div>
+
+    <button class="btn-refresh" onclick="loadSantriData()">🔄 Muat Ulang Data</button>
+  </div>
+
   <div id="loading" class="loading">Memuat data santri...</div>
   <div class="grid-container" id="santriContainer"></div>
 
   <script>
-    // URL Google Apps Script milik Anda
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyl6D9exf7nhrFE_K7Jcmt2dNOn0_Dw0BKgauu627xBpibZHk-Z01wEnMjnlX4Kgt-8/exec";
 
+    let rawSantriData = [];
+
     async function loadSantriData() {
+      const container = document.getElementById("santriContainer");
+      const loading = document.getElementById("loading");
+      
+      loading.style.display = "block";
+      loading.innerText = "Memuat data santri...";
+      container.innerHTML = "";
+
       try {
         const response = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -96,42 +168,93 @@
         });
         const result = await response.json();
 
-        document.getElementById("loading").style.display = "none";
-        const container = document.getElementById("santriContainer");
-        container.innerHTML = "";
+        loading.style.display = "none";
 
         if (!result.data || result.data.length === 0) {
           container.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>Semua santri telah dicatat kedatangannya!</p>";
           return;
         }
 
-        result.data.forEach(santri => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.id = `santri-${santri.rowIndex}`;
-          card.onclick = () => tandaiHadir(santri.rowIndex, card);
-
-          card.innerHTML = `
-            <div>
-              <div class="nama">${santri.nama}</div>
-              <div class="kelas">${santri.kelas}</div>
-            </div>
-            <div class="info-badge">
-              <span class="telat">Telat: ${santri.jumlahTelat}</span>
-              <span class="denda">Denda: ${typeof santri.denda === 'number' ? 'Rp' + santri.denda.toLocaleString('id-ID') : santri.denda}</span>
-            </div>
-          `;
-          container.appendChild(card);
-        });
+        rawSantriData = result.data;
+        populateKelasDropdown(rawSantriData);
+        applyFilter();
 
       } catch (error) {
-        document.getElementById("loading").innerText = "Gagal memuat data. Pastikan Apps Script sudah di-deploy dengan akses 'Anyone'.";
+        loading.innerText = "Gagal memuat data. Periksa koneksi atau URL Apps Script Anda.";
         console.error(error);
       }
     }
 
+    function populateKelasDropdown(data) {
+      const filterKelas = document.getElementById("filterKelas");
+      const currentSelected = filterKelas.value;
+      
+      const kelasList = [...new Set(data.map(item => item.kelas))].sort();
+
+      filterKelas.innerHTML = '<option value="">-- Semua Kelas --</option>';
+      kelasList.forEach(kelas => {
+        const option = document.createElement("option");
+        option.value = kelas;
+        option.textContent = kelas;
+        if (kelas === currentSelected) option.selected = true;
+        filterKelas.appendChild(option);
+      });
+    }
+
+    function applyFilter() {
+      const searchNama = document.getElementById("searchNama").value.toLowerCase();
+      const filterKelas = document.getElementById("filterKelas").value;
+      const filterGender = document.getElementById("filterGender").value;
+
+      const filtered = rawSantriData.filter(santri => {
+        const matchNama = santri.nama.toLowerCase().includes(searchNama);
+        const matchKelas = filterKelas === "" || santri.kelas === filterKelas;
+        
+        let matchGender = true;
+        if (filterGender !== "") {
+          const g = santri.gender;
+          if (filterGender === "L") matchGender = g === "L" || g === "LAKI-LAKI" || g === "LAKI LAKI";
+          if (filterGender === "P") matchGender = g === "P" || g === "PEREMPUAN";
+        }
+
+        return matchNama && matchKelas && matchGender;
+      });
+
+      renderCards(filtered);
+    }
+
+    function renderCards(data) {
+      const container = document.getElementById("santriContainer");
+      container.innerHTML = "";
+
+      if (data.length === 0) {
+        container.innerHTML = "<p style='text-align:center; grid-column: 1/-1; color: #888;'>Tidak ada santri yang sesuai filter.</p>";
+        return;
+      }
+
+      data.forEach(santri => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = `santri-${santri.rowIndex}`;
+        card.onclick = () => tandaiHadir(santri.rowIndex, card);
+
+        const labelGender = santri.gender ? ` • ${santri.gender}` : '';
+
+        card.innerHTML = `
+          <div>
+            <div class="nama">${santri.nama}</div>
+            <div class="kelas-gender">${santri.kelas}${labelGender}</div>
+          </div>
+          <div class="info-badge">
+            <span class="telat">Telat: ${santri.jumlahTelat}</span>
+            <span class="denda">Denda: ${typeof santri.denda === 'number' ? 'Rp' + santri.denda.toLocaleString('id-ID') : santri.denda}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     async function tandaiHadir(rowIndex, cardElement) {
-      // Hilangkan kartu secara instan dari tampilan aplikasi
       cardElement.style.display = "none";
 
       try {
@@ -142,13 +265,14 @@
             rowIndex: rowIndex
           })
         });
+        
+        rawSantriData = rawSantriData.filter(item => item.rowIndex !== rowIndex);
       } catch (error) {
-        alert("Gagal memperbarui data di Google Sheets!");
-        cardElement.style.display = "flex"; // Kembalikan tampilan kartu jika ada error
+        alert("Gagal mengupdate timestamp di Google Sheets!");
+        cardElement.style.display = "flex";
       }
     }
 
-    // Panggil fungsi saat halaman dibuka
     loadSantriData();
   </script>
 </body>
