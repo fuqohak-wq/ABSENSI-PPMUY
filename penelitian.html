@@ -30,6 +30,24 @@
       </div>
     </div>
 
+    <!-- KOMPONEN BARU: JUMLAH & DAFTAR NAMA PENGISI ANGKET -->
+    <div class="p-6 bg-indigo-50/70 border-b border-indigo-100">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="p-2 bg-indigo-100 text-indigo-600 rounded-lg text-sm"><i class="fa-solid fa-users"></i></span>
+          <h3 class="font-bold text-gray-800">Responden Terdaftar: <span id="totalResponden" class="text-indigo-600">0</span> orang</h3>
+        </div>
+        <button type="button" onclick="loadResponden()" class="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+          <i class="fa-solid fa-rotate"></i> Muat Ulang
+        </button>
+      </div>
+
+      <!-- Badge daftar nama -->
+      <div id="namaRespondenContainer" class="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-1">
+        <span class="text-xs text-gray-400 animate-pulse">Memuat data responden...</span>
+      </div>
+    </div>
+
     <!-- Form Konten -->
     <form id="researchForm" class="p-8 space-y-8">
       
@@ -158,10 +176,10 @@
   </div>
 
   <script>
-    // MASUKKAN URL GOOGLE WEB APP SCRIPT ANDA DI SINI
+    // URL GOOGLE WEB APP SCRIPT
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEdvIxHE-nTAOG8XIVrmqHJrih5o6IoAQCkSfj9PHvHnG9Mq4KZ--KAMTWi71-R7Hc/exec";
 
-    // Kumpulan pertanyaan yang telah disesuaikan agar general (belajar/menghafal)
+    // Pertanyaan
     const questions = [
       "Keluarga saya sering memberi nasehat agar saya senantiasa menjaga kesehatan saya",
       "Kyai, Bu Nyai, atau Ustadzah menanyakan keadaan saya khususnya berkaitan tentang perkembangan hafalan saya",
@@ -206,7 +224,6 @@
       "Saya dapat melihat sisi humoris/positif dari sebuah masalah yang rumit"
     ];
 
-    // Koleksi ucapan semangat yang dinamis & tidak membosankan
     const positiveQuotes = [
       { text: "Pilihan yang mantap! Teruskan ya!", icon: "🚀", title: "Luar Biasa!" },
       { text: "Setiap langkah kecil membawamu lebih dekat pada tujuan.", icon: "🌱", title: "Keren!" },
@@ -218,7 +235,7 @@
       { text: "Hebat! Pertahankan fokusmu.", icon: "🎯", title: "Fokus!" }
     ];
 
-    // Render Pertanyaan Dinamis ke dalam HTML
+    // Render Pertanyaan Dinamis
     const container = document.getElementById('questionsContainer');
     questions.forEach((q, index) => {
       const qNum = index + 1;
@@ -235,8 +252,7 @@
               return `
                 <label class="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:bg-indigo-50/50 transition">
                   <input type="radio" name="q${qNum}" value="${val}" required class="mb-2 text-indigo-600 focus:ring-indigo-500" onchange="showToast()">
-                  <span class="text-xs font-bold text-gray-500 mb-1">${val}</span>
-                  ${label ? `<span class="text-[10px] text-gray-400 text-center leading-tight">${label}</span>` : ''}
+                  <span class="text-xs font-bold text-gray-500 mb-1">${val}</span>${label ? `<span class="text-[10px] text-gray-400 text-center leading-tight">${label}</span>` : ''}
                 </label>
               `;
             }).join('')}
@@ -246,7 +262,37 @@
       container.innerHTML += qHTML;
     });
 
-    // Menampilkan toast notifikasi acak
+    // FUNGSI BARU: Mengambil dan Menampilkan Responden dari Google Sheets
+    function loadResponden() {
+      const totalEl = document.getElementById('totalResponden');
+      const containerEl = document.getElementById('namaRespondenContainer');
+
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          totalEl.innerText = data.total || 0;
+          containerEl.innerHTML = '';
+
+          if (data.names && data.names.length > 0) {
+            data.names.forEach(name => {
+              const badge = document.createElement('span');
+              badge.className = 'bg-white text-indigo-700 text-xs font-medium px-3 py-1 rounded-full border border-indigo-200 shadow-sm flex items-center gap-1';
+              badge.innerHTML = `<i class="fa-solid fa-user-check text-[10px] text-green-500"></i> ${name}`;
+              containerEl.appendChild(badge);
+            });
+          } else {
+            containerEl.innerHTML = '<span class="text-xs text-gray-400 italic">Belum ada responden. Jadilah yang pertama!</span>';
+          }
+        })
+        .catch(err => {
+          console.error("Gagal memuat responden:", err);
+          containerEl.innerHTML = '<span class="text-xs text-red-400">Gagal memuat data responden.</span>';
+        });
+    }
+
+    // Jalankan pengambilan data responden pertama kali saat halaman dibuka
+    document.addEventListener("DOMContentLoaded", loadResponden);
+
     function showToast() {
       const randomQuote = positiveQuotes[Math.floor(Math.random() * positiveQuotes.length)];
       document.getElementById('toastIcon').innerText = randomQuote.icon;
@@ -262,9 +308,8 @@
       updateProgress();
     }
 
-    // Update Progress Bar
     function updateProgress() {
-      const totalRequired = questions.length + 4; // 41 pertanyaan + 4 input profil
+      const totalRequired = questions.length + 4;
       let answered = 0;
       
       if (document.getElementById('email').value) answered++;
@@ -281,10 +326,8 @@
       document.getElementById('progressBar').style.width = `${Math.max(5, percentage)}%`;
     }
 
-    // Navigasi Langkah (Steps)
     function nextStep(step) {
       if (step === 2) {
-        // Validasi input di Step 1
         const email = document.getElementById('email').checkValidity();
         const nama = document.getElementById('nama').checkValidity();
         const usia = document.querySelector('input[name="usia"]:checked');
@@ -309,7 +352,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Mengirim Form Data ke Apps Script
+    // Mengirim Form Data
     document.getElementById('researchForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -331,15 +374,17 @@
 
       fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors', // Untuk bypass masalah CORS Apps Script
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
       .then(() => {
-        // Menampilkan Modal Sukses
         document.getElementById('successModal').classList.remove('hidden');
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Kirim Jawaban <i class="fa-solid fa-paper-plane ml-2"></i>`;
+        
+        // Memuat ulang daftar nama & jumlah setelah submit
+        loadResponden();
       })
       .catch(err => {
         console.error(err);
@@ -349,7 +394,6 @@
       });
     });
 
-    // Reset Form untuk Pengisian Baru (Supaya satu browser bisa isi berkali-kali)
     function resetForm() {
       document.getElementById('researchForm').reset();
       document.getElementById('successModal').classList.add('hidden');
